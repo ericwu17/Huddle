@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Link, Outlet, useLoaderData, useNavigate } from "react-router";
+import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
 import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
 import type { Session } from "../session";
 import type { GroupStatus } from "../types";
@@ -20,20 +20,29 @@ const STEP_FOR_STATUS: Record<GroupStatus, string> = {
 export default function GroupLayout() {
   const session = useLoaderData() as Session;
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const group = useGroupState();
   const mine = useMyPrivate();
   const booking = useLatestBooking();
 
-  // Follow the group to the next step whenever its status changes. The nav
-  // still lets testers jump to any screen.
+  // Follow the group to the next step whenever its status changes, but only the
+  // first time each run reaches a status, so a repeated or flapping update never
+  // drags anyone back. The nav still lets testers jump to any screen.
   const lastStatus = useRef<GroupStatus | null>(null);
+  const followed = useRef(new Set<string>());
   useEffect(() => {
     if (!group || group.id !== session.groupId || group.status === lastStatus.current) return;
     lastStatus.current = group.status;
+    const key = `${group.latestRunId}:${group.status}`;
+    if (followed.current.has(key)) return;
+    followed.current.add(key);
+    // The vote opens as the council finishes; stay on Plans so the debate can
+    // be read. Plans has its own "Go vote" button.
+    if (group.status === "voting" && pathname.endsWith("/plans")) return;
     let step = STEP_FOR_STATUS[group.status];
     if (group.status === "eliciting" && mine?.text) step = "swipe";
     navigate(`/g/${session.groupId}/${step}`);
-  }, [group, mine, navigate, session.groupId]);
+  }, [group, mine, navigate, pathname, session.groupId]);
 
   // Status only becomes "booked" once the call is confirmed, so follow a new
   // booking too: every phone watches the call live.

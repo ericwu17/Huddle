@@ -58,7 +58,7 @@ export default function Plans() {
         />
       ))}
       <Link className="btn btn-primary block text-center" to={`/g/${session.groupId}/vote`}>
-        Go vote
+        {group.status === "voting" ? "Voting is open · Go vote" : "Go vote"}
       </Link>
       <CouncilPanel runId={runId} plans={plans} council={planRun.council} />
       <section className="card space-y-2">

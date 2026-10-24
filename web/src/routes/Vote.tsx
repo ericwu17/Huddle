@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useProcedure, useReducer } from "spacetimedb/react";
 import { procedures, reducers } from "../module_bindings";
 import { usePlanRun, useScout, useVotes } from "../data";
@@ -51,6 +51,9 @@ export default function Vote() {
           <p>{council.rationale}</p>
         </div>
       )}
+      <Link className="block text-sm underline" to={`/g/${session.groupId}/plans`}>
+        Read the council's debate
+      </Link>
 
       {plans.map((p) => (
         <div key={p.id} className="space-y-1">
