@@ -1,0 +1,74 @@
+{
+  "//": "Seeded demo group (build-brief S1). Origins are approximate Berkeley spots. Disclosed in docs/HONESTY.md.",
+  "date": "2026-10-24",
+  "window": {
+    "start": "17:00",
+    "end": "23:00"
+  },
+  "members": [
+    {
+      "name": "Alex",
+      "text": "vegetarian, under $30, somewhere quiet",
+      "origin": {
+        "lat": 37.8719,
+        "lng": -122.2585
+      },
+      "hard": {
+        "vetoCuisines": [],
+        "vetoCategories": [],
+        "budgetMaxPerPerson": 30,
+        "dietary": [
+          "vegetarian"
+        ],
+        "maxTravelMinutes": null
+      }
+    },
+    {
+      "name": "Sam",
+      "text": "no sushi, I love trying new places",
+      "origin": {
+        "lat": 37.8676,
+        "lng": -122.2551
+      },
+      "hard": {
+        "vetoCuisines": [
+          "asian"
+        ],
+        "vetoCategories": [],
+        "budgetMaxPerPerson": null,
+        "dietary": [],
+        "maxTravelMinutes": null
+      }
+    },
+    {
+      "name": "Jordan",
+      "text": "broke this month, nothing over $20, outdoors if possible",
+      "origin": {
+        "lat": 37.865,
+        "lng": -122.268
+      },
+      "hard": {
+        "vetoCuisines": [],
+        "vetoCategories": [],
+        "budgetMaxPerPerson": 20,
+        "dietary": [],
+        "maxTravelMinutes": null
+      }
+    },
+    {
+      "name": "Riley",
+      "text": "romantic vibe, I don't care about price",
+      "origin": {
+        "lat": 37.879,
+        "lng": -122.27
+      },
+      "hard": {
+        "vetoCuisines": [],
+        "vetoCategories": [],
+        "budgetMaxPerPerson": null,
+        "dietary": [],
+        "maxTravelMinutes": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+[
+  {"placeId": "pf_01", "openNow": true, "vegetarianOptions": true, "checkedAt": 1761350000000, "source": "fake", "cached": true},
+  {"placeId": "pf_02", "openNow": true, "vegetarianOptions": true, "checkedAt": 1761350000000, "source": "fake", "cached": true},
+  {"placeId": "pf_03", "openNow": true, "vegetarianOptions": true, "checkedAt": 1761350000000, "source": "fake", "cached": true},
+  {"placeId": "pf_04", "openNow": true, "vegetarianOptions": null, "checkedAt": 1761350000000, "source": "fake", "cached": true}
+]
