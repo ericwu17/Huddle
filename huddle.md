@@ -28,7 +28,7 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 | Role | Owner |
 | --- | --- |
 | A, data + routing + glue | Haydn |
-| B, Convex + submission | Eric Chen |
+| B, SpacetimeDB + submission | Eric Chen |
 | C, solver + council | Max |
 | D, voice | Eric Wu |
 
@@ -37,7 +37,7 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 - Eric Chen is unavailable roughly H9 to H15 (Sat 6 AM to noon). Haydn is awake from H9 and covers that gap.
 - Max misses a short stretch tonight. If he isn't there at kickoff, Eric Wu writes the stub solver.
 - Sleep shifts stay as in the playbook: A+C H5-9; B+D H9-13; A+D H26-30; B+C H30-34. At least two awake at all times, hand-off note before sleeping.
-- Council logic (prompts, tools, validator) lives in Max's solver service. Convex only stores the messages.
+- Council logic (prompts, tools, validator) lives in Max's solver service. The SpacetimeDB module only stores the messages.
 
 ---
 
@@ -46,11 +46,11 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 | Who | Do |
 | --- | --- |
 | Haydn | Mapbox token. Bright Data account. Read the council-and-math file. |
-| Eric Chen | Convex, Google Places, Vultr accounts and keys. Ask the Bright Data booth the four questions in the council-and-math file. |
+| Eric Chen | SpacetimeDB, Google Places, Vultr accounts and keys. Ask the Bright Data booth the four questions in the council-and-math file. |
 | Max | Claude API key. Decide the stub /plan shape from the contract. |
 | Eric Wu | Upgrade Twilio and buy a number. Cartesia account. Ask Cartesia about Cantonese speech. |
 
-**Booths:** Meta: Haydn. Cartesia: Eric Wu. Bright Data and Convex: Eric Chen. Microsoft, Fetch.ai: Max. Everyone asks: "What does a winning project look like, and is there an extra form or post at submission?"
+**Booths:** Meta: Haydn. Cartesia: Eric Wu. Bright Data: Eric Chen. Microsoft, Fetch.ai: Max. Everyone asks: "What does a winning project look like, and is there an extra form or post at submission?"
 
 ---
 
@@ -59,28 +59,28 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 | Phase | Deliverable |
 | --- | --- |
 | H0-H2 | Check the contract works across all four services with stubs. Own the end-to-end smoke-test script. |
-| H2-H5 | Bare-bones UI, timeboxed to 3 hours: join, wants, swipe, plan list with basic map pins, vote. Default shadcn styling, no polish. Fake data first, then live Convex. |
+| H2-H5 | Bare-bones UI, timeboxed to 3 hours: join, wants, swipe, plan list with basic map pins, vote. Default shadcn styling, no polish. Fake data first, then the live SpacetimeDB module. |
 | H5-H9 | Sleep. Hand-off note first. |
 | H9-H13 | Read Eric Chen's hand-off note. Bright Data review pull for the 45 places. Aspect extraction with Claude (evidence spans, 13-feature order from the brief). Result: places.json v2 with review scores. |
-| H13 | Switch the UI from stubs to live Convex. |
+| H13 | Switch the UI from stubs to the live SpacetimeDB module. |
 | H13-H15 | Cover anything Eric Chen left half-done. |
 | H15-H19 (L2) | Mapbox route geometry and leg-time actions with caching (display and warnings only), plus the replan action. Run the smoke test every 2 hours and fix what breaks. |
 | H19-H24 (L3) | Polished screens, pass 1: confidence ring, Safe/Bold/Budget plan cards with the scout badge, vote screen with the council's pick highlighted, Consensus Map scatter and slider, trade-offer card, re-plan banner. Freeze at H24. |
 | H24-H34 | Demo video and pitch lead (with Eric Wu). Project image. Rehearsal. |
 
 **Cut first:** Consensus Map slider polish, then Mapbox isochrone, then review scoring (use star ratings).
-**Depends on:** Eric Chen's Convex (stubbed by H2), Max's plan shape, places.json v1 at H8.
+**Depends on:** Eric Chen's SpacetimeDB module (stubbed by H2), Max's plan shape, places.json v1 at H8.
 
-## B. Eric Chen: Convex and submission
+## B. Eric Chen: SpacetimeDB and submission
 
 | Phase | Deliverable |
 | --- | --- |
-| H0-H2 | Convex project, schema, createGroup / joinGroup / groupState returning fake data. |
-| H2-H8 | Every mutation, query and action in section S5.5 of the build brief. callApi helper. POST /callEvent. New: councilMessages table and POST /councilMessage. data/places.json v1 from Google Places (coordinates, price, hours, phone) for about 45 Berkeley places. |
+| H0-H2 | SpacetimeDB module, schema, create_group / join_group / my_group returning fake data. |
+| H2-H8 | Every table, view, reducer and job in section S5.5 of the build brief. callApi helper. POST /call-event. New: council_message table and POST /council-message. data/places.json v1 from Google Places (coordinates, price, hours, phone) for about 45 Berkeley places. |
 | H8 | Hand-off note: what's done, half-done, where the files are. Then sleep. |
 | H9-H15 | Away. Nothing critical owed. |
 | H15-H19 (L2) | runPlan, runOffers, acceptOffer end to end against Max's real solver. Health pings and demo-mode switch. |
-| H19-H24 (L3) | runScout (Bright Data live check on each plan's restaurant, cached fallback) and runCouncil, then the council panel UI (advocates stream in from councilMessages, chair's pick at the end). Test the re-plan loop with Eric Wu. |
+| H19-H24 (L3) | runScout (Bright Data live check on each plan's restaurant, cached fallback) and runCouncil, then the council panel UI (advocates stream in from the council messages, chair's pick at the end). Test the re-plan loop with Eric Wu. |
 | H19-H34 | Experiment harness on simulated groups (fairness method vs simple average, council vs solver agreement). Slide numbers, labeled as simulated. |
 | H24-H34 | Devpost writeup, README, repo cleanup, honesty list, submission checklist. Eric Chen owns submission. |
 
@@ -94,7 +94,7 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 | H0-H2 | FastAPI stubs for every endpoint in the contract. If Max is away, Eric Wu writes these. |
 | H2-H13 (L1) | Real /parse-prefs, the 13-feature vector, the taste update (Laplace approximation), next-swipe selection, plan enumeration with per-person ratios, and a plain "protect the worst-off" pick. |
 | H13-H19 (L2) | Robustness replay (300 draws, tau = 0.6), Safe/Bold/Budget plans, Pareto data for the Consensus Map, confidence for the ring. |
-| H19-H24 (L3) | Trade offers (/offers). Council: each role a plain function behind one llm_call adapter; advocate prompts and tools (my_score, my_dealbreakers, my_slack), chair prompt, validator (pick inside the acceptable set, cited numbers match, else fall back to Safe), each message posted to /councilMessage. Roulette among the top plans on ties. |
+| H19-H24 (L3) | Trade offers (/offers). Council: each role a plain function behind one llm_call adapter; advocate prompts and tools (my_score, my_dealbreakers, my_slack), chair prompt, validator (pick inside the acceptable set, cited numbers match, else fall back to Safe), each message posted to /council-message. Roulette among the top plans on ties. |
 | H24-H34 | Help Eric Wu make the call reliable. Help Eric Chen with experiment numbers. |
 
 **Cut first:** council (keep trade offers), then Bold plan.
@@ -104,7 +104,7 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 
 | Phase | Deliverable |
 | --- | --- |
-| H0-H2 | POST /book stub that posts a fake call sequence to /callEvent. |
+| H0-H2 | POST /book stub that posts a fake call sequence to /call-event. |
 | H2-H13 (L1) | Twilio number dials the demo phone only. Pipecat loop: Twilio media stream, speech-to-text, Claude, Cartesia voice. Agent opens in Mandarin and states it is an AI. |
 | H13-H19 (L2) | Real booking conversation: ask for a table, handle a counter-offer slot, confirm. Understands Cantonese. Latency target about 1.5 s per turn. Transcript events streamed. |
 | H19-H24 (L3) | Fallback decision at the H19 gate: if S1-S3 aren't passing 9 of 10, record a labeled call and play that. "Full" scenario posts a failure with a reason so the re-plan loop can be tested. Call screen UI (live transcript, status stepper, confirmation card). Guidelines in place: says it's an AI, dials only the demo number, only confirms agreed details. Optional extras only if ahead and only before the freeze, in order: language lock, English translation line, latency display, a distinct voice per advocate. |
@@ -137,9 +137,9 @@ The re-plan loop ties the caller back to the solver: a "full" result excludes th
 
 ## Cross-person hand-offs
 
-- **H2:** all stubs live (Convex queries, FastAPI endpoints, voice /book).
+- **H2:** all stubs live (SpacetimeDB views and reducers, FastAPI endpoints, voice /book).
 - **H8:** places.json v1 and Eric Chen's hand-off note.
-- **H13:** Haydn switches the UI to live Convex; Max's real /plan replaces the stub.
+- **H13:** Haydn switches the UI to the live SpacetimeDB module; Max's real /plan replaces the stub.
 - **H19:** gate check, cut decisions, council go or no-go.
 - **H24:** freeze.
 

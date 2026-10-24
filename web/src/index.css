@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Bare-bones rough draft. Real design tokens come with the polish pass (A6). */
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #fff;
+  color: #111;
+}
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.btn {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #fff;
+}
+.btn:disabled {
+  opacity: 0.5;
+}
+.btn-primary {
+  background: #111;
+  color: #fff;
+}
+
+.input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #999;
+  border-radius: 8px;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.error {
+  color: #b00020;
+  font-size: 0.875rem;
+}
+
+.muted {
+  color: #666;
+  font-size: 0.875rem;
+}
