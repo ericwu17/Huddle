@@ -31,7 +31,7 @@ function PlaceCard({
           <span className="display block text-[28px] text-[var(--cobalt)]">{place.name}</span>
           <span className="flex flex-wrap gap-1.5">
             <span className="sticker">{place.category}</span>
-            {place.cuisine && <span className="sticker">{place.cuisine}</span>}
+            {(place.label || place.cuisine) && <span className="sticker">{place.label || place.cuisine}</span>}
             <span className="sticker sticker-lime">${place.costPerPerson}/person</span>
             <span className="sticker sticker-sun">
               ★ {place.rating} ({place.reviewCount})

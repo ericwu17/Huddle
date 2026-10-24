@@ -39,6 +39,7 @@ export type Place = {
   reviewCount: number;
   googlePlaceId?: string;
   sources?: string[];
+  label?: string | null;
 };
 
 export type Hard = {

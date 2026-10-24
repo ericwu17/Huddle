@@ -125,6 +125,7 @@ class Place(Origin):
     rating: Annotated[Number, Field(ge=0, le=5)]
     sources: list[str]
     googlePlaceId: str | None = None  # data/places.json carries it; not used by the solver
+    label: Annotated[str, Field(max_length=100)] | None = None  # listed type ("Pizza restaurant"), display only
 
     @model_validator(mode="after")
     def complete(self):

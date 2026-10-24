@@ -200,7 +200,8 @@ def public_facts(catalog: Catalog, plan: AgentPlan) -> dict[str, str]:
         "sequence": " → ".join(s.name for s in plan.stops) + ".",
         "travel": ("This is one venue; there is no travel between stops." if len(plan.stops) == 1
                    else f"Estimated {plan.travelMinutes:g} minutes traveling between stops."),
-        "cuisine": f"The meal venue's catalog cuisine is {place.cuisine.replace('_', ' ')}.",
+        "cuisine": (f'The meal venue is listed as "{place.label}".' if place.label
+                    else f"The meal venue's catalog cuisine is {place.cuisine.replace('_', ' ')}."),
     }
     facts["dietary"] = ("The meal venue lists " + ", ".join(x.replace("_", " ") for x in place.dietary) + " options."
                         if place.dietary else "The meal venue has no dietary options listed in this catalog.")
@@ -327,7 +328,7 @@ async def coordinate(llm: LLM, catalog: Catalog, body: AgentPlanRequest) -> Agen
         "ratingFreshness": "Cached catalog observations; not verified live.",
         "catalogVersion": body.catalog.version if body.catalog is not None else "bundled",
         "venues": {venue.id: {"name": venue.name, "category": venue.category, "cuisine": venue.cuisine,
-                              "dietary": venue.dietary, "costPerPerson": venue.costPerPerson,
+                              "listedAs": venue.label, "dietary": venue.dietary, "costPerPerson": venue.costPerPerson,
                               "rating": (observed.rating if (observed := rating_observation(catalog.evidence.get(venue.id)))
                                          else venue.rating if venue.reviewCount else None),
                               "reviewCount": observed.reviewCount if observed else venue.reviewCount, "sources": venue.sources,
@@ -354,6 +355,8 @@ shared seating is an alternative only with supplied evidence for both takeout an
 All supplied itineraries passed code checks; never invent an ID, venue, price or confidence score.
 Return ONLY exact candidateId values and reasonIds from reasonTypes. Venues are deduplicated by
 placeId; join each candidate's stops to venues for names, cuisine, dietary support and cached ratings.
+A venue's cuisine is a coarse family (pizza and Italian count as mediterranean); listedAs, when
+present, is the venue's own listed type and the better guide to what it serves.
 Reason IDs select code-rendered factual sentences for the UI. The rating reason ID is 'ratings'.
 No raw prompts, private caps, names, private explanation or hidden reasoning may be returned.
 Review aspects (quiet/romantic/outdoors/etc) are NOT verified: never claim a match from placeholder scores.
