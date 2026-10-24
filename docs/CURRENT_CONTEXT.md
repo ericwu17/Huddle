@@ -12,6 +12,13 @@ defaults approved by Max and now implemented. See the additive
 [coordinator contract](AGENT_CONTRACT.md), [runbook](AGENT_RUNBOOK.md) and
 [verification record](AGENT_VERIFICATION.md) for the shipped behavior and checks.
 
+**Planned follow-up, not implemented:** Max wants Claude to construct and revise
+itineraries, with Python validating hard constraints and factual consistency
+instead of enumerating complete candidate plans. Eric Wu is currently building
+Bright Data → SpacetimeDB ingestion. Review his schema/read path, agree a versioned
+venue snapshot contract and prove newly scraped records reach the planner before
+the deferred agent rewrite. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+
 ## Goal
 
 Huddle helps a group turn everyone's individual prompts into an outing they can

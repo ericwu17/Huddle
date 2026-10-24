@@ -5,6 +5,11 @@ Implemented from the approved [agent flow](AGENT_FLOW_PLAN.md), October 24,
 endpoints, tables and legacy huddles remain compatible. Never encode agent
 results as fake posteriors, robustness or utility ratios.
 
+The [propose/validate/revise follow-up](CLAUDE_PLANNER_FOLLOWUP.md) is planned,
+not part of this implemented wire contract. Venue snapshots, catalog versions,
+structured validation feedback and compromise states require a coordinated API,
+module and UI contract update after reviewing Eric Wu's ingestion schema.
+
 ## FastAPI
 
 Both endpoints require the existing `X-Huddle-Secret` and use the configured

@@ -5,6 +5,11 @@ Approved by Max and implemented October 24, 2026, after syncing main through
 [contract](AGENT_CONTRACT.md), [runbook](AGENT_RUNBOOK.md) and
 [verification](AGENT_VERIFICATION.md) describe the resulting implementation.
 
+Max's subsequent [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) plans
+Claude-built itineraries and bounded revision from Python validation feedback,
+using Eric Wu's SpacetimeDB venue catalog. That work is deferred. The body below
+records the current first version, where Python enumerates candidate itineraries.
+
 ## Agreed operating setup
 
 Keep the current setup: Vercel frontend, SpacetimeDB Maincloud and FastAPI on one

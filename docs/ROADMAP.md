@@ -30,8 +30,12 @@ define the next implementation phase.
   current votes/roulette/bookings, and separate desktop/mobile browser identities.
 - [x] Publish the additive module to `huddle-calhacks` without a data reset;
   preserve existing secrets and point its API URL at Max's current tunnel.
-- [ ] Release the updated frontend to Vercel. Local Vite already creates agent
-  groups; existing deployed clients retain the legacy flow until released.
+- [x] Release the updated frontend to Vercel: main `57e1656` was pushed and
+  Vercel reported deployment completed. Use a new huddle for coordinator mode.
+- [ ] Review Eric Wu's Bright Data → SpacetimeDB ingestion handoff and connect
+  its versioned venue snapshot to FastAPI and module validation.
+- [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
+  constraints and factual consistency. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 - [ ] Rehearse with physical phones; browser mobile emulation is not that test.
 - [ ] Consider removing legacy endpoints only after teammate review; they remain
   compatible for existing groups and older frontend clients.
