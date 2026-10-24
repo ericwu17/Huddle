@@ -7,11 +7,15 @@ const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const rand = (a, b) => a + Math.random() * (b - a);
-const root = document.documentElement;
 document.body.insertAdjacentHTML("afterbegin", filterDefs);
-// Phones and reduced motion get still lines: the full-screen jitter is the costly part.
-if (reduce || innerWidth < 760) document.querySelectorAll("#boilBig animate").forEach((a) => a.remove());
-$("#world").innerHTML = world();
+// The background is three planes (sky, far hills, near hills) that slide at different speeds.
+// Each plane is drawn twice with a different wobble and the page flips between the two copies;
+// they are cached as images, so neither the flicker nor the scrolling redraws any SVG.
+// Phones and reduced motion get a single still copy.
+const still = reduce || innerWidth < 760;
+const PLANES = [["back", ["sky", "sun", "clouds"]], ["mid", ["far", "mid"]], ["front", ["near"]]];
+$("#world").innerHTML = PLANES.map(([name, only]) => `<div class="plane plane-${name}"><div class="frame">${world({ only })}</div>${still ? "" : `<div class="frame frame-b">${world({ only, wobble: "wobB" })}</div>`}</div>`).join("");
+const planes = $$("#world .plane");
 $$(".card-world").forEach((el, i) => { el.innerHTML = world({ sun: i !== 2 }); });
 
 // ---- The cast ---------------------------------------------------------------
@@ -31,27 +35,34 @@ const EXTRAS = [
 $("#navFig").innerHTML = figure({ hair: "curly", face: "grin", scarf: "#ff5fb4" });
 $("#cardCast").innerHTML = FRIENDS.map((f) => `<div class="dancer">${figure(f)}</div>`).join("");
 
-// ---- Scroll: hero progress drives the card and headline ---------------------
-const hero = $("#hero");
+// ---- Scroll: everything that depends on scroll position, measured once per frame --
+// Hero progress drives the card and headline; the call section's progress plays the call;
+// the section in the middle of the screen decides what the walkers act out.
+const hero = $("#hero"), callWrap = $("#call"), callCard = $("#callCard");
+const ACTS = [["#private", "private"], ["#argue", "argue"], ["#call", "call"], ["#start", "huddle"]].map(([s, n]) => [$(s), n]);
+let act = "wander", queued = false;
 function onScroll() {
+  queued = false;
   const r = hero.getBoundingClientRect();
   const p = clamp(-r.top / (hero.offsetHeight - innerHeight));
-  root.style.setProperty("--p", clamp(p / 0.5).toFixed(4));
-  root.style.setProperty("--h", clamp((p - 0.2) / 0.4).toFixed(4));
-  root.style.setProperty("--sp", clamp(scrollY / (document.body.scrollHeight - innerHeight)).toFixed(4));
+  hero.style.setProperty("--p", clamp(p / 0.5).toFixed(4));
+  hero.style.setProperty("--h", clamp((p - 0.2) / 0.4).toFixed(4));
+
+  const sp = clamp(scrollY / (document.documentElement.scrollHeight - innerHeight));
+  [260, 30, 70].forEach((d, i) => { planes[i].style.transform = `translate3d(0, ${(-sp * d).toFixed(1)}px, 0)`; });
+
+  const c = callWrap.getBoundingClientRect();
+  const q = clamp(-c.top / (c.height - innerHeight));
+  callCard.dataset.step = q < 0.08 ? 0 : q < 0.28 ? 1 : q < 0.48 ? 2 : q < 0.66 ? 3 : 4;
+
+  const mid = innerHeight * 0.5;
+  act = "wander";
+  for (const [el, name] of ACTS) { const b = el.getBoundingClientRect(); if (b.top < mid && b.bottom > mid * 0.4) act = name; }
+  document.body.dataset.act = act;
 }
-addEventListener("scroll", () => requestAnimationFrame(onScroll), { passive: true });
+addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(onScroll); } }, { passive: true });
 addEventListener("resize", onScroll);
 onScroll();
-
-// Which part of the story the walkers act out, by the section in the middle of the screen.
-const ACTS = [["#private", "private"], ["#argue", "argue"], ["#call", "call"], ["#start", "huddle"]];
-function currentAct() {
-  const mid = innerHeight * 0.5;
-  let act = "wander";
-  for (const [sel, name] of ACTS) { const r = $(sel).getBoundingClientRect(); if (r.top < mid && r.bottom > mid * 0.4) act = name; }
-  return act;
-}
 
 // ---- Entrances ----------------------------------------------------------------
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.2 });
@@ -80,8 +91,6 @@ new IntersectionObserver(([e]) => {
   }, 2600);
 }, { threshold: 0.4 }).observe($("#argue"));
 
-// ---- The call plays once the phone is on screen ------------------------------
-new IntersectionObserver(([e], o) => { if (e.isIntersecting) { $("#callCard").classList.add("on"); o.disconnect(); } }, { threshold: 0.5 }).observe($("#callCard"));
 
 // ---- Scene cards lean toward the pointer ------------------------------------
 $$(".scene-card").forEach((card) => {
@@ -113,7 +122,7 @@ function addWalker(look, opts) {
   return w;
 }
 const friends = FRIENDS.map((f, i) => addWalker(f, { friend: true, i, lines: f, lane: [4, 9, 6, 11][i], scale: small ? 0.62 : [1, 0.9, 0.96, 0.86][i], speed: rand(70, 95) }));
-(small ? EXTRAS.slice(0, 2) : EXTRAS).forEach((e, i) => addWalker(e, { friend: false, lane: [27, 31, 24, 34][i], scale: small ? 0.32 : [0.42, 0.36, 0.48, 0.32][i], speed: rand(28, 45) }));
+(small ? EXTRAS.slice(0, 2) : EXTRAS).forEach((e, i) => addWalker({ ...e, boil: false }, { friend: false, lane: [27, 31, 24, 34][i], scale: small ? 0.32 : [0.42, 0.36, 0.48, 0.32][i], speed: rand(28, 45) }));
 
 function say(w, text) {
   if (w.bubble.dataset.t === text) return;
@@ -126,15 +135,13 @@ function setPose(w, pose) { if (w.pose !== pose) { w.el.className = "walker pose
 // Where the four friends gather for each act.
 function spot(act, i) {
   const gap = (small ? 46 : 78) * friends[i].scale * (act === "huddle" ? 0.5 : 1);
-  const at = { argue: small ? 0.5 : 0.24, call: small ? 0.5 : 0.62, huddle: 0.5 }[act];
+  const at = { argue: small ? 0.5 : 0.24, call: small ? 0.5 : 0.3, huddle: 0.5 }[act];
   return at * innerWidth + (i - 1.5) * gap;
 }
 
 let last = performance.now();
 function tick(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  const act = currentAct();
-  document.body.dataset.act = act;
   for (const w of people) {
     let target = null, idle = "idle";
     if (!w.friend || act === "wander") {

@@ -37,14 +37,13 @@ button, input { font: inherit; color: inherit; }
 /* The world behind everything */
 .world { position: fixed; inset: 0; z-index: -2; overflow: hidden; }
 .doodle-world { display: block; width: 100%; height: 100%; overflow: visible; }
-.world .lay { transition: transform 200ms linear; }
-.world .lay-clouds { transform: translateX(calc(var(--sp, 0) * -120px)); }
-.world .lay-sun { transform: translate(1330px, calc(190px - var(--sp, 0) * 420px)); }
-.world .lay-far { transform: translateY(calc(var(--sp, 0) * -20px)); }
-.world .lay-mid { transform: translateY(calc(var(--sp, 0) * -45px)); }
-.world .lay-near { transform: translateY(calc(var(--sp, 0) * -80px)); }
-.world .lay-clouds { animation: drift 40s ease-in-out infinite alternate; }
-@keyframes drift { from { translate: 0 0; } to { translate: 60px 0; } }
+/* Each plane is its own GPU layer: scrolling moves the cached image, nothing is redrawn.
+   The wobble is two cached frames; flipping B's opacity is all the flicker costs. */
+.world { background: #5b7cf5; }
+.plane, .frame { position: absolute; inset: 0; }
+.plane { will-change: transform; }
+.frame-b { will-change: opacity; animation: flick 0.56s steps(1) infinite; }
+@keyframes flick { 0% { opacity: 0; } 50% { opacity: 1; } }
 .card-world { position: absolute; inset: clamp(6px, 0.7vw, 12px); border-radius: clamp(22px, 2.4vw, 38px); overflow: hidden; background: #5b7cf5; }
 .card-world .doodle-world { width: 100%; height: 100%; }
 
@@ -198,7 +197,7 @@ button, input { font: inherit; color: inherit; }
 .scene-flip { grid-template-columns: 7fr 5fr; }
 .scene-flip .scene-copy { order: 2; }
 .scene-copy .lead { margin-top: 24px; }
-.scene-card {
+.scene-card { will-change: transform;
   position: relative; aspect-ratio: 16 / 9; border-radius: clamp(28px, 3vw, 48px); background: var(--white); padding: clamp(6px, 0.7vw, 12px); overflow: hidden;
   box-shadow: 0 30px 80px rgb(20 35 143 / 0.35);
   transform: perspective(1400px) rotateY(calc(var(--ty, 0) * 1deg)) rotateX(calc(var(--tx, 0) * 1deg)); transition: transform 600ms var(--out);
@@ -224,7 +223,7 @@ button, input { font: inherit; color: inherit; }
 }
 .doodle-phone::before { content: ""; position: absolute; left: 50%; top: 7px; width: 26%; height: 5px; margin-left: -13%; background: var(--ink); border-radius: 4px; }
 @keyframes ring { 0%, 70%, 100% { transform: translate(-50%, -50%) rotate(-6deg); } 74% { transform: translate(-50%, -50%) rotate(-10deg); } 78% { transform: translate(-50%, -50%) rotate(-2deg); } 82% { transform: translate(-50%, -50%) rotate(-9deg); } 86% { transform: translate(-50%, -50%) rotate(-4deg); } }
-.on .doodle-phone { animation: none; }
+[data-step="4"] .doodle-phone { animation: none; }
 .screen { height: 100%; display: flex; flex-direction: column; gap: 6px; color: var(--ink); font-size: clamp(9px, 0.8vw, 14px); line-height: 1.2; overflow: hidden; }
 .screen-top { font-weight: 800; color: var(--cobalt); text-align: center; }
 .line { padding: 5px 8px; border-radius: 10px; max-width: 92%; font-weight: 600; opacity: 0; transform: translateY(6px); transition: opacity 300ms var(--out), transform 400ms var(--pop); }
@@ -232,11 +231,14 @@ button, input { font: inherit; color: inherit; }
 .us { background: #ffe2f1; align-self: flex-end; }
 .booked { margin-top: auto; text-align: center; font-family: var(--display); text-transform: uppercase; color: #17a34a; font-size: 1.9em; line-height: 1; opacity: 0; transform: scale(0.4); transition: opacity 300ms var(--out), transform 500ms var(--pop); }
 .booked span { font-family: var(--text); font-size: 0.45em; color: var(--ink); text-transform: none; font-weight: 700; }
-.on .line, .on .booked { opacity: 1; transform: none; }
-.on .line:nth-of-type(2) { transition-delay: 500ms; }
-.on .line:nth-of-type(3) { transition-delay: 1300ms; }
-.on .line:nth-of-type(4) { transition-delay: 2100ms; }
-.on .booked { transition-delay: 2900ms; }
+/* The call advances with the scroll: one line per step, then the booking. */
+[data-step="1"] .line:nth-of-type(2),
+[data-step="2"] .line:nth-of-type(-n+3),
+[data-step="3"] .line, [data-step="4"] .line, [data-step="4"] .booked { opacity: 1; transform: none; }
+
+/* The call section is three screens tall and its content stays pinned meanwhile. */
+.call-wrap { height: 300vh; position: relative; }
+.call-pin { position: sticky; top: 0; height: 100vh; height: 100dvh; min-height: 0; padding-block: 12vh; }
 
 /* Start */
 .start { min-height: 100vh; padding: 16vh var(--gutter) 40vh; text-align: center; display: flex; flex-direction: column; align-items: center; }
@@ -275,6 +277,8 @@ button, input { font: inherit; color: inherit; }
   .scene, .scene-flip { grid-template-columns: 1fr; padding-bottom: 30vh; }
   .scene-flip .scene-copy { order: 0; }
   .say { font-size: 13px; padding: 6px 10px 8px; box-shadow: 3px 4px 0 var(--ink); }
+  .call-pin { padding-block: 84px 4vh; align-content: center; gap: 20px; }
+  .call-wrap { height: 280vh; }
   .doodle-phone { padding: 12px 5px 6px; border-radius: 16px; border-width: 3px; box-shadow: 4px 5px 0 var(--ink); }
   .screen { font-size: 6.5px; gap: 3px; }
   .join-shell { flex-direction: column; border-radius: 28px; gap: 8px; }
