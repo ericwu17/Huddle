@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-24T20:17:52Z-a182c74b",
-  "generatedAt": "2026-10-24T20:17:52Z",
+  "version": "2026-10-24T22:29:05Z-d5490f3f",
+  "generatedAt": "2026-10-24T22:29:05Z",
   "venues": [
     {
       "place": {
@@ -102,7 +102,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Thai restaurant"
       },
       "evidence": {
         "sources": [
@@ -216,7 +217,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Mexican restaurant"
       },
       "evidence": {
         "sources": [
@@ -325,7 +327,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Mediterranean restaurant"
       },
       "evidence": {
         "sources": [
@@ -439,7 +442,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Pizza restaurant"
       },
       "evidence": {
         "sources": [
@@ -553,7 +557,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Pizza restaurant"
       },
       "evidence": {
         "sources": [
@@ -668,7 +673,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Vegan restaurant"
       },
       "evidence": {
         "sources": [
@@ -780,7 +786,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Noodle shop"
       },
       "evidence": {
         "sources": [
@@ -894,7 +901,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Mexican restaurant"
       },
       "evidence": {
         "sources": [
@@ -1009,7 +1017,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Pakistani restaurant"
       },
       "evidence": {
         "sources": [
@@ -1123,7 +1132,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Italian restaurant"
       },
       "evidence": {
         "sources": [
@@ -1237,7 +1247,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "American restaurant"
       },
       "evidence": {
         "sources": [
@@ -1379,7 +1390,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Californian restaurant"
       },
       "evidence": {
         "sources": [
@@ -1517,7 +1529,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Thai restaurant"
       },
       "evidence": {
         "sources": [
@@ -1631,7 +1644,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Mexican restaurant"
       },
       "evidence": {
         "sources": [
@@ -1845,7 +1859,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Italian restaurant"
       },
       "evidence": {
         "sources": [
@@ -1957,7 +1972,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Hamburger restaurant"
       },
       "evidence": {
         "sources": [
@@ -2091,7 +2107,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Indian restaurant"
       },
       "evidence": {
         "sources": [
@@ -2225,7 +2242,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Thai restaurant"
       },
       "evidence": {
         "sources": [
@@ -2339,7 +2357,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Mexican restaurant"
       },
       "evidence": {
         "sources": [
@@ -2441,7 +2460,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Art museum"
       },
       "evidence": {
         "sources": [
@@ -2557,7 +2577,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Live music venue"
       },
       "evidence": {
         "sources": [
@@ -2659,7 +2680,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Performing arts theater"
       },
       "evidence": {
         "sources": [
@@ -2766,7 +2788,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Botanical garden"
       },
       "evidence": {
         "sources": [
@@ -2868,7 +2891,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Science museum"
       },
       "evidence": {
         "sources": [
@@ -2975,7 +2999,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Performing arts theater"
       },
       "evidence": {
         "sources": [
@@ -3077,7 +3102,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Event venue"
       },
       "evidence": {
         "sources": [
@@ -3189,7 +3215,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Garden"
       },
       "evidence": {
         "sources": [
@@ -3296,7 +3323,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Handicraft museum"
       },
       "evidence": {
         "sources": [
@@ -3403,7 +3431,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Performing arts theatre"
       },
       "evidence": {
         "sources": [
@@ -3515,7 +3544,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -3607,7 +3637,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Live music venue"
       },
       "evidence": {
         "sources": [
@@ -3699,7 +3730,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Live music venue"
       },
       "evidence": {
         "sources": [
@@ -3811,7 +3843,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -3893,7 +3926,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Museum"
       },
       "evidence": {
         "sources": [
@@ -4110,7 +4144,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Dessert restaurant"
       },
       "evidence": {
         "sources": [
@@ -4217,7 +4252,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Tea house"
       },
       "evidence": {
         "sources": [
@@ -4329,7 +4365,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Bakery"
       },
       "evidence": {
         "sources": [
@@ -4546,7 +4583,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Bakery"
       },
       "evidence": {
         "sources": [
@@ -4658,7 +4696,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Bubble tea store"
       },
       "evidence": {
         "sources": [
@@ -4770,7 +4809,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Bakery"
       },
       "evidence": {
         "sources": [
@@ -4985,7 +5025,8 @@
         "sources": [
           "google",
           "brightdata"
-        ]
+        ],
+        "label": "Dessert shop"
       },
       "evidence": {
         "sources": [
@@ -5096,7 +5137,8 @@
         "rating": 4.1,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Indian restaurant"
       },
       "evidence": {
         "sources": [
@@ -5220,7 +5262,8 @@
         "rating": 4.8,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Pizza restaurant"
       },
       "evidence": {
         "sources": [
@@ -5333,7 +5376,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cajun restaurant"
       },
       "evidence": {
         "sources": [
@@ -5451,7 +5495,8 @@
         "rating": 4.7,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Pizza restaurant"
       },
       "evidence": {
         "sources": [
@@ -5584,7 +5629,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Californian restaurant"
       },
       "evidence": {
         "sources": [
@@ -5702,7 +5748,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Jewish restaurant"
       },
       "evidence": {
         "sources": [
@@ -5820,7 +5867,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "French restaurant"
       },
       "evidence": {
         "sources": [
@@ -5938,7 +5986,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Mexican restaurant"
       },
       "evidence": {
         "sources": [
@@ -6056,7 +6105,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Restaurant"
       },
       "evidence": {
         "sources": [
@@ -6174,7 +6224,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Hamburger restaurant"
       },
       "evidence": {
         "sources": [
@@ -6295,7 +6346,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Chinese restaurant"
       },
       "evidence": {
         "sources": [
@@ -6413,7 +6465,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Hot dog restaurant"
       },
       "evidence": {
         "sources": [
@@ -6531,7 +6584,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "French restaurant"
       },
       "evidence": {
         "sources": [
@@ -6677,7 +6731,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Restaurant"
       },
       "evidence": {
         "sources": [
@@ -6795,7 +6850,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Coffee shop"
       },
       "evidence": {
         "sources": [
@@ -6934,7 +6990,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Spanish restaurant"
       },
       "evidence": {
         "sources": [
@@ -7052,7 +7109,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "American restaurant"
       },
       "evidence": {
         "sources": [
@@ -7170,7 +7228,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Restaurant"
       },
       "evidence": {
         "sources": [
@@ -7288,7 +7347,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cheesesteak restaurant"
       },
       "evidence": {
         "sources": [
@@ -7406,7 +7466,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -7517,7 +7578,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cafe"
       },
       "evidence": {
         "sources": [
@@ -7628,7 +7690,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Pizza restaurant"
       },
       "evidence": {
         "sources": [
@@ -7746,7 +7809,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Ramen restaurant"
       },
       "evidence": {
         "sources": [
@@ -7859,7 +7923,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Brunch restaurant"
       },
       "evidence": {
         "sources": [
@@ -7977,7 +8042,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Restaurant"
       },
       "evidence": {
         "sources": [
@@ -8095,7 +8161,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Sandwich shop"
       },
       "evidence": {
         "sources": [
@@ -8213,7 +8280,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Udon noodle restaurant"
       },
       "evidence": {
         "sources": [
@@ -8333,7 +8401,8 @@
         "rating": 4.8,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Indian restaurant"
       },
       "evidence": {
         "sources": [
@@ -8451,7 +8520,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Pizza restaurant"
       },
       "evidence": {
         "sources": [
@@ -8569,7 +8639,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Hamburger restaurant"
       },
       "evidence": {
         "sources": [
@@ -8682,7 +8753,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Mediterranean restaurant"
       },
       "evidence": {
         "sources": [
@@ -8800,7 +8872,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Mexican restaurant"
       },
       "evidence": {
         "sources": [
@@ -8903,7 +8976,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Brunch restaurant"
       },
       "evidence": {
         "sources": [
@@ -9036,7 +9110,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cafe"
       },
       "evidence": {
         "sources": [
@@ -9147,7 +9222,8 @@
         "rating": 4.7,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cafe"
       },
       "evidence": {
         "sources": [
@@ -9277,7 +9353,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Indian restaurant"
       },
       "evidence": {
         "sources": [
@@ -9395,7 +9472,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Restaurant"
       },
       "evidence": {
         "sources": [
@@ -9513,7 +9591,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Ramen restaurant"
       },
       "evidence": {
         "sources": [
@@ -9631,7 +9710,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Burrito restaurant"
       },
       "evidence": {
         "sources": [
@@ -9749,7 +9829,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Hamburger restaurant"
       },
       "evidence": {
         "sources": [
@@ -9862,7 +9943,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Californian restaurant"
       },
       "evidence": {
         "sources": [
@@ -9980,7 +10062,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Pub"
       },
       "evidence": {
         "sources": [
@@ -10091,7 +10174,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bakery"
       },
       "evidence": {
         "sources": [
@@ -10202,7 +10286,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Hamburger restaurant"
       },
       "evidence": {
         "sources": [
@@ -10320,7 +10405,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Chinese restaurant"
       },
       "evidence": {
         "sources": [
@@ -10438,7 +10524,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Taco restaurant"
       },
       "evidence": {
         "sources": [
@@ -10556,7 +10643,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Korean restaurant"
       },
       "evidence": {
         "sources": [
@@ -10669,7 +10757,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -10780,7 +10869,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bakery"
       },
       "evidence": {
         "sources": [
@@ -10891,7 +10981,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -11002,7 +11093,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cafe"
       },
       "evidence": {
         "sources": [
@@ -11113,7 +11205,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cocktail bar"
       },
       "evidence": {
         "sources": [
@@ -11224,7 +11317,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -11335,7 +11429,8 @@
         "rating": 4.7,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Coffee shop"
       },
       "evidence": {
         "sources": [
@@ -11446,7 +11541,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -11557,7 +11653,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Brewpub"
       },
       "evidence": {
         "sources": [
@@ -11668,7 +11765,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Coffee shop"
       },
       "evidence": {
         "sources": [
@@ -11779,7 +11877,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -11890,7 +11989,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -12001,7 +12101,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cocktail bar"
       },
       "evidence": {
         "sources": [
@@ -12112,7 +12213,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -12223,7 +12325,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Live music venue"
       },
       "evidence": {
         "sources": [
@@ -12334,7 +12437,8 @@
         "rating": 4.8,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Botanical garden"
       },
       "evidence": {
         "sources": [
@@ -12445,7 +12549,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Coffee shop"
       },
       "evidence": {
         "sources": [
@@ -12556,7 +12661,8 @@
         "rating": 4.1,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Coffee shop"
       },
       "evidence": {
         "sources": [
@@ -12667,7 +12773,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Coffee shop"
       },
       "evidence": {
         "sources": [
@@ -12778,7 +12885,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -12879,7 +12987,8 @@
         "rating": 4.7,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bakery"
       },
       "evidence": {
         "sources": [
@@ -12990,7 +13099,8 @@
         "rating": 4.3,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -13101,7 +13211,8 @@
         "rating": 4.5,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -13212,7 +13323,8 @@
         "rating": 4.8,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park and Garden"
       },
       "evidence": {
         "sources": [
@@ -13323,7 +13435,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -13434,7 +13547,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -13545,7 +13659,8 @@
         "rating": 4.7,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Ice cream shop"
       },
       "evidence": {
         "sources": [
@@ -13651,7 +13766,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Art cafe"
       },
       "evidence": {
         "sources": [
@@ -13762,7 +13878,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -13873,7 +13990,8 @@
         "rating": 4.8,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Pub"
       },
       "evidence": {
         "sources": [
@@ -13984,7 +14102,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -14095,7 +14214,8 @@
         "rating": 4.6,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Brewery"
       },
       "evidence": {
         "sources": [
@@ -14201,7 +14321,8 @@
         "rating": 4.2,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -14312,7 +14433,8 @@
         "rating": 4.7,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Playground"
       },
       "evidence": {
         "sources": [
@@ -14423,7 +14545,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Bar"
       },
       "evidence": {
         "sources": [
@@ -14534,7 +14657,8 @@
         "rating": 4.4,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Park"
       },
       "evidence": {
         "sources": [
@@ -14645,7 +14769,8 @@
         "rating": 4.0,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Sports bar"
       },
       "evidence": {
         "sources": [
@@ -14756,7 +14881,8 @@
         "rating": 4.1,
         "sources": [
           "brightdata"
-        ]
+        ],
+        "label": "Cocktail bar"
       },
       "evidence": {
         "sources": [

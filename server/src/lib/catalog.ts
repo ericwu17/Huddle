@@ -16,9 +16,10 @@ const DIETS = ["vegetarian", "vegan", "gluten_free", "halal", "kosher"];
 const ASPECTS = ["noise", "crowd", "wait", "value", "romance", "service", "outdoor", "novelty"];
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const SOURCES = ["gmaps", "yelp", "google_places"];
-// Exactly the api Place model's fields (extra="forbid"); googlePlaceId is the only optional one.
+// Exactly the api Place model's fields (extra="forbid"); googlePlaceId and label are the optional ones.
 const REQUIRED = ["id", "name", "category", "cuisine", "address", "lat", "lng", "priceLevel", "costPerPerson",
   "dwellMinutes", "phone", "dietary", "hours", "aspects", "reviewCount", "rating", "sources"];
+const OPTIONAL = ["googlePlaceId", "label"];
 const CLOCK = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 export type EvidenceSource = { source: string; url: string | null; fetchedAt: string | null;
@@ -40,7 +41,7 @@ const webUrl = (value: unknown): value is string => text(value, 2000) &&
 // The reason a place breaks the contract (docs/CONTRACT.md S5.2), or null.
 export function placeProblem(p: any): string | null {
   if (!isObject(p)) return "not an object";
-  const unknown = Object.keys(p).filter((k) => k !== "googlePlaceId" && !REQUIRED.includes(k));
+  const unknown = Object.keys(p).filter((k) => !OPTIONAL.includes(k) && !REQUIRED.includes(k));
   if (unknown.length) return `unknown fields: ${unknown.join(", ")}`;
   const missing = REQUIRED.filter((k) => !(k in p));
   if (missing.length) return `missing fields: ${missing.join(", ")}`;
@@ -68,6 +69,7 @@ export function placeProblem(p: any): string | null {
   if (!Array.isArray(p.sources) || p.sources.length > 10 || !p.sources.every((s: unknown) => text(s, 50)))
     return "sources";
   if (p.googlePlaceId !== undefined && p.googlePlaceId !== null && !text(p.googlePlaceId, 300)) return "googlePlaceId";
+  if (p.label !== undefined && p.label !== null && !text(p.label, 100)) return "label";
   return null;
 }
 

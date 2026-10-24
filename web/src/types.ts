@@ -55,6 +55,7 @@ export type Place = {
   foodStyle?: string;
   menu?: { status: string; items: MenuItem[] };
   photos?: VenuePhoto[];
+  label?: string | null;
 };
 
 export type Hard = {

@@ -103,7 +103,7 @@ LEVEL_NAMES = ["PRICE_LEVEL_INEXPENSIVE", "PRICE_LEVEL_MODERATE", "PRICE_LEVEL_E
                "PRICE_LEVEL_VERY_EXPENSIVE"]
 PLACE_KEYS = ["id", "googlePlaceId", "name", "category", "cuisine", "address", "lat", "lng", "priceLevel",
               "costPerPerson", "dwellMinutes", "phone", "dietary", "hours", "aspects", "reviewCount", "rating",
-              "sources"]
+              "sources", "label"]
 
 
 def plain(text: str) -> str:
@@ -135,6 +135,14 @@ def cuisine_for(categories: list[str]) -> str:
             if any(k in token for k in keys):
                 return fam
     return "american"  # fetch_places.cuisine_for's default too
+
+
+# What the venue calls itself ("Pizza restaurant"), shown to people instead of the coarse cuisine
+# family, which files pizza under mediterranean for the model's sake.
+def label_for(row: dict) -> str | None:
+    g, y = row.get("google") or {}, row.get("yelp") or {}
+    first = (g.get("categories") or y.get("categories") or [None])[0]
+    return first.strip()[:100] if isinstance(first, str) and first.strip() else None
 
 
 def activity_cost(categories: list[str]) -> int:
@@ -451,7 +459,7 @@ def to_place(row: dict, pid: str, price_level: int | None = None):
         "dietary": diets(row_texts(row)), "hours": hours,
         "aspects": {a: {"mean": 0.5, "sd": 0.25} for a in fp.ASPECTS},
         "reviewCount": count(g.get("reviews_count") or y.get("reviews_count")), "rating": float(rating),
-        "sources": ["brightdata"],
+        "sources": ["brightdata"], "label": label_for(row),
     }
     return {k: place[k] for k in PLACE_KEYS}
 
@@ -493,6 +501,8 @@ def merge(catalog: list[dict], rows: list[dict], add: dict, log=print, prices: d
         p["dietary"] = p["dietary"] + [d for d in diets(row_texts(row)) if d not in p["dietary"]]
         if "brightdata" not in p["sources"]:
             p["sources"] = p["sources"] + ["brightdata"]
+        if not p.get("label") and label_for(row):
+            p["label"] = label_for(row)
         enriched += json.dumps(p) != before
     added = {c: [] for c in add}
     pending = {c: 0 for c in add}

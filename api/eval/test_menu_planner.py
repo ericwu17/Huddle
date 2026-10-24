@@ -137,7 +137,7 @@ class RealMenuSidecarTests(unittest.TestCase):
         self.assertEqual(len(result["venues"]), 130)
         self.assertEqual(sum(len(v["evidence"]["menu"]["items"]) for v in result["venues"]), 950)
         cheese = next(v for v in result["venues"] if v["place"]["id"] == "bd_6cfb614522")
-        self.assertEqual(cheese["evidence"]["foodStyle"], "Pizza")
+        self.assertIn("pizza", cheese["evidence"]["foodStyle"].casefold())
         self.assertEqual(cheese["evidence"]["menu"]["items"][0]["price"], None)
         self.assertIn("sesame", cheese["evidence"]["menu"]["items"][0]["description"])
         self.assertTrue(all(item["sourceUrl"].startswith(("http://", "https://")) and item["fetchedAt"]

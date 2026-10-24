@@ -314,11 +314,13 @@ describe("live venue catalog", () => {
 
   it("accepts the bundled catalog as a snapshot and sends it with each coordinator request", () => {
     const s = setup();
-    expect(push(s, LIVE_PLACES)).toMatchObject({ active: LIVE_PLACES.length, deactivated: 0 });
+    const labeled = LIVE_PLACES.map(p => p.id === "p_004" ? { ...p, label: "Pizza restaurant" } : p);
+    expect(push(s, labeled)).toMatchObject({ active: LIVE_PLACES.length, deactivated: 0 });
     expect(s.test.db.catalog_state.id.find(0)?.version).toBe("v1");
     s.ready(); const runId = s.plan();
     expect(s.captured().catalog.version).toBe("v1");
     expect(s.captured().catalog.places).toHaveLength(LIVE_PLACES.length);
+    expect(s.captured().catalog.places.find((p: any) => p.id === "p_004").label).toBe("Pizza restaurant");
     expect(s.captured().catalog.evidence.p_002.sources[0]).not.toHaveProperty("extra");
     expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
   });
@@ -337,6 +339,7 @@ describe("live venue catalog", () => {
     const bad: [any[], RegExp][] = [
       [first({ ...p, notInContract: 1 }), /unknown fields: notInContract/], [first({ ...p, category: "bar" }), /category/],
       [first({ ...p, dwellMinutes: 7.5 }), /dwellMinutes/],
+      [first({ ...p, label: "x".repeat(101) }), /label/],
       [first({ ...p, hours: { ...(p as any).hours, mon: [["21:00", "11:00"]] } }), /hours/],
       [[...LIVE_PLACES, p], /duplicate id p_001/], [LIVE_PLACES.filter(x => x.category !== "dessert"), /no dessert/],
       [Array.from({ length: MAX_ACTIVE.meal + 1 }, (_, i) => ({ ...p, id: `m_${i}` })).concat(LIVE_PLACES.slice(20)),

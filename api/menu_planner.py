@@ -12,13 +12,14 @@ from .menu_context import allowed_items, menu_items, own_total, supported_diet
 
 def food_style(catalog, place):
     evidence = catalog.evidence.get(place.id)
-    return evidence.foodStyle if evidence and evidence.foodStyle else place.cuisine.replace("_", " ")
+    return place.label or (evidence.foodStyle if evidence and evidence.foodStyle else place.cuisine.replace("_", " "))
 
 
 def summary(catalog, places):
     meal = next((p for p in places if p.category == "meal"), places[0])
     later = [p.name for p in places if p.id != meal.id]
-    return f"Try {meal.name} for {food_style(catalog, meal)}" + (", then " + " and ".join(later) if later else "") + "."
+    # Preserve the actual route order, including activity-first itineraries.
+    return "Visit " + " → ".join(p.name for p in places) + f"; {meal.name} is listed for {food_style(catalog, meal)}."
 
 
 def fallback_venues(catalog, body, eligible):
@@ -54,7 +55,7 @@ async def coordinate_menu(llm, catalog, body):
         offered = {f"idea_{p.id}": p for p in fallback[:40]}
     if not offered:
         return AgentPlanResponse(runId=body.runId, inputRevision=body.inputRevision, plans=[],
-            recommendedPlanId=None, rationale="", conflicts=["No remaining catalog venues can be suggested. Review exclusions or add venue data; no requirements were changed."], warnings=[])
+            recommendedPlanId=None, rationale="No remaining catalog venues are available to suggest.", conflicts=["No remaining catalog venues can be suggested. Review exclusions or add venue data; no requirements were changed."], warnings=[])
     venue_ids = ({p.id for p in offered.values()} if alternative else
                  {s.placeId for p in offered.values() for s in p.stops})
     menu_mode = any(e.menu is not None for e in catalog.evidence.values())
@@ -69,7 +70,7 @@ async def coordinate_menu(llm, catalog, body):
         if p.id not in venue_ids:
             continue
         observed = rating_observation(catalog.evidence.get(p.id))
-        venues[p.id] = {"name": p.name, "category": p.category, "cuisine": food_style(catalog, p),
+        venues[p.id] = {"name": p.name, "category": p.category, "cuisine": food_style(catalog, p), "listedAs": p.label,
             "dietary": p.dietary, "costPerPerson": p.costPerPerson,
             "rating": observed.rating if observed else p.rating if p.reviewCount else None,
             "reviewCount": observed.reviewCount if observed else p.reviewCount,

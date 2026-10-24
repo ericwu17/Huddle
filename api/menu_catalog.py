@@ -50,7 +50,9 @@ def enrich_catalog(snapshot, details):
         evidence["menu"] = {"status": str(menu.get("status") or "unknown")[:80], "items": items}
         # Preserve the broad legacy cuisine family/13-feature contract; display
         # the source listing's specific pizza identity instead of Mediterranean.
-        if "pizza" in place["name"].casefold() or "pizzeria" in place["name"].casefold():
+        if place.get("label"):
+            evidence["foodStyle"] = place["label"]
+        elif "pizza" in place["name"].casefold() or "pizzeria" in place["name"].casefold():
             evidence["foodStyle"] = "Pizza"
         photos = []
         for photo in detail.get("photos", []):

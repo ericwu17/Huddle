@@ -86,6 +86,8 @@ Features 0-7 are "aspects" scored in [0,1]. Features 8-12 are 0/1 one-hot (activ
 
 Rules: every aspect has mean and sd; missing data uses the category mean and sd 0.25. The server derives the 13-dim feature vector x (8 aspect means, then 5 cuisine one-hots).
 
+Two optional fields: `googlePlaceId`, and `label` (up to 100 characters), the venue's own primary listed type from Google Maps or Yelp, e.g. `"Pizza restaurant"`. `cuisine` is a coarse family for the model (pizza and Italian count as `mediterranean`), so anything people read shows `label` when present and falls back to `cuisine`.
+
 **Hard constraints** (per member):
 
 ```json

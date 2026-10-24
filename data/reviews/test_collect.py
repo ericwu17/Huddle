@@ -220,6 +220,9 @@ class BuildAndMerge(unittest.TestCase):
         self.assertNotIn("Oakland Spot", by_name)  # outside the Berkeley rectangle
         boba, arcade = by_name["Boba Guys"], by_name["Arcade X"]
         self.assertEqual((boba["category"], boba["cuisine"], boba["costPerPerson"]), ("dessert", "cafe_dessert", 9))
+        # What each venue calls itself, from its first category; bundled places pick it up when matched.
+        self.assertEqual((imm["label"], boba["label"], by_name["Arcade X"]["label"]),
+                         ("Thai restaurant", "Bubble tea store", "Arcades"))
         self.assertEqual((arcade["category"], arcade["costPerPerson"], arcade["googlePlaceId"]), ("activity", 25, None))
         # New venues get ids from their source key, the same on every run.
         self.assertEqual(boba["id"], collect.stable_id({"bdId": "g:ChIJb"}))

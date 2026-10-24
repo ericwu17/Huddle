@@ -351,7 +351,7 @@ def snapshot():
     places = json.loads(Path("data/places.json").read_text())
     meals = [p for p in places if p["category"] == "meal"][:2]
     fresh = {**meals[0], "id": "bd_fresh1234", "name": "Fresh Scraped Spot", "googlePlaceId": None,
-             "sources": ["brightdata"]}
+             "sources": ["brightdata"], "label": "Pizza restaurant"}
     kept = meals + [fresh] + [p for p in places if p["category"] != "meal"]
     evidence = {"bd_fresh1234": {"sources": [{"source": "gmaps", "url": "https://www.google.com/maps/place/x",
                                               "fetchedAt": "2026-10-24T18:00:00Z", "rating": 4.6, "reviewCount": 1204}]}}
@@ -427,6 +427,14 @@ class LiveCatalogTests(unittest.TestCase):
         bundled = Catalog(TypeAdapter(list[Place]).validate_json(Path("data/places.json").read_text()))
         other = next(iter(candidates(bundled, request()).values()))
         self.assertNotIn("rating", public_facts(bundled, other))
+
+    def test_cuisine_fact_uses_the_listed_type_over_the_coarse_family(self):
+        catalog = CatalogCache().get(AgentCatalog.model_validate(snapshot()))
+        plans = list(candidates(catalog, request(catalog=snapshot())).values())
+        fresh = next(p for p in plans if p.stops[0].placeId == "bd_fresh1234")
+        self.assertEqual(public_facts(catalog, fresh)["cuisine"], 'The meal venue is listed as "Pizza restaurant".')
+        plain = next(p for p in plans if p.stops[0].placeId != "bd_fresh1234" and p.stops[0].category == "meal")
+        self.assertRegex(public_facts(catalog, plain)["cuisine"], r"^The meal venue's catalog cuisine is ")
 
     def test_cache_reuses_identical_snapshots(self):
         cache = CatalogCache(size=2)

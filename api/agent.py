@@ -216,7 +216,9 @@ def public_facts(catalog: Catalog, plan: AgentPlan) -> dict[str, str]:
         "sequence": " → ".join(s.name for s in plan.stops) + ".",
         "travel": ("This is one venue; there is no travel between stops." if len(plan.stops) == 1
                    else f"Estimated {plan.travelMinutes:g} minutes traveling between stops."),
-        "cuisine": f"{place.name} is listed for {food_style(catalog, place)}.",
+        "cuisine": (f'The meal venue is listed as "{place.label}".' if place.label
+                    else f'The meal venue is listed as "{food_style(catalog, place)}".' if catalog.evidence.get(place.id) and catalog.evidence[place.id].foodStyle
+                    else f"The meal venue's catalog cuisine is {place.cuisine.replace('_', ' ')}."),
     }
     facts["dietary"] = ("The meal venue lists " + ", ".join(x.replace("_", " ") for x in place.dietary) + " options."
                         if place.dietary else "The meal venue has no dietary options listed in this catalog.")

@@ -10,9 +10,9 @@ export type CatalogListing = Pick<Place, "id" | "name" | "address" | "rating" | 
 
 const SOURCE_NAMES: Record<string, string> = { gmaps: "Google Maps", yelp: "Yelp", google_places: "Google" };
 
-function publicUrl(value: unknown): string | undefined {
+function publicUrl(value: unknown, allowHttp = false): string | undefined {
   if (typeof value !== "string") return;
-  try { const url = new URL(value); return url.protocol === "https:" ? url.href : undefined; } catch { return; }
+  try { const url = new URL(value); return !url.username && !url.password && (url.protocol === "https:" || allowHttp && url.protocol === "http:") ? url.href : undefined; } catch { return; }
 }
 
 export function parseCatalogEvidence(json: string): Pick<CatalogListing, "observation" | "foodStyle" | "menu" | "photos"> {
@@ -25,7 +25,7 @@ export function parseCatalogEvidence(json: string): Pick<CatalogListing, "observ
       typeof s.reviewCount === "number" && Number.isInteger(s.reviewCount) && s.reviewCount > 0) : undefined;
     const items: MenuItem[] = Array.isArray(evidence.menu?.items) ? evidence.menu.items.flatMap((item: Record<string, unknown>) => {
       if (!item || typeof item !== "object") return [];
-      const sourceUrl = publicUrl(item.sourceUrl);
+      const sourceUrl = publicUrl(item.sourceUrl, true);
       if (typeof item.id !== "string" || typeof item.name !== "string" || !item.name.trim() || !sourceUrl ||
         typeof item.fetchedAt !== "string" || !Number.isFinite(Date.parse(item.fetchedAt))) return [];
       return [{ id: item.id, name: item.name, section: typeof item.section === "string" ? item.section : "",
