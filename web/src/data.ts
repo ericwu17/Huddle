@@ -120,9 +120,14 @@ export function useVotes(runId: string | null, myMemberId: string): Votes | unde
     if (!ready) return undefined;
     const inRun = rows.filter((v) => v.runId === runId);
     const counts: Record<string, number> = {};
-    for (const v of inRun) counts[v.planId] = (counts[v.planId] ?? 0) + 1;
+    const byPlan: Record<string, string[]> = {};
+    for (const v of inRun) {
+      counts[v.planId] = (counts[v.planId] ?? 0) + 1;
+      (byPlan[v.planId] ??= []).push(v.memberId);
+    }
     return {
       counts,
+      byPlan,
       total: inRun.length,
       myVote: inRun.find((v) => v.memberId === myMemberId)?.planId ?? null,
     };

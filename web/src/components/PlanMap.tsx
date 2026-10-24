@@ -5,6 +5,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
 import type { Plan } from "../types";
+import { walkRoute, type WalkRoute } from "../walkRoute";
 
 const token = import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
 
@@ -83,6 +84,19 @@ function MapboxMap({ plan, lines }: Props) {
 function StreetMap({ plan, lines }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const boundsRef = useRef<L.LatLngBounds | null>(null);
+  // Walking geometry along streets; "none" means the router failed and the
+  // straight `lines` are drawn as a labeled guide instead.
+  const routeKey = plan.stops.map((s) => `${s.lng},${s.lat}`).join(";");
+  const [walk, setWalk] = useState<{ key: string; route: WalkRoute | null } | null>(null);
+  const route = walk?.key === routeKey ? walk.route : undefined;
+
+  useEffect(() => {
+    let live = true;
+    const points = routeKey.split(";").map((p) => { const [lng, lat] = p.split(",").map(Number); return { lat, lng }; });
+    void walkRoute(points).then((r) => { if (live) setWalk({ key: routeKey, route: r }); });
+    return () => { live = false; };
+  }, [routeKey]);
 
   useEffect(() => {
     const map = L.map(container.current!, {
@@ -96,10 +110,19 @@ function StreetMap({ plan, lines }: Props) {
     });
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · routes <a href="https://routing.openstreetmap.de/">FOSSGIS OSRM</a>',
     }).addTo(map);
     mapRef.current = map;
+    // The layout can widen after mount (sidebar, fonts); re-measure and refit.
+    const resize = new ResizeObserver(() => {
+      if (mapRef.current !== map) return;
+      map.stop();
+      map.invalidateSize({ animate: false });
+      if (boundsRef.current) map.fitBounds(boundsRef.current, { padding: [48, 48], maxZoom: 16, animate: false });
+    });
+    resize.observe(container.current!);
     return () => {
+      resize.disconnect();
       mapRef.current = null;
       map.stop();
       map.remove();
@@ -110,11 +133,17 @@ function StreetMap({ plan, lines }: Props) {
     const map = mapRef.current;
     if (!map) return;
     const layer = L.layerGroup().addTo(map);
-    for (const line of lines) {
-      const pts = line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
-      // A white casing under the dashed line keeps it visible over busy streets.
-      L.polyline(pts, { color: "#fffdf7", weight: 10, opacity: 0.95, lineCap: "round" }).addTo(layer);
-      L.polyline(pts, { color: "#ff5fb4", weight: 5, dashArray: "2 10", lineCap: "round" }).addTo(layer);
+    if (route) {
+      const pts = route.line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
+      // A white casing under the line keeps it visible over busy streets.
+      L.polyline(pts, { color: "#fffdf7", weight: 10, opacity: 0.95, lineCap: "round", lineJoin: "round" }).addTo(layer);
+      L.polyline(pts, { color: "#ff5fb4", weight: 5, lineCap: "round", lineJoin: "round" }).addTo(layer);
+    } else if (route === null) {
+      // No walking route: a thin grey guide, labeled in the legend as straight-line.
+      for (const line of lines) {
+        const pts = line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
+        L.polyline(pts, { color: "#6b6880", weight: 3, dashArray: "4 8", opacity: 0.8 }).addTo(layer);
+      }
     }
     plan.stops.forEach((s, i) => {
       const icon = L.divIcon({
@@ -129,6 +158,7 @@ function StreetMap({ plan, lines }: Props) {
     });
     if (plan.stops.length > 0) {
       const bounds = L.latLngBounds(plan.stops.map((s) => [s.lat, s.lng] as L.LatLngTuple));
+      boundsRef.current = bounds;
       // Bounds can update immediately before navigation removes the map. Do not
       // leave a pan/zoom frame targeting a pane that has already been detached.
       map.stop();
@@ -137,7 +167,7 @@ function StreetMap({ plan, lines }: Props) {
     return () => {
       if (mapRef.current === map) { map.stop(); layer.remove(); }
     };
-  }, [plan, lines]);
+  }, [plan, lines, route]);
 
   return (
     <div className="card map-card">
@@ -150,11 +180,19 @@ function StreetMap({ plan, lines }: Props) {
               <b>{s.name}</b>
               <span className="muted block">
                 {s.start}–{s.end}
+                {route && i < route.legMinutes.length ? ` · then ~${route.legMinutes[i]} min walk` : ""}
               </span>
             </span>
           </li>
         ))}
       </ol>
+      {plan.stops.length > 1 ? (
+        <p className="muted px-4 pb-3 text-sm">
+          {route === undefined ? "Finding the walking route…"
+            : route ? "Walking route and times: OpenStreetMap estimate (FOSSGIS OSRM)."
+            : "Walking route unavailable. Grey dashes are a straight-line guide, not a path."}
+        </p>
+      ) : null}
     </div>
   );
 }

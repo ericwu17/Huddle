@@ -40,13 +40,13 @@ export default function Lobby() {
     <div className="space-y-5">
       <h1 className="shout text-[52px]">Get everyone in</h1>
 
-      <section className="card space-y-4"><h2 className="card-title">Bring your people</h2>
+      <section className="card space-y-4"><h2 className="card-title">Invite Huddle friends</h2>
         {account ? <><FriendPicker selected={selected} onChange={setSelected} disabled={busy} exclude={sent.filter(i => i.status === "pending" || i.status === "accepted").map(i => i.toAccountId)} />
           <button className="btn btn-sun" disabled={busy || !selected.length} onClick={() => run(async () => { await invite({ groupId: group.id, friendAccountIds: selected }); setNotice(`In-app invitations sent to ${selected.length} ${selected.length === 1 ? "friend" : "friends"}.`); setSelected([]); })}>Send invitations</button>
           <p className="muted">Friends get a message in their Huddle inbox with a link to open this outing.</p>
           {notice ? <p role="status">{notice}</p> : null}
           {sent.length ? <ul className="space-y-3">{sent.map(i => <li className="space-y-2" key={i.id}><strong>{i.toDisplayName}</strong> · {i.status}<InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} /><SendInvitationMessageButton invitationId={i.id} pending={i.status === "pending"} status={deliveries?.find(d => d.invitationId === i.id)?.status} /></li>)}</ul> : null}
-        </> : <><p>Sign in to invite friends to Huddle.</p><Link className="btn" to="/login">Sign in</Link></>}
+        </> : <><p>Sign in to invite friends from your list.</p><Link className="btn" to="/login">Sign in</Link></>}
       </section>
 
       <section className="card card-note card-tilt-l space-y-3">

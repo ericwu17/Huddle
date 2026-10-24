@@ -102,7 +102,7 @@ npm ci --prefix web
 npm run dev --prefix web -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-Use `/start` for the app; `/` serves the landing page. Maincloud cannot call a
+The app starts at `/start` (`/` redirects there). Maincloud cannot call a
 loopback API directly. Existing [tunnel helpers](docs/LOCAL_TUNNELS.md) provide
 the current shared API connection. Only the designated host should publish its
 new URL; backend developers must not overwrite it with personal test instances.

@@ -14,6 +14,7 @@ import MeetupCalendarAction from "./MeetupCalendarAction";
 import AgentVenueDetails from "./AgentVenueDetails";
 import { dollars } from "../venueFormatting";
 import PrivateOrderSummary from "./PrivateOrderSummary";
+import { VoteChoice, VoteStatus } from "./VoteTally";
 
 export function AgentPrefs() {
   const { agentNeeds, group, session } = useGroup();
@@ -217,6 +218,7 @@ export function AgentVote() {
   const book = useReducer(reducers.startBooking);
   const { run, busy, error } = useRun();
   const result = planRun?.result;
+  if (runId && planRun === undefined) return <p className="card" role="status">Loading the plans…</p>;
   if (!runId || agent?.status !== "ready" || result?.inputRevision !== agent.revision) return <section className="card"><p>These choices are not current. Review your needs and plans first.</p><Link to={`/g/${session.groupId}/prefs`}>Review needs</Link></section>;
   const plans = result.plans.filter(isReadyAgentPlan);
   const counts = votes?.counts ?? {};
@@ -226,13 +228,16 @@ export function AgentVote() {
   const winner = complete ? leaders.length === 1 ? leaders[0] : leaders.find(p => p.id === planRun?.roulette?.planId) : null;
   return <div className="space-y-5">
     <h1 className="shout text-[48px]">Choose together</h1>
+    {plans.length ? <VoteStatus votes={votes} members={group.members} winnerTitle={winner?.title}
+      tiedTitles={complete && !winner ? leaders.map(p => p.title) : undefined} /> : null}
     <Link className="btn" to={`/g/${session.groupId}/plans`}>Read plans and conversation</Link>
     {!plans.length ? <section className="card space-y-3"><p>These suggestions need details confirmed before anyone can vote, spin, book or add a meetup to calendars.</p><Link className="underline font-bold" to={`/g/${session.groupId}/plans`}>Explore the suggestions</Link></section> : null}
-    {plans.map(p => <div key={p.id} className="space-y-2"><AgentPlanCard plan={p} order={orders.find(order => order.planId === p.id)} recommended={p.id === result.recommendedPlanId} />
-      <button className="btn w-full" disabled={busy} onClick={() => run(() => vote({ runId, planId: p.id }))}>
-        {votes?.myVote === p.id ? "Your vote ✓" : `Vote ${p.title}`} · {counts[p.id] ?? 0}
-      </button></div>)}
-    {plans.length ? <p className="on-sky">{votes?.total ?? 0} of {group.members.length} voted</p> : null}
+    {plans.map(p => <div key={p.id} className={`vote-option ${votes?.myVote === p.id ? "is-mine" : ""}`}>
+      <AgentPlanCard plan={p} order={orders.find(order => order.planId === p.id)} recommended={p.id === result.recommendedPlanId} />
+      <VoteChoice planId={p.id} title={p.title} votes={votes} members={group.members} myMemberId={session.memberId}
+        busy={busy} onVote={() => run(() => vote({ runId, planId: p.id }))} />
+    </div>)}
+    {plans.length ? <p className="on-sky muted">You can change your vote until the host starts booking.</p> : null}
     {winner ? <MeetupCalendarAction runId={runId} planId={winner.id} isHost={isHost} /> : null}
     {plans.length ? <p className="card card-note">Booking is a simulation. No restaurant will be called or reserved.</p> : null}
     {plans.length ? <div className="flex flex-wrap gap-3">

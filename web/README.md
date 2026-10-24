@@ -102,15 +102,13 @@ and the bounce when reopening Plans are fixed in `0d224a5` (`GroupLayout.tsx`
 follows each run's status once and leaves phones on Plans). It still needs a
 legacy browser check. The new coordinator flow passed two-user desktop/mobile
 browser testing, including readable plans, voting and booking after refresh.
-The landing page lives in `index.html` and `landing/` and is served
-at `/`; the application entry is `/start`.
+There is no separate landing page any more: `/` redirects to `/start`.
 
 ## Layout
 
-- `index.html` + `landing/`: the landing page at `/`. Its form sends `?name=` to `/start`
-- `app.html`: the React app's entry. Every other path is the app (`vite.config.ts` in dev, `vercel.json` on Vercel)
-- `src/router.tsx`: routes (`/start`, `/join/:code`, `/g/:groupId/{lobby,prefs,swipe,plans,vote,call,judge}`)
-- `src/doodle/`: the stick figures and drawn world, shared by the landing page and the app
+- `index.html`: the React app's only page. Every path is the app (Vite's SPA fallback in dev, the rewrite in `vercel.json` on Vercel)
+- `src/router.tsx`: routes (`/` → `/start`, `/join/:code`, `/g/:groupId/{lobby,prefs,swipe,plans,vote,call,judge}`)
+- `src/doodle/`: the stick figures and drawn world
 - `src/data.ts`: every read. Each hook subscribes to one `my_*` view and maps it to the types in `src/types.ts`
 - `src/module_bindings/`: generated client for the module (tables, reducers, procedures)
 - `src/types.ts`: contract types (docs/CONTRACT.md S5)

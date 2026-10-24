@@ -11,7 +11,7 @@ export function DoodleWorld() {
 
 type Look = { hair: Hair; face: Face; scarf: string };
 
-// The first four match the landing page's friends (and Advocates A to D).
+// The first four are the default friends (and Advocates A to D).
 const LOOKS: Look[] = [
   { hair: "curly", face: "smile", scarf: "#8fe03b" },
   { hair: "mop", face: "grin", scarf: "#ff5fb4" },
