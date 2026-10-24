@@ -186,6 +186,8 @@ export type Votes = {
   counts: Record<string, number>;
   total: number;
   myVote: string | null;
+  // memberIds per planId, so screens can show who picked what and who is still deciding.
+  byPlan: Record<string, string[]>;
 };
 
 export type FailReason = "full" | "closed" | "no_answer" | "refused" | "error";

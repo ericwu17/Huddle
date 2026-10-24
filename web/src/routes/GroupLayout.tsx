@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { joinUrl } from "../joinUrl";
 import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
 import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
 import type { Session } from "../session";
@@ -111,15 +112,19 @@ export default function GroupLayout() {
     agentNeeds,
   };
 
+  // Web layout: a vertical sidebar (who, steps, code, people) beside the step's
+  // screen. On a phone the sidebar collapses to the header and the step list.
   return (
-    <main className="page space-y-4">
-      <header className="topbar">
-        <a className="logo" href="/">
-          huddle
-        </a>
-        <span className="code-tag" aria-label={`Huddle code ${group.code}`}>
-          {group.code}
-        </span>
+    <main className="group-page">
+      <aside className="group-sidebar">
+        <header className="topbar">
+          <a className="logo" href="/">
+            huddle
+          </a>
+          <span className="code-tag" aria-label={`Huddle code ${group.code}`}>
+            {group.code}
+          </span>
+        </header>
         <span className="me-tag on-sky">
           <Buddy who={session.name} size={40} />
           <span>
@@ -127,10 +132,12 @@ export default function GroupLayout() {
             {ctx.isHost && <span className="sticker sticker-sun ml-1.5">host</span>}
           </span>
         </span>
-      </header>
+        {agent ? <AgentPhaseNav ctx={ctx} booking={booking} /> : <PhaseProgress ctx={ctx} booking={booking} />}
+        <SidebarPeople ctx={ctx} />
+      </aside>
+      <div className="group-main space-y-4">
       <AccountStatus />
       <p className="on-sky text-sm">Outing: {group.date} · {group.window.start}–{group.window.end} · Berkeley time</p>
-      {agent ? <AgentPhaseNav ctx={ctx} booking={booking} /> : <PhaseProgress ctx={ctx} booking={booking} />}
       <DemoBanner on={group.demoMode} />
       {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}
       {!agent ? <OffersInbox ctx={ctx} /> : null}
@@ -141,6 +148,37 @@ export default function GroupLayout() {
           Under the hood
         </Link>
       </p>
+      </div>
     </main>
+  );
+}
+
+// Desktop only: the join code with a copy button, and who's in and ready.
+function SidebarPeople({ ctx }: { ctx: GroupContext }) {
+  const { group, agent, session } = ctx;
+  const [copied, setCopied] = useState(false);
+  const link = joinUrl(group.code);
+  return (
+    <section className="sidebar-people card" aria-label="Who's in">
+      <div className="flex items-center justify-between gap-2">
+        <span className="muted text-sm">Join code</span>
+        <b className="display text-2xl tracking-[0.15em] text-[var(--cobalt)]">{group.code}</b>
+      </div>
+      <button className="btn w-full text-sm" onClick={() => navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }, () => {})}>
+        {copied ? "Link copied" : "Copy invite link"}
+      </button>
+      <ul className="sidebar-members">
+        {group.members.map((m) => {
+          const ready = agent ? agent.confirmedMemberIds.includes(m.id) : m.ready;
+          return (
+            <li key={m.id}>
+              <Buddy who={m.name} pose={ready ? "huddle" : "idle"} size={30} />
+              <span className="min-w-0 flex-1 truncate">{m.id === session.memberId ? `${m.name} (you)` : m.name}</span>
+              <span className={`sticker ${ready ? "sticker-lime" : ""}`}>{ready ? "ready" : "…"}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router";
 import { useAccount, useFriendRequests, useHuddleInvitations } from "../accountData";
 import AccountStatus from "./AccountStatus";
 import { Buddy } from "../doodle/Doodle";
+import JoinByCode from "./JoinByCode";
 
 export default function AccountShell({ children }: { children: ReactNode }) {
   const account = useAccount();
@@ -28,7 +29,8 @@ export default function AccountShell({ children }: { children: ReactNode }) {
 }
 
 export function AccountRequired() {
-  return <section className="card space-y-4"><h1 className="card-title">Make room for your people</h1>
+  return <><section className="card space-y-4"><h1 className="card-title">Make room for your people</h1>
     <p>Sign in to find friends, receive invitations and keep your own preferences.</p>
-    <Link className="btn btn-sun" to="/login">Sign in / create account</Link></section>;
+    <Link className="btn btn-sun" to="/login">Sign in / create account</Link></section>
+    <JoinByCode /></>;
 }

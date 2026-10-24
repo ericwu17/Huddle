@@ -8,6 +8,7 @@ import { Buddy } from "../doodle/Doodle";
 import { useAccount, useAccountMemberships, useFriendContactDestinations, useFriends, useHuddleInvitations } from "../accountData";
 import AccountShell, { AccountRequired } from "../components/AccountShell";
 import FriendPicker from "../components/FriendPicker";
+import JoinByCode from "../components/JoinByCode";
 
 export default function Home() {
   const { isActive } = useSpacetimeDB();
@@ -78,6 +79,7 @@ export default function Home() {
       {!isActive ? <p role="status">Connecting to Huddle…</p> : null}
       {error ? <p className="error" role="alert">{error}</p> : null}
     </section>
+    {review ? null : <JoinByCode />}
     {review ? <section className="card card-note space-y-4" aria-label="Review your Huddle invitation">
       <h2 className="card-title">Your invitation</h2><p className="font-bold">{review.summary}</p>
       <div><h3 className="font-bold">People to invite</h3>

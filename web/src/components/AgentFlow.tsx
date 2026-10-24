@@ -11,6 +11,7 @@ import { useCatalogListings } from "../catalogData";
 import { useVotes } from "../data";
 import PlanMap from "./PlanMap";
 import MeetupCalendarAction from "./MeetupCalendarAction";
+import { VoteChoice, VoteStatus } from "./VoteTally";
 
 export function AgentPrefs() {
   const { agentNeeds, group, session } = useGroup();
@@ -111,24 +112,37 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
 
 export function AgentPlanCard({ plan, recommended = false }: { plan: AgentPlan; recommended?: boolean }) {
   const listings = useCatalogListings();
+  // At a glance: one line per stop. Addresses, sources, the coordinator's
+  // reasoning and data limits stay one tap away under "More about this plan".
+  const stops = plan.stops.map(stop => {
+    const place = listings.get(stop.placeId);
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stop.name} ${place?.address ?? `${stop.lat},${stop.lng}`}`)}${place?.googlePlaceId ? `&query_place_id=${encodeURIComponent(place.googlePlaceId)}` : ""}`;
+    const rated = !!place && Number.isFinite(place.rating) && place.rating > 0;
+    return { stop, place, mapsUrl, rated };
+  });
   return <section className="card space-y-3">
-    {recommended ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
-    <div className="flex flex-wrap justify-between gap-3"><h2 className="card-title">{plan.title}</h2><span className="sticker sticker-lime">Est. ${plan.costPerPerson}/person total</span></div>
-    <ol className="space-y-4">{plan.stops.map(stop => {
-      const place = listings.get(stop.placeId);
-      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stop.name} ${place?.address ?? `${stop.lat},${stop.lng}`}`)}${place?.googlePlaceId ? `&query_place_id=${encodeURIComponent(place.googlePlaceId)}` : ""}`;
-      return <li key={stop.placeId} className="venue-details space-y-2">
-        <strong className="text-lg">{stop.name}</strong><p className="muted">{stop.start}–{stop.end} · {stop.category} · est. ${stop.costPerPerson}/person</p>
-        {place?.address ? <p className="text-sm">{place.address}</p> : null}
-        {place && Number.isFinite(place.rating) && place.rating > 0 ? <p className="text-sm"><strong>★ {place.rating.toFixed(1)}/5</strong>{place.reviewCount > 0 ? ` · ${place.reviewCount.toLocaleString()} reviews` : ""} <span className="muted">· {place.observation ? `${place.observation.source}, observed ${new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "America/Los_Angeles" }).format(new Date(place.observation.fetchedAt))}` : "cached catalog rating"}</span></p> : null}
-        {place?.dietary?.length && stop.category !== "activity" ? <p className="text-sm">Listed dietary options: {place.dietary.map(d => d.replaceAll("_", " ")).join(", ")}</p> : null}
-        {place?.observation?.url ? <a className="font-bold underline text-sm" href={place.observation.url} target="_blank" rel="noopener noreferrer">Rating source ↗</a> : null}
-        <a className="font-bold underline text-sm" href={mapsUrl} target="_blank" rel="noopener noreferrer">View venue details on Google Maps ↗</a>
-        {stop.category !== "activity" ? <p className="muted">Confirm current menu options and allergy handling directly with the venue.</p> : null}
-      </li>;
-    })}</ol>
-    <p>{plan.whyLine}</p>
-    <details><summary>Data limitations</summary><ul className="muted">{plan.limitations.map(l => <li key={l}>{l}</li>)}</ul></details>
+    {recommended ? <span className="sticker sticker-sun">★ Coordinator's pick</span> : null}
+    <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="card-title">{plan.title}</h2><span className="sticker sticker-lime">${plan.costPerPerson}/person</span></div>
+    <ol className="plan-stops">{stops.map(({ stop, place, mapsUrl, rated }, i) =>
+      <li key={stop.placeId}>
+        <span className="plan-dot">{i + 1}</span>
+        <div className="min-w-0">
+          <a className="plan-stop-name" href={mapsUrl} target="_blank" rel="noopener noreferrer">{stop.name}</a>
+          <p className="muted text-sm">{stop.start}–{stop.end} · {place?.label ?? stop.category} · ${stop.costPerPerson}{rated ? ` · ★ ${place!.rating.toFixed(1)}` : ""}</p>
+        </div>
+      </li>)}</ol>
+    <details className="plan-more"><summary>More about this plan</summary>
+      <div className="space-y-3 pt-2 text-sm">
+        <p>{plan.whyLine}</p>
+        <ul className="space-y-2">{stops.map(({ stop, place, rated }) => <li key={stop.placeId}>
+          <strong>{stop.name}</strong>{place?.address ? ` · ${place.address}` : ""}
+          {rated ? <span className="muted block">★ {place!.rating.toFixed(1)}/5{place!.reviewCount > 0 ? ` from ${place!.reviewCount.toLocaleString()} reviews` : ""} · {place!.observation ? <>{place!.observation.url ? <a className="underline" href={place!.observation.url} target="_blank" rel="noopener noreferrer">{place!.observation.source}</a> : place!.observation.source}, {new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "America/Los_Angeles" }).format(new Date(place!.observation.fetchedAt))}</> : "cached catalog rating"}</span> : null}
+          {place?.dietary?.length && stop.category !== "activity" ? <span className="muted block">Listed dietary options: {place.dietary.map(d => d.replaceAll("_", " ")).join(", ")}</span> : null}
+        </li>)}</ul>
+        <p className="muted">Check menus and allergy handling directly with each venue.</p>
+        {plan.limitations.length ? <ul className="muted list-disc pl-5">{plan.limitations.map(l => <li key={l}>{l}</li>)}</ul> : null}
+      </div>
+    </details>
   </section>;
 }
 
@@ -183,6 +197,7 @@ export function AgentVote() {
   const book = useReducer(reducers.startBooking);
   const { run, busy, error } = useRun();
   const result = planRun?.result;
+  if (runId && planRun === undefined) return <p className="card" role="status">Loading the plans…</p>;
   if (!runId || agent?.status !== "ready" || result?.inputRevision !== agent.revision) return <section className="card"><p>These choices are not current. Review your needs and plans first.</p><Link to={`/g/${session.groupId}/prefs`}>Review needs</Link></section>;
   const plans = result.plans;
   const counts = votes?.counts ?? {};
@@ -192,12 +207,15 @@ export function AgentVote() {
   const winner = complete ? leaders.length === 1 ? leaders[0] : leaders.find(p => p.id === planRun?.roulette?.planId) : null;
   return <div className="space-y-5">
     <h1 className="shout text-[48px]">Choose together</h1>
+    <VoteStatus votes={votes} members={group.members} winnerTitle={winner?.title}
+      tiedTitles={complete && !winner ? leaders.map(p => p.title) : undefined} />
     <Link className="btn" to={`/g/${session.groupId}/plans`}>Read plans and conversation</Link>
-    {plans.map(p => <div key={p.id} className="space-y-2"><AgentPlanCard plan={p} recommended={p.id === result.recommendedPlanId} />
-      <button className="btn w-full" disabled={busy} onClick={() => run(() => vote({ runId, planId: p.id }))}>
-        {votes?.myVote === p.id ? "Your vote ✓" : `Vote ${p.title}`} · {counts[p.id] ?? 0}
-      </button></div>)}
-    <p className="on-sky">{votes?.total ?? 0} of {group.members.length} voted</p>
+    {plans.map(p => <div key={p.id} className={`vote-option ${votes?.myVote === p.id ? "is-mine" : ""}`}>
+      <AgentPlanCard plan={p} recommended={p.id === result.recommendedPlanId} />
+      <VoteChoice planId={p.id} title={p.title} votes={votes} members={group.members} myMemberId={session.memberId}
+        busy={busy} onVote={() => run(() => vote({ runId, planId: p.id }))} />
+    </div>)}
+    <p className="on-sky muted">You can change your vote until the host starts booking.</p>
     {winner ? <MeetupCalendarAction runId={runId} planId={winner.id} isHost={isHost} /> : null}
     <p className="card card-note">Booking is a simulation. No restaurant will be called or reserved.</p>
     <div className="flex flex-wrap gap-3">

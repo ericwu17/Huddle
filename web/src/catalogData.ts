@@ -6,7 +6,7 @@ import type { Place } from "./types";
 
 type Observation = { source: string; fetchedAt: string; url?: string; rating: number; reviewCount: number };
 type Listing = Pick<Place, "id" | "name" | "address" | "rating" | "reviewCount"> &
-  Partial<Pick<Place, "dietary" | "googlePlaceId">> & { observation?: Observation };
+  Partial<Pick<Place, "dietary" | "googlePlaceId" | "label">> & { observation?: Observation };
 
 const SOURCE_NAMES: Record<string, string> = { gmaps: "Google Maps", yelp: "Yelp", google_places: "Google" };
 

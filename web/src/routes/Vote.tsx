@@ -9,6 +9,7 @@ import { KIND_LABEL } from "../plans";
 import PlanCard from "../components/PlanCard";
 import { Buddy } from "../doodle/Doodle";
 import { AgentVote } from "../components/AgentFlow";
+import { VoteChoice, VoteStatus } from "../components/VoteTally";
 
 export default function Vote() {
   const { agent } = useGroup();
@@ -53,6 +54,8 @@ function LegacyVote() {
   return (
     <div className="space-y-5">
       <h1 className="shout text-[52px]">Pick one</h1>
+      <VoteStatus votes={votes} members={group.members} winnerTitle={winner ? KIND_LABEL[winner.kind] : null}
+        tiedTitles={leaders.length > 1 ? leaders.map((p) => KIND_LABEL[p.kind]) : undefined} />
       {council && !council.fallbackUsed && (
         <div className="flex items-end gap-2">
           <Buddy who="Chair" pose="wave" size={88} crown boil />
@@ -74,20 +77,10 @@ function LegacyVote() {
             selected={votes?.myVote === p.id}
             recommended={council?.fallbackUsed === false && council.chosenPlanId === p.id}
           />
-          <button
-            className={`btn w-full ${votes?.myVote === p.id ? "btn-sun" : ""}`}
-            disabled={busy}
-            onClick={() => run(() => vote({ runId, planId: p.id }))}
-          >
-            {votes?.myVote === p.id ? "Your vote ✓" : `Vote ${KIND_LABEL[p.kind]}`}
-            <span className="sticker">{counts[p.id] ?? 0}</span>
-          </button>
+          <VoteChoice planId={p.id} title={KIND_LABEL[p.kind]} votes={votes} members={group.members}
+            myMemberId={session.memberId} busy={busy} onVote={() => run(() => vote({ runId, planId: p.id }))} />
         </div>
       ))}
-
-      <p className="on-sky">
-        {votes?.total ?? 0} of {group.members.length} voted
-      </p>
 
       <div className="flex gap-3">
         <button
