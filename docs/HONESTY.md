@@ -19,3 +19,4 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | Review data is scraped via Bright Data (terms checked) | `data/reviews/` | planned |
 | Council messages are AI-generated under a validator | `api/` | planned |
 | Auth is hackathon-grade: each phone is whoever holds its SpacetimeDB token (kept in local storage); services share one secret header | `server/src/http.ts` | in use |
+| Demo mode: if the api or voice service is unreachable (or the host turns demo mode on), the group switches to labeled synthetic data and a scripted call; plans carry a `fallback:` warning and the UI shows "Demo mode: cached data" | `server/src/lib/demo.ts` | in use |

@@ -2,8 +2,8 @@
 import { t } from "spacetimedb/server";
 import scoutCache from "../../data/scout_cache.json";
 import spacetimedb, { council_job, scout_job } from "./schema";
-import { markVoting, planRequest } from "./plans";
-import { callApi } from "./lib/api";
+import { groupIdOf, markVoting, planRequest } from "./plans";
+import { apiFor } from "./lib/demo";
 import type { Tx } from "./lib/types";
 import { at, nowMs, parse } from "./lib/util";
 
@@ -80,7 +80,7 @@ export const runCouncilJob = spacetimedb.procedure(
       };
     });
     if (!body) return {};
-    const res = callApi(ctx, "/council", body);
+    const res = apiFor(ctx, groupIdOf(ctx, job.runId), "/council", body);
     ctx.withTx((tx) => {
       if (!res.ok) {
         // Council unavailable: skip it; the UI highlights Safe with its whyLine (S6).

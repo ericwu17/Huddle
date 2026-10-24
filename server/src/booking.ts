@@ -4,7 +4,7 @@ import spacetimedb, { call_job, fake_event_job } from "./schema";
 import { finishCouncil, insertCouncilMessage } from "./council";
 import { requireMember } from "./groups";
 import { replan } from "./replan";
-import { callVoice } from "./lib/api";
+import { voiceFor } from "./lib/demo";
 import { fakeCallEvents } from "./lib/fakes";
 import { placeById } from "./lib/places";
 import { planFitsBudgets } from "./lib/budgets";
@@ -71,6 +71,7 @@ export const runCallJob = spacetimedb.procedure(
       const mins = Number(hh) * 60 + Number(mm);
       const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
       return {
+        groupId: b.groupId,
         bookingId: b.id, placeId: b.placeId, restaurantName: b.restaurantName,
         restaurantPhone: placeById(b.placeId)?.phone ?? "", partySize: b.partySize, time: b.time,
         nameOnReservation: members[0]?.name ?? "Guest",
@@ -79,7 +80,8 @@ export const runCallJob = spacetimedb.procedure(
       };
     });
     if (!body) return {};
-    const res = callVoice(ctx, "/book", body);
+    const { groupId, ...book } = body;
+    const res = voiceFor(ctx, groupId, "/book", book);
     ctx.withTx((tx) => {
       if (!res.ok) {
         recordCallEvent(tx, { bookingId: job.bookingId, type: "failed", reason: "error", text: res.error.message });

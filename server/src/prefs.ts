@@ -3,7 +3,7 @@ import { SenderError, t } from "spacetimedb/server";
 import spacetimedb, { parse_job, preview_job, swipe_job } from "./schema";
 import { requireMember } from "./groups";
 import { planMembers, startRun } from "./plans";
-import { callApi } from "./lib/api";
+import { apiFor } from "./lib/demo";
 import { CONFIDENCE_TARGET, MAX_SWIPES, MIN_SWIPES, PREVIEW_DEBOUNCE_MS } from "./lib/constants";
 import { placesForMode } from "./lib/places";
 import { guardPlanResult, preserveBudget } from "./lib/budgets";
@@ -48,6 +48,7 @@ function readPrefs(ctx: Proc, memberId: string) {
     const prefs = tx.db.private_prefs.memberId.find(memberId);
     const swipes = Array.from(tx.db.swipe.memberId.filter(memberId));
     return {
+      groupId: m?.groupId ?? "",
       text: prefs?.text ?? "",
       posterior: parse(prefs?.posteriorJson),
       alreadySeen: swipes.map((s) => [s.winnerPlaceId, s.loserPlaceId]),
@@ -57,9 +58,9 @@ function readPrefs(ctx: Proc, memberId: string) {
 }
 
 function fetchNextPair(ctx: Proc, memberId: string) {
-  const { posterior, alreadySeen, swipeCount } = readPrefs(ctx, memberId);
+  const { groupId, posterior, alreadySeen, swipeCount } = readPrefs(ctx, memberId);
   if (swipeCount >= MAX_SWIPES || !posterior) return;
-  const res = callApi(ctx, "/elicit/next", {
+  const res = apiFor(ctx, groupId, "/elicit/next", {
     memberId, posterior, alreadySeen, candidatePlaceIds: placesForMode(ctx.env.STUB_MODE).map((p) => p.id), focusPlaceIds: [],
   });
   if (!res.ok) throw new Error(`elicit/next failed: ${JSON.stringify(res.error)}`);
@@ -73,8 +74,8 @@ function fetchNextPair(ctx: Proc, memberId: string) {
 export const runParseJob = spacetimedb.procedure(
   { onSchedule: parse_job }, { job: parse_job.rowType }, t.unit(),
   (ctx, { job }) => {
-    const { text } = readPrefs(ctx, job.memberId);
-    const res = callApi(ctx, "/parse-prefs", { text, memberId: job.memberId });
+    const { groupId, text } = readPrefs(ctx, job.memberId);
+    const res = apiFor(ctx, groupId, "/parse-prefs", { text, memberId: job.memberId });
     if (!res.ok) throw new Error(`parse-prefs failed: ${JSON.stringify(res.error)}`);
     const { hard, posterior, warnings } = res.data;
     const applied = ctx.withTx((tx) => {
@@ -99,8 +100,8 @@ export const runParseJob = spacetimedb.procedure(
 export const runSwipeJob = spacetimedb.procedure(
   { onSchedule: swipe_job }, { job: swipe_job.rowType }, t.unit(),
   (ctx, { job }) => {
-    const { posterior } = readPrefs(ctx, job.memberId);
-    const res = callApi(ctx, "/elicit/update", {
+    const { groupId, posterior } = readPrefs(ctx, job.memberId);
+    const res = apiFor(ctx, groupId, "/elicit/update", {
       posterior, winnerPlaceId: job.winnerPlaceId, loserPlaceId: job.loserPlaceId,
     });
     if (!res.ok) throw new Error(`elicit/update failed: ${JSON.stringify(res.error)}`);
@@ -129,7 +130,7 @@ export const runPreviewJob = spacetimedb.procedure(
       return { g, members: planMembers(tx, g.id).filter((m) => m.posterior) };
     });
     if (!input) return {};
-    const res = callApi(ctx, "/plan", {
+    const res = apiFor(ctx, job.groupId, "/plan", {
       runId: `preview_${job.groupId}_${job.nonce}`,
       date: input.g.date,
       window: { start: input.g.windowStart, end: input.g.windowEnd },

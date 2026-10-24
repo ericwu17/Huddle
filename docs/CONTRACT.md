@@ -318,6 +318,8 @@ Paths are lowercase (SpacetimeDB requires it). 401 on a bad secret, 400 on a bad
 2. `replan` adds the booking's placeId to `group.excludedPlaceIds`, sets `group.replanFor = bookingId` and `status = 'planned'`, and calls `startRun(tx, groupId)` (plan, offers, scout and council follow on their own; the vote reopens after). A repeated failed event for the same booking is ignored. The `replan_job` table is unused (Maincloud cannot add a schedule to an existing table).
 3. The UI shows "That place is full. New plan ready" with a one-tap "Call again" (`start_booking`, which clears `replan_for`). Never auto-call. Other reasons (no_answer, refused, error) do not replan.
 
+**Demo mode (S6):** every api and voice call goes through `server/src/lib/demo.ts`. With `group.demoMode` on, the module uses its labeled fakes and never calls out. If a call fails (unreachable, timeout, 5xx), that group switches to demo mode automatically and continues on fakes; it stays on until the host turns it off (`set_demo_mode`). Plans made this way carry a `fallback: ...` warning. Smoke-test it with `SMOKE_EXPECT_DEMO=1` against a module whose URLs are unreachable.
+
 **Schema changes on Maincloud are limited:** adding or removing a schedule on an existing table is refused, and other breaking changes may need the database wiped. Ask B before adding tables or scheduled jobs.
 
 **Env (set at publish; shell values for declared keys are picked up automatically):** `HUDDLE_SHARED_SECRET`, `FASTAPI_BASE_URL`, `STUB_MODE`, `VOICE_BASE_URL`, `COUNCIL_ENABLED`, `AGENT_LANGUAGE`, `STUB_SCENARIO` (fake call: `confirm` or `full`). Update without rebuilding: `spacetime publish huddle-calhacks -s maincloud --env-only`.

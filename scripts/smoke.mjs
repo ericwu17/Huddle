@@ -137,7 +137,14 @@ const run = (await view(host, "my_plan_runs")).find((r) => r.run_id === g.latest
 const result = JSON.parse(run.result_json);
 check("3 plans safe/bold/budget", result.plans.map((p) => p.kind).join() === "safe,bold,budget");
 const fellBack = (result.warnings ?? []).filter((w) => w.startsWith("fallback:"));
-check("plan came from the api (no module fallback)", fellBack.length === 0, fellBack.join(" | "));
+if (conf("SMOKE_EXPECT_DEMO") === "1") {
+  // Run against a module whose api URL is unreachable: the flow must still finish, labeled.
+  check("demo: plan fell back to labeled fakes", fellBack.length > 0, fellBack.join(" | ").slice(0, 120));
+  check("demo: group switched to demo mode", (await view(host, "my_group"))[0].demo_mode === true);
+} else {
+  check("plan came from the api (no module fallback)", fellBack.length === 0, fellBack.join(" | "));
+  check("demo mode stayed off", (await view(host, "my_group"))[0].demo_mode === false);
+}
 check("privacy: perMember/gaveUp/posteriorSummary stripped", result.plans.every((p) => !p.perMember && !p.gaveUp) && !result.posteriorSummary);
 const leaked = result.plans.filter((p) => demo.some(([n]) => new RegExp(`\\b${n}\\b`, "i").test(p.whyLine ?? "")));
 check("privacy: no member names in whyLine", leaked.length === 0, leaked.map((p) => p.whyLine).join(" | "));
