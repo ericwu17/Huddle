@@ -89,6 +89,33 @@ function queueBooking(s: ReturnType<typeof session>, runId: string, plan: any) {
   return [...s.test.db.call_job.iter()].at(-1)!;
 }
 
+describe("host settings", () => {
+  it("rejects member changes to privacy and fallback settings", () => {
+    const s = session();
+    for (const on of [true, false]) {
+      // Start each attempt with the opposite host-selected value.
+      s.reduce(s.users[0].auth, (tx) => exports.setDemoMode(tx, { on: !on }));
+      s.reduce(s.users[0].auth, (tx) => exports.setShowWhoCompromised(tx, { on: !on }));
+      expect(() => s.reduce(s.users[1].auth, (tx) => exports.setDemoMode(tx, { on }))).toThrow();
+      expect(() => s.reduce(s.users[1].auth, (tx) => exports.setShowWhoCompromised(tx, { on }))).toThrow();
+      const group = s.test.db.group.id.find(s.group.groupId)!;
+      expect(group.demoMode).toBe(!on);
+      expect(group.showWhoCompromised).toBe(!on);
+    }
+  });
+
+  it("lets the host turn both settings on and off", () => {
+    const s = session();
+    for (const on of [true, false]) {
+      s.reduce(s.users[0].auth, (tx) => exports.setDemoMode(tx, { on }));
+      s.reduce(s.users[0].auth, (tx) => exports.setShowWhoCompromised(tx, { on }));
+      const group = s.test.db.group.id.find(s.group.groupId)!;
+      expect(group.demoMode).toBe(on);
+      expect(group.showWhoCompromised).toBe(on);
+    }
+  });
+});
+
 describe("stale choices and budget changes", () => {
   it("rejects new unaffordable votes/bookings and stops counting old votes", () => {
     for (const cap of [17, 13, 0]) {
