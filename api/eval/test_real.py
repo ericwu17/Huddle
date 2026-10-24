@@ -1,4 +1,4 @@
-"""STUB_MODE=false checks: parser, learning, solver, offers, council.
+"""Service checks: parser, learning, solver, offers, council.
 
 No network: Claude is a scripted fake client, so the real retry and validation
 paths run. Run: python -m unittest discover -s api/eval -v.
@@ -86,7 +86,7 @@ def demo_members(texts=None):
     return members
 
 
-class RealModeTests(unittest.TestCase):
+class ServiceTests(unittest.TestCase):
     def setUp(self):
         self.secret = secrets.token_urlsafe(32)
         self.headers = {"X-Huddle-Secret": self.secret}
@@ -101,7 +101,7 @@ class RealModeTests(unittest.TestCase):
             self.deliveries.append(delivery)
             return delivery
 
-        self.client = TestClient(create_app(Settings(self.secret, False), delivery_factory, LLM(self.fake)))
+        self.client = TestClient(create_app(Settings(self.secret), delivery_factory, LLM(self.fake)))
         self.client.__enter__()
         self.addCleanup(self.client.__exit__, None, None, None)
         self.body = dict(runId="run_test_1", date=DEMO["date"], window=DEMO["window"], members=demo_members(),

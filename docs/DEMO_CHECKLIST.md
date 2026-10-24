@@ -53,7 +53,7 @@ that future features already work. Current integration details: [HANDOFF.md](HAN
 - [ ] Reload one phone and verify it retains its identity/group membership.
 - [ ] Check a phone-sized viewport for clipped controls and unreadable text.
 
-Use the repeatable backend smoke command in [api/README.md](../api/README.md#check-the-live-connected-stubs).
+Use the repeatable backend smoke command in [api/README.md](../api/README.md#check-the-live-deployment).
 It creates disposable synthetic groups; it does not replace the browser rehearsal.
 
 ## Three-minute script (draft; rehearse with a clock)

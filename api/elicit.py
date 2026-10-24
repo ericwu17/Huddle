@@ -27,7 +27,7 @@ def known(cat: Catalog, ids) -> list[int]:
     missing = sorted({pid for pid in ids if pid not in cat.index})
     if missing:
         # Usually the module still runs STUB_MODE=true and sends stub_* IDs.
-        raise ElicitError(f"Unknown place IDs {missing[:3]}; the module and API must use the same STUB_MODE")
+        raise ElicitError(f"Unknown place IDs {missing[:3]}; the module must run with STUB_MODE=false")
     return [cat.index[pid] for pid in ids]
 
 

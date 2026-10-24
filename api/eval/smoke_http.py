@@ -1,8 +1,7 @@
 """Real HTTP smoke check for a running instance (local or through a tunnel).
 
-Reads the mode from /health. Stub mode: the synthetic fixtures, byte-identical
-on repeat. Real mode: the seeded demo group on data/places.json, including one
-Claude parse and one live council when the server has ANTHROPIC_API_KEY.
+Runs the seeded demo group on data/places.json, including one Claude parse and
+one live council when the server has ANTHROPIC_API_KEY.
 """
 
 import json
@@ -11,42 +10,10 @@ from pathlib import Path
 
 import httpx
 
-FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 DEMO = Path(__file__).resolve().parents[2] / "data" / "demo_group.json"
 
 
-def fixture(name):
-    return json.loads((FIXTURES / name).read_text())
-
-
-def stub_checks(client):
-    def post(path, body):
-        response = client.post(path, json=body)
-        response.raise_for_status()
-        assert response.headers["X-Huddle-Stub"] == "true"
-        assert client.post(path, json=body).json() == response.json(), path
-        print(f"PASS {path}: authenticated, synthetic, deterministic")
-        return response.json()
-
-    post("/parse-prefs", fixture("parse-prefs.request.json"))
-    post("/elicit/next", fixture("elicit-next.request.json"))
-    post("/elicit/update", fixture("elicit-update.request.json"))
-    request = fixture("plan.request.json")
-    result = post("/plan", request)
-    assert len(result["plans"]) == 3
-    for plan in result["plans"]:
-        assert plan["costPerPerson"] == sum(s["costPerPerson"] for s in plan["stops"])
-        assert all(m["hard"]["budgetMaxPerPerson"] is None or plan["costPerPerson"] <= m["hard"]["budgetMaxPerPerson"] for m in request["members"])
-    post("/offers", dict(**request, baselinePlanId=result["plans"][0]["id"]))
-    post("/roulette", dict(plans=[dict(id=p["id"], robustness=p["robustness"]) for p in result["plans"]], seed=7))
-    post("/council", dict(runId=request["runId"], plans=result["plans"], pareto=result["pareto"],
-                         members=request["members"], scoutFacts=[], options=dict(rounds=2, showWho=False, seed=7)))
-    request["members"][0]["hard"]["budgetMaxPerPerson"] = 13
-    assert post("/plan", request)["plans"] == []
-    print("PASS cumulative budgets: every sample total fits all caps; $13 rejects all fixtures")
-
-
-def real_checks(client):
+def checks(client):
     def post(path, body):
         response = client.post(path, json=body)
         response.raise_for_status()
@@ -99,13 +66,10 @@ def main():
         assert httpx.get(base + "/health", timeout=10).status_code == 401
         health = client.get("/health")
         health.raise_for_status()
-        mode = health.json()
-        print(f"PASS /health and unauthenticated rejection: {mode}")
-        if mode["stub"]:
-            assert mode == dict(ok=True, stub=True, placesLoaded=9)
-            stub_checks(client)
-        else:
-            real_checks(client)
+        status = health.json()
+        assert status["ok"] and not status["stub"], status
+        print(f"PASS /health and unauthenticated rejection: {status}")
+        checks(client)
 
 
 if __name__ == "__main__":

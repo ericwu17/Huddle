@@ -5,21 +5,23 @@ learning, the group solver, private trade offers, roulette and the agent
 council. The SpacetimeDB module is its only caller; the browser never reaches it.
 Python 3.11+.
 
-## Two modes
+## No stub mode
 
-| `STUB_MODE` | Places | What every endpoint does |
-| --- | --- | --- |
-| `true` (default) | 9 fictional fixtures, `api/fixtures/places.fake.json` | Phase-zero canned data, labeled `SYNTHETIC STUB` ([details below](#stub-mode-phase-zero)) |
-| `false` | 45 real Berkeley places, `data/places.json` | The real service: Claude parsing, Bayesian swipe learning, Monte Carlo solver, offers, live council |
+The service always runs for real over the 45 Berkeley places in
+`data/places.json`: Claude parsing, Bayesian swipe learning, Monte Carlo solver,
+offers and live council. The phase-zero stub mode has been removed. `STUB_MODE`
+is no longer read, `/health` always reports `"stub": false`, and startup refuses
+a catalog containing `synthetic_stub` places (such as
+`api/fixtures/places.fake.json`).
 
-**The module and the API must use the same mode.** The module picks swipe
+**The module must run with `STUB_MODE=false`.** The module picks swipe
 candidates from its own catalog (`server/src/lib/places.ts`). A stub-mode module
-sends `stub_*` IDs, and a real-mode API rejects them with 422, which puts that
-group into demo mode. Switch both together. The order is in
+sends `stub_*` IDs, which this API rejects with 422, putting that group into
+demo mode. The switch-over order is in
 [docs/LOCAL_TUNNELS.md](../docs/LOCAL_TUNNELS.md#4-point-the-maincloud-module-at-the-tunnels).
 
-Real-mode responses carry no `X-Huddle-Stub` header, so the module stores runs
-with `stub: false` and ingests the council transcript directly.
+Responses carry no `X-Huddle-Stub` header, so the module stores runs with
+`stub: false` and ingests the council transcript directly.
 
 ## Run locally
 
@@ -33,7 +35,7 @@ api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-a
 ```
 
 The app loads `api/.env` itself; exported variables win, so
-`STUB_MODE=false api/.venv/bin/python -m uvicorn ...` overrides the file for one
+`PLACES_PATH=... api/.venv/bin/python -m uvicorn ...` overrides the file for one
 run. Restart uvicorn after editing `api/.env`.
 
 ## Configuration
@@ -41,14 +43,13 @@ run. Restart uvicorn after editing `api/.env`.
 | Name | Meaning |
 | --- | --- |
 | `HUDDLE_SHARED_SECRET` | Required, nonblank. Every route, `/health` included, needs it in `X-Huddle-Secret`. Never browser-visible. |
-| `STUB_MODE` | `true` (default) or `false`. Anything else refuses startup. |
-| `PLACES_PATH` | Optional catalog override. Stub mode accepts only `synthetic_stub` places; real mode refuses them. |
-| `ANTHROPIC_API_KEY` | Real mode. Without it parsing uses the keyword rules and the council falls back to Safe; nothing else needs it. |
+| `PLACES_PATH` | Optional catalog override; defaults to `data/places.json`. `synthetic_stub` places refuse startup. |
+| `ANTHROPIC_API_KEY` | Without it parsing uses the keyword rules and the council falls back to Safe; nothing else needs it. |
 | `CLAUDE_MODEL_FAST`, `CLAUDE_MODEL_SMART` | Default `claude-haiku-5-5` (parser, advocates) and `claude-sonnet-5-5` (chair). |
-| `SPACETIMEDB_URI`, `SPACETIMEDB_DB` | Real mode, optional. When both are set, each validated council message is also POSTed to `/route/council-message` as it is produced, so the panel fills live. The response transcript is the source of truth either way; the module deduplicates. |
+| `SPACETIMEDB_URI`, `SPACETIMEDB_DB` | Optional. When both are set, each validated council message is also POSTed to `/route/council-message` as it is produced, so the panel fills live. The response transcript is the source of truth either way; the module deduplicates. |
 | `FASTAPI_BASE_URL` | Read by the smoke check and the module, not by this service. |
 
-## How the real service works
+## How the service works
 
 Each section maps to the build brief, Part C.
 
@@ -96,8 +97,8 @@ Each section maps to the build brief, Part C.
   concession wins (ties: largest gain), at most one per member and three in
   total. The baseline is recomputed from the same `runId`, so `baselinePlanId`
   is not looked up.
-- **`/roulette` (C9).** Weights ∝ robustness², seeded draw. Same code in both
-  modes.
+- **`/roulette` (C9), [solver.py](solver.py).** Weights ∝ robustness², seeded
+  draw.
 - **`/council` (S5.3 rules, C10), [council.py](council.py), [llm.py](llm.py).**
   - Each advocate gets only its own member's tools (`my_score`,
     `my_dealbreakers`, `my_slack`) plus the public `plan_facts`, all computed up
@@ -155,29 +156,28 @@ determinism comes from the schema and the validators instead.
 ## Checks
 
 ```sh
-api/.venv/bin/python -m unittest discover -s api/eval -v   # 37 tests, both modes, no network
-api/.venv/bin/python api/eval/check_integration.py         # module procedures + local stub API
+api/.venv/bin/python -m unittest discover -s api/eval -v   # 27 tests, no network
 FASTAPI_BASE_URL=http://127.0.0.1:8000 HUDDLE_SHARED_SECRET=... \
-  api/.venv/bin/python api/eval/smoke_http.py              # any running instance; detects the mode
+  api/.venv/bin/python api/eval/smoke_http.py              # any running instance
 ```
 
-- `test_api.py` covers stub mode and startup; `test_real.py` covers real mode
-  with a scripted fake Claude client. That exercises the retry, validation,
-  fallback and deadline paths: dropped advocates, a chair falling back to Safe,
-  prompts free of names and caps, and the council deadline.
-- `smoke_http.py` reads the mode from `/health`. In real mode it parses the
+- `test_api.py` covers auth, the OpenAPI schema, roulette, request validation
+  and startup; `test_real.py` covers parsing, learning, the solver, offers and
+  the council with a scripted fake Claude client. That exercises the retry,
+  validation, fallback and deadline paths: dropped advocates, a chair falling
+  back to Safe, prompts free of names and caps, and the council deadline.
+- `smoke_http.py` checks `/health` reports `"stub": false`, then parses the
   four demo phrases (live Claude if the server has a key), plans for the demo
   group, and runs offers, roulette and one live council.
-- Verified on 2026-10-23:
-  - all 37 unit tests;
-  - `check_integration.py` (15 module tests);
-  - `smoke_http.py` in both modes over HTTP;
+- Verified on 2026-10-23, before stub mode was removed:
+  - all unit tests at the time;
+  - `smoke_http.py` over HTTP;
   - a one-off run of the real module procedures (parse, 12 swipe rounds,
     preview, plan, offers with `accept_offer`, roulette, scout, council)
     against a real-mode API with live Claude: `stub: false` runs, a 9-message
     council, no demo-mode switch. That run is not part of the suite.
 
-## Check the live connected stubs
+## Check the live deployment
 
 End to end through Maincloud. The helper loads the shared secret from `api/.env`
 without printing it, runs `scripts/smoke.mjs`, and creates a disposable
@@ -194,37 +194,16 @@ For a failure that starts in the voice service, restart only the voice API with
 `--voice-scenario full`, then restore `confirm` and rerun. The flag selects
 assertions; it does not change the service.
 
-The smoke test was written against the stubs. Against a real-mode API, two
+The smoke test was written against the old stubs. Against this API, two
 council checks can fail without anything being wrong: a live advocate can be
 dropped (fewer than nine messages), or the chair can pick a plan other than
 Safe.
-
-## Stub mode (phase zero)
-
-`STUB_MODE=true` keeps the phase-zero behavior unchanged. There is no parser,
-learning, solver or live council; all venue data and scores are fake; responses
-carry `X-Huddle-Stub: true` and an `X-Huddle-Notice`.
-
-| Route | Stub behavior |
-| --- | --- |
-| `GET /health` | `{"ok":true,"stub":true,"placesLoaded":9}` |
-| `POST /parse-prefs` | Four exact demo phrases (below) map to canned fixtures with an identity posterior. Any other text returns 409, which leaves the prefs page on "Parsing…" in a module without demo mode. |
-| `POST /elicit/next` | First unseen same-category fixture pair, focus first. |
-| `POST /elicit/update` | Returns the posterior unchanged. |
-| `POST /plan` | Three fixed itineraries ($18 / $20 / $14), filtered against every member's cumulative budget, vetoes, dietary needs, hours, window and first-leg travel. Preview: at most one Safe plan, `pareto: []`. |
-| `POST /offers` | `{"offers":[]}` |
-| `POST /roulette` | The real seeded draw. |
-| `POST /council` | Canned nine-message transcript; the chair picks Safe. |
-
-Demo phrases (case-insensitive): `vegetarian, under $30, somewhere quiet` ·
-`no sushi, I love trying new places` · `broke this month, nothing over $20,
-outdoors if possible` · `romantic vibe, I don't care about price`.
 
 ## Contract notes
 
 No shared shape was changed. Open points:
 
-1. `/elicit/next` has no exhausted-pair result shape; both modes return 409. The
+1. `/elicit/next` has no exhausted-pair result shape; it returns 409. The
    module stops asking at 12 swipes, far below the number of pairs.
 2. `relaxationHints` entries have no schema and would be group-visible; they
    stay `[]` (see above).
@@ -233,7 +212,7 @@ No shared shape was changed. Open points:
 4. Roulette's input has no member data, so the caller must send only plans
    that are currently approved.
 5. The module turns any failed API call into demo mode for that group
-   (`server/src/lib/demo.ts`), 4xx included, so a mode mismatch shows up as
+   (`server/src/lib/demo.ts`), 4xx included, so a stub-mode module shows up as
    demo mode rather than an error.
 
 ## Privacy rules this service keeps

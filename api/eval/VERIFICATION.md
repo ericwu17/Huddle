@@ -73,7 +73,7 @@ and booking events in `huddle-calhacks`:
   check verified that health response. No real phone or model calls were made.
 
 Reproduce using `api/eval/check_live.py` and the exact command in
-[`api/README.md`](../README.md#check-the-live-connected-stubs). The helper loads
+[`api/README.md`](../README.md#check-the-live-deployment). The helper loads
 the ignored `api/.env` without printing credentials. `node --check
 scripts/smoke.mjs` also passed. Browser rendering and persistence across host
 restarts remain outside these checks.

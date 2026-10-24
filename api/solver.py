@@ -1,14 +1,15 @@
-"""Real group solver (build-brief C3, C4, C7, C8). Stateless; no DB, no model calls.
+"""Real group solver (build-brief C3, C4, C7, C8, C9). Stateless; no DB, no model calls.
 
 Pipeline: hard filter -> time-feasible itineraries -> Monte Carlo over each member's
 posterior -> robustness (share of samples where nobody falls below tau of their own
 best) -> Safe / Bold / Budget. Offers re-run the same machinery with one member's
-limit relaxed.
+limit relaxed. Roulette is a seeded draw weighted by robustness squared.
 """
 
 from dataclasses import dataclass
 from hashlib import sha256
 from math import ceil, sqrt
+import random
 import time
 
 import numpy as np
@@ -16,7 +17,7 @@ import numpy as np
 from .catalog import CATEGORIES, DIETARY_CATEGORIES, Catalog, Itinerary, clock
 from .models import (
     FEATURES, Member, Offer, OffersRequest, OffersResponse, Pareto, Plan, PlanRequest,
-    PlanResponse,
+    PlanResponse, RouletteRequest, RouletteResponse,
 )
 
 OFFER_MAX = 15            # C8: relax one limit by at most $15 or 15 min
@@ -391,3 +392,15 @@ def offers(cat: Catalog, request: OffersRequest) -> OffersResponse:
             toMemberId=member.memberId, type=kind, amount=amount, unit="usd" if kind == "budget" else "min",
             plan=plan_, robustnessGain=round(rob_gain, 4), minRatioGain=round(min_gain, 4)))
     return OffersResponse(offers=result)
+
+
+def roulette(request: RouletteRequest) -> RouletteResponse:
+    """C9: weights proportional to robustness squared, seeded draw."""
+    # Scaling preserves squared proportions and prevents all tiny inputs underflowing.
+    scale = max(p.robustness for p in request.plans)
+    weights = {p.id: (p.robustness / scale) ** 2 for p in request.plans}
+    total = sum(weights.values())
+    weights = {pid: weight / total for pid, weight in weights.items()}
+    eligible = [p.id for p in request.plans if weights[p.id] > 0]
+    chosen = random.Random(request.seed).choices(eligible, weights=[weights[pid] for pid in eligible])[0]
+    return RouletteResponse(planId=chosen, weights=weights)
