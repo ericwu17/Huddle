@@ -1,6 +1,6 @@
 # Huddle contract
 
-> Section S5 of build-brief.md, with S5.5 rewritten for SpacetimeDB (replaced Convex on Fri Oct 23, H2). Maintained by Eric Chen. Read-only for everyone else: propose changes in the team channel.
+> Section S5 of build-brief.md, with S5.5 written for SpacetimeDB. Maintained by Eric Chen. Read-only for everyone else: propose changes in the team channel.
 
 ## S5.1 Constants
 

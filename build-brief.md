@@ -103,9 +103,10 @@ huddle/
   server/                   (B)  SpacetimeDB module: tables, views, reducers, procedures, HTTP routes
     src/geo.ts              (A)  Mapbox procedures: routeGeometry, legTimes, isochrone
     src/replan.ts           (A)  the re-plan job (S5.5)
-  web/                      (A)  Next.js app (App Router, TypeScript)
-    components/council/     (B)  council panel UI
-    components/call/        (D)  live call screen UI
+  web/                      (A)  Vite + React app (TypeScript)
+    src/module_bindings/    (generated from server/ by `npm run generate`; never edit by hand)
+    src/components/council/ (B)  council panel UI
+    src/components/call/    (D)  live call screen UI
   data/
     fetch_places.py, places.base.json, places.fake.json,
     demo_group.json, cached_run.json, scout_cache.json   (B)
@@ -118,16 +119,16 @@ huddle/
 
 **Ownership is strict:**
 
-- **A** = `web/` except `web/components/council/`, `web/components/call/`; plus `server/src/geo.ts`, `server/src/replan.ts`, `data/reviews/`, `data/places.json` (after v1), `scripts/`, `docs/BRIGHTDATA.md`.
-- **B** = `server/` (except `geo.ts` and `replan.ts`), `web/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and the `data/` files listed under B.
+- **A** = `web/` except `web/src/components/council/`, `web/src/components/call/`; plus `server/src/geo.ts`, `server/src/replan.ts`, `data/reviews/`, `data/places.json` (after v1), `scripts/`, `docs/BRIGHTDATA.md`.
+- **B** = `server/` (except `geo.ts` and `replan.ts`), `web/src/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and the `data/` files listed under B.
 - **C** = `api/`.
-- **D** = `voice/` and `web/components/call/`.
+- **D** = `voice/` and `web/src/components/call/`.
 
 Cross-folder needs go through the human.
 
 ## S4. Stack and environment
 
-- **Web (A, B, D):** Next.js (App Router, TypeScript), Tailwind CSS, shadcn/ui, framer-motion (drag gestures), qrcode.react, Mapbox GL JS. Realtime via the `spacetimedb/react` hooks (`useTable`, `useReducer`, `useProcedure`) on bindings generated from `server/`.
+- **Web (A, B, D):** Vite, React 19, React Router 7 (data mode, `createBrowserRouter`), TypeScript, Tailwind CSS 4, qrcode.react, Mapbox GL JS, oxlint. Env names keep the `NEXT_PUBLIC_` prefix (`vite.config.ts` accepts it). Realtime via the `spacetimedb/react` hooks (`useTable`, `useReducer`, `useProcedure`) on bindings generated from `server/`.
 - **SpacetimeDB (B, plus A's geo.ts and replan.ts):** a `spacetimedb` 2.13.0 TypeScript module: tables, views, reducers, procedures (outbound HTTP), schedule tables, HTTP routes. Server secrets are env keys the module declares, set at `spacetime publish` time.
 - **API (C):** Python 3.11+, FastAPI, uvicorn, pydantic v2, numpy, the anthropic SDK, httpx.
 - **Data:** Python scripts. Bright Data for reviews (A). Google Places API (New) for place basics (B). Claude for review aspect extraction (A).
@@ -490,7 +491,7 @@ Hours are from the real hacking start. H0 is assumed to be Fri 9:00 PM; shift if
 
 # PART A: DATA / ROUTING / GLUE + CORE SCREENS (Haydn; paste S + this)
 
-You are the integrator. You own: `web/` UI except `web/components/council/` and `web/components/call/`; plus `server/src/geo.ts`, `server/src/replan.ts`, `data/reviews/`, `data/places.json` (after B writes v1), `scripts/`, and `docs/BRIGHTDATA.md`. You make the parts fit together and catch drift early. The frontend is deliberately not your whole job: a bare-bones UI goes up first, and polished screens come later.
+You are the integrator. You own: `web/` UI except `web/src/components/council/` and `web/src/components/call/`; plus `server/src/geo.ts`, `server/src/replan.ts`, `data/reviews/`, `data/places.json` (after B writes v1), `scripts/`, and `docs/BRIGHTDATA.md`. You make the parts fit together and catch drift early. The frontend is deliberately not your whole job: a bare-bones UI goes up first, and polished screens come later.
 
 ## A1. Your jobs, in order
 
@@ -516,7 +517,7 @@ Run it at H2, H8, H13, then every 2 hours. When it fails, work out which part dr
 
 ## A3. Bare-bones UI (H2-5): what to build
 
-Six screens, default shadcn styling, no custom design tokens, no animation, 390px width, light mode. Ugly is fine; working is mandatory.
+Six screens, plain Tailwind with the shared `.btn` / `.input` / `.card` classes in `web/src/index.css`, no custom design tokens, no animation, 390px width, light mode. Ugly is fine; working is mandatory.
 
 1. **Home and join:** "Start a huddle" (createGroup), "Join with code", the QR code of `{origin}/join/{code}` (qrcode.react), the big 4-letter code.
 2. **Lobby:** member chips, ready state, host-only "Everyone's in".
@@ -607,7 +608,7 @@ Also: loading skeletons, error toasts, the "Demo mode: cached data" banner, and 
 
 # PART B: SPACETIMEDB + COUNCIL PANEL + SUBMISSION (Eric Chen; paste S + this)
 
-You own `server/` (everything except `src/geo.ts` and `src/replan.ts`), `web/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and these `data/` files: `fetch_places.py`, `places.base.json`, `places.fake.json`, `demo_group.json`, `cached_run.json`, `scout_cache.json`. You make four phones agree on one reality and make everything survive bad Wi-Fi. You are away or asleep from about H9 to H15, so everything others depend on lands by H8, with a hand-off note.
+You own `server/` (everything except `src/geo.ts` and `src/replan.ts`), `web/src/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and these `data/` files: `fetch_places.py`, `places.base.json`, `places.fake.json`, `demo_group.json`, `cached_run.json`, `scout_cache.json`. You make four phones agree on one reality and make everything survive bad Wi-Fi. You are away or asleep from about H9 to H15, so everything others depend on lands by H8, with a hand-off note.
 
 ## B1. SpacetimeDB (server/)
 
@@ -651,7 +652,7 @@ A shared helper `callApi(path, body)`: adds `X-Huddle-Secret`, 20 s timeout, one
 
 For each of the three plans, take the meal stop's place and run a live check through Bright Data. Use A's `docs/BRIGHTDATA.md` for the product, endpoint, and parameters (synchronous call, 20 s timeout). Store `{openNow, vegetarianOptions, checkedAt, source: "brightdata", cached: false}` in scoutChecks. On timeout or error, use `data/scout_cache.json` and set `cached: true`. Report only what the data says; unknown is null. Never guess.
 
-## B4. Council panel (web/components/council/CouncilPanel.tsx) (H19-24)
+## B4. Council panel (web/src/components/council/CouncilPanel.tsx) (H19-24)
 
 Reads the `my_council_messages` view live. Shows Round 1, Round 2, then the chair, as speech bubbles that appear as they stream in. Labels are "Advocate A-D" (names only if showWhoCompromised). The chair's bubble ends with "Recommended: {plan name}". If the run's result says fallbackUsed, show "Safe plan used (the council check failed)". Never show messages that failed validation (the api never posts them). Match A's design tokens once A defines them at H19.
 
@@ -813,7 +814,7 @@ If the posterior is not ready by H18, ship the L1 solver with Monte Carlo over t
 
 # PART D: VOICE + CALL SCREEN (Eric Wu; paste S + this)
 
-You own `voice/` and `web/components/call/`. You build the booking voice agent (Mandarin) and the live call screen, and you help with the demo video and call rehearsal. You are also the Cartesia liaison.
+You own `voice/` and `web/src/components/call/`. You build the booking voice agent (Mandarin) and the live call screen, and you help with the demo video and call rehearsal. You are also the Cartesia liaison.
 
 ## D1. Service (voice/, FastAPI)
 
@@ -850,7 +851,7 @@ Run each 10 times. **Pass criteria:** connects 10 of 10; confirmation or clean f
 - **Speaking:** the agent always replies in Mandarin. Cartesia does not list Cantonese speech, so do not promise it.
 - **STRETCH** (only if S1-S3 already pass): language lock (choose the speech-to-text language from the first utterance), an English translation line (`textEn` on transcript events), per-turn latency display, a distinct voice per council advocate.
 
-## D5. Call screen UI (web/components/call/) (H19-24)
+## D5. Call screen UI (web/src/components/call/) (H19-24)
 
 Reads the `my_call_events` view live. Show: a live transcript (the original line, plus the English line under it when `textEn` is present), a status stepper (dialing, connected, slot offered, confirmed), a confirmation card (name, time, party size), and a "Call failed: that place is full" state that hands off to A's re-plan banner. If the call falls back, play the labeled recording and label it "Recorded earlier." Use A's design tokens once A defines them at H19.
 

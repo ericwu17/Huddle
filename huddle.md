@@ -59,7 +59,7 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 | Phase | Deliverable |
 | --- | --- |
 | H0-H2 | Check the contract works across all four services with stubs. Own the end-to-end smoke-test script. |
-| H2-H5 | Bare-bones UI, timeboxed to 3 hours: join, wants, swipe, plan list with basic map pins, vote. Default shadcn styling, no polish. Fake data first, then the live SpacetimeDB module. |
+| H2-H5 | Bare-bones UI, timeboxed to 3 hours: join, wants, swipe, plan list with basic map pins, vote. Plain Tailwind styling, no polish. Fake data first, then the live SpacetimeDB module. |
 | H5-H9 | Sleep. Hand-off note first. |
 | H9-H13 | Read Eric Chen's hand-off note. Bright Data review pull for the 45 places. Aspect extraction with Claude (evidence spans, 13-feature order from the brief). Result: places.json v2 with review scores. |
 | H13 | Switch the UI from stubs to the live SpacetimeDB module. |
