@@ -49,7 +49,10 @@ at `/landing`.
 
 ## Layout
 
-- `src/router.tsx`: routes (`/`, `/join/:code`, `/g/:groupId/{lobby,prefs,swipe,plans,vote,call,judge}`)
+- `index.html` + `landing/`: the landing page at `/`. Its form sends `?name=` to `/start`
+- `app.html`: the React app's entry. Every other path is the app (`vite.config.ts` in dev, `vercel.json` on Vercel)
+- `src/router.tsx`: routes (`/start`, `/join/:code`, `/g/:groupId/{lobby,prefs,swipe,plans,vote,call,judge}`)
+- `src/doodle/`: the stick figures and drawn world, shared by the landing page and the app
 - `src/data.ts`: every read. Each hook subscribes to one `my_*` view and maps it to the types in `src/types.ts`
 - `src/module_bindings/`: generated client for the module (tables, reducers, procedures)
 - `src/types.ts`: contract types (docs/CONTRACT.md S5)

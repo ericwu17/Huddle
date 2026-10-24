@@ -4,6 +4,7 @@ import { useProcedure } from "spacetimedb/react";
 import { procedures } from "../module_bindings";
 import { saveSession } from "../session";
 import { useRun } from "../useRun";
+import { Buddy } from "../doodle/Doodle";
 
 export default function Join() {
   const code = useParams().code!.toUpperCase();
@@ -21,18 +22,35 @@ export default function Join() {
   }
 
   return (
-    <main className="page space-y-4">
-      <h1 className="text-2xl font-bold">Join huddle {code}</h1>
-      <input
-        className="input"
-        placeholder="Your name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <button className="btn btn-primary w-full" disabled={busy || !name.trim()} onClick={join}>
-        Join
-      </button>
-      {error && <p className="error">{error}</p>}
+    <main className="page space-y-6">
+      <a className="logo" href="/">
+        huddle
+      </a>
+      <div className="flex items-end gap-4 pt-4">
+        <h1 className="shout text-[56px]">
+          You're invited to <span className="code-tag inline-block align-middle text-[34px]">{code}</span>
+        </h1>
+      </div>
+
+      <div className="flex items-end gap-3">
+        <Buddy who={name.trim() || code} pose="wave" size={110} boil />
+        <p className="bubble hand mb-16 text-2xl">{name.trim() ? `Hi ${name.trim()}!` : "What's your name?"}</p>
+      </div>
+
+      <section className="card space-y-3">
+        <input
+          className="input"
+          placeholder="Your first name"
+          autoComplete="given-name"
+          maxLength={24}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <button className="btn btn-primary w-full" disabled={busy || !name.trim()} onClick={join}>
+          Join the huddle ↗
+        </button>
+        {error && <p className="error">{error}</p>}
+      </section>
     </main>
   );
 }

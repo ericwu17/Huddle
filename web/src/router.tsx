@@ -12,7 +12,7 @@ import Call from "./routes/Call";
 import Judge from "./routes/Judge";
 
 export const router = createBrowserRouter([
-  { path: "/", Component: Home },
+  { path: "/start", Component: Home },
   { path: "/join/:code", Component: Join },
   {
     path: "/g/:groupId",
@@ -20,7 +20,7 @@ export const router = createBrowserRouter([
     Component: GroupLayout,
     loader: ({ params }) => {
       const session = getSession(params.groupId!);
-      if (!session) throw redirect("/");
+      if (!session) throw redirect("/start");
       return session;
     },
     children: [

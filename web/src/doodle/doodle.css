@@ -1,0 +1,44 @@
+/* Shared by the landing page and the app: the stick figures and their poses.
+   Markup comes from figure() in doodles.ts. */
+
+:root {
+  --pop: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fig { width: 100%; height: 100%; overflow: visible; display: block; }
+.fig .arm, .fig .leg { transform-box: fill-box; transition: transform 260ms var(--out); }
+.fig .arm-l, .fig .leg-l { transform-origin: 100% 0%; }
+.fig .arm-r, .fig .leg-r { transform-origin: 0% 0%; }
+.fig .phone { opacity: 0; transition: opacity 200ms; }
+
+.pose-walk .fig { animation: bob 0.31s ease-in-out infinite alternate; }
+.pose-walk .leg-l { animation: swingA 0.62s ease-in-out infinite; }
+.pose-walk .leg-r { animation: swingB 0.62s ease-in-out infinite; }
+.pose-walk .arm-l { animation: swingB 0.62s ease-in-out infinite; }
+.pose-walk .arm-r { animation: swingA 0.62s ease-in-out infinite; }
+@keyframes swingA { 0%, 100% { transform: rotate(22deg); } 50% { transform: rotate(-22deg); } }
+@keyframes swingB { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(22deg); } }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-3%); } }
+
+.pose-idle .arm-l { transform: rotate(8deg); }
+.pose-idle .arm-r { transform: rotate(-8deg); }
+.pose-phone .arm-r { transform: rotate(-100deg); }
+.pose-phone .phone, .pose-ear .phone { opacity: 1; }
+.pose-phone .arm-l { transform: rotate(-30deg); }
+.pose-ear .arm-r { transform: rotate(-112deg); }
+.pose-ear .fig { animation: nod 0.7s ease-in-out infinite alternate; }
+.pose-argue .arm-l { animation: flailL 0.5s ease-in-out infinite alternate; }
+.pose-argue .arm-r { animation: flailR 0.42s ease-in-out infinite alternate; }
+.pose-argue .fig { animation: bob 0.25s ease-in-out infinite alternate; }
+@keyframes flailL { from { transform: rotate(55deg); } to { transform: rotate(112deg); } }
+@keyframes flailR { from { transform: rotate(-112deg); } to { transform: rotate(-60deg); } }
+.pose-wave .arm-r { animation: wave 0.4s ease-in-out infinite alternate; }
+@keyframes wave { from { transform: rotate(-114deg); } to { transform: rotate(-88deg); } }
+.pose-huddle .arm-l { transform: rotate(62deg); }
+.pose-huddle .arm-r { transform: rotate(-62deg); }
+.pose-huddle .fig { animation: hop 1.6s var(--pop) infinite; }
+.pose-huddle .leg-l { transform: rotate(10deg); }
+.pose-huddle .leg-r { transform: rotate(-10deg); }
+@keyframes hop { 0%, 55%, 100% { transform: translateY(0); } 70% { transform: translateY(-22%); } 85% { transform: translateY(0); } }
+@keyframes nod { from { transform: rotate(-2deg); } to { transform: rotate(3deg); } }

@@ -5,6 +5,7 @@ import { SpacetimeDBProvider } from "spacetimedb/react";
 import { DbConnection } from "./module_bindings";
 import { router } from "./router";
 import MissingConfig from "./MissingConfig";
+import { DoodleWorld } from "./doodle/Doodle";
 import { loadToken, saveToken } from "./session";
 import "./index.css";
 
@@ -24,6 +25,7 @@ const connectionBuilder =
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <DoodleWorld />
     {connectionBuilder ? (
       <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
         <RouterProvider router={router} />

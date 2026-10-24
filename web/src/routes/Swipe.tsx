@@ -8,19 +8,38 @@ import ConfidenceRing from "../components/ConfidenceRing";
 
 const MAX_SWIPES = 12;
 
-function PlaceCard({ place, id }: { place: Place | undefined; id: string }) {
-  if (!place) return <div className="card">{id}</div>;
+function PlaceCard({
+  place,
+  id,
+  disabled,
+  onPick,
+  tilt,
+}: {
+  place: Place | undefined;
+  id: string;
+  disabled: boolean;
+  onPick: () => void;
+  tilt: string;
+}) {
   return (
-    <div className="card space-y-1">
-      <p className="font-semibold">{place.name}</p>
-      <p className="muted">
-        {place.category} · {place.cuisine} · ${place.costPerPerson}/person
-      </p>
-      <p className="muted">
-        ★ {place.rating} ({place.reviewCount})
-      </p>
-      {place.dietary.length > 0 && <p className="muted">{place.dietary.join(", ")}</p>}
-    </div>
+    <button className={`card place-card ${tilt} w-full text-left`} disabled={disabled} onClick={onPick}>
+      {!place ? (
+        <p className="display text-2xl">{id}</p>
+      ) : (
+        <span className="block space-y-1.5">
+          <span className="display block text-[28px] text-[var(--cobalt)]">{place.name}</span>
+          <span className="flex flex-wrap gap-1.5">
+            <span className="sticker">{place.category}</span>
+            {place.cuisine && <span className="sticker">{place.cuisine}</span>}
+            <span className="sticker sticker-lime">${place.costPerPerson}/person</span>
+            <span className="sticker sticker-sun">
+              ★ {place.rating} ({place.reviewCount})
+            </span>
+          </span>
+          {place.dietary.length > 0 && <span className="muted block">{place.dietary.join(", ")}</span>}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -37,40 +56,48 @@ export default function Swipe() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-4">
+    <div className="space-y-5">
+      <section className="card flex items-center gap-4">
         <ConfidenceRing value={group.confidence} />
-        <div className="text-sm">
-          <p>
-            Your swipes: {me?.swipeCount ?? 0} / {MAX_SWIPES}
+        <div className="min-w-0 flex-1 text-sm">
+          <p className="display text-xl text-[var(--cobalt)]">
+            Your swipes {me?.swipeCount ?? 0} / {MAX_SWIPES}
           </p>
-          <ul className="muted">
+          <ul className="mt-1 flex flex-wrap gap-1.5">
             {group.members.map((m) => (
-              <li key={m.id}>
-                {m.name}: {m.swipeCount}
+              <li key={m.id} className="sticker">
+                {m.name} · {m.swipeCount}
               </li>
             ))}
           </ul>
         </div>
-      </div>
+      </section>
 
-      <h2 className="text-lg font-semibold">This or that?</h2>
+      <h1 className="shout text-[52px]">This or that?</h1>
       {!pair ? (
-        <p className="muted">
+        <p className="on-sky">
           {(me?.swipeCount ?? 0) >= MAX_SWIPES ? "You're done. Waiting for the group…" : "Loading next pair…"}
         </p>
       ) : (
-        <div className="space-y-2">
-          <PlaceCard place={PLACE_BY_ID.get(pair.a)} id={pair.a} />
-          <PlaceCard place={PLACE_BY_ID.get(pair.b)} id={pair.b} />
-          <div className="grid grid-cols-2 gap-2">
-            <button className="btn" disabled={busy} onClick={() => choose(pair.a, pair.b)}>
-              First
-            </button>
-            <button className="btn" disabled={busy} onClick={() => choose(pair.b, pair.a)}>
-              Second
-            </button>
-          </div>
+        <div className="space-y-3">
+          <PlaceCard
+            place={PLACE_BY_ID.get(pair.a)}
+            id={pair.a}
+            disabled={busy}
+            tilt="card-tilt-l"
+            onPick={() => choose(pair.a, pair.b)}
+          />
+          <p className="shout text-center text-3xl" aria-hidden="true">
+            or
+          </p>
+          <PlaceCard
+            place={PLACE_BY_ID.get(pair.b)}
+            id={pair.b}
+            disabled={busy}
+            tilt="card-tilt-r"
+            onPick={() => choose(pair.b, pair.a)}
+          />
+          <p className="on-sky muted text-center">Tap the one you'd rather go to.</p>
         </div>
       )}
       {error && <p className="error">{error}</p>}

@@ -14,20 +14,26 @@ export default function PlanCard({ plan, scout, selected, recommended, onSelect 
   const meal = plan.stops.find((s) => s.category === "meal");
   return (
     <div
-      className={`card space-y-2 ${selected ? "border-2 border-black" : ""}`}
+      className={`card plan-card plan-${plan.kind} space-y-3 ${selected ? "is-selected" : ""} ${onSelect ? "cursor-pointer" : ""}`}
       onClick={onSelect}
       role={onSelect ? "button" : undefined}
     >
-      <div className="flex items-baseline justify-between">
-        <h3 className="font-semibold">{KIND_LABEL[plan.kind]}</h3>
-        <span>${plan.costPerPerson}/person</span>
+      {recommended && <span className="plan-pick sticker sticker-sun">★ Council's pick</span>}
+      <div className="flex items-baseline justify-between gap-2">
+        <h3 className="display text-[34px]">{KIND_LABEL[plan.kind]}</h3>
+        <span className="sticker sticker-lime text-sm">${plan.costPerPerson}/person</span>
       </div>
-      {recommended && <p className="text-sm font-semibold">★ Recommended by the council</p>}
-      <p className="text-sm">{pct(plan.robustness)} sure nobody's unhappy</p>
-      <ol className="space-y-1 text-sm">
-        {plan.stops.map((s) => (
+      <p className="hand text-xl leading-tight">{pct(plan.robustness)} sure nobody's unhappy</p>
+      <ol className="plan-stops text-sm">
+        {plan.stops.map((s, i) => (
           <li key={s.placeId}>
-            {s.start}–{s.end} · {s.name} <span className="muted">({s.category}, ${s.costPerPerson})</span>
+            <span className="plan-dot">{i + 1}</span>
+            <span>
+              <b>{s.name}</b>
+              <span className="muted block">
+                {s.start}–{s.end} · {s.category} · ${s.costPerPerson}
+              </span>
+            </span>
           </li>
         ))}
       </ol>

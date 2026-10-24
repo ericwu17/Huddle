@@ -1,4 +1,7 @@
 {
-  "redirects": [{ "source": "/landing", "destination": "/landing/", "permanent": false }],
-  "rewrites": [{ "source": "/((?!landing/).*)", "destination": "/index.html" }]
+  "redirects": [
+    { "source": "/landing", "destination": "/", "permanent": false },
+    { "source": "/landing/", "destination": "/", "permanent": false }
+  ],
+  "rewrites": [{ "source": "/((?!assets/).+)", "destination": "/app.html" }]
 }

@@ -14,9 +14,11 @@ export default function Judge() {
   const x = (v: number) => `${((Math.max(-range, Math.min(range, v)) + range) / (2 * range)) * 100}%`;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <h1 className="shout text-[52px]">Under the hood</h1>
       <section className="card space-y-2">
-        <h2 className="font-semibold">Your taste (posterior mean ± sd)</h2>
+        <h2 className="card-title">Your taste</h2>
+        <p className="muted">Posterior mean ± sd. Only you see yours.</p>
         {!mine?.posteriorSummary && <p className="muted">No posterior yet.</p>}
         {mine?.posteriorSummary?.features.map((f) => (
           <div key={f.name} className="text-xs">
@@ -26,25 +28,25 @@ export default function Judge() {
                 {f.mean.toFixed(2)} ± {f.sd.toFixed(2)}
               </span>
             </div>
-            <div className="relative h-3 bg-gray-100">
-              <div className="absolute top-0 h-3 w-px bg-gray-400" style={{ left: "50%" }} />
+            <div className="relative h-4 overflow-hidden rounded-full border-2 border-[var(--ink)] bg-white">
+              <div className="absolute top-0 h-4 w-px bg-[var(--ink)]" style={{ left: "50%" }} />
               <div
-                className="absolute top-0 h-3 bg-gray-400"
+                className="absolute top-0 h-4 bg-[var(--sun)]"
                 style={{ left: x(f.mean - f.sd), width: `calc(${x(f.mean + f.sd)} - ${x(f.mean - f.sd)})` }}
               />
-              <div className="absolute top-0 h-3 w-1 bg-black" style={{ left: x(f.mean) }} />
+              <div className="absolute top-0 h-4 w-1.5 bg-[var(--pink)]" style={{ left: x(f.mean) }} />
             </div>
           </div>
         ))}
       </section>
 
       <section className="card space-y-1 text-sm">
-        <h2 className="font-semibold">Solver stats</h2>
+        <h2 className="card-title">Solver stats</h2>
         <p>Group confidence: {group.confidence ?? "–"}</p>
         {result ? (
           <>
             <p>Robustness: {result.plans.map((p) => `${p.kind} ${p.robustness}`).join(", ")}</p>
-            <pre className="overflow-x-auto bg-gray-50 p-2 text-xs">{JSON.stringify(result.stats, null, 2)}</pre>
+            <pre className="scrap">{JSON.stringify(result.stats, null, 2)}</pre>
           </>
         ) : (
           <p className="muted">No run yet.</p>

@@ -1,54 +1,325 @@
 @import "tailwindcss";
+@import "./doodle/doodle.css";
 
-/* Bare-bones rough draft. Real design tokens come with the polish pass (A6). */
+/* The app wears the landing page's look: a drawn world behind, paper cards
+   with thick ink and offset shadows, Anton for shouting, Gochi Hand for talking. */
 
-body {
-  font-family: system-ui, sans-serif;
-  background: #fff;
-  color: #111;
+:root {
+  --sky: #5b7cf5;
+  --cobalt: #1f3fd8;
+  --deep: #14238f;
+  --pink: #ff5fb4;
+  --lime: #8fe03b;
+  --sun: #ffd23a;
+  --paper: #fffdf7;
+  --note: #fff3a8;
+  --ink: #16152b;
+  --ink-soft: #5d5b73;
+  --red: #d61f45;
+  --green: #17a34a;
+
+  --display: "Anton", Impact, sans-serif;
+  --text: "Plus Jakarta Sans", system-ui, sans-serif;
+  --hand: "Gochi Hand", "Comic Sans MS", cursive;
 }
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--text);
+  font-size: 16px;
+  line-height: 1.45;
+  background: var(--sky);
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+
+/* The world, fixed behind everything */
+.app-world { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--sky); pointer-events: none; }
+.app-world .doodle-world { display: block; width: 100%; height: 100%; }
 
 .page {
-  max-width: 480px;
+  max-width: 520px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 16px 16px 160px;
 }
 
-.btn {
-  min-height: 44px;
-  padding: 8px 14px;
-  border: 1px solid #111;
-  border-radius: 8px;
-  background: #fff;
+/* ---- Type ---- */
+.display {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
 }
-.btn:disabled {
-  opacity: 0.5;
-}
-.btn-primary {
-  background: #111;
+/* White Anton with the stacked cobalt edge, for titles sitting on the sky. */
+.shout {
+  font-family: var(--display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.92;
   color: #fff;
+  text-shadow: 0 1px 0 #dfe6ff, 0 3px 0 var(--cobalt), 0 5px 0 var(--deep), 0 10px 18px rgb(20 35 143 / 0.35);
 }
+.hand { font-family: var(--hand); font-weight: 400; }
+.on-sky { text-shadow: 0 1px 2px rgb(20 35 143 / 0.7), 0 2px 12px rgb(20 35 143 / 0.5); font-weight: 700; }
+
+/* ---- Paper ---- */
+.card {
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 6px 7px 0 var(--ink);
+}
+.card-title { font-family: var(--display); font-weight: 400; text-transform: uppercase; font-size: 24px; line-height: 1; color: var(--cobalt); }
+.card-note { background: var(--note); }
+.card-pink { background: #ffe2f1; }
+.card-mint { background: #e3f9d0; }
+.card-tilt-l { transform: rotate(-1.2deg); }
+.card-tilt-r { transform: rotate(1.2deg); }
+
+/* Text that is neither shouting nor important. Inherits colour so it works on paper and sky. */
+.muted { opacity: 0.72; font-size: 0.875rem; }
+.card .muted { color: var(--ink-soft); opacity: 1; }
+
+.error {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 12px;
+  background: #fff;
+  color: var(--red);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px 14px 14px 4px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--ink);
+  text-shadow: none;
+}
+
+/* ---- Controls ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 20px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 15px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 4px 5px 0 var(--ink);
+  transition: transform 160ms var(--out), box-shadow 160ms var(--out), background-color 160ms;
+}
+.btn:hover:not(:disabled) { transform: translate(-1px, -2px); box-shadow: 5px 7px 0 var(--ink); }
+.btn:active:not(:disabled) { transform: translate(3px, 4px); box-shadow: 1px 1px 0 var(--ink); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-primary { background: var(--pink); color: #fff; }
+.btn-sun { background: var(--sun); }
+.btn-cobalt { background: var(--cobalt); color: #fff; }
 
 .input {
   width: 100%;
-  min-height: 44px;
-  padding: 8px 10px;
-  border: 1px solid #999;
-  border-radius: 8px;
+  min-height: 52px;
+  padding: 10px 16px;
+  background: #fff;
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  font: inherit;
+  font-weight: 600;
+}
+.input::placeholder { color: #9a98ad; font-weight: 500; }
+.input:focus { outline: none; box-shadow: 0 0 0 4px var(--sun); }
+textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; resize: vertical; }
+
+.check { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; }
+.check input { appearance: none; width: 26px; height: 26px; flex: none; border: 3px solid var(--ink); border-radius: 8px; background: #fff; cursor: pointer; display: grid; place-items: center; }
+.check input:checked { background: var(--lime); }
+.check input:checked::after { content: ""; width: 7px; height: 13px; margin-top: -3px; border: solid var(--ink); border-width: 0 3.5px 3.5px 0; transform: rotate(45deg); }
+
+/* Stickers: little labels with an ink edge */
+.sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.sticker-sun { background: var(--sun); }
+.sticker-lime { background: var(--lime); }
+.sticker-pink { background: var(--pink); color: #fff; }
+.sticker-red { background: #ffd0da; }
+
+/* Raw JSON for testers, written on a scrap of paper */
+.scrap {
+  overflow-x: auto;
+  padding: 10px 12px;
+  background: #f4f0e2;
+  color: var(--ink);
+  border: 2px dashed var(--ink-soft);
+  border-radius: 12px;
+  font-size: 12px;
 }
 
-.card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 12px;
+/* ---- Group shell ---- */
+.topbar { display: flex; align-items: center; gap: 12px; }
+.logo { font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; text-shadow: 0 2px 0 var(--cobalt), 0 4px 0 var(--deep); }
+.code-tag { padding: 2px 12px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-3deg); }
+.me-tag { margin-left: auto; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
+
+.steps {
+  display: flex;
+  gap: 6px;
+  margin: 0 -16px;
+  padding: 4px 16px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.steps::-webkit-scrollbar { display: none; }
+.steps a {
+  flex: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgb(20 35 143 / 0.42);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.4);
+  transition: background-color 160ms;
+}
+.steps a:hover { background: rgb(20 35 143 / 0.6); }
+.steps a.active { background: var(--paper); color: var(--cobalt); box-shadow: 3px 3px 0 var(--ink); border: 2.5px solid var(--ink); padding: 4.5px 11.5px; }
+
+/* ---- Figures ---- */
+.buddy { position: relative; display: inline-block; flex: none; vertical-align: bottom; }
+.buddy-fig, .buddy-fig .fig { display: block; width: 100%; height: 100%; }
+.buddy-crown { position: absolute; left: 26%; top: -9%; width: 48%; overflow: visible; }
+.buddy-crown path { fill: var(--sun); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+
+/* A row of people standing on a line */
+.crowd { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 18px; }
+.crowd-member { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 64px; }
+.crowd-member b { font-family: var(--hand); font-weight: 400; font-size: 20px; line-height: 1; }
+
+/* ---- Speech bubbles ---- */
+.bubble {
+  position: relative;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 22px 22px 22px 6px;
+  padding: 10px 14px 12px;
+  box-shadow: 4px 5px 0 var(--ink);
 }
 
-.error {
-  color: #b00020;
-  font-size: 0.875rem;
+/* Bouncing dots for "someone is typing" */
+.dots { display: inline-flex; gap: 5px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: dot 0.9s var(--pop) infinite; }
+.dots i:nth-child(2) { animation-delay: 0.15s; }
+.dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dot { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+/* Entrance for anything that streams in */
+.pop-in { animation: popIn 420ms var(--pop) both; }
+@keyframes popIn { from { opacity: 0; transform: translateY(12px) scale(0.92); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 1ms !important; }
 }
 
-.muted {
-  color: #666;
-  font-size: 0.875rem;
+/* Swipe: each place is one big tappable card */
+.place-card { cursor: pointer; transition: transform 200ms var(--pop), box-shadow 160ms var(--out); }
+.place-card:hover:not(:disabled) { transform: rotate(0deg) translateY(-3px); box-shadow: 8px 10px 0 var(--ink); }
+.place-card:active:not(:disabled) { transform: scale(0.98); box-shadow: 2px 2px 0 var(--ink); }
+.place-card:disabled { opacity: 0.6; cursor: wait; }
+
+/* Plans: each kind gets its own paper colour */
+.plan-card { transition: transform 200ms var(--pop), box-shadow 160ms var(--out); }
+.plan-safe .display { color: var(--cobalt); }
+.plan-bold { background: #ffe2f1; }
+.plan-bold .display { color: #c2187a; }
+.plan-budget { background: #e3f9d0; }
+.plan-budget .display { color: #2f7a12; }
+.plan-card.is-selected { transform: translateY(-3px); box-shadow: 9px 11px 0 var(--ink); outline: 4px solid var(--sun); outline-offset: 3px; }
+.plan-pick { position: absolute; top: -14px; right: 14px; transform: rotate(4deg); font-size: 13px; }
+.plan-stops { display: grid; gap: 8px; }
+.plan-stops li { display: flex; gap: 10px; align-items: flex-start; }
+.plan-dot { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--sun); border: 2.5px solid var(--ink); font-family: var(--display); font-size: 14px; line-height: 1; }
+
+/* The chair speaks in solid ink */
+.bubble-chair { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: 4px 5px 0 var(--cobalt); }
+
+/* Call: a hand-drawn phone holding the live transcript */
+.call-phone {
+  position: relative;
+  max-width: 340px;
+  margin: 0 auto;
+  padding: 26px 12px 16px;
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-radius: 34px;
+  box-shadow: 7px 9px 0 var(--ink);
+  transform: rotate(-2deg);
 }
+.call-phone::before { content: ""; position: absolute; left: 50%; top: 10px; width: 64px; height: 6px; margin-left: -32px; background: var(--ink); border-radius: 4px; }
+.call-phone.is-ringing { animation: ring 2.4s ease-in-out infinite; }
+@keyframes ring { 0%, 70%, 100% { transform: rotate(-2deg); } 74% { transform: rotate(-5deg); } 78% { transform: rotate(1deg); } 82% { transform: rotate(-4deg); } 86% { transform: rotate(-1deg); } }
+.call-screen { display: flex; flex-direction: column; gap: 8px; min-height: 260px; max-height: 420px; overflow-y: auto; color: var(--ink); font-size: 14px; line-height: 1.3; }
+.call-line { max-width: 86%; padding: 7px 11px; border-radius: 14px; font-weight: 600; }
+.call-line.is-them { background: #e8edff; align-self: flex-start; border-bottom-left-radius: 4px; }
+.call-line.is-us { background: #ffe2f1; align-self: flex-end; border-bottom-right-radius: 4px; }
+.call-who { font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cobalt); }
+
+/* ---- Council: the friends' advocates argue it out ---- */
+.council-round {
+  width: fit-content;
+  padding: 3px 14px;
+  background: var(--sun);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transform: rotate(-2deg);
+}
+.council-row { display: flex; align-items: flex-end; gap: 6px; }
+.council-row.is-right { flex-direction: row-reverse; }
+.council-row .buddy { margin-bottom: -4px; }
+.council-bubble { flex: 1; min-width: 0; margin-bottom: 30px; }
+.council-row.is-right .council-bubble { border-radius: 22px 22px 6px 22px; }
+.council-row.is-left .council-bubble { transform: rotate(-0.6deg); }
+.council-row.is-right .council-bubble { transform: rotate(0.6deg); }
+.council-speaker { font-family: var(--display); font-weight: 400; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cobalt); }
+.bubble-chair .council-speaker { color: var(--sun); }
+.council-for { font-family: var(--text); font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--ink-soft); }
+.council-text { font-family: var(--hand); font-size: 19px; line-height: 1.2; margin-top: 2px; }
+.council-cited { margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--ink-soft); }
+.bubble-chair .council-cited { color: #b9b7cf; }
+.council-verdict { margin-top: 10px; font-size: 14px; white-space: normal; }
+.council-waiting { display: flex; align-items: center; gap: 12px; }

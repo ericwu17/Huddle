@@ -4,6 +4,7 @@ import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
+import { Buddy } from "../doodle/Doodle";
 
 export default function Prefs() {
   const { session, mine } = useGroup();
@@ -12,40 +13,46 @@ export default function Prefs() {
   const [text, setText] = useState("");
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold">What do you want?</h2>
-      <p className="muted">Only you see this.</p>
-      <textarea
-        className="input min-h-28"
-        placeholder="no sushi, under $30, somewhere quiet"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <button
-        className="btn btn-primary w-full"
-        disabled={busy || !text.trim()}
-        onClick={() => run(() => submitPrefs({ text }))}
-      >
-        Save
-      </button>
-      {error && <p className="error">{error}</p>}
+    <div className="space-y-5">
+      <h1 className="shout text-[52px]">What do you want?</h1>
+
+      <section className="card card-note space-y-3">
+        <div className="flex items-center gap-3">
+          <Buddy who={session.name} pose="phone" size={84} boil />
+          <p className="bubble hand text-xl">Only you see this. Be honest!</p>
+        </div>
+        <textarea
+          className="input min-h-32"
+          placeholder="no sushi, under $30, somewhere quiet"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button
+          className="btn btn-primary w-full"
+          disabled={busy || !text.trim()}
+          onClick={() => run(() => submitPrefs({ text }))}
+        >
+          Save, privately
+        </button>
+        {error && <p className="error">{error}</p>}
+      </section>
 
       {mine?.text && (
-        <section className="card space-y-2 text-sm">
-          <p>
-            <span className="font-semibold">You said:</span> {mine.text}
+        <section className="card space-y-3 text-sm">
+          <p className="hand text-xl">
+            <span className="display mr-2 text-base text-[var(--cobalt)]">You said</span>"{mine.text}"
           </p>
           {mine.hard ? (
-            <pre className="overflow-x-auto bg-gray-50 p-2">{JSON.stringify(mine.hard, null, 2)}</pre>
+            <pre className="scrap">{JSON.stringify(mine.hard, null, 2)}</pre>
           ) : (
-            <p className="muted">Parsing…</p>
+            <p className="muted">Reading it…</p>
           )}
           {mine.warnings.map((w) => (
             <p key={w} className="error">
               {w}
             </p>
           ))}
-          <Link className="underline" to={`/g/${session.groupId}/swipe`}>
+          <Link className="btn btn-sun w-full" to={`/g/${session.groupId}/swipe`}>
             Next: swipe →
           </Link>
         </section>

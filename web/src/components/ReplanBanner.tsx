@@ -30,8 +30,8 @@ export default function ReplanBanner({ ctx }: { ctx: GroupContext }) {
   }
 
   return (
-    <div className="card space-y-2 bg-orange-50">
-      <p className="font-semibold">That place is full. New plan ready.</p>
+    <div className="card card-note space-y-3">
+      <p className="card-title">That place is full. New plan ready.</p>
       {plan ? (
         <p className="text-sm">
           {plan.kind}: {plan.stops.map((s) => s.name).join(" → ")}

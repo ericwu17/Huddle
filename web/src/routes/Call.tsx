@@ -9,8 +9,8 @@ export default function Call() {
   const startBooking = useReducer(reducers.startBooking);
   const { run, busy, error } = useRun();
 
-  if (booking === undefined) return <p className="muted">Loading…</p>;
-  if (booking === null) return <p className="muted">No booking yet. Vote, then tap "Book it".</p>;
+  if (booking === undefined) return <p className="on-sky">Loading…</p>;
+  if (booking === null) return <p className="on-sky">No booking yet. Vote, then tap "Book it".</p>;
 
   function retry() {
     run(() =>

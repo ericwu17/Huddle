@@ -8,6 +8,7 @@ import StatusNav from "../components/StatusNav";
 import DemoBanner from "../components/DemoBanner";
 import ReplanBanner from "../components/ReplanBanner";
 import OffersInbox from "../components/OffersInbox";
+import { Buddy } from "../doodle/Doodle";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -56,17 +57,26 @@ export default function GroupLayout() {
     lastBooking.current = id;
   }, [booking, navigate, session.groupId]);
 
-  if (group === undefined) return <main className="page">Loading group…</main>;
+  if (group === undefined) return <main className="page on-sky">Loading group…</main>;
   // Views only cover this phone's current group: the one it joined last.
   if (group === null || group.id !== session.groupId) {
     return (
-      <main className="page space-y-2">
-        <p>This phone isn't in huddle {session.code} anymore.</p>
-        {group && (
-          <Link className="underline" to={`/g/${group.id}`}>
-            Go to huddle {group.code}
-          </Link>
-        )}
+      <main className="page space-y-4">
+        <a className="logo" href="/">
+          huddle
+        </a>
+        <section className="card space-y-3">
+          <p>This phone isn't in huddle {session.code} anymore.</p>
+          {group ? (
+            <Link className="btn btn-primary w-full" to={`/g/${group.id}`}>
+              Go to huddle {group.code}
+            </Link>
+          ) : (
+            <Link className="btn w-full" to="/start">
+              Start a new huddle
+            </Link>
+          )}
+        </section>
       </main>
     );
   }
@@ -80,11 +90,19 @@ export default function GroupLayout() {
 
   return (
     <main className="page space-y-4">
-      <header className="flex items-baseline justify-between">
-        <h1 className="text-xl font-bold">Huddle {group.code}</h1>
-        <span className="muted">
-          {session.name}
-          {ctx.isHost && " (host)"} · {group.status}
+      <header className="topbar">
+        <a className="logo" href="/">
+          huddle
+        </a>
+        <span className="code-tag" aria-label={`Huddle code ${group.code}`}>
+          {group.code}
+        </span>
+        <span className="me-tag on-sky">
+          <Buddy who={session.name} size={40} />
+          <span>
+            {session.name}
+            {ctx.isHost && <span className="sticker sticker-sun ml-1.5">host</span>}
+          </span>
         </span>
       </header>
       <StatusNav groupId={session.groupId} />

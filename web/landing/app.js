@@ -1,6 +1,6 @@
 // Huddle landing: scroll choreography, the doodled people walking around the hills,
 // and the little interactions.
-import { figure, filterDefs, LOCK, world } from "./doodles.js";
+import { figure, filterDefs, LOCK, world } from "../src/doodle/doodles.ts";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));

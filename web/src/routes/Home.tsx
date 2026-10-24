@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useProcedure } from "spacetimedb/react";
 import { procedures } from "../module_bindings";
 import { saveSession } from "../session";
 import { useRun } from "../useRun";
+import { Buddy } from "../doodle/Doodle";
 
 export default function Home() {
   const navigate = useNavigate();
   const createGroup = useProcedure(procedures.createGroup);
   const joinGroup = useProcedure(procedures.joinGroup);
   const { run, busy, error } = useRun();
-  const [name, setName] = useState("");
+  // The landing page's form sends ?name= here.
+  const [params] = useSearchParams();
+  const [name, setName] = useState(params.get("name") ?? "");
   const [code, setCode] = useState("");
 
   async function start() {
@@ -25,36 +28,48 @@ export default function Home() {
 
   return (
     <main className="page space-y-6">
-      <h1 className="text-2xl font-bold">Huddle</h1>
+      <a className="logo" href="/">
+        huddle
+      </a>
 
-      <section className="card space-y-2">
-        <h2 className="font-semibold">Start a huddle</h2>
+      <div className="pt-4">
+        <h1 className="shout text-[64px]">Get the group in</h1>
+        <p className="on-sky mt-3">Start a huddle, drop the code in the group chat. First names only.</p>
+      </div>
+
+      <div className="crowd justify-center" aria-hidden="true">
+        {["Advocate A", "Advocate B", "Advocate C", "Advocate D"].map((who, i) => (
+          <Buddy key={who} who={who} pose={i % 2 ? "wave" : "huddle"} size={92} boil={i === 1} />
+        ))}
+      </div>
+
+      <section className="card space-y-3">
+        <h2 className="card-title">Start a huddle</h2>
         <input
           className="input"
-          placeholder="Your name"
+          placeholder="Your first name"
+          autoComplete="given-name"
+          maxLength={24}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <button className="btn btn-primary w-full" disabled={busy || !name.trim()} onClick={start}>
-          Start a huddle
+          Start a huddle ↗
         </button>
         {error && <p className="error">{error}</p>}
       </section>
 
-      <section className="card space-y-2">
-        <h2 className="font-semibold">Join with code</h2>
+      <section className="card card-note card-tilt-r space-y-3">
+        <h2 className="card-title">Got a code?</h2>
         <input
-          className="input uppercase"
+          className="input display text-center text-3xl tracking-[0.3em] uppercase"
           placeholder="ABCD"
+          aria-label="Huddle code"
           maxLength={4}
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
         />
-        <button
-          className="btn w-full"
-          disabled={code.length !== 4}
-          onClick={() => navigate(`/join/${code}`)}
-        >
+        <button className="btn w-full" disabled={code.length !== 4} onClick={() => navigate(`/join/${code}`)}>
           Join
         </button>
       </section>

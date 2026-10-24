@@ -24,9 +24,9 @@ export default function ConsensusMap({ pareto, plans, onSelect, size = 320 }: Pr
 
   return (
     <div className="space-y-2">
-      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-md border">
-        <line x1={pad} y1={size - pad} x2={size - pad} y2={size - pad} stroke="#999" />
-        <line x1={pad} y1={pad} x2={pad} y2={size - pad} stroke="#999" />
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-md rounded-2xl border-[3px] border-[var(--ink)] bg-white">
+        <line x1={pad} y1={size - pad} x2={size - pad} y2={size - pad} stroke="#16152b" strokeWidth={2.5} strokeLinecap="round" />
+        <line x1={pad} y1={pad} x2={pad} y2={size - pad} stroke="#16152b" strokeWidth={2.5} strokeLinecap="round" />
         <text x={size / 2} y={size - 6} textAnchor="middle" fontSize={11}>
           mean ratio (total happiness)
         </text>
@@ -46,11 +46,12 @@ export default function ConsensusMap({ pareto, plans, onSelect, size = 320 }: Pr
                 cx={sx(p.meanRatio)}
                 cy={sy(p.minRatio)}
                 r={isBest ? 8 : plan ? 6 : 3}
-                fill={isBest ? "#111" : plan ? "#fff" : "#999"}
-                stroke="#111"
+                fill={isBest ? "#ff5fb4" : plan ? "#ffd23a" : "#c9c5d8"}
+                stroke="#16152b"
+                strokeWidth={plan ? 2.5 : 1.5}
               />
               {plan && (
-                <text x={sx(p.meanRatio) + 9} y={sy(p.minRatio) - 9} fontSize={11}>
+                <text x={sx(p.meanRatio) + 9} y={sy(p.minRatio) - 9} fontSize={15} fontFamily="Gochi Hand, cursive" fill="#16152b">
                   {KIND_LABEL[plan.kind]}
                 </text>
               )}
@@ -67,7 +68,7 @@ export default function ConsensusMap({ pareto, plans, onSelect, size = 320 }: Pr
           step={0.05}
           value={w}
           onChange={(e) => setW(Number(e.target.value))}
-          className="w-full"
+          className="w-full accent-[var(--pink)]"
         />
       </label>
       <p className="muted">

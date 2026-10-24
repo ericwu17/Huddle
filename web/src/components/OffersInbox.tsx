@@ -14,11 +14,12 @@ export default function OffersInbox({ ctx }: { ctx: GroupContext }) {
   if (open.length === 0) return null;
 
   return (
-    <section className="card space-y-3 bg-blue-50">
-      <h2 className="font-semibold">Private offer (only you see this)</h2>
+    <section className="card card-pink card-tilt-l space-y-3">
+      <h2 className="card-title">Psst, a private offer</h2>
+      <p className="muted">Only you see this.</p>
       {open.map((offer) => (
         <div key={offer.offerId} className="space-y-2">
-          <p>
+          <p className="hand text-xl leading-tight">
             {offer.text ||
               (offer.type === "budget"
                 ? `Stretch your budget by $${offer.amount} for a plan the group would like better?`

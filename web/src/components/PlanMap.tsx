@@ -60,7 +60,7 @@ function MapboxMap({ plan, lines }: Props) {
         id: "route",
         type: "line",
         source: "route",
-        paint: { "line-color": "#111", "line-width": 3 },
+        paint: { "line-color": "#ff5fb4", "line-width": 5, "line-dasharray": [1, 1.4] },
       });
     }
 
@@ -73,7 +73,7 @@ function MapboxMap({ plan, lines }: Props) {
     return () => markers.forEach((m) => m.remove());
   }, [plan, lines, loaded]);
 
-  return <div ref={container} className="h-64 w-full rounded-lg" />;
+  return <div ref={container} className="card h-64 w-full overflow-hidden !p-0" />;
 }
 
 // No Mapbox token: plot stops on a plain box so the screen still works.
@@ -101,15 +101,17 @@ function SvgMap({ plan, lines }: Props) {
           <polyline
             key={i}
             fill="none"
-            stroke="#111"
-            strokeWidth={2}
+            stroke="#ff5fb4"
+            strokeWidth={4}
+            strokeDasharray="2 7"
+            strokeLinecap="round"
             points={line.map(([lng, lat]) => `${sx(lng)},${sy(lat)}`).join(" ")}
           />
         ))}
         {plan.stops.map((s, i) => (
           <g key={s.placeId}>
-            <circle cx={sx(s.lng)} cy={sy(s.lat)} r={10} fill="#fff" stroke="#111" />
-            <text x={sx(s.lng)} y={sy(s.lat)} textAnchor="middle" dominantBaseline="central" fontSize={11}>
+            <circle cx={sx(s.lng)} cy={sy(s.lat)} r={13} fill="#ffd23a" stroke="#16152b" strokeWidth={3} />
+            <text x={sx(s.lng)} y={sy(s.lat)} textAnchor="middle" dominantBaseline="central" fontSize={14} fontFamily="Anton, Impact, sans-serif" fill="#16152b">
               {i + 1}
             </text>
           </g>

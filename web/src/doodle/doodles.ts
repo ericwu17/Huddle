@@ -41,8 +41,8 @@ export const filterDefs = `
 </svg>`;
 
 // ---- The drawn world: sky, sun, clouds, three hills, flowers -------------------
-const cloud = (x, y, s) => `<path transform="translate(${x} ${y}) scale(${s})" d="M-90 20 c-30 0 -34 -40 -4 -44 c2 -30 46 -40 62 -14 c14 -34 70 -30 74 6 c32 -6 48 30 22 46 c4 14 -10 24 -26 22 z" fill="#fff" stroke="${INK}" stroke-width="${6 / s}"/>`;
-function flowers(seed, n, y0, y1) {
+const cloud = (x: number, y: number, s: number) => `<path transform="translate(${x} ${y}) scale(${s})" d="M-90 20 c-30 0 -34 -40 -4 -44 c2 -30 46 -40 62 -14 c14 -34 70 -30 74 6 c32 -6 48 30 22 46 c4 14 -10 24 -26 22 z" fill="#fff" stroke="${INK}" stroke-width="${6 / s}"/>`;
+function flowers(seed: number, n: number, y0: number, y1: number) {
   let s = seed, out = "";
   const r = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
   for (let i = 0; i < n; i++) {
@@ -56,8 +56,10 @@ function flowers(seed, n, y0, y1) {
 const birds = `<g fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"><path d="M560 220 q14 -14 26 0 q12 -14 26 0"/><path d="M640 180 q10 -10 20 0 q10 -10 20 0"/><path d="M500 260 q8 -8 16 0 q8 -8 16 0"/></g>`;
 
 // `only` picks which layers to draw, so the page can stack them as separate planes.
-export function world({ sun = true, wobble = "wobA", only = ["sky", "sun", "clouds", "far", "mid", "near"] } = {}) {
-  const has = (k) => only.includes(k);
+export type Layer = "sky" | "sun" | "clouds" | "far" | "mid" | "near";
+
+export function world({ sun = true, wobble = "wobA", only = ["sky", "sun", "clouds", "far", "mid", "near"] as Layer[] } = {}) {
+  const has = (k: Layer) => only.includes(k);
   return `
 <svg class="doodle-world" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <g filter="url(#${wobble})" stroke-linejoin="round" stroke-linecap="round">
@@ -78,7 +80,7 @@ export function world({ sun = true, wobble = "wobA", only = ["sky", "sun", "clou
 }
 
 // Hair and faces, so each friend reads as a different person.
-const HAIR = {
+export const HAIR = {
   spiky: `<path d="M-13 14 l3 -9 l3 6 l3 -9 l3 7 l3 -9 l3 8 l3 -6" fill="none"/>`,
   mop: `<path d="M-15 18 c-2 -14 10 -22 18 -18 c6 -4 14 2 12 14 c-4 -6 -10 -8 -14 -6 c-6 -2 -12 2 -16 10z" fill="${INK}"/>`,
   pony: `<path d="M-14 16 c0 -14 26 -16 28 -2" fill="none"/><path d="M13 12 c10 2 12 14 6 22" fill="none"/>`,
@@ -86,14 +88,22 @@ const HAIR = {
   bald: ``,
   curly: `<path d="M-14 12 c-4 -6 2 -10 5 -8 c0 -6 8 -6 9 -1 c2 -5 10 -4 9 2 c5 -1 7 5 3 8" fill="none"/>`,
 };
-const FACE = {
+export const FACE = {
   smile: `<circle cx="-5" cy="20" r="1.8" fill="${INK}" stroke="none"/><circle cx="6" cy="20" r="1.8" fill="${INK}" stroke="none"/><path d="M-7 27 q6 6 13 0" fill="none"/>`,
   grin: `<circle cx="-5" cy="19" r="1.8" fill="${INK}" stroke="none"/><circle cx="6" cy="19" r="1.8" fill="${INK}" stroke="none"/><path d="M-8 25 q8 9 16 0 z" fill="${INK}"/>`,
   beard: `<circle cx="-5" cy="19" r="1.8" fill="${INK}" stroke="none"/><circle cx="6" cy="19" r="1.8" fill="${INK}" stroke="none"/><path d="M-9 26 c2 10 16 10 18 0 c-4 4 -14 4 -18 0z" fill="${INK}"/>`,
 };
 
 // Stick figure, hip at (0, 92). Parts are grouped so CSS can swing them.
-export function figure({ hair = "bald", face = "smile", scarf = "#ff5fb4", boil = true } = {}) {
+export type Hair = keyof typeof HAIR;
+export type Face = keyof typeof FACE;
+
+export function figure({
+  hair = "bald" as Hair,
+  face = "smile" as Face,
+  scarf = "#ff5fb4",
+  boil = true,
+}: { hair?: Hair; face?: Face; scarf?: string; boil?: boolean } = {}) {
   return `
 <svg class="fig" viewBox="-46 -14 92 162" aria-hidden="true">
   <g ${boil ? 'filter="url(#boil)"' : ""} stroke="${INK}" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" fill="none">

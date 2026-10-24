@@ -7,6 +7,7 @@ import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
 import { KIND_LABEL } from "../plans";
 import PlanCard from "../components/PlanCard";
+import { Buddy } from "../doodle/Doodle";
 
 export default function Vote() {
   const { group, session } = useGroup();
@@ -21,9 +22,9 @@ export default function Vote() {
   const { run, busy, error } = useRun();
   const [spun, setSpun] = useState<string | null>(null);
 
-  if (!runId) return <p className="muted">Nothing to vote on yet.</p>;
+  if (!runId) return <p className="on-sky">Nothing to vote on yet.</p>;
   const plans = planRun?.result?.plans;
-  if (!plans) return <p className="muted">Loading plans…</p>;
+  if (!plans) return <p className="on-sky">Loading plans…</p>;
 
   const council = planRun!.council;
   const counts = votes?.counts ?? {};
@@ -44,19 +45,23 @@ export default function Vote() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <h1 className="shout text-[52px]">Pick one</h1>
       {council && !council.fallbackUsed && (
-        <div className="card text-sm">
-          <p className="font-semibold">Council's rationale</p>
-          <p>{council.rationale}</p>
+        <div className="flex items-end gap-2">
+          <Buddy who="Chair" pose="wave" size={88} crown boil />
+          <div className="bubble bubble-chair flex-1 text-sm">
+            <p className="display text-base text-[var(--sun)]">The chair says</p>
+            <p className="hand text-xl leading-tight">{council.rationale}</p>
+          </div>
         </div>
       )}
-      <Link className="block text-sm underline" to={`/g/${session.groupId}/plans`}>
+      <Link className="on-sky block text-sm underline" to={`/g/${session.groupId}/plans`}>
         Read the council's debate
       </Link>
 
       {plans.map((p) => (
-        <div key={p.id} className="space-y-1">
+        <div key={p.id} className="space-y-3">
           <PlanCard
             plan={p}
             scout={scoutByPlace}
@@ -64,20 +69,21 @@ export default function Vote() {
             recommended={council?.fallbackUsed === false && council.chosenPlanId === p.id}
           />
           <button
-            className="btn w-full"
+            className={`btn w-full ${votes?.myVote === p.id ? "btn-sun" : ""}`}
             disabled={busy}
             onClick={() => run(() => vote({ runId, planId: p.id }))}
           >
-            {votes?.myVote === p.id ? "Your vote" : `Vote ${KIND_LABEL[p.kind]}`} · {counts[p.id] ?? 0}
+            {votes?.myVote === p.id ? "Your vote ✓" : `Vote ${KIND_LABEL[p.kind]}`}
+            <span className="sticker">{counts[p.id] ?? 0}</span>
           </button>
         </div>
       ))}
 
-      <p className="muted">
+      <p className="on-sky">
         {votes?.total ?? 0} of {group.members.length} voted
       </p>
 
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <button
           className="btn"
           disabled={busy}
@@ -95,7 +101,7 @@ export default function Vote() {
         </button>
       </div>
       {spun && (
-        <p className="text-sm">
+        <p className="bubble hand w-fit text-xl">
           Roulette picked: {KIND_LABEL[plans.find((p) => p.id === spun)?.kind ?? "safe"]}
         </p>
       )}

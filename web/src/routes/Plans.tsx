@@ -8,6 +8,7 @@ import PlanCard from "../components/PlanCard";
 import PlanMap from "../components/PlanMap";
 import ConsensusMap from "../components/ConsensusMap";
 import CouncilPanel from "../components/council/CouncilPanel";
+import { Buddy } from "../doodle/Doodle";
 
 export default function Plans() {
   const { group, session } = useGroup();
@@ -16,22 +17,20 @@ export default function Plans() {
   const scout = useScout(runId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  if (!runId) return <p className="muted">No plan yet. Keep swiping until the group is confident.</p>;
-  if (planRun === undefined) return <p className="muted">Loading plans…</p>;
+  if (!runId) return <p className="on-sky">No plan yet. Keep swiping until the group is confident.</p>;
+  if (planRun === undefined) return <p className="on-sky">Loading plans…</p>;
   if (planRun === null) return <p className="error">Run {runId} not found.</p>;
-  if (planRun.status === "running") return <p className="muted">Planning…</p>;
+  if (planRun.status === "running") return <Thinking />;
   if (planRun.status === "error") return <p className="error">Planning failed: {planRun.error}</p>;
 
   const result = planRun.result!;
   const plans = result.plans;
   if (plans.length === 0) {
     return (
-      <div className="space-y-2">
-        <p>No feasible plans.</p>
-        <pre className="overflow-x-auto bg-gray-50 p-2 text-xs">
-          {JSON.stringify(result.relaxationHints, null, 2)}
-        </pre>
-      </div>
+      <section className="card space-y-2">
+        <h2 className="card-title">No plan fits everyone</h2>
+        <pre className="scrap">{JSON.stringify(result.relaxationHints, null, 2)}</pre>
+      </section>
     );
   }
 
@@ -40,7 +39,8 @@ export default function Plans() {
   const scoutByPlace = new Map((scout ?? []).map((c) => [c.placeId, c]));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      <h1 className="shout text-[52px]">The plans</h1>
       {result.warnings.map((w) => (
         <p key={w} className="error">
           {w}
@@ -57,15 +57,31 @@ export default function Plans() {
           onSelect={() => setSelectedId(p.id)}
         />
       ))}
-      <Link className="btn btn-primary block text-center" to={`/g/${session.groupId}/vote`}>
-        {group.status === "voting" ? "Voting is open · Go vote" : "Go vote"}
-      </Link>
       <CouncilPanel runId={runId} plans={plans} council={planRun.council} />
+      <Link className="btn btn-primary w-full" to={`/g/${session.groupId}/vote`}>
+        {group.status === "voting" ? "Voting is open · Go vote ↗" : "Go vote ↗"}
+      </Link>
       <section className="card space-y-2">
-        <h2 className="font-semibold">Consensus Map</h2>
+        <h2 className="card-title">Consensus map</h2>
         <ConsensusMap pareto={result.pareto} plans={plans} onSelect={setSelectedId} />
       </section>
     </div>
+  );
+}
+
+// While the solver runs: the friends argue in the background.
+function Thinking() {
+  return (
+    <section className="card flex items-center gap-4">
+      <span className="flex">
+        {["Advocate A", "Advocate B", "Advocate C"].map((who, i) => (
+          <Buddy key={who} who={who} pose="argue" size={70} boil={i === 1} />
+        ))}
+      </span>
+      <p className="hand text-2xl leading-tight">
+        Planning <span className="dots"><i /><i /><i /></span>
+      </p>
+    </section>
   );
 }
 
