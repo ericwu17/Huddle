@@ -5,6 +5,7 @@ import { procedures } from "../module_bindings";
 import { saveSession } from "../session";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
+import { useAccount } from "../accountData";
 
 export default function Join() {
   const { isActive } = useSpacetimeDB();
@@ -13,11 +14,13 @@ export default function Join() {
   const joinGroup = useProcedure(procedures.joinGroup);
   const { run, busy, error } = useRun();
   const [name, setName] = useState("");
+  const account = useAccount();
+  const currentName = account?.displayName ?? name;
 
   async function join() {
     await run(async () => {
-      const joined = await joinGroup({ code, name });
-      saveSession({ ...joined, code, name });
+      const joined = await joinGroup({ code, name: currentName });
+      saveSession({ ...joined, code, name: currentName });
       navigate(`/g/${joined.groupId}/lobby`);
     });
   }
@@ -44,11 +47,12 @@ export default function Join() {
           placeholder="Your first name"
           autoComplete="given-name"
           maxLength={24}
-          value={name}
+          value={currentName}
+          readOnly={!!account}
           onChange={(e) => setName(e.target.value)}
         />
         {!isActive ? <p role="status" className="muted">Connecting to Huddle…</p> : null}
-        <button className="btn btn-primary w-full" disabled={busy || !isActive || !name.trim()} onClick={join}>
+        <button className="btn btn-primary w-full" disabled={busy || !isActive || account === undefined || !currentName.trim()} onClick={join}>
           Join the huddle ↗
         </button>
         {error && <p className="error">{error}</p>}

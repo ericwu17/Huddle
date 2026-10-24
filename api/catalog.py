@@ -95,12 +95,14 @@ class Catalog:
                 return True
         return False
 
-    def itineraries(self, day: str, window_start: str, window_end: str) -> list[Itinerary]:
+    def itineraries(self, day: str, window_start: str, window_end: str,
+                    templates: tuple[tuple[str, ...], ...] = TEMPLATES) -> list[Itinerary]:
         """Every time-feasible stop sequence for that day and window, earliest start each."""
         weekday = WEEKDAYS[date.fromisoformat(day).weekday()]
-        return self._enumerate(weekday, minutes(window_start), minutes(window_end))
+        return self._enumerate(weekday, minutes(window_start), minutes(window_end), templates)
 
-    def _enumerate_uncached(self, weekday: str, lo: int, hi: int) -> list[Itinerary]:
+    def _enumerate_uncached(self, weekday: str, lo: int, hi: int,
+                            templates: tuple[tuple[str, ...], ...] = TEMPLATES) -> list[Itinerary]:
         grid = list(range(lo, hi + 1, GRID))
         ok = {(i, t) for i in range(len(self.places)) for t in grid if self.open_for(i, weekday, t)}
         by_cat = {c: [i for i in range(len(self.places)) if self.category[i] == c and
@@ -108,7 +110,7 @@ class Catalog:
         legs = self.legs.tolist()  # plain floats: numpy scalar indexing dominates this loop
         dwell = [p.dwellMinutes for p in self.places]
         result = []
-        for template in TEMPLATES:
+        for template in templates:
             for combo in product(*(by_cat[c] for c in template)):
                 for first in grid:
                     starts, t = [], first

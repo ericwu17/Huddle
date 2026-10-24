@@ -13,7 +13,6 @@
   "dependencies": {
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.33.0",
-    "qrcode.react": "^4.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "^7.18.4",

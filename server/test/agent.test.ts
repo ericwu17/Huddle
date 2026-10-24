@@ -8,7 +8,7 @@ import { catalogSnapshot, findPlace, ingestCatalog, MAX_ACTIVE } from "../src/li
 
 const internal = TestAuth.internal();
 const needs = (cap = 30, hard: any = {}) => ({ hard: { budgetMaxPerPerson: cap, dietary: [], allergies: [],
-  vetoCuisines: [], vetoCategories: [], rejectedTerms: [], maxTravelMinutes: null, ...hard },
+  vetoCuisines: [], vetoCategories: [], rejectedTerms: [], maxTravelMinutes: null, maxOutingMinutes: null, ...hard },
   preferences: ["a fun outing"], questions: [], warnings: [] });
 const response = (data: any) => ({ code: 200, headers: { entries: [] }, version: { tag: "Http11" as const }, body: JSON.stringify(data) });
 
@@ -17,7 +17,7 @@ function result(body: any) {
   const activity = LIVE_PLACES.find(p => p.id === "p_022")!;
   const stops = [activity, meal].map((p, i) => ({ placeId: p.id, name: p.name, category: p.category,
     lat: p.lat, lng: p.lng, costPerPerson: p.costPerPerson,
-    start: i ? "19:00" : "17:00", end: i ? "20:15" : "18:15" }));
+    start: i ? "20:00" : "18:00", end: i ? "21:15" : "19:15" }));
   return { mode: "agent", runId: body.runId, inputRevision: body.inputRevision,
     plans: [1, 2].map(i => ({ id: `choice-${i}`, title: `Option ${i}`, stops, costPerPerson: 22,
       whyLine: "A validated catalog itinerary.", limitations: ["Cached estimates."], travelMinutes: 10 })),
@@ -32,6 +32,7 @@ function setup() {
   let intercept: ((body: any) => void) | null = null;
   let extracted = needs();
   let bad = false;
+  let transform: ((data: any) => void) | null = null;
   let captured: any;
   const withEnv = (ctx: any): any => new Proxy(Object.create(null), { get(_target, key) {
     if (key === "env") return env;
@@ -47,6 +48,7 @@ function setup() {
     intercept?.(body);
     const data = result(body);
     if (bad) data.plans[0].costPerPerson = 1;
+    transform?.(data);
     return response(data);
   }).build());
   const group = api.createAgentGroup(proc(users[0].auth), { name: "Agent test" });
@@ -68,6 +70,12 @@ function setup() {
     const n = test.db.agent_need.memberId.find(users[index].id)!;
     reduce(users[index].auth, tx => api.confirmAgentNeeds(tx, { revision: n.revision }));
   }
+  function save(index: number, hard: any = {}, text = "") {
+    reduce(users[index].auth, tx => api.saveAgentPreferences(tx, { text, structuredJson: JSON.stringify({
+      budgetMaxPerPerson: null, maxOutingMinutes: null, dietary: [], allergies: [], ...hard,
+    }) }));
+    return test.db.agent_need.memberId.find(users[index].id)!;
+  }
   function ready() { for (let i = 0; i < users.length; i++) { review(i); confirm(i); } }
   function start() {
     reduce(users[0].auth, tx => api.findAgentPlans(tx, {}));
@@ -80,11 +88,48 @@ function setup() {
   function book(index: number, runId: string) {
     return reduce(users[index].auth, tx => api.startBooking(tx, { runId, planId: "choice-1", stopIndex: 1 }));
   }
-  return { test, users, group, reduce, proc, submit, review, confirm, ready, start, plan, vote, book,
-    intercept: (fn: typeof intercept) => { intercept = fn; }, bad: () => { bad = true; }, captured: () => captured };
+  return { test, users, group, reduce, proc, submit, review, save, confirm, ready, start, plan, vote, book,
+    extraction: (value: typeof extracted) => { extracted = value; },
+    intercept: (fn: typeof intercept) => { intercept = fn; }, bad: () => { bad = true; }, captured: () => captured,
+    transform: (fn: (data: any) => void) => { transform = fn; } };
 }
 
 describe("single coordinator flow", () => {
+  it("accepts a current one-meal outing within identical 40-dollar/90-minute limits through voting and booking", () => {
+    const s = setup();
+    for (let i = 0; i < 2; i++) s.save(i, { budgetMaxPerPerson: 40, maxOutingMinutes: 90 });
+    s.transform(data => {
+      data.plans = data.plans.slice(0, 1);
+      const plan = data.plans[0];
+      plan.stops = plan.stops.filter((stop: any) => stop.category === "meal");
+      plan.costPerPerson = plan.stops[0].costPerPerson;
+      plan.travelMinutes = 0;
+    });
+    const runId = s.plan();
+    expect(s.test.db.agent_session.groupId.find(s.group.groupId)?.status).toBe("ready");
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    s.vote(0, runId); s.vote(1, runId);
+    s.reduce(s.users[0].auth, tx => api.startBooking(tx, { runId, planId: "choice-1", stopIndex: 0 }));
+    expect(s.test.db.booking.count()).toBe(1n);
+  });
+
+  it.each(["too short", "over budget", "allergy", "activity alone"])("does not use a single stop to bypass %s", reason => {
+    const s = setup();
+    const meal = LIVE_PLACES.find(p => p.id === "p_002")!;
+    for (let i = 0; i < 2; i++) s.save(i, { budgetMaxPerPerson: reason === "over budget" ? meal.costPerPerson - 1 : 40,
+      maxOutingMinutes: reason === "too short" ? 60 : 90, allergies: reason === "allergy" ? ["peanut"] : [] });
+    s.transform(data => {
+      data.plans = data.plans.slice(0, 1);
+      const plan = data.plans[0];
+      plan.stops = plan.stops.filter((stop: any) => stop.category === (reason === "activity alone" ? "activity" : "meal"));
+      plan.costPerPerson = plan.stops[0].costPerPerson; plan.travelMinutes = 0;
+    });
+    const runId = s.plan();
+    expect(s.test.db.agent_session.groupId.find(s.group.groupId)?.status).toBe("error");
+    expect(() => s.vote(0, runId)).toThrow();
+    expect(s.test.db.booking.count()).toBe(0n);
+  });
+
   it("requires every confirmation and host-triggered planning; sends every private prompt", () => {
     const s = setup();
     s.review(0); s.confirm(0);
@@ -121,12 +166,85 @@ describe("single coordinator flow", () => {
     expect(JSON.parse(s.test.db.private_prefs.memberId.find(s.users[0].id)!.hardJson!).budgetMaxPerPerson).toBe(30);
   });
 
-  it("blocks unknown allergy evidence and invented service totals", () => {
+  it("saves known allergies but blocks unverified food results and invented service totals", () => {
     const s = setup(); s.review(0, 30, { allergies: ["peanuts"] });
-    expect(() => s.confirm(0)).toThrow();
+    expect(() => s.confirm(0)).not.toThrow();
+    s.review(1); s.confirm(1);
+    const allergyRun = s.plan();
+    expect(s.test.db.plan_run.runId.find(allergyRun)?.status).toBe("error");
     const b = setup(); b.ready(); b.bad(); const run = b.plan();
     expect(b.test.db.plan_run.runId.find(run)?.status).toBe("error");
     expect(api.my_votes(b.test.viewContext(b.users[0].auth))).toEqual([]);
+  });
+
+  it("saves empty flexible preferences ready without any interpretation job", () => {
+    const s = setup(); const jobs = s.test.db.agent_needs_job.count();
+    const saved = s.save(0);
+    expect(saved.confirmed).toBe(true);
+    expect(JSON.parse(saved.resultJson!).hard.budgetMaxPerPerson).toBeNull();
+    expect(JSON.parse(saved.resultJson!).hard.maxOutingMinutes).toBeNull();
+    expect(s.test.db.agent_needs_job.count()).toBe(jobs);
+    expect(api.my_agent_preferences(s.test.viewContext(s.users[0].auth))?.memberId).toBe(s.users[0].id);
+    expect(api.my_agent_preferences(s.test.viewContext(s.users[1].auth))).toBeUndefined();
+  });
+
+  it("does not store an exact no-allergies field value as a positive allergy", () => {
+    const s = setup(); const saved = s.save(0, { allergies: [" No known allergies "] });
+    expect(saved.confirmed).toBe(true);
+    expect(JSON.parse(saved.resultJson!).hard.allergies).toEqual([]);
+    expect(JSON.parse(saved.resultJson!).warnings).toEqual([]);
+  });
+
+  it("treats zero as a real saved cap and preserves it against Flexible or higher edits", () => {
+    const s = setup(); s.save(0, { budgetMaxPerPerson: 0 });
+    expect(JSON.parse(s.test.db.private_prefs.memberId.find(s.users[0].id)!.hardJson!).budgetMaxPerPerson).toBe(0);
+    for (const cap of [null, 30]) {
+      const saved = s.save(0, { budgetMaxPerPerson: cap });
+      expect(JSON.parse(saved.resultJson!).hard.budgetMaxPerPerson).toBe(0);
+      expect(JSON.parse(saved.resultJson!).warnings.join(" ")).toContain("private trade");
+    }
+  });
+
+  it("rejects malformed controls before changing or invalidating saved preferences", () => {
+    const s = setup(); const saved = s.save(0, { budgetMaxPerPerson: 20 });
+    for (const structuredJson of ["{broken", "true", "[]", '{"budgetMaxPerPerson":-1}',
+      JSON.stringify({ budgetMaxPerPerson: null, maxOutingMinutes: null, dietary: ["invented"], allergies: [] })]) {
+      expect(() => s.reduce(s.users[0].auth, tx => api.saveAgentPreferences(tx, { text: "", structuredJson }))).toThrow();
+      expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.revision).toBe(saved.revision);
+    }
+  });
+
+  it("automatically becomes ready after text interpretation while preserving controls the service drops", () => {
+    const s = setup();
+    s.save(0, { budgetMaxPerPerson: 20, maxOutingMinutes: 180, dietary: ["vegetarian"], allergies: ["peanuts"] }, "quiet please");
+    expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(false);
+    const job = [...s.test.db.agent_needs_job.iter()].at(-1)!;
+    s.extraction(needs(50));
+    api.runAgentNeedsJob(s.proc(), { job });
+    const saved = s.test.db.agent_need.memberId.find(s.users[0].id)!;
+    expect(saved.confirmed).toBe(true);
+    expect(JSON.parse(saved.resultJson!).hard).toMatchObject({ budgetMaxPerPerson: 20, maxOutingMinutes: 180,
+      dietary: ["vegetarian"], allergies: ["peanuts"] });
+    expect(s.test.db.member.id.find(s.users[0].id)?.ready).toBe(true);
+  });
+
+  it("keeps targeted questions private and not ready, then ignores the stale response after a blank edit", () => {
+    const s = setup(); s.save(0, {}, "avoid peanuts maybe");
+    const job = [...s.test.db.agent_needs_job.iter()].at(-1)!;
+    s.extraction({ ...needs(), questions: ["Is peanuts an allergy or a preference?"] });
+    api.runAgentNeedsJob(s.proc(), { job });
+    expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(false);
+    expect(JSON.stringify(api.my_agent_session(s.test.viewContext(s.users[1].auth)))).not.toContain("peanuts");
+    s.save(0);
+    api.runAgentNeedsJob(s.proc(), { job });
+    expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(true);
+    expect(JSON.parse(s.test.db.agent_need.memberId.find(s.users[0].id)!.resultJson!).questions).toEqual([]);
+  });
+
+  it("rejects plans longer than the outing slider including time between stops", () => {
+    const s = setup(); s.save(0, { budgetMaxPerPerson: 30, maxOutingMinutes: 120 }); s.save(1);
+    const runId = s.plan(); // mocked result spans 195 minutes, despite only 150 minutes at venues
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
   });
 
   it("rejects an in-flight result after a private prompt update", () => {

@@ -7,8 +7,8 @@ from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 
 from api.agent import candidates, coordinate, interpret, public_facts
-from api.agent_models import AgentCatalog, AgentNeeds, AgentNeedsRequest, AgentPlanRequest
-from api.catalog import Catalog, CatalogCache
+from api.agent_models import AgentCatalog, AgentHard, AgentNeeds, AgentNeedsRequest, AgentPlanRequest
+from api.catalog import Catalog, CatalogCache, minutes
 from api.main import Settings, create_app
 from api.models import Place
 
@@ -26,23 +26,37 @@ def request(**changes):
     return AgentPlanRequest.model_validate({**data, **changes})
 
 
+def meal_request(duration=90, cap=30, **hard):
+    return request(members=[{"memberId": member, "prompt": "Burgers if possible",
+                             "needs": needs(cap, maxOutingMinutes=duration, **hard).model_dump()}
+                            for member in ("one", "two")])
+
+
 class Model:
     available = True
 
-    def __init__(self, bad=False, extracted=None):
+    def __init__(self, bad=False, extracted=None, prefer_rating=False, all_reasons=False):
         self.context = None
         self.bad = bad
         self.extracted = extracted
+        self.prefer_rating = prefer_rating
+        self.all_reasons = all_reasons
+        self.schema = None
         self.calls = 0
 
     async def call(self, role, system, user, schema, model, timeout, **kwargs):
         self.calls += 1
         self.context = json.loads(user)
+        self.schema = schema
         if role == "agent-needs":
             value = (self.extracted or needs()).model_dump()
         else:
             value = {"choices": [{"candidateId": "invented" if self.bad else self.context["candidates"][0]["candidateId"],
                                   "reasonIds": ["total", "sequence"]}]}
+            if self.prefer_rating:
+                value["choices"][0]["reasonIds"] = ["ratings"]
+            if self.all_reasons:
+                value["choices"][0]["reasonIds"] = list(self.context["reasonTypes"])
         kwargs["check"](value)
         return value
 
@@ -62,15 +76,88 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("robustness", result.model_dump_json())
         self.assertTrue(result.plans)
 
+    async def test_real_cached_ratings_reach_claude_and_public_reason_uses_only_catalog_facts(self):
+        model = Model(prefer_rating=True)
+        result = await coordinate(model, self.catalog, request())
+        for place_id, fact in model.context["venues"].items():
+            venue = self.catalog.places[self.catalog.index[place_id]]
+            self.assertEqual(fact["rating"], venue.rating if venue.reviewCount else None)
+            self.assertEqual(fact["reviewCount"], venue.reviewCount)
+            self.assertEqual(fact["sources"], venue.sources)
+        self.assertIn("cached", result.plans[0].whyLine)
+        self.assertIn("freshness is not verified", result.plans[0].whyLine)
+        self.assertNotIn("PRIVATE_ONLY", result.plans[0].whyLine)
+        self.assertLess(len(json.dumps(model.context, separators=(",", ":"))), 45000)
+        self.assertLessEqual(len(model.context["venues"]), len(self.catalog.places))
+        self.assertTrue(all("publicFacts" not in candidate for candidate in model.context["candidates"]))
+        choice_schema = model.schema["properties"]["choices"]["items"]["properties"]
+        self.assertEqual(set(choice_schema["candidateId"]["enum"]), {candidate["candidateId"] for candidate in model.context["candidates"]})
+        self.assertEqual(set(choice_schema["reasonIds"]["items"]["enum"]), set(model.context["reasonTypes"]))
+
     async def test_exact_cumulative_costs_and_dietary_activity_exception(self):
         result = await coordinate(Model(), self.catalog, request())
         for plan in result.plans:
             self.assertEqual(plan.costPerPerson, sum(stop.costPerPerson for stop in plan.stops))
             self.assertLessEqual(plan.costPerPerson, 25)
-            self.assertTrue(any(s.category == "activity" for s in plan.stops))
             for stop in plan.stops:
                 place = self.catalog.places[self.catalog.index[stop.placeId]]
                 if stop.category != "activity": self.assertIn("vegetarian", place.dietary)
+        # Activities remain valid alongside food even though they have no
+        # dietary tags. A cheaper meal-only recommendation must not hide this.
+        with_activity = [plan for plan in candidates(self.catalog, request()).values()
+                         if any(stop.category == "activity" for stop in plan.stops)]
+        self.assertTrue(with_activity)
+        self.assertTrue(any(not self.catalog.places[self.catalog.index[stop.placeId]].dietary
+                            for plan in with_activity for stop in plan.stops if stop.category == "activity"))
+        for plan in with_activity:
+            self.assertEqual(plan.costPerPerson, sum(stop.costPerPerson for stop in plan.stops))
+            self.assertLessEqual(plan.costPerPerson, 25)
+            self.assertTrue(all("vegetarian" in self.catalog.places[self.catalog.index[stop.placeId]].dietary
+                                for stop in plan.stops if stop.category != "activity"))
+
+    async def test_matching_burger_requests_can_select_a_grounded_meal_within_ninety_minutes(self):
+        body = meal_request()
+        available = candidates(self.catalog, body)
+        self.assertTrue(available)
+        self.assertTrue(all(len(plan.stops) == 1 for plan in available.values()))
+        model = Model()
+        result = await coordinate(model, self.catalog, body)
+        self.assertEqual(model.calls, 1)
+        self.assertTrue(result.plans)
+        for plan in result.plans:
+            self.assertEqual(len(plan.stops), 1)
+            stop = plan.stops[0]
+            venue = self.catalog.places[self.catalog.index[stop.placeId]]
+            self.assertEqual(stop.category, "meal")
+            self.assertEqual(stop.name, venue.name)
+            self.assertEqual(plan.costPerPerson, venue.costPerPerson)
+            self.assertLessEqual(plan.costPerPerson, 30)
+            self.assertEqual(minutes(stop.end) - minutes(stop.start), venue.dwellMinutes)
+            self.assertLessEqual(minutes(stop.end) - minutes(stop.start), 90)
+            self.assertEqual(plan.travelMinutes, 0)
+        self.assertTrue(all(len(plan.stops) >= 2 for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
+
+    async def test_meal_only_does_not_shorten_visits_or_weaken_budget_dietary_or_allergy_limits(self):
+        for body, explanation in [(meal_request(duration=60), "time"), (meal_request(cap=0), "budget"),
+                                  (meal_request(dietary=["vegan"]), "dietary"), (meal_request(allergies=["peanut"]), "allergy")]:
+            model = Model()
+            result = await coordinate(model, self.catalog, body)
+            self.assertFalse(result.plans)
+            self.assertEqual(model.calls, 0)
+            self.assertIn(explanation, result.conflicts[0])
+            self.assertNotIn("$30", result.conflicts[0])
+            self.assertNotIn("peanut", result.conflicts[0])
+        vegetarian = await coordinate(Model(), self.catalog, meal_request(dietary=["vegetarian"]))
+        self.assertTrue(vegetarian.plans)
+        self.assertTrue(all("vegetarian" in self.catalog.places[self.catalog.index[plan.stops[0].placeId]].dietary
+                            for plan in vegetarian.plans))
+
+    async def test_all_six_supported_public_reasons_are_valid_and_do_not_trigger_a_retry(self):
+        model = Model(all_reasons=True)
+        result = await coordinate(model, self.catalog, request())
+        self.assertTrue(result.plans)
+        self.assertEqual(model.calls, 1)
+        self.assertIn("cached", result.plans[0].whyLine)
 
     async def test_zero_budget_is_not_uncapped_and_no_candidates_never_calls_model(self):
         body = request()
@@ -98,6 +185,29 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("allergy", result.conflicts[0])
         self.assertEqual(model.calls, 0)
 
+    async def test_max_vegan_steak_and_dessert_scenario_explains_the_catalog_gap(self):
+        body = request(members=[
+            {"memberId": "max", "prompt": "Vegan, under $30 for the whole outing", "needs": needs(30, dietary=["vegan"]).model_dump()},
+            {"memberId": "eric-wu", "prompt": "Steak and fries, under $50", "needs": needs(50).model_dump()},
+            {"memberId": "eric-chen", "prompt": "Good dessert afterwards, under three hours total", "needs": needs(None, maxOutingMinutes=180).model_dump()},
+        ])
+        model = Model()
+        result = await coordinate(model, self.catalog, body)
+        self.assertFalse(result.plans)
+        self.assertIn("dietary", result.conflicts[0])
+        self.assertIn("verified dietary venue data", result.conflicts[0])
+        self.assertEqual(model.calls, 0)
+        self.assertEqual(body.members[0].needs.hard.dietary, ["vegan"])
+
+    def test_agent_can_offer_dinner_and_dessert_without_forcing_an_activity(self):
+        body = request()
+        body.members[0].needs.hard.maxOutingMinutes = 180
+        plans = candidates(self.catalog, body)
+        self.assertTrue(any([s.category for s in plan.stops] == ["meal", "dessert"] for plan in plans.values()))
+        # This addition is confined to agent planning; legacy templates remain as documented.
+        self.assertTrue(all(tuple(self.catalog.places[i].category for i in plan.stops) != ("meal", "dessert")
+                            for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
+
     async def test_invalid_model_id_never_becomes_a_plan(self):
         from fastapi import HTTPException
         with self.assertRaises(HTTPException) as error:
@@ -113,6 +223,88 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
     async def test_missing_allergy_extraction_requests_private_clarification(self):
         result = await interpret(Model(), AgentNeedsRequest(memberId="one", text="I have a peanut allergy"))
         self.assertTrue(result.questions)
+
+    async def test_blank_flexible_input_skips_model_even_when_unavailable(self):
+        model = Model()
+        model.available = False
+        result = await interpret(model, AgentNeedsRequest(memberId="one", text="", structured=AgentHard()))
+        self.assertEqual(model.calls, 0)
+        self.assertIsNone(result.hard.budgetMaxPerPerson)
+        self.assertIsNone(result.hard.maxOutingMinutes)
+        self.assertFalse(result.questions)
+
+    async def test_slider_zero_and_structured_restrictions_survive_model_dropping_them(self):
+        model = Model(extracted=needs(50))
+        result = await interpret(model, AgentNeedsRequest(memberId="one", text="somewhere quiet",
+            structured=AgentHard(budgetMaxPerPerson=0, maxOutingMinutes=120,
+                                 dietary=["vegetarian"], allergies=["peanuts"])))
+        self.assertEqual(result.hard.budgetMaxPerPerson, 0)
+        self.assertEqual(result.hard.maxOutingMinutes, 120)
+        self.assertEqual(result.hard.dietary, ["vegetarian"])
+        self.assertEqual(result.hard.allergies, ["peanuts"])
+        self.assertFalse(result.questions)
+        self.assertIn("saved", " ".join(result.warnings))
+
+    async def test_blank_edit_keeps_prior_cap_and_known_restrictions(self):
+        old = AgentHard(budgetMaxPerPerson=20, dietary=["vegan"], allergies=["sesame"], rejectedTerms=["sushi"])
+        result = await interpret(Model(), AgentNeedsRequest(memberId="one", currentHard=old))
+        self.assertEqual(result.hard, old)
+        # Explicit owner controls can edit a restriction, but cannot raise a cap.
+        result = await interpret(Model(), AgentNeedsRequest(memberId="one", currentHard=old,
+            structured=AgentHard(budgetMaxPerPerson=None, dietary=[], allergies=[])))
+        self.assertEqual(result.hard.budgetMaxPerPerson, 20)
+        self.assertEqual(result.hard.rejectedTerms, ["sushi"])
+        self.assertEqual(result.hard.allergies, [])
+
+    async def test_no_allergies_negation_does_not_trigger_a_followup(self):
+        for text in ["no allergies", "I have no known food allergies", "I don't have any allergies", "not allergic to anything"]:
+            result = await interpret(Model(), AgentNeedsRequest(memberId="one", text=text))
+            self.assertFalse(result.questions, text)
+        result = await interpret(Model(), AgentNeedsRequest(memberId="one", text="No food allergies, but I have an anaphylactic reaction to bee stings"))
+        self.assertTrue(result.questions)
+
+    async def test_explicit_empty_allergy_field_sentinels_are_not_allergens(self):
+        for value in ["None", "No allergies", " NO KNOWN ALLERGIES ", "n/a"]:
+            result = await interpret(Model(), AgentNeedsRequest(memberId="one", structured=AgentHard(allergies=[value])))
+            self.assertEqual(result.hard.allergies, [])
+            self.assertFalse(result.questions)
+        self.assertEqual(AgentHard(allergies=["none", "peanut"]).allergies, ["none", "peanut"])
+
+    async def test_slider_and_prompt_budget_conflict_requests_one_targeted_correction(self):
+        result = await interpret(Model(extracted=needs(20)), AgentNeedsRequest(memberId="one", text="under $20",
+            currentHard=AgentHard(budgetMaxPerPerson=30), structured=AgentHard(budgetMaxPerPerson=30)))
+        self.assertEqual(result.hard.budgetMaxPerPerson, 20)
+        self.assertEqual(len(result.questions), 1)
+        self.assertIn("slider", result.questions[0])
+
+    def test_outing_duration_counts_the_gap_and_is_distinct_from_first_leg_travel(self):
+        meal = next(p for p in self.catalog.places if p.category == "meal").model_copy(update={
+            "id": "duration-meal", "costPerPerson": 12, "dwellMinutes": 45, "lat": 37.871, "lng": -122.27,
+            "dietary": ["vegetarian"], "hours": {day: [["17:00", "23:00"]] for day in ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]}})
+        activity = next(p for p in self.catalog.places if p.category == "activity").model_copy(update={
+            "id": "duration-activity", "costPerPerson": 5, "dwellMinutes": 45, "lat": 37.87, "lng": -122.27,
+            "hours": meal.hours})
+        catalog = Catalog([meal, activity])
+        body = request()
+        body.members[0].needs.hard.maxOutingMinutes = 105
+        body.members[0].needs.hard.maxTravelMinutes = None  # outing slider needs no starting location
+        plans = candidates(catalog, body)
+        self.assertTrue(plans)
+        multi_stop = [plan for plan in plans.values() if len(plan.stops) == 2]
+        self.assertTrue(multi_stop)
+        for plan in multi_stop:
+            self.assertEqual(sum(s.costPerPerson for s in plan.stops), 17)
+            self.assertEqual(minutes(plan.stops[-1].end) - minutes(plan.stops[0].start), 105)
+            self.assertLess(sum(minutes(s.end) - minutes(s.start) for s in plan.stops), 105)
+        body.members[0].needs.hard.maxOutingMinutes = 104
+        shorter = candidates(catalog, body)
+        self.assertTrue(shorter)
+        self.assertTrue(all(len(plan.stops) == 1 for plan in shorter.values()))
+        body.members[0].needs.hard.maxOutingMinutes = None
+        body.members[1].needs.hard.budgetMaxPerPerson = 16
+        lower_budget = candidates(catalog, body)
+        self.assertTrue(lower_budget)
+        self.assertTrue(all(len(plan.stops) == 1 and plan.costPerPerson <= 16 for plan in lower_budget.values()))
 
     async def test_service_missing_credentials_is_explicit_no_synthetic_plan(self):
         from fastapi import HTTPException
@@ -149,6 +341,10 @@ class AgentHttpTests(unittest.TestCase):
             self.assertEqual(response.json()["inputRevision"], 7)
             self.assertNotIn("posterior", response.json())
             self.assertNotIn("X-Huddle-Stub", response.headers)
+            response = client.post("/agent/plan", headers=headers, json=meal_request().model_dump())
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.json()["plans"])
+            self.assertTrue(all(len(plan["stops"]) == 1 for plan in response.json()["plans"]))
 
 
 def snapshot():
@@ -165,6 +361,37 @@ def snapshot():
 
 class LiveCatalogTests(unittest.TestCase):
     headers = {"X-Huddle-Secret": "unit-test-secret"}
+
+    def test_scraped_catalog_new_ids_reach_claude_with_sources_and_keep_short_outing_limits(self):
+        saved = json.loads(Path("data/brightdata/catalog.json").read_text())
+        live = {"version": saved["version"], "places": [v["place"] for v in saved["venues"]],
+                "evidence": {v["place"]["id"]: v["evidence"] for v in saved["venues"]}}
+        bundled_ids = [p["id"] for p in json.loads(Path("data/places.json").read_text())]
+        body = meal_request(duration=90, cap=40).model_copy(update={
+            "catalog": AgentCatalog.model_validate(live), "excludePlaceIds": bundled_ids,
+        })
+        model = Model(prefer_rating=True)
+        with TestClient(create_app(Settings(secret="unit-test-secret"), llm=model)) as client:
+            response = client.post("/agent/plan", headers=self.headers, json=body.model_dump(mode="json"))
+        self.assertEqual(response.status_code, 200)
+        plans = response.json()["plans"]
+        self.assertTrue(plans)
+        self.assertEqual(model.context["catalogVersion"], saved["version"])
+        for venue in model.context["venues"].values():
+            observed = next((source for source in venue["ratingEvidence"]["sources"]
+                             if source["rating"] is not None and source["reviewCount"] and source["fetchedAt"]), None)
+            if observed:
+                self.assertEqual(venue["rating"], observed["rating"])
+                self.assertEqual(venue["reviewCount"], observed["reviewCount"])
+        for plan in plans:
+            self.assertLessEqual(plan["costPerPerson"], 40)
+            self.assertEqual(plan["costPerPerson"], sum(stop["costPerPerson"] for stop in plan["stops"]))
+            self.assertLessEqual(minutes(plan["stops"][-1]["end"]) - minutes(plan["stops"][0]["start"]), 90)
+            for stop in plan["stops"]:
+                self.assertNotIn(stop["placeId"], bundled_ids)
+                self.assertTrue(model.context["venues"][stop["placeId"]]["ratingEvidence"]["sources"])
+            self.assertIn("Google Maps showed", plan["whyLine"])
+        self.assertNotIn("PRIVATE_ONLY", response.text)
 
     def test_plans_use_only_the_snapshot_the_module_sent(self):
         live = snapshot()

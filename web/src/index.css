@@ -47,6 +47,48 @@ body {
   padding: 16px 16px 160px;
 }
 
+/* Personal pages share the illustrated world and make room for desktop forms. */
+.account-page { display: grid; grid-template-columns: 190px minmax(0, 760px); gap: 40px; max-width: 1060px; margin: 0 auto; padding: 32px 24px 140px; }
+.account-sidebar { align-self: start; position: sticky; top: 28px; display: flex; flex-direction: column; gap: 28px; }
+.sidebar-buddy { text-align: center; }
+.account-nav { display: flex; flex-direction: column; gap: 12px; }
+.account-nav a { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; color: var(--ink); background: var(--paper); border: 2px solid var(--ink); border-radius: 16px; font-weight: 800; text-decoration: none; box-shadow: 2px 3px 0 var(--ink); }
+.account-nav a.active { background: var(--sun); color: var(--ink); box-shadow: 3px 4px 0 var(--ink); }
+.account-nav a:hover { background: var(--note); }
+.account-nav a.active:hover { background: var(--sun); }
+.account-main { min-width: 0; }
+.home-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 0; }
+.social-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 10px 0; }
+.social-row + .social-row, .inbox-message + .inbox-message { border-top: 2px dashed #ded9c9; }
+.inbox-message { padding: 14px 0; }
+.inbox-notice { padding: 10px 12px; border-radius: 12px; background: var(--note); color: var(--ink); font-size: 14px; }
+.inbox-notice, .inbox-message { overflow-wrap: anywhere; }
+.venue-details { border-left: 3px solid var(--sun); padding: 4px 0 4px 14px; }
+.contact-results { max-height: 380px; overflow-y: auto; border: 2px solid #ded9c9; border-radius: 16px; padding: 14px; }
+.contact-choice { display: flex; align-items: flex-start; gap: 10px; padding: 8px; border-radius: 12px; background: white; cursor: pointer; overflow-wrap: anywhere; }
+.contact-choice input { width: 20px; height: 20px; accent-color: var(--cobalt); flex: none; margin-top: 2px; }
+.contact-choice span { min-width: 0; }
+.friend-picker summary { width: fit-content; list-style: none; }
+.friend-picker summary::-webkit-details-marker { display: none; }
+.friend-picker-menu { margin-top: 14px; padding: 16px; background: #fff; border: 2px solid var(--ink); border-radius: 18px; max-height: 300px; overflow-y: auto; }
+.preference-field { border: 2px solid #ded9c9; border-radius: 18px; padding: 14px; }
+.preference-field legend { padding: 0 8px; }
+.range-input { width: 100%; min-height: 40px; accent-color: var(--cobalt); cursor: pointer; }
+.diet-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 2px solid var(--ink); border-radius: 999px; font-size: 14px; font-weight: 700; background: white; cursor: pointer; }
+.diet-chip.selected { background: #e3f9d0; }
+.diet-chip input { accent-color: var(--cobalt); width: 18px; height: 18px; }
+.password-field { position: relative; }
+.password-field .input { padding-right: 150px; }
+.password-toggle { position: absolute; right: 12px; top: 10px; min-height: 32px; padding: 4px 8px; border-radius: 10px; color: var(--cobalt); font-size: 13px; font-weight: 800; cursor: pointer; background: #edf0ff; }
+@media (max-width: 760px) {
+  .account-page { display: block; padding: 20px 16px 140px; }
+  .account-sidebar { position: static; gap: 20px; margin-bottom: 28px; }
+  .account-sidebar .sidebar-buddy, .account-sidebar > p { display: none; }
+  .account-nav { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  .account-nav a { padding: 8px 10px; font-size: 13px; }
+  .home-intro .crowd { display: none; }
+}
+
 /* ---- Type ---- */
 .display {
   font-family: var(--display);

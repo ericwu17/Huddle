@@ -35,13 +35,13 @@ On smaller screens, collapse navigation to a menu and stack the same content in 
 
 | Page | Layout and content | Character scene and motion |
 | --- | --- | --- |
-| Public landing | Wide split hero: “Your people. One great plan.” Start and join actions on the left; illustration on the right. | Friends enter from different sides and gather around a picnic table. Clouds drift slowly. |
+| Public landing | Wide split hero: “Your people. One great plan.” Sign in and start actions on the left; illustration on the right. | Friends enter from different sides and gather around a picnic table. Clouds drift slowly. |
 | Login | Compact username/password form beside a welcoming illustration. Clearly identify available demo accounts where applicable. | One figure opens a garden gate. After successful login, they wave the user through. |
-| Start a huddle | Main signed-in screen. Large “What are we doing?” prompt, selected contacts, microphone when supported, and a yellow **Review huddle** action. Join by code and the current huddle are secondary entry points. | The user's figure sits at an empty picnic table. Selecting contacts adds figures nearby, marked **Not invited yet**. |
+| Start a huddle | Main signed-in screen. Large invitation prompt such as “Dinner with Alex and Mark,” reviewed contact matches, microphone when supported, and a yellow **Review invitation** action. Invite friends through an explicit picker; pending invitations appear in Inbox. | The user's figure sits at an empty picnic table. Selecting contacts adds figures nearby, marked **Not invited yet**. |
 | Review your invitation | Editable outing summary: people, date, time, and the initiator's interpreted needs. **Create & invite** is the explicit action. Resolve ambiguous contacts before sending invitations. | The user's figure holds invitation envelopes. They fly out only after confirmation. |
-| Join / invitation | Show host, outing summary, and **Join huddle**. Keep code entry available. Explain contact creation briefly. | The user's figure approaches the group and joins the circle only after accepting. |
-| Lobby | Large gathering scene, invitation code/QR, participant list, and distinct joined/pending statuses. | Joined friends wave from the table. Pending invitees appear as outlined placeholders, not ready participants. |
-| Your needs — private | Prompt and editable interpretation side by side. Include explicit **Total outing budget**, dietary requirements, travel limits, unresolved questions, and **Confirm my needs**. | The user's figure writes a folded note. Confirmation seals it; the group sees readiness only. |
+| Join / invitation | Show host, outing summary, and **Join huddle**. Use the addressed invitation link. Explain contact creation briefly. | The user's figure approaches the group and joins the circle only after accepting. |
+| Lobby | Large gathering scene, Invite friends picker, participant list, and distinct joined/pending statuses. | Joined friends wave from the table. Pending invitees appear as outlined placeholders, not ready participants. |
+| Your needs — private | Prompt and editable interpretation side by side. Include optional budget/duration sliders, dietary requirements, allergies, an optional prompt, and **Save & ready**. Ask only consequential private clarifications. | The user's figure writes a folded note. Confirmation seals it; the group sees readiness only. |
 | Waiting for friends | Shared readiness list: “Three people ready. Waiting for one.” The host's **Find plans** activates once current requirements are confirmed and blocking questions are resolved. | Ready figures gather; the remaining place stays open. Never display another person's private needs. |
 | Huddling… | Large scene on the left, factual progress on the right: **Gathering confirmed needs → Checking options → Preparing recommendations**. | Figures lean together over a map, point, nod, and peek up. These are character animations, not a claim that multiple agents are running. |
 | Conversation & proposals | Persistent discussion beside a wide map and up to three distinct valid proposals. Show grounded reasons, trade-offs, estimated whole-outing costs, and limitations. | A coordinator figure presents plans. Optional advocates appear only if implemented; speech bubbles contain actual public messages. |
@@ -60,7 +60,7 @@ On smaller screens, collapse navigation to a menu and stack the same content in 
 | Preferences | “Your usual vibe.” Editable defaults on a quiet cream surface. Explain what gets reused and provide an explicit clear-context action. Defaults do not change existing outing limits. |
 | Settings | Simple account and credential sections. A figure holds a key beside masked provider details. Integrations show their actual status; unfinished connections are not presented as connected. |
 
-Account pages remain staged enhancements. A login form, history list, or settings mockup does not establish account ownership or working persistence. Use only authorized personal context and group records.
+Account pages are implemented on the isolated branch preview and require verification before shared release. A login form, history list, or settings mockup does not establish account ownership or working persistence. Use only authorized personal context and group records.
 
 ## Animation and live behavior
 
@@ -89,8 +89,8 @@ Animation tells the story of the real state: **gathering, waiting, considering, 
 
 Prioritize a complete, rehearsed core journey:
 
-1. Start and code/QR join.
-2. Private prompts, interpretations, clarification, and confirmation.
+1. Sign in, select friends, send addressed in-app invitations, and explicitly accept.
+2. Private optional limits/prompts, Save & ready, and targeted clarification.
 3. Huddling progress tied to real planning state.
 4. Validated proposals, map, and persistent discussion.
 5. Voting and explicit booking simulation.

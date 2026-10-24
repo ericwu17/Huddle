@@ -11,6 +11,7 @@ import OffersInbox from "../components/OffersInbox";
 import { Buddy } from "../doodle/Doodle";
 import { useAgentNeeds, useAgentState } from "../agentData";
 import AgentPhaseNav from "../components/AgentPhaseNav";
+import AccountStatus from "../components/AccountStatus";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -127,6 +128,8 @@ export default function GroupLayout() {
           </span>
         </span>
       </header>
+      <AccountStatus />
+      <p className="on-sky text-sm">Outing: {group.date} · {group.window.start}–{group.window.end} · Berkeley time</p>
       {agent ? <AgentPhaseNav ctx={ctx} booking={booking} /> : <PhaseProgress ctx={ctx} booking={booking} />}
       <DemoBanner on={group.demoMode} />
       {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}

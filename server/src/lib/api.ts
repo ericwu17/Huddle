@@ -37,12 +37,12 @@ function post<T>(ctx: Proc, base: string, path: string, body: unknown, idempoten
 }
 
 // Future live council calls may have delivery side effects, so do not retry them.
-const NOT_IDEMPOTENT = new Set(["/council", "/agent/needs", "/agent/plan"]);
+const NOT_IDEMPOTENT = new Set(["/council", "/agent/needs", "/agent/plan", "/accounts/credentials", "/agent/invite-intent"]);
 
 export function callApi<T = any>(ctx: Proc, path: string, body: unknown): ApiResult<T> {
   const base = ctx.env.FASTAPI_BASE_URL;
   if (!base) return { ok: true, data: fakeApi(path, body) as T, stub: true };
-  return post<T>(ctx, base, path, body, !NOT_IDEMPOTENT.has(path));
+  return post<T>(ctx, base, path, body, !NOT_IDEMPOTENT.has(path) && !path.startsWith("/connectors/"));
 }
 
 // stub: true when VOICE_BASE_URL is unset; the caller then plays fakeCallEvents.

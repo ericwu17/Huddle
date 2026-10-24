@@ -37,6 +37,8 @@ export type Place = {
   dietary: string[];
   rating: number;
   reviewCount: number;
+  googlePlaceId?: string;
+  sources?: string[];
 };
 
 export type Hard = {

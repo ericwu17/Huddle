@@ -10,8 +10,22 @@ export {
   my_group, my_members, my_private, my_offers, my_plan_runs, my_council_messages,
   my_scout, my_votes, my_bookings, my_call_events, catalog_status, catalog_venues,
 } from "./views";
-export { health, callEvent, councilMessage, catalogPush, router } from "./http";
+export { health, callEvent, councilMessage, catalogPush, googleOAuthClaim, googleOAuthComplete, router } from "./http";
 export {
   createAgentGroup, submitAgentPrefs, confirmAgentNeeds, findAgentPlans,
   runAgentNeedsJob, runAgentPlanJob, postAgentDiscussion, my_agent_session, my_agent_needs,
+  saveAgentPreferences, my_agent_preferences,
 } from "./agent";
+export { registerAccount, loginAccount, logoutAccount, selectHuddle, runAccountExpiryJob,
+  my_account, my_account_memberships } from "./accounts";
+export { saveAccountContext, clearAccountContext, my_account_context,
+  requestFriend, respondFriendRequest, removeFriend, my_friends, my_friend_requests,
+  inviteFriends, respondHuddleInvitation, cancelHuddleInvitation, runInvitationExpiryJob,
+  my_huddle_invitations } from "./social";
+export { saveMessageConnector, setCalendarEventConsent, disconnectGoogleCalendar,
+  startGoogleCalendar, connectorStatus, my_connectors, my_invitation_deliveries,
+  my_group_connectors, runInvitationDeliveryJob, runCalendarOAuthExpiryJob, runCalendarRevokeJob } from "./connectors";
+export { searchMacContacts, saveFriendContact, clearFriendContact, my_friend_contact_destinations } from "./contacts";
+export { sendInvitationMessage } from "./connectors";
+export { parseHuddleIntent, createInvitationHuddle } from "./invitations";
+export { scheduleHuddle, setHuddleWindow, confirmMeetup, runMeetupJob, my_meetup } from "./scheduling";

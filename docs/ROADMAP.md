@@ -6,6 +6,16 @@
 architecture direction. The historical math-based milestones below do not
 define the next implementation phase.
 
+**Branch review status:** accounts, friends, addressed invitations, private saved
+context, optional sliders/Save & ready, cached ratings and password visibility
+are implemented in the isolated preview. Max authorized the main push after
+sync/conflict resolution; shared backend publication remains a separate step.
+The 130-venue catalog is active in that preview. Verification currently
+shows 99 Python passes, 129 server passes/one opt-in skip and 41 connected passes
+with real Claude and simulated booking. The final desktop/mobile browser rerun passed 30 assertions, including rapid
+map navigation and resizing, without page/console errors. Max's review and
+review continues for the remaining planner/UI follow-ups.
+
 - [x] Review Eric Chen's Windows API launcher on main; it hosts the existing API
   through a tunnel and does not introduce a new planner.
 - [x] Reproduce the local database-to-loopback HTTP restriction on SpacetimeDB
@@ -28,13 +38,16 @@ define the next implementation phase.
   proposals and choice; remove unsupported numerical confidence in the new flow.
 - [x] Verify independent groups, prompt/budget changes, invalid model output,
   current votes/roulette/bookings, and separate desktop/mobile browser identities.
-- [x] Publish the additive module to `huddle-calhacks` without a data reset;
+- [x] Previous coordinator release: publish the additive module to `huddle-calhacks` without a data reset;
   preserve existing secrets and point its API URL at Max's current tunnel.
-- [x] Release the updated frontend to Vercel: main `57e1656` was pushed and
+- [x] Previous coordinator release: release the frontend to Vercel; main `57e1656` was pushed and
   Vercel reported deployment completed. Use a new huddle for coordinator mode.
 - [x] Bright Data → SpacetimeDB ingestion (Eric Wu): versioned venue snapshot via
   `POST /catalog`, sent to FastAPI with each coordinator request and validated
   by both. 130-venue catalog committed ([BRIGHTDATA.md](BRIGHTDATA.md)).
+- [x] Sync main, combine catalog integration with account/connector hard checks,
+  regenerate bindings and activate all 130 venues in `huddle-account-max-check`.
+  New scraped IDs pass API validation; frontend ratings use the database views.
 - [ ] Go live with the catalog: republish the module, restart the shared API,
   run `collect.py publish` ([steps](BRIGHTDATA.md#go-live)). Max to review the
   schema/read path.
@@ -42,14 +55,44 @@ define the next implementation phase.
   `data/brightdata/details.json`) to the coordinator's public facts.
 - [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
   constraints and factual consistency. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
-- [ ] Review [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md):
-  optional budget/time sliders, optional prompt, flexible defaults, one ready
-  action and targeted clarifications. Thirty scenarios are specified, not yet
-  implemented or executed as an acceptance suite.
-- [ ] Review [PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md):
-  prompt-first home, stable accounts/contacts, in-app invitations without QR or
-  invitation links, and editable saved context. Stage external SMS separately;
-  no account, notification or memory implementation is claimed.
+- [x] Implement optional budget/time sliders, optional prompt, flexible defaults,
+  Save & ready and targeted clarifications on the isolated branch. Known allergies
+  can finish input; verified venue evidence remains required for final food plans.
+- [x] Implement account memberships, friends/requests, an Invite friends picker,
+  addressed in-app notification links and owner-editable saved context in SpacetimeDB.
+  New account huddles reject code-join bypasses. An opt-in Mac Messages adapter is
+  implemented; a real user-triggered submission reached Messages but failed delivery.
+- [x] Reduce password minimum to eight characters and add show/hide password.
+- [x] Remove QR UI from the account flow; invitation messages carry addressed
+  opening links and the Invite friends dropdown selects explicit recipients.
+- [x] Include cached rating/review-count/source context for Claude and cached
+  ratings on venue cards, with evidence limits preserved.
+- [x] Complete the 41-check connected account → friends → invite → preferences →
+  real-Claude plans → vote → simulated booking journey on the isolated module.
+- [x] Finish the map-fix browser rerun: 30 assertions passed; record exact
+  evidence in [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md). No main push/shared
+  deployment until requested; sync main before any approved release.
+- [x] Add reviewed natural-language invitation intent, a picker fallback,
+  Connectors, private Google OAuth, common-time scheduling, manual Berkeley time
+  fallback and explicitly opted-in agreed meetup events on the isolated preview.
+- [ ] Verify real Google consent/free-busy/event creation and one consenting
+  Messages invitation. Credentials are configured; provider writes have only
+  mocked tests. See [CONNECTORS_CONTRACT.md](CONNECTORS_CONTRACT.md).
+- [x] Fix the artificial two-stop minimum for short dinner requests: one meal
+  may be a complete coordinator plan, still subject to every hard constraint.
+- [x] Add Max-owned Mac Contacts lookup and reviewed per-friend address links;
+  explicit recipient opt-out remains authoritative. Real lookup succeeded.
+- [ ] Confirm actual Messages receipt after an explicit reviewed invitation.
+- [x] Review Eric Wu's actual catalog fields, snapshot boundary and sample records.
+- [ ] Wire the separately collected menu/takeout/seating/photo evidence through
+  a bounded extension of the snapshot contract. Inferred
+  dietary tags and a default $25 meal estimate do not prove vegan/allergen safety
+  or actual affordability. Reviews/star distributions are not reported in `/catalog`.
+- [ ] Implement the approved individual-payment rule after reviewing assignments
+  and item-price shapes: each person pays for their own meal plus later stops,
+  not another participant's meal. Keep the current shared-stop runtime unchanged
+  until that coordinated API/module/UI follow-up is agreed and tested.
+- [ ] Complete Max's guided review with a separate test-bot browser.
 - [ ] Rehearse with physical phones; browser mobile emulation is not that test.
 - [ ] Consider removing legacy endpoints only after teammate review; they remain
   compatible for existing groups and older frontend clients.
@@ -61,10 +104,12 @@ booking is simulated and review/price/travel limitations remain explicit.
 Suggested split: Max leads context/contracts and verification; Eric Wu owns the
 API migration/local operation with Max; Eric Chen leads UI and coordinates
 SpacetimeDB context/progress changes with Max. Coordinate overlapping file edits.
-Bright Data scraping and the shared catalog integration are built; publishing
-the catalog and using the venue details are next. See [NEXT_TASKS.md](NEXT_TASKS.md) for concrete
+Eric Wu owns the active Bright Data ingestion handoff; Max integrates the
+reviewed snapshot and deferred Claude proposal/validation/revision flow. Specific
+menu prices, takeout support and shared seating matter before adding more review
+text for the current mixed-meal example. See [NEXT_TASKS.md](NEXT_TASKS.md) for concrete
 UI/Claude/data tasks, suggested owners and solo testing. Advanced routing, real
-calls, vendor/MCP additions, accounts and personal history remain later work.
+calls, vendor/MCP additions, inferred memory and actual-visit history remain later work.
 The coordinator task is in progress until these demo-polish checks are complete.
 
 ## Historical roadmap and completed legacy work
@@ -93,7 +138,12 @@ requirements; use the priorities above when choosing work.
 
 **Sleep/away times need re-checking against the 6 PM start.** If Eric Chen's away window is fixed in clock time (Sat 6 AM to noon), it is now H12 to H18, not H9 to H15.
 
-## Current coverage and access
+## Historical coverage and access at the original handoff
+
+The ownership/key-availability statements in this and the A–D sections below
+describe the original handoff, not the current account-branch or Bright Data
+assignment. Eric Wu's current ingestion ownership and the priorities above
+supersede them.
 
 - Eric Chen is working on UI; Max covers backend code and integration in this Codex session. Eric Wu is working in `api/`; coordinate before touching that folder. Primary ownership and shared contracts remain unchanged.
 - Max Li and Eric Wu are confirmed Admin collaborators on `huddle-calhacks`. Max deployed source `7612d0b` with CLI 2.13.0 using his own account and `--delete-data=never`. Both public service URLs and real API mode were verified; the existing shared secret was preserved.

@@ -6,17 +6,41 @@
 import { type Infer as __Infer } from "spacetimedb";
 
 // Import all procedure arg schemas
+import * as ConnectorStatusProcedure from "../connector_status_procedure";
 import * as CreateAgentGroupProcedure from "../create_agent_group_procedure";
 import * as CreateGroupProcedure from "../create_group_procedure";
+import * as CreateInvitationHuddleProcedure from "../create_invitation_huddle_procedure";
 import * as DoRouletteProcedure from "../do_roulette_procedure";
 import * as JoinGroupProcedure from "../join_group_procedure";
+import * as LoginAccountProcedure from "../login_account_procedure";
+import * as ParseHuddleIntentProcedure from "../parse_huddle_intent_procedure";
+import * as RegisterAccountProcedure from "../register_account_procedure";
+import * as ScheduleHuddleProcedure from "../schedule_huddle_procedure";
+import * as SearchMacContactsProcedure from "../search_mac_contacts_procedure";
+import * as StartGoogleCalendarProcedure from "../start_google_calendar_procedure";
 
+export type ConnectorStatusArgs = __Infer<typeof ConnectorStatusProcedure.params>;
+export type ConnectorStatusResult = __Infer<typeof ConnectorStatusProcedure.returnType>;
 export type CreateAgentGroupArgs = __Infer<typeof CreateAgentGroupProcedure.params>;
 export type CreateAgentGroupResult = __Infer<typeof CreateAgentGroupProcedure.returnType>;
 export type CreateGroupArgs = __Infer<typeof CreateGroupProcedure.params>;
 export type CreateGroupResult = __Infer<typeof CreateGroupProcedure.returnType>;
+export type CreateInvitationHuddleArgs = __Infer<typeof CreateInvitationHuddleProcedure.params>;
+export type CreateInvitationHuddleResult = __Infer<typeof CreateInvitationHuddleProcedure.returnType>;
 export type DoRouletteArgs = __Infer<typeof DoRouletteProcedure.params>;
 export type DoRouletteResult = __Infer<typeof DoRouletteProcedure.returnType>;
 export type JoinGroupArgs = __Infer<typeof JoinGroupProcedure.params>;
 export type JoinGroupResult = __Infer<typeof JoinGroupProcedure.returnType>;
+export type LoginAccountArgs = __Infer<typeof LoginAccountProcedure.params>;
+export type LoginAccountResult = __Infer<typeof LoginAccountProcedure.returnType>;
+export type ParseHuddleIntentArgs = __Infer<typeof ParseHuddleIntentProcedure.params>;
+export type ParseHuddleIntentResult = __Infer<typeof ParseHuddleIntentProcedure.returnType>;
+export type RegisterAccountArgs = __Infer<typeof RegisterAccountProcedure.params>;
+export type RegisterAccountResult = __Infer<typeof RegisterAccountProcedure.returnType>;
+export type ScheduleHuddleArgs = __Infer<typeof ScheduleHuddleProcedure.params>;
+export type ScheduleHuddleResult = __Infer<typeof ScheduleHuddleProcedure.returnType>;
+export type SearchMacContactsArgs = __Infer<typeof SearchMacContactsProcedure.params>;
+export type SearchMacContactsResult = __Infer<typeof SearchMacContactsProcedure.returnType>;
+export type StartGoogleCalendarArgs = __Infer<typeof StartGoogleCalendarProcedure.params>;
+export type StartGoogleCalendarResult = __Infer<typeof StartGoogleCalendarProcedure.returnType>;
 

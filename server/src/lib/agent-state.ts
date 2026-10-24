@@ -2,7 +2,7 @@
 import { SenderError } from "spacetimedb/server";
 import type { ReadDb, Tx } from "./types";
 import { at, membersOf, nowMs, parse } from "./util";
-import { planFitsBudgets } from "./budgets";
+import { planFitsAgentRequirements } from "./agent-constraints";
 
 export const isAgent = (db: ReadDb, groupId: string) => !!db.agent_session.groupId.find(groupId);
 
@@ -21,7 +21,7 @@ export function allAgentNeedsConfirmed(db: ReadDb, groupId: string): boolean {
   return members.length >= 2 && members.every((member) => {
     const need = db.agent_need.memberId.find(member.id);
     const result = parse(need?.resultJson);
-    return !!need?.confirmed && !!result?.hard && !result.questions?.length && !result.hard.allergies?.length;
+    return !!need?.confirmed && !!result?.hard && !result.questions?.length;
   });
 }
 
@@ -29,7 +29,7 @@ export function startAgentRun(tx: Tx, groupId: string): string {
   const state = tx.db.agent_session.groupId.find(groupId);
   const group = tx.db.group.id.find(groupId);
   if (!state || !group || !allAgentNeedsConfirmed(tx.db, groupId))
-    throw new SenderError("Everyone must confirm their current needs and resolve blocking questions first.");
+    throw new SenderError("Everyone must save their preferences and answer any private clarification first.");
   if (state.status === "planning") throw new SenderError("The coordinator is already planning.");
   const runId = `run_${group.code}_${group.runCounter + 1}`;
   const revision = state.revision + 1;
@@ -51,7 +51,7 @@ export function agentPlans(db: ReadDb, groupId: string, runId: string): any[] {
       session?.status !== "ready" || session.activeRunId !== runId || result?.mode !== "agent" ||
       result.inputRevision !== session.revision || !allAgentNeedsConfirmed(db, groupId)) return [];
   const members = membersOf(db, groupId).map(m => ({ hard: parse(db.private_prefs.memberId.find(m.id)?.hardJson) }));
-  return Array.isArray(result.plans) ? result.plans.filter((p: any) => planFitsBudgets(p, members)) : [];
+  return Array.isArray(result.plans) ? result.plans.filter((p: any) => planFitsAgentRequirements(p, members)) : [];
 }
 
 export function agentBallot(db: ReadDb, groupId: string, runId: string) {

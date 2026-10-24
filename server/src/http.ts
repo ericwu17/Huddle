@@ -8,6 +8,7 @@ import { recordCallEvent } from "./booking";
 import { insertCouncilMessage } from "./council";
 import { placesForMode } from "./lib/places";
 import { ingestCatalog } from "./lib/catalog";
+import { claimGoogleOAuth, completeGoogleOAuth } from "./connectors";
 
 const json = (body: unknown, status = 200) =>
   new SyncResponse(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
@@ -58,7 +59,28 @@ export const catalogPush = spacetimedb.httpHandler((ctx, req) => {
   }
 });
 
+export const googleOAuthClaim = spacetimedb.httpHandler((ctx, req) => {
+  if (!authorized(req, ctx.env.HUDDLE_SHARED_SECRET)) return json({ error: "unauthorized" }, 401);
+  try {
+    const body = req.json();
+    return json(ctx.withTx(tx => claimGoogleOAuth(tx, body)));
+  } catch {
+    return json({ error: "Google authorization is expired or no longer current." }, 400);
+  }
+});
+
+export const googleOAuthComplete = spacetimedb.httpHandler((ctx, req) => {
+  if (!authorized(req, ctx.env.HUDDLE_SHARED_SECRET)) return json({ error: "unauthorized" }, 401);
+  try {
+    const body = req.json();
+    return json(ctx.withTx(tx => completeGoogleOAuth(tx, body)));
+  } catch {
+    return json({ error: "Google authorization result could not be accepted." }, 400);
+  }
+});
+
 export const router = spacetimedb.httpRouter(
   new Router().get("/health", health).post("/call-event", callEvent).post("/council-message", councilMessage)
-    .post("/catalog", catalogPush),
+    .post("/catalog", catalogPush)
+    .post("/connectors/google/claim", googleOAuthClaim).post("/connectors/google/complete", googleOAuthComplete),
 );

@@ -35,12 +35,31 @@ import {
 
 // Import all reducer arg schemas
 import AcceptOfferReducer from "./accept_offer_reducer";
+import CancelHuddleInvitationReducer from "./cancel_huddle_invitation_reducer";
 import CastVoteReducer from "./cast_vote_reducer";
+import ClearAccountContextReducer from "./clear_account_context_reducer";
+import ClearFriendContactReducer from "./clear_friend_contact_reducer";
 import ConfirmAgentNeedsReducer from "./confirm_agent_needs_reducer";
+import ConfirmMeetupReducer from "./confirm_meetup_reducer";
 import DeclineOfferReducer from "./decline_offer_reducer";
+import DisconnectGoogleCalendarReducer from "./disconnect_google_calendar_reducer";
 import FindAgentPlansReducer from "./find_agent_plans_reducer";
+import InviteFriendsReducer from "./invite_friends_reducer";
+import LogoutAccountReducer from "./logout_account_reducer";
 import PostAgentDiscussionReducer from "./post_agent_discussion_reducer";
+import RemoveFriendReducer from "./remove_friend_reducer";
+import RequestFriendReducer from "./request_friend_reducer";
+import RespondFriendRequestReducer from "./respond_friend_request_reducer";
+import RespondHuddleInvitationReducer from "./respond_huddle_invitation_reducer";
+import SaveAccountContextReducer from "./save_account_context_reducer";
+import SaveAgentPreferencesReducer from "./save_agent_preferences_reducer";
+import SaveFriendContactReducer from "./save_friend_contact_reducer";
+import SaveMessageConnectorReducer from "./save_message_connector_reducer";
+import SelectHuddleReducer from "./select_huddle_reducer";
+import SendInvitationMessageReducer from "./send_invitation_message_reducer";
+import SetCalendarEventConsentReducer from "./set_calendar_event_consent_reducer";
 import SetDemoModeReducer from "./set_demo_mode_reducer";
+import SetHuddleWindowReducer from "./set_huddle_window_reducer";
 import SetOriginReducer from "./set_origin_reducer";
 import SetReadyReducer from "./set_ready_reducer";
 import SetShowWhoCompromisedReducer from "./set_show_who_compromised_reducer";
@@ -50,20 +69,40 @@ import SubmitPrefsReducer from "./submit_prefs_reducer";
 import SubmitSwipeReducer from "./submit_swipe_reducer";
 
 // Import all procedure arg schemas
+import * as ConnectorStatusProcedure from "./connector_status_procedure";
 import * as CreateAgentGroupProcedure from "./create_agent_group_procedure";
 import * as CreateGroupProcedure from "./create_group_procedure";
+import * as CreateInvitationHuddleProcedure from "./create_invitation_huddle_procedure";
 import * as DoRouletteProcedure from "./do_roulette_procedure";
 import * as JoinGroupProcedure from "./join_group_procedure";
+import * as LoginAccountProcedure from "./login_account_procedure";
+import * as ParseHuddleIntentProcedure from "./parse_huddle_intent_procedure";
+import * as RegisterAccountProcedure from "./register_account_procedure";
+import * as ScheduleHuddleProcedure from "./schedule_huddle_procedure";
+import * as SearchMacContactsProcedure from "./search_mac_contacts_procedure";
+import * as StartGoogleCalendarProcedure from "./start_google_calendar_procedure";
 
 // Import all table schema definitions
 import CatalogStatusRow from "./catalog_status_table";
 import CatalogVenuesRow from "./catalog_venues_table";
+import MyAccountRow from "./my_account_table";
+import MyAccountContextRow from "./my_account_context_table";
+import MyAccountMembershipsRow from "./my_account_memberships_table";
 import MyAgentNeedsRow from "./my_agent_needs_table";
+import MyAgentPreferencesRow from "./my_agent_preferences_table";
 import MyAgentSessionRow from "./my_agent_session_table";
 import MyBookingsRow from "./my_bookings_table";
 import MyCallEventsRow from "./my_call_events_table";
+import MyConnectorsRow from "./my_connectors_table";
 import MyCouncilMessagesRow from "./my_council_messages_table";
+import MyFriendContactDestinationsRow from "./my_friend_contact_destinations_table";
+import MyFriendRequestsRow from "./my_friend_requests_table";
+import MyFriendsRow from "./my_friends_table";
 import MyGroupRow from "./my_group_table";
+import MyGroupConnectorsRow from "./my_group_connectors_table";
+import MyHuddleInvitationsRow from "./my_huddle_invitations_table";
+import MyInvitationDeliveriesRow from "./my_invitation_deliveries_table";
+import MyMeetupRow from "./my_meetup_table";
 import MyMembersRow from "./my_members_table";
 import MyOffersRow from "./my_offers_table";
 import MyPlanRunsRow from "./my_plan_runs_table";
@@ -89,6 +128,27 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, CatalogVenuesRow),
+  myAccount: __table({
+    name: 'my_account',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAccountRow),
+  myAccountContext: __table({
+    name: 'my_account_context',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAccountContextRow),
+  myAccountMemberships: __table({
+    name: 'my_account_memberships',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAccountMembershipsRow),
   myAgentNeeds: __table({
     name: 'my_agent_needs',
     indexes: [
@@ -96,6 +156,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyAgentNeedsRow),
+  myAgentPreferences: __table({
+    name: 'my_agent_preferences',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAgentPreferencesRow),
   myAgentSession: __table({
     name: 'my_agent_session',
     indexes: [
@@ -117,6 +184,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyCallEventsRow),
+  myConnectors: __table({
+    name: 'my_connectors',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyConnectorsRow),
   myCouncilMessages: __table({
     name: 'my_council_messages',
     indexes: [
@@ -124,6 +198,27 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyCouncilMessagesRow),
+  myFriendContactDestinations: __table({
+    name: 'my_friend_contact_destinations',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyFriendContactDestinationsRow),
+  myFriendRequests: __table({
+    name: 'my_friend_requests',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyFriendRequestsRow),
+  myFriends: __table({
+    name: 'my_friends',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyFriendsRow),
   myGroup: __table({
     name: 'my_group',
     indexes: [
@@ -131,6 +226,34 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyGroupRow),
+  myGroupConnectors: __table({
+    name: 'my_group_connectors',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyGroupConnectorsRow),
+  myHuddleInvitations: __table({
+    name: 'my_huddle_invitations',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyHuddleInvitationsRow),
+  myInvitationDeliveries: __table({
+    name: 'my_invitation_deliveries',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyInvitationDeliveriesRow),
+  myMeetup: __table({
+    name: 'my_meetup',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyMeetupRow),
   myMembers: __table({
     name: 'my_members',
     indexes: [
@@ -178,12 +301,31 @@ const tablesSchema = __schema({
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */
 const reducersSchema = __reducers(
   __reducerSchema("accept_offer", AcceptOfferReducer),
+  __reducerSchema("cancel_huddle_invitation", CancelHuddleInvitationReducer),
   __reducerSchema("vote", CastVoteReducer),
+  __reducerSchema("clear_account_context", ClearAccountContextReducer),
+  __reducerSchema("clear_friend_contact", ClearFriendContactReducer),
   __reducerSchema("confirm_agent_needs", ConfirmAgentNeedsReducer),
+  __reducerSchema("confirm_meetup", ConfirmMeetupReducer),
   __reducerSchema("decline_offer", DeclineOfferReducer),
+  __reducerSchema("disconnect_google_calendar", DisconnectGoogleCalendarReducer),
   __reducerSchema("find_agent_plans", FindAgentPlansReducer),
+  __reducerSchema("invite_friends", InviteFriendsReducer),
+  __reducerSchema("logout_account", LogoutAccountReducer),
   __reducerSchema("post_agent_discussion", PostAgentDiscussionReducer),
+  __reducerSchema("remove_friend", RemoveFriendReducer),
+  __reducerSchema("request_friend", RequestFriendReducer),
+  __reducerSchema("respond_friend_request", RespondFriendRequestReducer),
+  __reducerSchema("respond_huddle_invitation", RespondHuddleInvitationReducer),
+  __reducerSchema("save_account_context", SaveAccountContextReducer),
+  __reducerSchema("save_agent_preferences", SaveAgentPreferencesReducer),
+  __reducerSchema("save_friend_contact", SaveFriendContactReducer),
+  __reducerSchema("save_message_connector", SaveMessageConnectorReducer),
+  __reducerSchema("select_huddle", SelectHuddleReducer),
+  __reducerSchema("send_invitation_message", SendInvitationMessageReducer),
+  __reducerSchema("set_calendar_event_consent", SetCalendarEventConsentReducer),
   __reducerSchema("set_demo_mode", SetDemoModeReducer),
+  __reducerSchema("set_huddle_window", SetHuddleWindowReducer),
   __reducerSchema("set_origin", SetOriginReducer),
   __reducerSchema("set_ready", SetReadyReducer),
   __reducerSchema("set_show_who_compromised", SetShowWhoCompromisedReducer),
@@ -195,10 +337,18 @@ const reducersSchema = __reducers(
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */
 const proceduresSchema = __procedures(
+  __procedureSchema("connector_status", ConnectorStatusProcedure.params, ConnectorStatusProcedure.returnType),
   __procedureSchema("create_agent_group", CreateAgentGroupProcedure.params, CreateAgentGroupProcedure.returnType),
   __procedureSchema("create_group", CreateGroupProcedure.params, CreateGroupProcedure.returnType),
+  __procedureSchema("create_invitation_huddle", CreateInvitationHuddleProcedure.params, CreateInvitationHuddleProcedure.returnType),
   __procedureSchema("do_roulette", DoRouletteProcedure.params, DoRouletteProcedure.returnType),
   __procedureSchema("join_group", JoinGroupProcedure.params, JoinGroupProcedure.returnType),
+  __procedureSchema("login_account", LoginAccountProcedure.params, LoginAccountProcedure.returnType),
+  __procedureSchema("parse_huddle_intent", ParseHuddleIntentProcedure.params, ParseHuddleIntentProcedure.returnType),
+  __procedureSchema("register_account", RegisterAccountProcedure.params, RegisterAccountProcedure.returnType),
+  __procedureSchema("schedule_huddle", ScheduleHuddleProcedure.params, ScheduleHuddleProcedure.returnType),
+  __procedureSchema("search_mac_contacts", SearchMacContactsProcedure.params, SearchMacContactsProcedure.returnType),
+  __procedureSchema("start_google_calendar", StartGoogleCalendarProcedure.params, StartGoogleCalendarProcedure.returnType),
 );
 
 type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "tables"> & {
@@ -207,18 +357,42 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "catalog_status": Omit<typeof tablesSchema.schemaType.tables["catalogStatus"], "accessorName"> & { readonly accessorName: "catalog_status" };
     /** @deprecated Use `catalogVenues` instead. This alias will be removed in the next major version. */
     readonly "catalog_venues": Omit<typeof tablesSchema.schemaType.tables["catalogVenues"], "accessorName"> & { readonly accessorName: "catalog_venues" };
+    /** @deprecated Use `myAccount` instead. This alias will be removed in the next major version. */
+    readonly "my_account": Omit<typeof tablesSchema.schemaType.tables["myAccount"], "accessorName"> & { readonly accessorName: "my_account" };
+    /** @deprecated Use `myAccountContext` instead. This alias will be removed in the next major version. */
+    readonly "my_account_context": Omit<typeof tablesSchema.schemaType.tables["myAccountContext"], "accessorName"> & { readonly accessorName: "my_account_context" };
+    /** @deprecated Use `myAccountMemberships` instead. This alias will be removed in the next major version. */
+    readonly "my_account_memberships": Omit<typeof tablesSchema.schemaType.tables["myAccountMemberships"], "accessorName"> & { readonly accessorName: "my_account_memberships" };
     /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
     readonly "my_agent_needs": Omit<typeof tablesSchema.schemaType.tables["myAgentNeeds"], "accessorName"> & { readonly accessorName: "my_agent_needs" };
+    /** @deprecated Use `myAgentPreferences` instead. This alias will be removed in the next major version. */
+    readonly "my_agent_preferences": Omit<typeof tablesSchema.schemaType.tables["myAgentPreferences"], "accessorName"> & { readonly accessorName: "my_agent_preferences" };
     /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
     readonly "my_agent_session": Omit<typeof tablesSchema.schemaType.tables["myAgentSession"], "accessorName"> & { readonly accessorName: "my_agent_session" };
     /** @deprecated Use `myBookings` instead. This alias will be removed in the next major version. */
     readonly "my_bookings": Omit<typeof tablesSchema.schemaType.tables["myBookings"], "accessorName"> & { readonly accessorName: "my_bookings" };
     /** @deprecated Use `myCallEvents` instead. This alias will be removed in the next major version. */
     readonly "my_call_events": Omit<typeof tablesSchema.schemaType.tables["myCallEvents"], "accessorName"> & { readonly accessorName: "my_call_events" };
+    /** @deprecated Use `myConnectors` instead. This alias will be removed in the next major version. */
+    readonly "my_connectors": Omit<typeof tablesSchema.schemaType.tables["myConnectors"], "accessorName"> & { readonly accessorName: "my_connectors" };
     /** @deprecated Use `myCouncilMessages` instead. This alias will be removed in the next major version. */
     readonly "my_council_messages": Omit<typeof tablesSchema.schemaType.tables["myCouncilMessages"], "accessorName"> & { readonly accessorName: "my_council_messages" };
+    /** @deprecated Use `myFriendContactDestinations` instead. This alias will be removed in the next major version. */
+    readonly "my_friend_contact_destinations": Omit<typeof tablesSchema.schemaType.tables["myFriendContactDestinations"], "accessorName"> & { readonly accessorName: "my_friend_contact_destinations" };
+    /** @deprecated Use `myFriendRequests` instead. This alias will be removed in the next major version. */
+    readonly "my_friend_requests": Omit<typeof tablesSchema.schemaType.tables["myFriendRequests"], "accessorName"> & { readonly accessorName: "my_friend_requests" };
+    /** @deprecated Use `myFriends` instead. This alias will be removed in the next major version. */
+    readonly "my_friends": Omit<typeof tablesSchema.schemaType.tables["myFriends"], "accessorName"> & { readonly accessorName: "my_friends" };
     /** @deprecated Use `myGroup` instead. This alias will be removed in the next major version. */
     readonly "my_group": Omit<typeof tablesSchema.schemaType.tables["myGroup"], "accessorName"> & { readonly accessorName: "my_group" };
+    /** @deprecated Use `myGroupConnectors` instead. This alias will be removed in the next major version. */
+    readonly "my_group_connectors": Omit<typeof tablesSchema.schemaType.tables["myGroupConnectors"], "accessorName"> & { readonly accessorName: "my_group_connectors" };
+    /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
+    readonly "my_huddle_invitations": Omit<typeof tablesSchema.schemaType.tables["myHuddleInvitations"], "accessorName"> & { readonly accessorName: "my_huddle_invitations" };
+    /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
+    readonly "my_invitation_deliveries": Omit<typeof tablesSchema.schemaType.tables["myInvitationDeliveries"], "accessorName"> & { readonly accessorName: "my_invitation_deliveries" };
+    /** @deprecated Use `myMeetup` instead. This alias will be removed in the next major version. */
+    readonly "my_meetup": Omit<typeof tablesSchema.schemaType.tables["myMeetup"], "accessorName"> & { readonly accessorName: "my_meetup" };
     /** @deprecated Use `myMembers` instead. This alias will be removed in the next major version. */
     readonly "my_members": Omit<typeof tablesSchema.schemaType.tables["myMembers"], "accessorName"> & { readonly accessorName: "my_members" };
     /** @deprecated Use `myOffers` instead. This alias will be removed in the next major version. */
@@ -251,12 +425,24 @@ const REMOTE_MODULE = {
 const tableAccessorAliases = {
   "catalog_status": "catalogStatus",
   "catalog_venues": "catalogVenues",
+  "my_account": "myAccount",
+  "my_account_context": "myAccountContext",
+  "my_account_memberships": "myAccountMemberships",
   "my_agent_needs": "myAgentNeeds",
+  "my_agent_preferences": "myAgentPreferences",
   "my_agent_session": "myAgentSession",
   "my_bookings": "myBookings",
   "my_call_events": "myCallEvents",
+  "my_connectors": "myConnectors",
   "my_council_messages": "myCouncilMessages",
+  "my_friend_contact_destinations": "myFriendContactDestinations",
+  "my_friend_requests": "myFriendRequests",
+  "my_friends": "myFriends",
   "my_group": "myGroup",
+  "my_group_connectors": "myGroupConnectors",
+  "my_huddle_invitations": "myHuddleInvitations",
+  "my_invitation_deliveries": "myInvitationDeliveries",
+  "my_meetup": "myMeetup",
   "my_members": "myMembers",
   "my_offers": "myOffers",
   "my_plan_runs": "myPlanRuns",
@@ -287,18 +473,42 @@ export type DbView = __DbViewBase & {
   readonly "catalog_status": __DbViewBase["catalogStatus"];
   /** @deprecated Use `catalogVenues` instead. This alias will be removed in the next major version. */
   readonly "catalog_venues": __DbViewBase["catalogVenues"];
+  /** @deprecated Use `myAccount` instead. This alias will be removed in the next major version. */
+  readonly "my_account": __DbViewBase["myAccount"];
+  /** @deprecated Use `myAccountContext` instead. This alias will be removed in the next major version. */
+  readonly "my_account_context": __DbViewBase["myAccountContext"];
+  /** @deprecated Use `myAccountMemberships` instead. This alias will be removed in the next major version. */
+  readonly "my_account_memberships": __DbViewBase["myAccountMemberships"];
   /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
   readonly "my_agent_needs": __DbViewBase["myAgentNeeds"];
+  /** @deprecated Use `myAgentPreferences` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_preferences": __DbViewBase["myAgentPreferences"];
   /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
   readonly "my_agent_session": __DbViewBase["myAgentSession"];
   /** @deprecated Use `myBookings` instead. This alias will be removed in the next major version. */
   readonly "my_bookings": __DbViewBase["myBookings"];
   /** @deprecated Use `myCallEvents` instead. This alias will be removed in the next major version. */
   readonly "my_call_events": __DbViewBase["myCallEvents"];
+  /** @deprecated Use `myConnectors` instead. This alias will be removed in the next major version. */
+  readonly "my_connectors": __DbViewBase["myConnectors"];
   /** @deprecated Use `myCouncilMessages` instead. This alias will be removed in the next major version. */
   readonly "my_council_messages": __DbViewBase["myCouncilMessages"];
+  /** @deprecated Use `myFriendContactDestinations` instead. This alias will be removed in the next major version. */
+  readonly "my_friend_contact_destinations": __DbViewBase["myFriendContactDestinations"];
+  /** @deprecated Use `myFriendRequests` instead. This alias will be removed in the next major version. */
+  readonly "my_friend_requests": __DbViewBase["myFriendRequests"];
+  /** @deprecated Use `myFriends` instead. This alias will be removed in the next major version. */
+  readonly "my_friends": __DbViewBase["myFriends"];
   /** @deprecated Use `myGroup` instead. This alias will be removed in the next major version. */
   readonly "my_group": __DbViewBase["myGroup"];
+  /** @deprecated Use `myGroupConnectors` instead. This alias will be removed in the next major version. */
+  readonly "my_group_connectors": __DbViewBase["myGroupConnectors"];
+  /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_invitations": __DbViewBase["myHuddleInvitations"];
+  /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
+  readonly "my_invitation_deliveries": __DbViewBase["myInvitationDeliveries"];
+  /** @deprecated Use `myMeetup` instead. This alias will be removed in the next major version. */
+  readonly "my_meetup": __DbViewBase["myMeetup"];
   /** @deprecated Use `myMembers` instead. This alias will be removed in the next major version. */
   readonly "my_members": __DbViewBase["myMembers"];
   /** @deprecated Use `myOffers` instead. This alias will be removed in the next major version. */
@@ -319,18 +529,42 @@ export type Tables = __TablesBase & {
   readonly "catalog_status": __TablesBase["catalogStatus"];
   /** @deprecated Use `catalogVenues` instead. This alias will be removed in the next major version. */
   readonly "catalog_venues": __TablesBase["catalogVenues"];
+  /** @deprecated Use `myAccount` instead. This alias will be removed in the next major version. */
+  readonly "my_account": __TablesBase["myAccount"];
+  /** @deprecated Use `myAccountContext` instead. This alias will be removed in the next major version. */
+  readonly "my_account_context": __TablesBase["myAccountContext"];
+  /** @deprecated Use `myAccountMemberships` instead. This alias will be removed in the next major version. */
+  readonly "my_account_memberships": __TablesBase["myAccountMemberships"];
   /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
   readonly "my_agent_needs": __TablesBase["myAgentNeeds"];
+  /** @deprecated Use `myAgentPreferences` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_preferences": __TablesBase["myAgentPreferences"];
   /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
   readonly "my_agent_session": __TablesBase["myAgentSession"];
   /** @deprecated Use `myBookings` instead. This alias will be removed in the next major version. */
   readonly "my_bookings": __TablesBase["myBookings"];
   /** @deprecated Use `myCallEvents` instead. This alias will be removed in the next major version. */
   readonly "my_call_events": __TablesBase["myCallEvents"];
+  /** @deprecated Use `myConnectors` instead. This alias will be removed in the next major version. */
+  readonly "my_connectors": __TablesBase["myConnectors"];
   /** @deprecated Use `myCouncilMessages` instead. This alias will be removed in the next major version. */
   readonly "my_council_messages": __TablesBase["myCouncilMessages"];
+  /** @deprecated Use `myFriendContactDestinations` instead. This alias will be removed in the next major version. */
+  readonly "my_friend_contact_destinations": __TablesBase["myFriendContactDestinations"];
+  /** @deprecated Use `myFriendRequests` instead. This alias will be removed in the next major version. */
+  readonly "my_friend_requests": __TablesBase["myFriendRequests"];
+  /** @deprecated Use `myFriends` instead. This alias will be removed in the next major version. */
+  readonly "my_friends": __TablesBase["myFriends"];
   /** @deprecated Use `myGroup` instead. This alias will be removed in the next major version. */
   readonly "my_group": __TablesBase["myGroup"];
+  /** @deprecated Use `myGroupConnectors` instead. This alias will be removed in the next major version. */
+  readonly "my_group_connectors": __TablesBase["myGroupConnectors"];
+  /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_invitations": __TablesBase["myHuddleInvitations"];
+  /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
+  readonly "my_invitation_deliveries": __TablesBase["myInvitationDeliveries"];
+  /** @deprecated Use `myMeetup` instead. This alias will be removed in the next major version. */
+  readonly "my_meetup": __TablesBase["myMeetup"];
   /** @deprecated Use `myMembers` instead. This alias will be removed in the next major version. */
   readonly "my_members": __TablesBase["myMembers"];
   /** @deprecated Use `myOffers` instead. This alias will be removed in the next major version. */

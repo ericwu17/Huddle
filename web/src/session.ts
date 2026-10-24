@@ -52,3 +52,13 @@ export function saveToken(token: string) {
     // Blocked storage: this phone gets a new identity on every reload.
   }
 }
+
+// A full reload follows account transitions, clearing all subscribed React state.
+export function clearAccountBrowserState(dropToken: boolean) {
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith("huddle:session:"));
+    for (const k of keys) localStorage.removeItem(k);
+    for (const k of Object.keys(sessionStorage).filter(k => k.startsWith("huddle:draft:"))) sessionStorage.removeItem(k);
+    if (dropToken) localStorage.removeItem(TOKEN_KEY);
+  } catch { /* Storage can be disabled; the full account transition still reloads. */ }
+}

@@ -63,7 +63,7 @@ class APIBoundaryTests(unittest.TestCase):
     def test_openapi_exposes_all_documented_operations(self):
         response = self.client.get("/openapi.json", headers=self.headers)
         schema = response.json()
-        self.assertEqual(set(schema["paths"]), {"/health", "/parse-prefs", "/elicit/next", "/elicit/update", "/plan", "/offers", "/roulette", "/council", "/agent/needs", "/agent/plan"})
+        self.assertEqual(set(schema["paths"]), {"/health", "/parse-prefs", "/elicit/next", "/elicit/update", "/plan", "/offers", "/roulette", "/council", "/agent/needs", "/agent/plan", "/accounts/credentials", "/agent/invite-intent", "/connectors/status", "/connectors/google/start", "/connectors/google/revoke", "/connectors/calendar/availability", "/connectors/calendar/events", "/connectors/calendar/schedule", "/connectors/calendar/meetup", "/connectors/messages/send", "/connectors/contacts/search"})
         for path, operations in schema["paths"].items():
             operation = operations["get" if path == "/health" else "post"]
             self.assertIn("schema", operation["responses"]["200"]["content"]["application/json"])

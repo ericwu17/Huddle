@@ -6,11 +6,22 @@ This plan changes the next planner design, not the live endpoint shapes or
 current runtime. Keep local FastAPI + tunnel + Maincloud and one coordinator.
 The broader demo-polish task remains open.
 
+**Catalog handoff checkpoint:** main `156697c` now supplies the existing
+`AgentCatalog` snapshot contract, `venue`/`catalog_state`, public catalog views
+and authenticated atomic catalog push. This code is merged with accounts/
+connectors and verified with 130 active venues in `huddle-account-max-check`;
+new scraped IDs reach FastAPI/Claude and public rating metadata. Shared rollout
+is pending. The handoff questions below about that basic snapshot are resolved;
+menu/photo/takeout/seating evidence, individual meal assignments and the full
+Claude propose/validate/revise loop remain follow-ups. `details.json` is a
+collected file, not already an active planner contract.
+
 Subsequent [preference/acceptance planning](PREFERENCE_ACCEPTANCE_PLAN.md)
 proposes optional budget/time sliders, an optional prompt, flexible defaults and
 one Save & ready action instead of a mandatory separate review/confirm sequence.
-It separates input ambiguity from venue-evidence gaps. These are proposed changes
-to step 1 below; neither preference UX nor planner changes are implemented here.
+It separates input ambiguity from venue-evidence gaps. The preference changes
+are now implemented on the isolated review branch; the planner rewrite below
+remains a follow-up awaiting the versioned catalog contract.
 
 ## Responsibility change
 
@@ -68,9 +79,14 @@ receives context through FastAPI; it does not get database credentials.
 
 - Every venue ID exists in the supplied snapshot. Costs, categories, coordinates,
   hours and cited evidence agree with that snapshot; Claude cannot invent facts.
-- Resolve stop prices from the catalog and sum every stop's per-person cost.
-  Reject inconsistent displayed totals and compare the full outing total against
-  every member's non-null cap. Zero remains a real cap. Missing prices are not $0.
+- Apply Max's approved follow-up cost rule: each person pays for their own meal
+  and their own costs at subsequent stops, including dessert. A person does not
+  pay for somebody else's meal when the group splits its meal choices. Sum each
+  person's assigned costs across the entire outing and compare that person's
+  total against their own non-null cap. Reject inconsistent displayed totals;
+  zero remains a real cap and missing prices are not $0. The assignment/item-price
+  representation still requires coordinated contract review before implementing
+  this rule; the current shared-stop runtime contract remains unchanged.
 - Confirmed dietary needs, allergies and must-reject constraints are respected.
   Dietary checks apply to meals/desserts, not tagless activities. Unknown required
   evidence stays unknown, rather than being inferred from model knowledge.
@@ -94,11 +110,33 @@ verification path. Do not tell users to delete a real allergy to continue.
 Obtain his commit, actual table/view names and read mechanism, plus a few sample
 records (no API keys). Review the code after syncing main and agree on:
 
+**Eric-reported handoff, pending source and sample-record verification:** Eric
+reports that `collect.py` lines 408–433 preserve name, address, coordinates,
+phone, category, cuisine, hours, rating, review count and inferred dietary tags.
+He reports `priceLevel` remains null without Yelp data and meal costs default
+to $25. These are his reported implementation details, not independently
+verified claims in this document or an agreed planner wire contract.
+
+He also reports that `/catalog` includes evidence source URL/fetch time and
+ratings, while review text and star distributions are **not** included in that
+catalog. Photos would require normalizing `main_image` and adding a reviewed
+`Place` field; the planner/UI must not assume photos already arrive in the
+snapshot. Confirm exact field names, meanings and response shapes in his code
+and representative records before wiring them through Maincloud and FastAPI.
+
+For the meal-quality example below, the priority gaps are specific menu items
+and prices, takeout support and suitable shared seating. Additional reviews are
+secondary context; reviews alone do not establish those facts. Inferred dietary
+tags do not verify a vegan meal, an allergen claim or cross-contact safety. A
+default $25 meal estimate cannot prove that the person's actual meal and later
+stops fit a hard cap. Preserve estimate/unknown labels and request the necessary
+evidence instead of presenting these values as verified prices or capabilities.
+
 | Information | What must be clear |
 | --- | --- |
 | Stable venue IDs | Provider identifiers, deduplication and identity across refreshes |
 | Basic facts | Name, coordinates, supported category/cuisine values and dietary labels |
-| Prices | Currency, per-person meaning, estimate/range and unknown handling |
+| Prices | Currency, actual item prices versus defaults/estimates, assignment to each person, ranges and unknown handling |
 | Hours | Timezone, weekday/exception format, closed versus unknown |
 | Evidence | Source URL, fetched-at time, what is actually verified, and unsupported claims |
 | Refresh behavior | Catalog version, last valid snapshot, partial/failed scrape behavior |
@@ -116,6 +154,13 @@ structured proposal/validation feedback, progress and compromise states across
 API, Maincloud and UI. Preserve existing result fields where possible; document
 and coordinate any necessary shape changes before implementation. No live shapes
 are changed by this document.
+
+The personalized payment rule is approved; its representation is not yet agreed.
+Review meal/stop participant assignments, item quantities/prices, evidence and
+each member's full-outing total together. A shared per-person stop cost and an
+entire party's bill are different quantities. Do not repurpose the existing
+single `costPerPerson` field to carry a member-indexed total or silently charge
+everyone for all alternative meals.
 
 Eric owns ingestion/refresh. Max owns this planner integration and validation.
 Eric Chen owns the UI for proposal/revision/conditional-compromise states and
@@ -139,7 +184,10 @@ database-independent; no database token or shared secret goes into the browser.
 - [ ] Claude constructs an itinerary rather than selecting preassembled plan IDs;
   a rejected proposal is revised using specific validation feedback.
 - [ ] Costs, category mappings, hours and null/unknown values survive ingestion
-  and round-trip correctly; current cumulative budgets still hold.
+  and round-trip correctly. Under the reviewed personalized-cost contract, each
+  person's own meal plus later-stop costs fit their own cumulative cap; another
+  person's meal is not added to it. Defaults such as a $25 meal estimate do not
+  become verified item prices or proof of actual affordability.
 - [ ] Two groups remain isolated; a budget/input change during planning and a
   catalog refresh cannot commit stale results or enable old votes/bookings.
 - [ ] Full/closed venue replacement excludes that venue and requires a new vote
@@ -156,3 +204,59 @@ database-independent; no database token or shared secret goes into the browser.
 Eric's finished ingestion is the handoff point, not proof the planner uses it.
 Integrate and prove that data path first, then implement the deferred Claude
 propose/validate/revise loop against the agreed snapshot contract.
+
+## Current acceptance example: a real meal for everyone
+
+Max's October 24 review clarifies the desired quality of Claude's reasoning:
+
+- Max wants vegan food, at most $30 for the whole outing.
+- Eric wants steak and fries, at most $50 for the whole outing.
+- Eric Chen wants good dessert afterward, within three hours for the whole trip.
+- Compare three distinct, independently viable options when the facts support
+  them. A full vegan meal at a takeout venue may be a better experience than a
+  salad at a steak restaurant; Claude should weigh this nuance and explain it.
+  Python validates the hard requirements rather than deciding whose taste wins.
+- A split-meal suggestion requires verified takeout support at the meal venues
+  **and** a suitable nearby place where the group can actually sit and eat.
+  Do not assume every park has accessible seating or permits food at that time.
+- A dine-in alternative needs specific evidenced vegan meal options and steak/
+  fries at the same venue. A generic vegetarian tag does not prove a vegan dish.
+- Add a dessert venue, an achievable route, itemized costs and timings. Do not
+  impose a separate activity just to fill an old itinerary template.
+
+The intended public response is a useful conversational suggestion, such as
+explaining the two nearby takeout choices, the evidenced shared seating and
+where dessert fits afterward. This is an example of response structure, **not**
+a claim that any real venues have been verified for this example. Do not expose
+private participant prompts, caps or sensitive restrictions in shared prose;
+show each owner the relevant private match details. Public explanations should
+cite actual venue/menu/route facts and stay grounded in the agreed snapshot.
+
+Each option should show place photos with source attribution, cached/current
+rating and review count, the specific menu evidence behind each meal fit, source
+freshness, travel and the reason for the trade-off. Unsupported information must
+stay visibly unknown. Three viable alternatives are a goal, not permission to
+pad with unsupported options or silently drop a restriction.
+
+**Implemented in the branch input/selection step:** optional limits, saved
+context, meal → dessert options, cached rating/review-count/source context for
+Claude, and cached ratings on place cards. The original catalog currently has
+no verified vegan/menu-item, photo, takeout or shared-seating evidence; this
+specific example correctly stops at a dietary-evidence gap. The current public
+coordinator message is assembled from selected factual sentences, not free-form
+Claude prose. The full nuanced proposal/revision response remains this follow-up.
+
+**Cost rule approved; contract implementation remains a follow-up:** Max has
+confirmed that each person pays for their own meal plus the stops afterward,
+such as their dessert. They do not pay for the other person's meal. This remains
+a cumulative outing budget, rather than an independent budget at each stop;
+caps cannot be pooled or averaged between people. Split-meal plans therefore
+need reviewed participant assignments and evidenced item prices before the
+API/module/UI can validate and display the right individual totals.
+
+The existing runtime still charges the same sum of its shared stops against
+every person's cap. Keep that contract unchanged until the coordinated update
+is documented and tested. For an explicitly synthetic arithmetic check, meals
+of $20 and $40 followed by an $8-per-person dessert imply individual outing
+totals of $28 and $48, not $68 each. This example asserts no real venue prices
+and does not establish a proposed wire shape.

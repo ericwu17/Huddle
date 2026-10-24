@@ -201,6 +201,9 @@ export const agent_need = table({ name: "agent_need" }, {
   text: t.string(), revision: t.u32(), resultJson: t.option(t.string()),
   confirmed: t.bool(), error: t.option(t.string()),
 });
+export const agent_preference_input = table({ name: "agent_preference_input" }, {
+  memberId: t.string().primaryKey(), structuredJson: t.string(), revision: t.u32(),
+});
 
 // Live venue catalog pushed by data/reviews/collect.py through POST /catalog (lib/catalog.ts).
 // placeJson is a contract Place (docs/CONTRACT.md S5.2); evidenceJson holds source URLs and
@@ -237,13 +240,94 @@ export const replan_job = job("replan_job", { groupId: t.string(), bookingId: t.
 export const agent_needs_job = job("agent_needs_job", { memberId: t.string(), revision: t.u32() });
 export const agent_plan_job = job("agent_plan_job", { groupId: t.string(), runId: t.string(), revision: t.u32() });
 
+export const account = table({ name: "account" }, {
+  id: t.string().primaryKey(), username: t.string().unique(), displayName: t.string(),
+  principal: t.identity().unique(), passwordHash: t.string(), createdAt: t.f64(),
+});
+export const account_session = table({ name: "account_session" }, {
+  identity: t.identity().primaryKey(), accountId: t.option(t.string()), nonce: t.string(),
+  activeGroupId: t.option(t.string()), expiresAt: t.f64(),
+});
+export const account_membership = table({ name: "account_membership" }, {
+  id: t.string().primaryKey(), accountId: t.string().index("btree"), groupId: t.string(),
+  memberId: t.string(), role: t.string(),
+});
+export const account_auth_attempt = table({ name: "account_auth_attempt" }, {
+  key: t.string().primaryKey(), count: t.u32(), windowStartedAt: t.f64(),
+});
+export const account_expiry_job = job("account_expiry_job", { identity: t.identity(), nonce: t.string() });
+
+// Account context and social state are private. Only scoped views below the
+// authenticated account boundary are subscribable by browser clients.
+export const account_context = table({ name: "account_context" }, {
+  accountId: t.string().primaryKey(), contextJson: t.string(), revision: t.u32(), updatedAt: t.f64(),
+});
+export const account_friend = table({ name: "account_friend" }, {
+  id: t.string().primaryKey(), accountId: t.string().index("btree"), friendAccountId: t.string(), createdAt: t.f64(),
+});
+export const friend_request = table({ name: "friend_request" }, {
+  id: t.string().primaryKey(), fromAccountId: t.string().index("btree"),
+  toAccountId: t.string().index("btree"), status: t.string(), createdAt: t.f64(),
+});
+export const huddle_invitation = table({ name: "huddle_invitation" }, {
+  id: t.string().primaryKey(), groupId: t.string().index("btree"),
+  fromAccountId: t.string().index("btree"), toAccountId: t.string().index("btree"),
+  status: t.string(), createdAt: t.f64(), expiresAt: t.f64(),
+});
+export const invitation_expiry_job = job("invitation_expiry_job", { invitationId: t.string() });
+export const invitation_start = table({ name: "invitation_start" }, {
+  requestId: t.string().primaryKey(), accountId: t.string(), groupId: t.string(),
+  memberId: t.string(), code: t.string(), fingerprint: t.string(),
+});
+export const message_connector = table({ name: "message_connector" }, {
+  accountId: t.string().primaryKey(), enabled: t.bool(), destination: t.string(), updatedAt: t.f64(),
+});
+export const friend_contact_destination = table({ name: "friend_contact_destination" }, {
+  id: t.string().primaryKey(), ownerAccountId: t.string().index("btree"), friendAccountId: t.string(),
+  contactId: t.string(), contactName: t.string(), destination: t.string(), updatedAt: t.f64(),
+});
+export const calendar_connection = table({ name: "calendar_connection" }, {
+  accountId: t.string().primaryKey(), provider: t.string(), status: t.string(), generation: t.string(),
+  tokenCiphertext: t.option(t.string()), email: t.option(t.string()), scopesJson: t.string(),
+  expiresAt: t.option(t.f64()), eventConsent: t.bool(), error: t.option(t.string()), updatedAt: t.f64(),
+});
+export const calendar_oauth_state = table({ name: "calendar_oauth_state" }, {
+  stateId: t.string().primaryKey(), accountId: t.string().index("btree"), generation: t.string(),
+  ownerIdentity: t.identity(), sessionNonce: t.string(), status: t.string(),
+  claimNonce: t.option(t.string()), expiresAt: t.f64(), createdAt: t.f64(),
+});
+export const calendar_oauth_expiry_job = job("calendar_oauth_expiry_job", { stateId: t.string() });
+export const calendar_revoke_job = job("calendar_revoke_job", {
+  accountId: t.string(), tokenCiphertext: t.string(), generation: t.string(),
+});
+export const calendar_revocation = table({ name: "calendar_revocation" }, {
+  generation: t.string().primaryKey(), accountId: t.string(), status: t.string(),
+});
+export const invitation_delivery = table({ name: "invitation_delivery" }, {
+  invitationId: t.string().primaryKey(), status: t.string(), error: t.option(t.string()),
+  destination: t.option(t.string()), message: t.option(t.string()), updatedAt: t.f64(),
+});
+export const invitation_delivery_job = job("invitation_delivery_job", { invitationId: t.string() });
+export const meetup = table({ name: "meetup" }, {
+  runId: t.string().primaryKey(), groupId: t.string().index("btree"), planId: t.string(),
+  inputRevision: t.u32(), status: t.string(), message: t.string(), createdAt: t.f64(),
+});
+export const meetup_job = job("meetup_job", { runId: t.string() });
+export const group_schedule = table({ name: "group_schedule" }, {
+  groupId: t.string().primaryKey(), timeZone: t.string(), start: t.string(), end: t.string(), checkedAt: t.f64(),
+});
+
 const spacetimedb = schema(
   {
     group, member, private_prefs, swipe, plan_run, offer, vote, booking, call_event,
     council_message, scout_check, geo_cache,
     parse_job, swipe_job, preview_job, plan_job, offers_job, scout_job,
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,
-    agent_session, agent_need, agent_needs_job, agent_plan_job,
+    agent_session, agent_need, agent_preference_input, agent_needs_job, agent_plan_job,
+    account, account_session, account_membership, account_auth_attempt, account_expiry_job,
+    account_context, account_friend, friend_request, huddle_invitation, invitation_expiry_job, invitation_start,
+    message_connector, friend_contact_destination, calendar_connection, calendar_oauth_state, calendar_oauth_expiry_job, calendar_revoke_job, calendar_revocation,
+    invitation_delivery, invitation_delivery_job, meetup, meetup_job, group_schedule,
     venue, catalog_state,
   },
   {
@@ -256,6 +340,9 @@ const spacetimedb = schema(
       COUNCIL_ENABLED: t.option(t.string()),
       AGENT_LANGUAGE: t.option(t.string()),
       STUB_SCENARIO: t.option(t.string()), // confirm | full (fake call only)
+      MESSAGES_ENABLED: t.option(t.string()), // permitted recipient address and API enablement are also required
+      PUBLIC_FRONTEND_BASE_URL: t.option(t.string()), // public HTTPS UI for this database
+      MAC_CONTACTS_OWNER_USERNAME: t.option(t.string()), // canonical account allowed to search this host Mac's Contacts
     },
   },
 );

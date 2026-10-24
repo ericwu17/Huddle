@@ -1,14 +1,16 @@
 // New coordinator flow. Legacy groups keep their original tables and jobs.
 import { SenderError, t } from "spacetimedb/server";
 import spacetimedb, { agent_needs_job, agent_plan_job } from "./schema";
-import { createGroup, requireMember } from "./groups";
+import { createGroup, requireMember, setReady } from "./groups";
 import { callApi } from "./lib/api";
 import { allAgentNeedsConfirmed, invalidateAgent, startAgentRun } from "./lib/agent-state";
-import { preserveBudget, planFitsBudgets } from "./lib/budgets";
+import { preserveBudget } from "./lib/budgets";
+import { clockMinutes, estimatedTravelMinutes, planFitsAgentRequirements } from "./lib/agent-constraints";
 import { at, currentGroup, currentMember, membersOf, nowMs, parse } from "./lib/util";
 import { LIVE_PLACES } from "./lib/places";
 import { catalogSnapshot } from "./lib/catalog";
-import type { ReadDb } from "./lib/types";
+import type { ReadDb, Tx } from "./lib/types";
+import { requireActor } from "./lib/account-state";
 
 export const createAgentGroup = spacetimedb.procedure(
   { name: t.option(t.string()) }, t.object("CreateAgentGroupResult", { groupId: t.string(), code: t.string() }),
@@ -30,6 +32,8 @@ export const submitAgentPrefs = spacetimedb.reducer({ text: t.string() }, (tx, {
   const need = { memberId: me.id, groupId: me.groupId, text: clean, revision,
     resultJson: undefined, confirmed: false, error: undefined };
   if (previous) tx.db.agent_need.memberId.update(need); else tx.db.agent_need.insert(need);
+  // A legacy caller must not accidentally reuse an older structured submission.
+  tx.db.agent_preference_input.memberId.delete(me.id);
   const prefs = tx.db.private_prefs.memberId.find(me.id);
   if (prefs) tx.db.private_prefs.memberId.update({ ...prefs, text: clean, updatedAt: nowMs(tx) });
   else tx.db.private_prefs.insert({ memberId: me.id, text: clean, hardJson: undefined,
@@ -39,11 +43,95 @@ export const submitAgentPrefs = spacetimedb.reducer({ text: t.string() }, (tx, {
   tx.db.agent_needs_job.insert({ ...at(tx), memberId: me.id, revision });
 });
 
+const DIETARY = new Set(["vegetarian", "vegan", "gluten_free", "halal", "kosher"]);
+const INPUT_KEYS = new Set(["budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes", "dietary", "allergies"]);
+const emptyHard = () => ({ budgetMaxPerPerson: null, maxOutingMinutes: null, maxTravelMinutes: null,
+  dietary: [] as string[], allergies: [] as string[], vetoCuisines: [] as string[],
+  vetoCategories: [] as string[], rejectedTerms: [] as string[] });
+
+function structuredInput(json: string, previous: any) {
+  if (json.length > 8000) throw new SenderError("Preference controls are too long.");
+  let input: any;
+  try { input = parse(json); }
+  catch { throw new SenderError("Check your preference controls and save again."); }
+  if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).some(k => !INPUT_KEYS.has(k)))
+    throw new SenderError("Use the budget, time, dietary and allergy controls.");
+  for (const key of ["budgetMaxPerPerson", "maxOutingMinutes"])
+    if (!(key in input)) throw new SenderError("Choose a limit or Flexible for budget and outing time.");
+  for (const key of ["budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes"])
+    if (key in input && input[key] !== null && (typeof input[key] !== "number" || !Number.isFinite(input[key]) || input[key] < 0))
+      throw new SenderError("Limits must be nonnegative numbers or Flexible.");
+  for (const [key, max] of [["dietary", 5], ["allergies", 12]] as const) {
+    if (!Array.isArray(input[key]) || input[key].length > max ||
+        input[key].some((value: any) => typeof value !== "string" || !value.trim() || value.length > 2000))
+      throw new SenderError("Check your dietary and allergy fields.");
+    input[key] = [...new Set(input[key].map((value: string) => value.trim()))];
+  }
+  if (input.dietary.some((value: string) => !DIETARY.has(value)))
+    throw new SenderError("Choose a supported dietary tag; describe other requirements in the prompt.");
+  if (input.allergies.length === 1 && ["none", "no allergies", "no known allergies", "n/a"].includes(input.allergies[0].toLowerCase()))
+    input.allergies = [];
+  const protectedBudget = preserveBudget(previous, { ...emptyHard(), ...previous, ...input });
+  return { hard: protectedBudget.hard, preserved: protectedBudget.preserved };
+}
+
+function directNeeds(hard: any, preserved: boolean) {
+  return { hard, preferences: [], questions: [], warnings: [
+    ...(preserved ? ["Your existing outing cap was kept. An increase requires accepting a private trade offer."] : []),
+    ...(hard.allergies.length ? ["Your allergy is saved. Food recommendations still need verified venue allergy evidence; you can finish saving preferences now."] : []),
+  ] };
+}
+
+function markMemberReady(tx: Tx, memberId: string) {
+  const member = tx.db.member.id.find(memberId);
+  if (!member) return;
+  tx.db.member.id.update({ ...member, ready: true });
+  const group = tx.db.group.id.find(member.groupId);
+  const members = membersOf(tx.db, member.groupId);
+  if (group?.status === "lobby" && members.length >= 2 && members.every(m => m.id === memberId || m.ready))
+    tx.db.group.id.update({ ...group, status: "eliciting" });
+}
+
+// The explicit Save & ready action authorizes the controls immediately. Text is
+// optional; only additional text needs interpretation, and safe results become
+// ready without asking the owner to confirm the same controls a second time.
+export const saveAgentPreferences = spacetimedb.reducer({ text: t.string(), structuredJson: t.string() }, (tx, args) => {
+  const me = requireMember(tx);
+  if (!tx.db.agent_session.groupId.find(me.groupId)) throw new SenderError("This huddle uses the legacy flow.");
+  const text = args.text.trim();
+  if (text.length > 4000) throw new SenderError("Keep your optional prompt within 4000 characters.");
+  const prefs = tx.db.private_prefs.memberId.find(me.id);
+  const saved = structuredInput(args.structuredJson, parse(prefs?.hardJson));
+  const old = tx.db.agent_need.memberId.find(me.id);
+  const revision = (old?.revision ?? 0) + 1;
+  const result = directNeeds(saved.hard, saved.preserved);
+  const need = { memberId: me.id, groupId: me.groupId, text, revision,
+    resultJson: text ? undefined : JSON.stringify(result), confirmed: !text, error: undefined };
+  if (old) tx.db.agent_need.memberId.update(need); else tx.db.agent_need.insert(need);
+  const input = { memberId: me.id, structuredJson: JSON.stringify(saved.hard), revision };
+  if (tx.db.agent_preference_input.memberId.find(me.id)) tx.db.agent_preference_input.memberId.update(input);
+  else tx.db.agent_preference_input.insert(input);
+  if (prefs) tx.db.private_prefs.memberId.update({ ...prefs, text,
+    hardJson: JSON.stringify(saved.hard), warningsJson: JSON.stringify(result.warnings), updatedAt: nowMs(tx) });
+  else tx.db.private_prefs.insert({ memberId: me.id, text, hardJson: JSON.stringify(saved.hard), priorJson: undefined,
+    posteriorJson: undefined, nextPairA: undefined, nextPairB: undefined, nextPairCategory: undefined,
+    warningsJson: JSON.stringify(result.warnings), updatedAt: nowMs(tx) });
+  tx.db.member.id.update({ ...me, ready: !text });
+  invalidateAgent(tx, me.groupId);
+  if (text) tx.db.agent_needs_job.insert({ ...at(tx), memberId: me.id, revision });
+  else setReady(tx, {});
+});
+
 function validNeeds(value: any): boolean {
   const hard = value?.hard;
-  return !!hard && [hard.dietary, hard.allergies, hard.vetoCuisines, hard.vetoCategories, hard.rejectedTerms,
-    value.preferences, value.questions, value.warnings].every(a => Array.isArray(a) && a.length <= 30 && a.every(x => typeof x === "string" && x.length <= 2000)) &&
-    [hard.budgetMaxPerPerson, hard.maxTravelMinutes].every(n => n === null || typeof n === "number" && Number.isFinite(n) && n >= 0);
+  const bounded = (list: any, max: number) => Array.isArray(list) && list.length <= max &&
+    list.every(value => typeof value === "string" && value.length >= 1 && value.length <= 2000);
+  return !!hard && [[hard.dietary, 5], [hard.allergies, 12], [hard.vetoCuisines, 6], [hard.vetoCategories, 3],
+    [hard.rejectedTerms, 20], [value.preferences, 15], [value.questions, 8], [value.warnings, 12]]
+    .every(([list, max]) => bounded(list, max as number)) &&
+    [hard.budgetMaxPerPerson, hard.maxTravelMinutes, hard.maxOutingMinutes ?? null]
+      .every(n => n === null || typeof n === "number" && Number.isFinite(n) && n >= 0) &&
+    hard.dietary.every((value: string) => DIETARY.has(value));
 }
 
 export const runAgentNeedsJob = spacetimedb.procedure(
@@ -51,8 +139,10 @@ export const runAgentNeedsJob = spacetimedb.procedure(
     const body = ctx.withTx(tx => {
       const need = tx.db.agent_need.memberId.find(job.memberId);
       const prefs = tx.db.private_prefs.memberId.find(job.memberId);
+      const input = tx.db.agent_preference_input.memberId.find(job.memberId);
       return need?.revision === job.revision && !need.resultJson ? {
         memberId: need.memberId, text: need.text, currentHard: parse(prefs?.hardJson),
+        ...(input?.revision === job.revision ? { structured: parse(input.structuredJson) } : {}),
       } : null;
     });
     if (!body) return {};
@@ -65,14 +155,36 @@ export const runAgentNeedsJob = spacetimedb.procedure(
         return;
       }
       const prefs = tx.db.private_prefs.memberId.find(need.memberId)!;
-      const protectedBudget = preserveBudget(parse(prefs.hardJson), res.data.hard);
+      const input = tx.db.agent_preference_input.memberId.find(need.memberId);
+      const structured = input?.revision === job.revision ? parse(input.structuredJson) : null;
+      // Validate again at the database boundary. A service/model result cannot
+      // erase explicitly supplied restrictions or replace an outing-time slider.
+      const hard = { ...res.data.hard, maxOutingMinutes: res.data.hard.maxOutingMinutes ?? null };
+      if (structured) {
+        for (const key of ["dietary", "allergies", "vetoCuisines", "vetoCategories", "rejectedTerms"])
+          hard[key] = [...new Set([...structured[key], ...hard[key]])];
+        for (const key of ["maxOutingMinutes", "maxTravelMinutes"])
+          if (structured[key] != null) hard[key] = structured[key];
+        if (structured.budgetMaxPerPerson != null &&
+            (hard.budgetMaxPerPerson == null || hard.budgetMaxPerPerson > structured.budgetMaxPerPerson))
+          hard.budgetMaxPerPerson = structured.budgetMaxPerPerson;
+      }
+      const protectedBudget = preserveBudget(parse(prefs.hardJson), hard);
       const result = { ...res.data, hard: protectedBudget.hard,
         warnings: [...res.data.warnings, ...(protectedBudget.preserved ? ["Existing outing cap retained; increases require a private offer acceptance."] : [])] };
-      tx.db.agent_need.memberId.update({ ...need, resultJson: JSON.stringify(result), error: undefined });
-      // An unconfirmed model interpretation cannot establish a new cap. Keep
-      // the last user-confirmed limits until the owner confirms this summary.
+      if (!validNeeds(result)) {
+        tx.db.agent_need.memberId.update({ ...need, error: "The combined restrictions exceed supported limits. Shorten repeated entries and save again." });
+        return;
+      }
+      const autoReady = !!structured && !result.questions.length;
+      tx.db.agent_need.memberId.update({ ...need, resultJson: JSON.stringify(result), confirmed: autoReady, error: undefined });
+      // Legacy review requests still require confirmation. The Save & ready
+      // flow already carries the owner's explicit action and saves safe text
+      // interpretation without an extra confirmation screen.
       tx.db.private_prefs.memberId.update({ ...prefs,
+        ...(autoReady ? { hardJson: JSON.stringify(result.hard) } : {}),
         warningsJson: JSON.stringify(result.warnings), updatedAt: nowMs(tx) });
+      if (autoReady) markMemberReady(tx, need.memberId);
     });
     return {};
   },
@@ -83,7 +195,7 @@ export const confirmAgentNeeds = spacetimedb.reducer({ revision: t.u32() }, (tx,
   const need = tx.db.agent_need.memberId.find(me.id);
   const result = parse(need?.resultJson);
   if (!need || need.revision !== revision || !validNeeds(result)) throw new SenderError("Review your current interpreted needs first.");
-  if (result.questions.length || result.hard.allergies.length) throw new SenderError("Resolve the private questions or missing allergy evidence before confirming.");
+  if (result.questions.length) throw new SenderError("Resolve the private clarification before saving your needs.");
   const prefs = tx.db.private_prefs.memberId.find(me.id)!;
   const protectedBudget = preserveBudget(parse(prefs.hardJson), result.hard);
   result.hard = protectedBudget.hard;
@@ -94,7 +206,7 @@ export const confirmAgentNeeds = spacetimedb.reducer({ revision: t.u32() }, (tx,
 export const findAgentPlans = spacetimedb.reducer({}, tx => {
   const me = requireMember(tx);
   const group = tx.db.group.id.find(me.groupId)!;
-  if (!group.hostIdentity.isEqual(tx.sender)) throw new SenderError("Only the host can request plans.");
+  if (!group.hostIdentity.isEqual(requireActor(tx))) throw new SenderError("Only the host can request plans.");
   if (group.status === "lobby") throw new SenderError("Finish joining and getting ready first.");
   startAgentRun(tx, group.id);
 });
@@ -113,13 +225,32 @@ function validResult(data: any, body: any): boolean {
   if (data?.mode !== "agent" || data.runId !== body.runId || data.inputRevision !== body.inputRevision ||
       !Array.isArray(data.plans) || data.plans.length > 3 || !Array.isArray(data.conflicts) || !Array.isArray(data.warnings)) return false;
   const ids = new Set();
+  const weekday = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(`${body.date}T12:00:00Z`).getUTCDay()];
   return data.plans.every((plan: any) => {
-    if (!plan || typeof plan.id !== "string" || ids.has(plan.id) || !planFitsBudgets(plan, body.members.map((m: any) => ({ hard: m.needs.hard })))) return false;
+    if (!plan || typeof plan.id !== "string" || ids.has(plan.id) || !planFitsAgentRequirements(plan, body.members.map((m: any) => ({ hard: m.needs.hard })))) return false;
     ids.add(plan.id);
+    if (clockMinutes(plan.stops[0].start) < clockMinutes(body.window.start) ||
+        clockMinutes(plan.stops.at(-1).end) > clockMinutes(body.window.end)) return false;
+    if (body.members.some((member: any) => member.needs.hard.maxTravelMinutes != null &&
+        (!member.origin || estimatedTravelMinutes(member.origin, plan.stops[0]) > member.needs.hard.maxTravelMinutes))) return false;
+    if (plan.stops.some((stop: any, index: number) => index > 0 &&
+        clockMinutes(stop.start) - clockMinutes(plan.stops[index - 1].end) + 1e-9 < estimatedTravelMinutes(plan.stops[index - 1], stop))) return false;
     return plan.stops.every((stop: any) => {
       const place = catalog.find(p => p.id === stop.placeId);
+      const hours: [string, string][] = place?.hours?.[weekday] ?? [];
+      const start = clockMinutes(stop.start), end = clockMinutes(stop.end);
       return place && place.name === stop.name && place.category === stop.category &&
-        place.costPerPerson === stop.costPerPerson && !body.excludePlaceIds.includes(place.id);
+        place.lat === stop.lat && place.lng === stop.lng &&
+        end - start === place.dwellMinutes && hours.some(([lo, hi]) => clockMinutes(lo) <= start &&
+          end <= (hi === "23:59" ? 1440 : clockMinutes(hi))) &&
+        place.costPerPerson === stop.costPerPerson && !body.excludePlaceIds.includes(place.id) &&
+        body.members.every((member: any) => {
+          const hard = member.needs.hard;
+          const label = `${place.name} ${place.cuisine} ${place.category}`.toLocaleLowerCase();
+          return !hard.vetoCategories.includes(place.category) && !hard.vetoCuisines.includes(place.cuisine) &&
+            !hard.rejectedTerms.some((term: string) => label.includes(term.toLocaleLowerCase())) &&
+            (place.category === "activity" || hard.dietary.every((diet: string) => place.dietary.includes(diet)));
+        });
     });
   }) && (data.plans.length ? ids.has(data.recommendedPlanId) : data.recommendedPlanId === null);
 }
@@ -198,4 +329,11 @@ export const my_agent_needs = spacetimedb.view({ name: "my_agent_needs", public:
   if (!need) return undefined;
   const { groupId: _privateGroup, ...row } = need;
   return row;
+});
+
+export const my_agent_preferences = spacetimedb.view({ name: "my_agent_preferences", public: true }, t.option(t.row("MyAgentPreferencesRow", {
+  memberId: t.string().primaryKey(), structuredJson: t.string(), revision: t.u32(),
+})), ctx => {
+  const me = currentMember(ctx.db, ctx.sender);
+  return me ? ctx.db.agent_preference_input.memberId.find(me.id) ?? undefined : undefined;
 });

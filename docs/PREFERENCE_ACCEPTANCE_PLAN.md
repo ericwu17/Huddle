@@ -1,16 +1,18 @@
 # Preference input and acceptance scenarios
 
-Draft for Max's review, October 24, 2026. **Planning only; no app, API or database
-implementation changes.** This proposes the next preference experience and
-acceptance criteria while Eric Wu builds Bright Data → SpacetimeDB. The
+Approved by Max for implementation, October 24, 2026. Optional inputs, private
+structured limits and Save & ready are implemented on the isolated review branch;
+verification is recorded in [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md). The full
+P01–P30 table remains an acceptance specification, not a claim that every later
+planner/data scenario is implemented. Eric Wu owns Bright Data → SpacetimeDB. The
 [Claude planner rewrite](CLAUDE_PLANNER_FOLLOWUP.md) stays a deferred follow-up.
 
 ## Proposed input experience
 
 Use optional structured controls for limits, plus an optional prompt for context.
 One **Save & ready** action replaces separate lobby readiness, Review my needs
-and Confirm my needs actions in the ordinary path. Joining still shows the code,
-people and shared outing settings. Merely joining or loading the form does not
+and Confirm my needs actions in the ordinary path. Joining shows people and shared outing settings; account huddles use addressed
+in-app invitations. Merely joining or loading the form does not
 mark anyone ready.
 
 | Input | Default | Meaning and behavior |
@@ -85,11 +87,10 @@ Examples:
 | Initial slider says $20; prompt says “under $30” | Ask which cap the user intended. If a $20 cap was already established, keep it; a question is not a substitute for private-offer acceptance. |
 | Claude is unavailable | Keep directly entered limits and the prompt. Offer Retry for unresolved interpretation; do not silently discard possible restrictions from a nonempty prompt or pretend the model ran. |
 
-This is a proposed revision of today's all-member confirmation gate. It needs a
-coordinated readiness/interpretation contract update, not just removal of a UI
-button. Explicit requirements extracted from text must remain visible and
-correctable. The existing flow stays live until this proposal is approved and
-implemented.
+The branch implements coordinated input/readiness contracts rather than only
+removing a button. Explicit requirements extracted from text remain visible and
+correctable. Legacy submit/confirm contracts remain for old clients; shared
+release awaits Max's branch review.
 
 ## Keep the experience moving when data is missing
 
@@ -189,8 +190,10 @@ Code/catalog review and two local synthetic diagnostics on October 24 found:
 - There is no per-person maximum whole-outing-duration field; existing
   `maxTravelMinutes` means first-leg travel, not total outing duration.
 
-None of P01–P30 has been run as an acceptance suite for the proposed design. The
-earlier passing coordinator smoke verifies the current flow, not these changes.
+See the review runbook for executed unit/native/connected/browser checks.
+Conditional ideas, scoped allergen evidence, activity-only plan shapes, catalog
+version integration and bounded Claude repair are still follow-ups; do not mark
+P01–P30 all complete from the account/preference verification.
 
 ## Implementation sequence when approved
 

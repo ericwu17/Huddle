@@ -10,6 +10,71 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
+export const Account = __t.object("Account", {
+  id: __t.string(),
+  username: __t.string(),
+  displayName: __t.string(),
+  principal: __t.identity(),
+  passwordHash: __t.string(),
+  createdAt: __t.f64(),
+});
+export type Account = __Infer<typeof Account>;
+
+export const AccountAuthAttempt = __t.object("AccountAuthAttempt", {
+  key: __t.string(),
+  count: __t.u32(),
+  windowStartedAt: __t.f64(),
+});
+export type AccountAuthAttempt = __Infer<typeof AccountAuthAttempt>;
+
+export const AccountAuthResult = __t.object("AccountAuthResult", {
+  ok: __t.bool(),
+  message: __t.string(),
+});
+export type AccountAuthResult = __Infer<typeof AccountAuthResult>;
+
+export const AccountContext = __t.object("AccountContext", {
+  accountId: __t.string(),
+  contextJson: __t.string(),
+  revision: __t.u32(),
+  updatedAt: __t.f64(),
+});
+export type AccountContext = __Infer<typeof AccountContext>;
+
+export const AccountExpiryJob = __t.object("AccountExpiryJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  identity: __t.identity(),
+  nonce: __t.string(),
+});
+export type AccountExpiryJob = __Infer<typeof AccountExpiryJob>;
+
+export const AccountFriend = __t.object("AccountFriend", {
+  id: __t.string(),
+  accountId: __t.string(),
+  friendAccountId: __t.string(),
+  createdAt: __t.f64(),
+});
+export type AccountFriend = __Infer<typeof AccountFriend>;
+
+export const AccountMembership = __t.object("AccountMembership", {
+  id: __t.string(),
+  accountId: __t.string(),
+  groupId: __t.string(),
+  memberId: __t.string(),
+  role: __t.string(),
+});
+export type AccountMembership = __Infer<typeof AccountMembership>;
+
+export const AccountSession = __t.object("AccountSession", {
+  identity: __t.identity(),
+  accountId: __t.option(__t.string()),
+  nonce: __t.string(),
+  activeGroupId: __t.option(__t.string()),
+  expiresAt: __t.f64(),
+});
+export type AccountSession = __Infer<typeof AccountSession>;
+
 export const AgentNeed = __t.object("AgentNeed", {
   memberId: __t.string(),
   groupId: __t.string(),
@@ -38,6 +103,13 @@ export const AgentPlanJob = __t.object("AgentPlanJob", {
 });
 export type AgentPlanJob = __Infer<typeof AgentPlanJob>;
 
+export const AgentPreferenceInput = __t.object("AgentPreferenceInput", {
+  memberId: __t.string(),
+  structuredJson: __t.string(),
+  revision: __t.u32(),
+});
+export type AgentPreferenceInput = __Infer<typeof AgentPreferenceInput>;
+
 export const AgentSession = __t.object("AgentSession", {
   groupId: __t.string(),
   revision: __t.u32(),
@@ -63,6 +135,57 @@ export const Booking = __t.object("Booking", {
   createdAt: __t.f64(),
 });
 export type Booking = __Infer<typeof Booking>;
+
+export const CalendarConnection = __t.object("CalendarConnection", {
+  accountId: __t.string(),
+  provider: __t.string(),
+  status: __t.string(),
+  generation: __t.string(),
+  tokenCiphertext: __t.option(__t.string()),
+  email: __t.option(__t.string()),
+  scopesJson: __t.string(),
+  expiresAt: __t.option(__t.f64()),
+  eventConsent: __t.bool(),
+  error: __t.option(__t.string()),
+  updatedAt: __t.f64(),
+});
+export type CalendarConnection = __Infer<typeof CalendarConnection>;
+
+export const CalendarOauthExpiryJob = __t.object("CalendarOauthExpiryJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  stateId: __t.string(),
+});
+export type CalendarOauthExpiryJob = __Infer<typeof CalendarOauthExpiryJob>;
+
+export const CalendarOauthState = __t.object("CalendarOauthState", {
+  stateId: __t.string(),
+  accountId: __t.string(),
+  generation: __t.string(),
+  ownerIdentity: __t.identity(),
+  sessionNonce: __t.string(),
+  status: __t.string(),
+  claimNonce: __t.option(__t.string()),
+  expiresAt: __t.f64(),
+  createdAt: __t.f64(),
+});
+export type CalendarOauthState = __Infer<typeof CalendarOauthState>;
+
+export const CalendarRevocation = __t.object("CalendarRevocation", {
+  generation: __t.string(),
+  accountId: __t.string(),
+  status: __t.string(),
+});
+export type CalendarRevocation = __Infer<typeof CalendarRevocation>;
+
+export const CalendarRevokeJob = __t.object("CalendarRevokeJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  accountId: __t.string(),
+  tokenCiphertext: __t.string(),
+  generation: __t.string(),
+});
+export type CalendarRevokeJob = __Infer<typeof CalendarRevokeJob>;
 
 export const CallEvent = __t.object("CallEvent", {
   id: __t.u64(),
@@ -125,6 +248,13 @@ export type CatalogVenueRow = __Infer<typeof CatalogVenueRow>;
 export const CatalogVenues = __t.object("CatalogVenues", {});
 export type CatalogVenues = __Infer<typeof CatalogVenues>;
 
+export const ConnectorConfigurationResult = __t.object("ConnectorConfigurationResult", {
+  googleConfigured: __t.bool(),
+  messagesConfigured: __t.bool(),
+  externalInvitesConfigured: __t.bool(),
+});
+export type ConnectorConfigurationResult = __Infer<typeof ConnectorConfigurationResult>;
+
 export const CouncilJob = __t.object("CouncilJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),
@@ -159,6 +289,13 @@ export const CreateGroupResult = __t.object("CreateGroupResult", {
 });
 export type CreateGroupResult = __Infer<typeof CreateGroupResult>;
 
+export const CreateInvitationHuddleResult = __t.object("CreateInvitationHuddleResult", {
+  groupId: __t.string(),
+  memberId: __t.string(),
+  code: __t.string(),
+});
+export type CreateInvitationHuddleResult = __Infer<typeof CreateInvitationHuddleResult>;
+
 export const FakeEventJob = __t.object("FakeEventJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),
@@ -166,6 +303,26 @@ export const FakeEventJob = __t.object("FakeEventJob", {
   payloadJson: __t.string(),
 });
 export type FakeEventJob = __Infer<typeof FakeEventJob>;
+
+export const FriendContactDestination = __t.object("FriendContactDestination", {
+  id: __t.string(),
+  ownerAccountId: __t.string(),
+  friendAccountId: __t.string(),
+  contactId: __t.string(),
+  contactName: __t.string(),
+  destination: __t.string(),
+  updatedAt: __t.f64(),
+});
+export type FriendContactDestination = __Infer<typeof FriendContactDestination>;
+
+export const FriendRequest = __t.object("FriendRequest", {
+  id: __t.string(),
+  fromAccountId: __t.string(),
+  toAccountId: __t.string(),
+  status: __t.string(),
+  createdAt: __t.f64(),
+});
+export type FriendRequest = __Infer<typeof FriendRequest>;
 
 export const GeoCache = __t.object("GeoCache", {
   key: __t.string(),
@@ -195,11 +352,118 @@ export const Group = __t.object("Group", {
 });
 export type Group = __Infer<typeof Group>;
 
+export const GroupSchedule = __t.object("GroupSchedule", {
+  groupId: __t.string(),
+  timeZone: __t.string(),
+  start: __t.string(),
+  end: __t.string(),
+  checkedAt: __t.f64(),
+});
+export type GroupSchedule = __Infer<typeof GroupSchedule>;
+
+export const HuddleInvitation = __t.object("HuddleInvitation", {
+  id: __t.string(),
+  groupId: __t.string(),
+  fromAccountId: __t.string(),
+  toAccountId: __t.string(),
+  status: __t.string(),
+  createdAt: __t.f64(),
+  expiresAt: __t.f64(),
+});
+export type HuddleInvitation = __Infer<typeof HuddleInvitation>;
+
+export const HuddleInviteIntentResult = __t.object("HuddleInviteIntentResult", {
+  friendAccountIds: __t.array(__t.string()),
+  ambiguousNames: __t.array(__t.string()),
+  unknownNames: __t.array(__t.string()),
+  outingKind: __t.string(),
+  summary: __t.string(),
+});
+export type HuddleInviteIntentResult = __Infer<typeof HuddleInviteIntentResult>;
+
+export const InvitationDelivery = __t.object("InvitationDelivery", {
+  invitationId: __t.string(),
+  status: __t.string(),
+  error: __t.option(__t.string()),
+  destination: __t.option(__t.string()),
+  message: __t.option(__t.string()),
+  updatedAt: __t.f64(),
+});
+export type InvitationDelivery = __Infer<typeof InvitationDelivery>;
+
+export const InvitationDeliveryJob = __t.object("InvitationDeliveryJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  invitationId: __t.string(),
+});
+export type InvitationDeliveryJob = __Infer<typeof InvitationDeliveryJob>;
+
+export const InvitationExpiryJob = __t.object("InvitationExpiryJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  invitationId: __t.string(),
+});
+export type InvitationExpiryJob = __Infer<typeof InvitationExpiryJob>;
+
+export const InvitationStart = __t.object("InvitationStart", {
+  requestId: __t.string(),
+  accountId: __t.string(),
+  groupId: __t.string(),
+  memberId: __t.string(),
+  code: __t.string(),
+  fingerprint: __t.string(),
+});
+export type InvitationStart = __Infer<typeof InvitationStart>;
+
 export const JoinGroupResult = __t.object("JoinGroupResult", {
   memberId: __t.string(),
   groupId: __t.string(),
 });
 export type JoinGroupResult = __Infer<typeof JoinGroupResult>;
+
+export const MacContactDestination = __t.object("MacContactDestination", {
+  value: __t.string(),
+  label: __t.string(),
+  kind: __t.string(),
+});
+export type MacContactDestination = __Infer<typeof MacContactDestination>;
+
+export const MacContactMatch = __t.object("MacContactMatch", {
+  contactId: __t.string(),
+  displayName: __t.string(),
+  get destinations() {
+    return __t.array(MacContactDestination);
+  },
+});
+export type MacContactMatch = __Infer<typeof MacContactMatch>;
+
+export const MacContactsSearchResult = __t.object("MacContactsSearchResult", {
+  ok: __t.bool(),
+  message: __t.string(),
+  get contacts() {
+    return __t.array(MacContactMatch);
+  },
+  truncated: __t.bool(),
+});
+export type MacContactsSearchResult = __Infer<typeof MacContactsSearchResult>;
+
+export const Meetup = __t.object("Meetup", {
+  runId: __t.string(),
+  groupId: __t.string(),
+  planId: __t.string(),
+  inputRevision: __t.u32(),
+  status: __t.string(),
+  message: __t.string(),
+  createdAt: __t.f64(),
+});
+export type Meetup = __Infer<typeof Meetup>;
+
+export const MeetupJob = __t.object("MeetupJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  runId: __t.string(),
+});
+export type MeetupJob = __Infer<typeof MeetupJob>;
 
 export const Member = __t.object("Member", {
   id: __t.string(),
@@ -214,6 +478,52 @@ export const Member = __t.object("Member", {
 });
 export type Member = __Infer<typeof Member>;
 
+export const MessageConnector = __t.object("MessageConnector", {
+  accountId: __t.string(),
+  enabled: __t.bool(),
+  destination: __t.string(),
+  updatedAt: __t.f64(),
+});
+export type MessageConnector = __Infer<typeof MessageConnector>;
+
+export const MyAccount = __t.object("MyAccount", {});
+export type MyAccount = __Infer<typeof MyAccount>;
+
+export const MyAccountContext = __t.object("MyAccountContext", {});
+export type MyAccountContext = __Infer<typeof MyAccountContext>;
+
+export const MyAccountContextRow = __t.object("MyAccountContextRow", {
+  accountId: __t.string(),
+  contextJson: __t.string(),
+  revision: __t.u32(),
+  updatedAt: __t.f64(),
+});
+export type MyAccountContextRow = __Infer<typeof MyAccountContextRow>;
+
+export const MyAccountMembershipRow = __t.object("MyAccountMembershipRow", {
+  id: __t.string(),
+  groupId: __t.string(),
+  code: __t.string(),
+  memberId: __t.string(),
+  name: __t.string(),
+  role: __t.string(),
+  status: __t.string(),
+  date: __t.string(),
+});
+export type MyAccountMembershipRow = __Infer<typeof MyAccountMembershipRow>;
+
+export const MyAccountMemberships = __t.object("MyAccountMemberships", {});
+export type MyAccountMemberships = __Infer<typeof MyAccountMemberships>;
+
+export const MyAccountRow = __t.object("MyAccountRow", {
+  accountId: __t.string(),
+  username: __t.string(),
+  displayName: __t.string(),
+  activeGroupId: __t.option(__t.string()),
+  expiresAt: __t.f64(),
+});
+export type MyAccountRow = __Infer<typeof MyAccountRow>;
+
 export const MyAgentNeeds = __t.object("MyAgentNeeds", {});
 export type MyAgentNeeds = __Infer<typeof MyAgentNeeds>;
 
@@ -226,6 +536,16 @@ export const MyAgentNeedsRow = __t.object("MyAgentNeedsRow", {
   error: __t.option(__t.string()),
 });
 export type MyAgentNeedsRow = __Infer<typeof MyAgentNeedsRow>;
+
+export const MyAgentPreferences = __t.object("MyAgentPreferences", {});
+export type MyAgentPreferences = __Infer<typeof MyAgentPreferences>;
+
+export const MyAgentPreferencesRow = __t.object("MyAgentPreferencesRow", {
+  memberId: __t.string(),
+  structuredJson: __t.string(),
+  revision: __t.u32(),
+});
+export type MyAgentPreferencesRow = __Infer<typeof MyAgentPreferencesRow>;
 
 export const MyAgentSession = __t.object("MyAgentSession", {});
 export type MyAgentSession = __Infer<typeof MyAgentSession>;
@@ -246,6 +566,21 @@ export type MyBookings = __Infer<typeof MyBookings>;
 export const MyCallEvents = __t.object("MyCallEvents", {});
 export type MyCallEvents = __Infer<typeof MyCallEvents>;
 
+export const MyConnectors = __t.object("MyConnectors", {});
+export type MyConnectors = __Infer<typeof MyConnectors>;
+
+export const MyConnectorsRow = __t.object("MyConnectorsRow", {
+  accountId: __t.string(),
+  messageEnabled: __t.bool(),
+  messageDestination: __t.string(),
+  messageStatus: __t.string(),
+  calendarStatus: __t.string(),
+  calendarEmail: __t.option(__t.string()),
+  calendarEventConsent: __t.bool(),
+  calendarError: __t.option(__t.string()),
+});
+export type MyConnectorsRow = __Infer<typeof MyConnectorsRow>;
+
 export const MyCouncilMessageRow = __t.object("MyCouncilMessageRow", {
   id: __t.u64(),
   runId: __t.string(),
@@ -264,8 +599,56 @@ export type MyCouncilMessageRow = __Infer<typeof MyCouncilMessageRow>;
 export const MyCouncilMessages = __t.object("MyCouncilMessages", {});
 export type MyCouncilMessages = __Infer<typeof MyCouncilMessages>;
 
+export const MyFriendContactDestinationRow = __t.object("MyFriendContactDestinationRow", {
+  friendAccountId: __t.string(),
+  contactId: __t.string(),
+  contactName: __t.string(),
+  destination: __t.string(),
+});
+export type MyFriendContactDestinationRow = __Infer<typeof MyFriendContactDestinationRow>;
+
+export const MyFriendContactDestinations = __t.object("MyFriendContactDestinations", {});
+export type MyFriendContactDestinations = __Infer<typeof MyFriendContactDestinations>;
+
+export const MyFriendRequestRow = __t.object("MyFriendRequestRow", {
+  id: __t.string(),
+  fromAccountId: __t.string(),
+  fromUsername: __t.string(),
+  fromDisplayName: __t.string(),
+  toAccountId: __t.string(),
+  toUsername: __t.string(),
+  toDisplayName: __t.string(),
+  direction: __t.string(),
+  status: __t.string(),
+  createdAt: __t.f64(),
+});
+export type MyFriendRequestRow = __Infer<typeof MyFriendRequestRow>;
+
+export const MyFriendRequests = __t.object("MyFriendRequests", {});
+export type MyFriendRequests = __Infer<typeof MyFriendRequests>;
+
+export const MyFriendRow = __t.object("MyFriendRow", {
+  accountId: __t.string(),
+  username: __t.string(),
+  displayName: __t.string(),
+});
+export type MyFriendRow = __Infer<typeof MyFriendRow>;
+
+export const MyFriends = __t.object("MyFriends", {});
+export type MyFriends = __Infer<typeof MyFriends>;
+
 export const MyGroup = __t.object("MyGroup", {});
 export type MyGroup = __Infer<typeof MyGroup>;
+
+export const MyGroupConnectorRow = __t.object("MyGroupConnectorRow", {
+  memberId: __t.string(),
+  connected: __t.bool(),
+  eventConsent: __t.bool(),
+});
+export type MyGroupConnectorRow = __Infer<typeof MyGroupConnectorRow>;
+
+export const MyGroupConnectors = __t.object("MyGroupConnectors", {});
+export type MyGroupConnectors = __Infer<typeof MyGroupConnectors>;
 
 export const MyGroupRow = __t.object("MyGroupRow", {
   id: __t.string(),
@@ -283,6 +666,48 @@ export const MyGroupRow = __t.object("MyGroupRow", {
   myMemberId: __t.option(__t.string()),
 });
 export type MyGroupRow = __Infer<typeof MyGroupRow>;
+
+export const MyHuddleInvitationRow = __t.object("MyHuddleInvitationRow", {
+  id: __t.string(),
+  groupId: __t.string(),
+  groupName: __t.string(),
+  fromAccountId: __t.string(),
+  fromDisplayName: __t.string(),
+  toAccountId: __t.string(),
+  toUsername: __t.string(),
+  toDisplayName: __t.string(),
+  direction: __t.string(),
+  status: __t.string(),
+  message: __t.string(),
+  path: __t.string(),
+  createdAt: __t.f64(),
+  expiresAt: __t.f64(),
+});
+export type MyHuddleInvitationRow = __Infer<typeof MyHuddleInvitationRow>;
+
+export const MyHuddleInvitations = __t.object("MyHuddleInvitations", {});
+export type MyHuddleInvitations = __Infer<typeof MyHuddleInvitations>;
+
+export const MyInvitationDeliveries = __t.object("MyInvitationDeliveries", {});
+export type MyInvitationDeliveries = __Infer<typeof MyInvitationDeliveries>;
+
+export const MyInvitationDeliveryRow = __t.object("MyInvitationDeliveryRow", {
+  invitationId: __t.string(),
+  status: __t.string(),
+  error: __t.option(__t.string()),
+});
+export type MyInvitationDeliveryRow = __Infer<typeof MyInvitationDeliveryRow>;
+
+export const MyMeetup = __t.object("MyMeetup", {});
+export type MyMeetup = __Infer<typeof MyMeetup>;
+
+export const MyMeetupRow = __t.object("MyMeetupRow", {
+  runId: __t.string(),
+  planId: __t.string(),
+  status: __t.string(),
+  message: __t.string(),
+});
+export type MyMeetupRow = __Infer<typeof MyMeetupRow>;
 
 export const MyMemberRow = __t.object("MyMemberRow", {
   id: __t.string(),
@@ -434,6 +859,15 @@ export const RouletteResult = __t.object("RouletteResult", {
 });
 export type RouletteResult = __Infer<typeof RouletteResult>;
 
+export const ScheduleHuddleResult = __t.object("ScheduleHuddleResult", {
+  ok: __t.bool(),
+  message: __t.string(),
+  date: __t.option(__t.string()),
+  windowStart: __t.option(__t.string()),
+  windowEnd: __t.option(__t.string()),
+});
+export type ScheduleHuddleResult = __Infer<typeof ScheduleHuddleResult>;
+
 export const ScoutCheck = __t.object("ScoutCheck", {
   id: __t.u64(),
   runId: __t.string(),
@@ -452,6 +886,13 @@ export const ScoutJob = __t.object("ScoutJob", {
   runId: __t.string(),
 });
 export type ScoutJob = __Infer<typeof ScoutJob>;
+
+export const StartGoogleCalendarResult = __t.object("StartGoogleCalendarResult", {
+  ok: __t.bool(),
+  message: __t.string(),
+  authorizationUrl: __t.option(__t.string()),
+});
+export type StartGoogleCalendarResult = __Infer<typeof StartGoogleCalendarResult>;
 
 export const Swipe = __t.object("Swipe", {
   id: __t.u64(),

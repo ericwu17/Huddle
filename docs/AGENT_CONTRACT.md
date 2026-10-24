@@ -74,7 +74,11 @@ Response:
 
 Each plan contains `id`, `title`, `stops`, `costPerPerson`, `whyLine`,
 `limitations`, `travelMinutes`. Stops retain the known place ID/name/category,
-start/end, coordinates and catalog cost. The total equals the sum of every stop.
+start/end, coordinates and catalog cost. A coordinator plan has one to three
+stops. A single-stop plan must be a meal venue: a dinner can fit a short outing
+without forcing an activity or dessert. Both API and module validate this
+additive count change; retained legacy templates/shapes are unchanged.
+The total equals the sum of every stop.
 Prices and travel are explicitly estimates. There is no score or posterior.
 
 Code enumerates feasible catalog itineraries and validates whole-outing caps,

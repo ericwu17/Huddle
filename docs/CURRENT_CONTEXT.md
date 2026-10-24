@@ -17,26 +17,69 @@ itineraries, with Python validating hard constraints and factual consistency
 instead of enumerating complete candidate plans. Eric Wu has built Bright Data →
 SpacetimeDB ingestion: a versioned venue snapshot (`POST /catalog`, `venue` and
 `catalog_state` tables) that the module sends to FastAPI with each coordinator
-request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). It is not
-yet published to Maincloud ([go live](BRIGHTDATA.md#go-live)). Review the schema
-and read path before the deferred agent rewrite. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). The merged
+implementation is verified on isolated Maincloud `huddle-account-max-check`
+with the committed 130-venue snapshot. Shared `huddle-calhacks` activation
+remains separate ([go live](BRIGHTDATA.md#go-live)). Menus/photos/seating in
+`details.json` still need a coordinated read contract. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 
-**Preference UX proposal, planning only:** omitted options on first submission
-mean flexible. Optional budget/whole-outing-duration sliders and an optional
-prompt feed one Save & ready action; only genuine consequential ambiguity asks
-for a targeted clarification. A blank edit cannot erase prior restrictions or
-raise an established cap. Input readiness and missing venue evidence are separate.
-See [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md) for the proposed
-behavior and 30 acceptance scenarios. Current contracts/confirmation remain live.
+**Account and preference expansion: branch implementation verified for review.**
+Max approved username/password accounts, private saved context, reciprocal friends,
+a friend picker and durable in-app invitations with an opening link. New
+account-owned huddles use addressed invitations; legacy anonymous groups retain
+compatibility. Passwords now require eight characters and can be shown while
+entering them. Contacts are created after accepted friendship/membership, never
+by importing a phone address book.
 
-**Further product proposal, not implemented:** a prompt-first signed-in home,
-contacts and durable account-scoped invitations would replace QR/code/link
-sharing for known contacts. Saved personal context would provide editable
-defaults, with today's mood/limits separate and controlled by each user. Start
-with an in-app inbox; literal SMS is a separate later delivery adapter. See
-[PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md). The current
-illustrated design direction is [Design.md](../Design.md); account/notification
-features and planner changes remain follow-ups.
+Private budget and full-outing-duration controls have an explicit Flexible state,
+exact numeric inputs and optional sliders. An optional prompt adds context.
+**Save & ready** saves direct inputs without a second confirmation; consequential
+ambiguity still requires a private correction. A blank initial submission is
+valid. A later blank/Flexible edit cannot erase an established outing cap.
+Known allergy input and missing venue evidence are separate states: the person
+can finish their input, while an unsupported food plan remains unavailable.
+
+Max authorized syncing main, resolving conflicts and pushing the combined
+account/connector work for both Erics to test on October 24. The connected
+review environment remains isolated Maincloud `huddle-account-max-check` and
+local Vite port 5174. A Git push does not deploy the matching shared backend. See
+[ACCOUNTS_CONTRACT.md](ACCOUNTS_CONTRACT.md),
+[ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md) and
+[PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md).
+Eric Wu's Bright Data/ingestion files remain untouched. The branch now also
+implements invitation-only home intent: Claude resolves actual friends, the
+initiator reviews recipients, then explicitly starts invitations. Home text
+never becomes a private preference submission; a picker works without Claude.
+
+The Connectors tab adds per-account Google Calendar consent, private encrypted
+credentials, common free/busy time selection and a separate agreed-meetup write
+after complete current voting and event opt-in. Manual outing date/time remains
+available without calendars; all venue hours use Berkeley time. An optional
+Max-Mac Messages adapter submits invitation links only for opted-in recipients.
+Max reports Google Calendar connects; group free/busy and real meetup-event
+creation still need a participant test. A user-triggered invitation reached Mac
+Messages, which reported Not Delivered. Max also reports ordinary sending and
+phone-history syncing fail there. OS submission is not recipient delivery; do
+not automatically resend an ambiguous submission. See
+[CONNECTORS_CONTRACT.md](CONNECTORS_CONTRACT.md). General SMS/email/push, voice
+prompts, model-inferred memory and the Claude propose/revise planner remain
+follow-ups. Coordinator plans now support a one-meal outing for short time limits; the
+old two-stop minimum incorrectly rejected matching $40/90-minute food requests.
+Both API and module enforce the expanded one-to-three-stop contract, with only
+a meal permitted as a single stop. Legacy templates are unchanged.
+
+Max can search his Mac Contacts and explicitly link a selected address to an
+accepted Huddle friend. A reviewed invitation can use that private mapping;
+recipient-saved delivery settings, including opt-out, take priority. This is
+selected-contact linking, not continuous address-book synchronization. Actual
+lookup worked; real message receipt still needs participant confirmation.
+Max reports Google Calendar now connects after the tester allowlist update;
+shared availability and real meetup-event creation remain separate checks.
+
+The preview planner now receives the active 130-venue database snapshot. Claude
+gets its source/fetch evidence; plan cards resolve new `bd_` IDs through public
+catalog views and show ratings with observation dates. The shared backend keeps
+its prior catalog until the coordinated module/API/catalog release.
 
 ## Goal
 
@@ -119,9 +162,10 @@ not be presented as results from this new method.
 
 ## Implemented coordinator interaction
 
-1. Start or join a huddle using the existing code/QR flow.
-2. Each participant submits their own prompt and reviews any interpretation or
-   private clarification. The host's prompt does not speak for everyone.
+1. On the branch preview, sign in, start a huddle and invite accepted friends.
+   Recipients open their in-app invitation link and explicitly join.
+2. Each participant saves their private optional limits/prompt with Save & ready.
+   Ask only consequential clarifications. The host cannot submit for invitees.
 3. Build the coordinator's context from the confirmed current inputs. Filter
    venue candidates using code, then request a small set of distinct proposals.
 4. Validate every proposal and show its itinerary, whole-outing price, concise
@@ -131,12 +175,11 @@ not be presented as results from this new method.
 6. Participants choose a current valid plan. Keep the existing visibly scripted
    booking/re-plan demonstration until real calls are deliberately implemented.
 
-The shadcn interface proposal remains the design direction: Start a huddle as
-the main screen, readable agent conversation, plans and voting accessible from
-navigation, and consistent mobile controls. Username/password accounts,
-contacts, personal history, voice input and personal provider keys remain
-staged proposals. They are not prerequisites for proving agent planning with
-the existing device identities. Vendor/MCP settings and real phone calls wait.
+The custom illustrated theme in Design.md is the design direction: prompt-first
+home, clear friends/inbox navigation, readable plans and consistent mobile
+controls. Branch accounts, memberships and private saved defaults use SpacetimeDB.
+History records proposed/simulated outcomes accurately; no inferred visits.
+Voice input, personal provider keys, vendor/MCP settings and real calls wait.
 
 ## Runtime and local development
 
@@ -188,8 +231,9 @@ phase accepts that limitation and does not claim shared-service redundancy.
 ## Current implementation and migration
 
 New huddles created by the updated frontend use one Claude coordinator through
-`/agent/needs` and `/agent/plan`. Each member privately reviews and confirms their
-needs; only the host starts planning after everyone confirms. Database jobs carry
+`/agent/needs` and `/agent/plan`. Each member saves private optional inputs with Save & ready; safe prompt
+interpretations become ready automatically, with targeted clarifications only.
+Only the host starts planning after everyone is ready. Database jobs carry
 input revisions, persist context/results and discard stale replies. The new UI
 shows estimated stop costs and grounded explanations without taste scores or
 confidence percentages. Equal-weight Spin resolves complete tied ballots only.
@@ -202,14 +246,12 @@ Vercel frontend continues to create legacy groups until its frontend release.
 Eric Chen's `scripts/host-api.ps1` is hosting tooling, not a replacement planner.
 Max's Mac is the designated API/tunnel host for this connected implementation test.
 
-Maincloud currently plans over the 45 bundled Berkeley venues. Review aspects
-are placeholders and scout facts are cached. The Bright Data scraper
-(`data/reviews/`, [BRIGHTDATA.md](BRIGHTDATA.md)) has collected 936 Berkeley
-places from Google Maps and built a 130-venue catalog with source URLs and
-fetch times. It goes live after the module is republished, the API restarted and
-the catalog published ([go live](BRIGHTDATA.md#go-live)). Menus, takeout,
-seating, photos and dietary evidence (`data/brightdata/details.json`) are
-collected but not yet read by the coordinator. Keep a validated cached snapshot for scrape
+Eric Wu collected 936 Berkeley stops and built a 130-venue snapshot (60 meals,
+45 activities, 25 desserts), including 85 venues absent from the bundled list.
+This snapshot is activated and tested in the isolated preview. Raw scraping and
+ingestion files were not edited during the integration. Review aspects and
+scout facts remain placeholders/cached. Details for 130 venues exist separately
+but menus/photos/takeout/seating are not yet read by the planner. Keep a validated cached snapshot for scrape
 outages; scraping cannot guarantee a choice that satisfies every hard constraint.
 Neither Claude nor scraped reviews replace verified allergy evidence. See
 [NEXT_TASKS.md](NEXT_TASKS.md) for the open workstreams and suggested ownership.
@@ -218,9 +260,9 @@ The additive contract uses separate requests/results and private agent tables;
 it does not populate obsolete math fields. Public explanations are rendered from
 catalog facts selected by Claude, so private model prose cannot expose prompts or
 caps. The bounded candidate set is not a guarantee of a globally optimal plan.
-Unknown allergy evidence blocks planning; qualitative review aspects, ingredients,
+Unknown allergy evidence blocks validated food plans; qualitative review aspects, ingredients,
 live availability and actual prices are still unverified. Private trade-offer
-generation, accounts, shadcn migration and personal history are deferred. An
+generation, inferred memory and actual-visit history are deferred. An
 established cap cannot be raised through prompt editing or model interpretation.
 Preserve the exact 13-feature order wherever the legacy contract is still used.
 
@@ -232,9 +274,8 @@ Preserve the exact 13-feature order wherever the legacy contract is still used.
 | Eric Wu | Current `api/` implementation owner; coordinate the agent-planner migration and designated local API/tunnel operation with Max |
 | Eric Chen | UI, readable prompt/agent/plan flow and SpacetimeDB context/progress integration with Max |
 
-Coordinate file ownership before overlapping edits. Haydn's attendance is an
-open question. Publishing the live catalog and using the venue details are the
-remaining Bright Data tasks.
+Coordinate file ownership before overlapping edits. Eric Wu owns the active Bright Data ingestion work; Max owns the follow-up
+versioned catalog/planner integration and Eric Chen coordinates its UI.
 
 - [x] Confirm Max's Mac as designated local API/tunnel operator and verify the
   Maincloud API URL before shared testing; retain this setup for agent work.

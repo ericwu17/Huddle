@@ -1,5 +1,9 @@
 # Run and verify the coordinator flow
 
+For the unreleased account branch, use [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md)
+and its isolated module/port 5174. The shared module has no account code yet;
+do not point the new account UI at it before an approved coordinated release.
+
 The current arrangement is local FastAPI + Cloudflare tunnel + SpacetimeDB
 Maincloud, with Vite for local frontend work. The laptop must stay awake and
 connected. Claude needs internet access. No local database or paid hosting is
@@ -44,8 +48,8 @@ npm run dev --prefix web -- --host 0.0.0.0 --port 5173 --strictPort
 ```
 
 Open `http://localhost:5173/start` on the host, or Vite's printed network URL on
-phones. For phone QR joining, the host should open that network URL too so QR
-links point to the laptop rather than each phone's localhost. The browser talks
+phones. Account Huddles use addressed invitation links and no QR UI. Phone
+links need a reachable frontend URL connected to the same database. The browser talks
 to Maincloud; it never receives the private API secret. Vercel shows the new UI
 only after the frontend changes are released there.
 

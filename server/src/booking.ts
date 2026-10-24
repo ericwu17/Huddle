@@ -11,6 +11,7 @@ import { availablePlans } from "./lib/availability";
 import type { Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs } from "./lib/util";
 import { agentBallot, isAgent } from "./lib/agent-state";
+import { requireActor } from "./lib/account-state";
 
 const FAKE_CALL_STEP_MS = 1200;
 const REPLAN_REASONS = new Set(["full", "closed"]);
@@ -55,7 +56,7 @@ export const startBooking = spacetimedb.reducer(
     if (!stop) throw new SenderError("no such stop");
     const g = tx.db.group.id.find(me.groupId)!;
     if (isAgent(tx.db, g.id)) {
-      if (!g.hostIdentity.isEqual(tx.sender)) throw new SenderError("Only the host can start the booking simulation.");
+      if (!g.hostIdentity.isEqual(requireActor(tx))) throw new SenderError("Only the host can start the booking simulation.");
       if (agentBallot(tx.db, g.id, runId).winner !== planId) throw new SenderError("Everyone must vote and resolve the current choice first.");
       if (stop.category !== "meal") throw new SenderError("Choose the meal stop for booking.");
       if (Array.from(tx.db.booking.groupId.filter(g.id)).some(b => b.runId === runId && b.status !== "failed"))

@@ -1,10 +1,19 @@
 # Huddle Python API
 
 The stateless FastAPI service for the new single-Claude coordinator and the
-legacy S5.3 planner. The SpacetimeDB module is its only caller; browsers connect
-to Maincloud. The tested environment uses Python 3.13.
+legacy S5.3 planner. The SpacetimeDB module calls its protected endpoints; browsers connect
+to Maincloud, with one public state-validated Google OAuth callback. The tested environment uses Python 3.13.
 
 ## Coordinator flow
+
+The branch-only account foundation also adds service-protected
+`POST /accounts/credentials`, using FastAPI Users on request-local credential
+snapshots. Maincloud owns accounts, revocable sessions, memberships, friends, invitations
+and private saved defaults; the API
+does not persist them or expose this endpoint to browser callers. Login requires
+the existing shared service secret, not a Claude key. See
+[account contract](../docs/ACCOUNTS_CONTRACT.md) and
+[isolated review setup](../docs/ACCOUNTS_RUNBOOK.md).
 
 Authenticated `POST /agent/needs` interprets one private prompt for owner review;
 `POST /agent/plan` receives all confirmed member contexts and shared discussion.
@@ -22,6 +31,28 @@ lowered, but prompt edits and Claude cannot raise them.
 See [contract](../docs/AGENT_CONTRACT.md), [setup/run commands](../docs/AGENT_RUNBOOK.md)
 and [verification](../docs/AGENT_VERIFICATION.md). The remaining sections describe
 the retained legacy endpoints where stated.
+
+## Optional invitation and calendar connectors
+
+`POST /agent/invite-intent` resolves only supplied real contacts and never sends
+messages or saves private needs. Short outings may return one meal stop; an extra activity/dessert is optional.
+The `/connectors/` endpoints implement Google
+OAuth, private free/busy, bounded Claude time choice, explicitly opted-in meetup
+events and an opt-in Mac Messages submission adapter. Only
+`GET /connectors/google/callback` is public; its one-use encrypted state must be
+claimed by Maincloud before any token exchange.
+
+Settings: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`,
+`HUDDLE_CONNECTOR_ENCRYPTION_KEY`, `HUDDLE_FRONTEND_BASE_URL`,
+`HUDDLE_MESSAGES_ENABLED`, `HUDDLE_MAC_CONTACTS_ENABLED` and the existing
+Maincloud/service-secret settings. Protected `POST /connectors/contacts/search`
+performs a bounded matching-name lookup on the designated host Mac; Maincloud
+restricts callers to `MAC_CONTACTS_OWNER_USERNAME`.
+Keep real values in ignored `api/.env`, never frontend env or source. Retain
+the encryption key across restarts. See [connector contract and operating
+limits](../docs/CONNECTORS_CONTRACT.md) and [preview runbook](../docs/ACCOUNTS_RUNBOOK.md).
+Provider writes are mocked in automated tests; configuration alone does not
+prove a real Google connection, event or received message.
 
 ## No stub mode
 
@@ -62,7 +93,7 @@ run. Restart uvicorn after editing `api/.env`.
 
 | Name | Meaning |
 | --- | --- |
-| `HUDDLE_SHARED_SECRET` | Required, nonblank. Every route, `/health` included, needs it in `X-Huddle-Secret`. Never browser-visible. |
+| `HUDDLE_SHARED_SECRET` | Required, nonblank. Protected routes, `/health` included, need `X-Huddle-Secret`. The Google GET callback instead validates one-use encrypted OAuth state. Never browser-visible. |
 | `PLACES_PATH` | Optional catalog override; defaults to `data/places.json`. `synthetic_stub` places refuse startup. |
 | `ANTHROPIC_API_KEY` | Required for the coordinator endpoints. Without it they return 503; legacy parsing/council retain their labeled fallback behavior. |
 | `CLAUDE_MODEL_FAST`, `CLAUDE_MODEL_SMART` | Default `claude-haiku-5-5` (parser, advocates) and `claude-sonnet-5-5` (chair). |

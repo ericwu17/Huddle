@@ -1,5 +1,6 @@
 import { ScheduleAt } from "spacetimedb/server";
 import type { ReadDb, Tx } from "./types";
+import { membershipKey, principalFor } from "./account-state";
 
 export const nowMs = (ctx: { timestamp: { toMillis(): bigint } }) => Number(ctx.timestamp.toMillis());
 
@@ -23,6 +24,14 @@ export const parse = <T = any>(json: string | undefined | null): T | null => (js
 
 // The caller's member row: their most recent join. Phones identify by SpacetimeDB Identity.
 export function currentMember(db: ReadDb, sender: Tx["sender"]) {
+  const session = db.account_session.identity.find(sender);
+  if (session) {
+    if (!session.accountId || !session.activeGroupId) return null;
+    const membership = db.account_membership.id.find(membershipKey(session.accountId, session.activeGroupId));
+    const member = membership && db.member.id.find(membership.memberId);
+    const principal = principalFor(db, sender);
+    return member && principal && member.groupId === session.activeGroupId && member.identity.isEqual(principal) ? member : null;
+  }
   let best: ReturnType<ReadDb["member"]["id"]["find"]> = null;
   for (const m of db.member.identity.filter(sender)) if (!best || m.joinedAt > best.joinedAt) best = m;
   return best;
@@ -32,6 +41,7 @@ export function currentMember(db: ReadDb, sender: Tx["sender"]) {
 export function currentGroup(db: ReadDb, sender: Tx["sender"]) {
   const m = currentMember(db, sender);
   if (m) return db.group.id.find(m.groupId);
+  if (db.account_session.identity.find(sender)) return null;
   let best: ReturnType<ReadDb["group"]["id"]["find"]> = null;
   for (const g of db.group.hostIdentity.filter(sender)) if (!best || g.createdAt > best.createdAt) best = g;
   return best;

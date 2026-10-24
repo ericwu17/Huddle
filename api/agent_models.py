@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from .models import Model, Identifier, Money, Number, Category, Cuisine, Diet, Origin, Place, Stop, Window
 
@@ -17,6 +17,18 @@ class AgentHard(Model):
     vetoCategories: list[Category] = Field(default_factory=list, max_length=3)
     rejectedTerms: list[Text] = Field(default_factory=list, max_length=20)
     maxTravelMinutes: Money | None = None
+    # Full outing elapsed time, including travel/waiting between stops. This is
+    # deliberately separate from the journey to the first venue.
+    maxOutingMinutes: Money | None = None
+
+    @field_validator("allergies", mode="before")
+    @classmethod
+    def explicit_no_allergy(cls, value):
+        if isinstance(value, list) and len(value) == 1 and isinstance(value[0], str) and value[0].strip().casefold() in {
+            "none", "no allergies", "no known allergies", "n/a",
+        }:
+            return []
+        return value
 
 
 class AgentNeeds(Model):
@@ -28,13 +40,14 @@ class AgentNeeds(Model):
 
 class AgentNeedsRequest(Model):
     memberId: Identifier
-    text: Annotated[str, Field(min_length=1, max_length=4000)]
+    text: Annotated[str, Field(max_length=4000)] = ""
     currentHard: AgentHard | None = None
+    structured: AgentHard | None = None
 
 
 class AgentMember(Model):
     memberId: Identifier
-    prompt: Annotated[str, Field(min_length=1, max_length=4000)]
+    prompt: Annotated[str, Field(max_length=4000)] = ""
     needs: AgentNeeds
     origin: Origin | None = None
 
@@ -88,11 +101,17 @@ class AgentPlanRequest(Model):
 class AgentPlan(Model):
     id: Identifier
     title: Text
-    stops: Annotated[list[Stop], Field(min_length=2, max_length=3)]
+    stops: Annotated[list[Stop], Field(min_length=1, max_length=3)]
     costPerPerson: Money
     whyLine: Text
     limitations: list[Text]
     travelMinutes: Money
+
+    @model_validator(mode="after")
+    def single_stop_is_meal(self):
+        if len(self.stops) == 1 and self.stops[0].category != "meal":
+            raise ValueError("a single-stop coordinator outing must be a meal")
+        return self
 
 
 class AgentPlanResponse(Model):

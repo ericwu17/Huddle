@@ -104,11 +104,11 @@
   <!-- Start -->
   <section class="start" id="start">
     <h2 class="mega reveal">Get the <span>group in</span></h2>
-    <p class="lead reveal">Start a huddle, drop the code in your group chat, and everyone's in within a minute. First names only.</p>
-    <form class="join reveal" action="/start" method="get">
-      <label class="sr" for="first">Your first name</label>
+    <p class="lead reveal">Sign in, choose your Huddle friends, and send an invitation. Everyone brings their own preferences.</p>
+    <form class="join reveal" action="/login" method="get">
+      <label class="sr" for="first">Your Huddle username</label>
       <div class="join-shell">
-        <input id="first" name="name" placeholder="Your first name" autocomplete="given-name" maxlength="24">
+        <input id="first" name="username" placeholder="Your Huddle username" autocomplete="username" maxlength="24">
         <button type="submit"><span>Start a huddle</span><i aria-hidden="true">↗</i></button>
       </div>
     </form>

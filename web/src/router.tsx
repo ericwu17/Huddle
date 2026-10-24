@@ -10,9 +10,21 @@ import Plans from "./routes/Plans";
 import Vote from "./routes/Vote";
 import Call from "./routes/Call";
 import Judge from "./routes/Judge";
+import Login from "./routes/Login";
+import Friends from "./routes/Friends";
+import Inbox from "./routes/Inbox";
+import Invitation from "./routes/Invitation";
+import Context from "./routes/Context";
+import Connectors from "./routes/Connectors";
 
 export const router = createBrowserRouter([
   { path: "/start", Component: Home },
+  { path: "/login", Component: Login },
+  { path: "/friends", Component: Friends },
+  { path: "/inbox", Component: Inbox },
+  { path: "/invite/:invitationId", Component: Invitation },
+  { path: "/context", Component: Context },
+  { path: "/connectors", Component: Connectors },
   { path: "/join/:code", Component: Join },
   {
     path: "/g/:groupId",
@@ -20,7 +32,7 @@ export const router = createBrowserRouter([
     Component: GroupLayout,
     loader: ({ params }) => {
       const session = getSession(params.groupId!);
-      if (!session) throw redirect("/start");
+      if (!session) throw redirect(`/start?open=${encodeURIComponent(params.groupId!)}`);
       return session;
     },
     children: [

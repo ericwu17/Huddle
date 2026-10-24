@@ -6,6 +6,8 @@ import spacetimedb from "./schema";
 import type { Tx } from "./lib/types";
 import { currentGroup, currentMember, membersOf, newId, nowMs } from "./lib/util";
 import { invalidateAgent, isAgent } from "./lib/agent-state";
+import { membershipKey, requireActor } from "./lib/account-state";
+import { connectHuddleContacts } from "./social";
 
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I, O, 0, 1
 
@@ -23,12 +25,14 @@ function nextSaturday(now: number): string {
 }
 
 export function requireMember(tx: Tx) {
+  requireActor(tx);
   const m = currentMember(tx.db, tx.sender);
   if (!m) throw new SenderError("join a huddle first");
   return m;
 }
 
 export function requireGroup(tx: Tx) {
+  requireActor(tx);
   const g = currentGroup(tx.db, tx.sender);
   if (!g) throw new SenderError("no huddle");
   return g;
@@ -36,40 +40,26 @@ export function requireGroup(tx: Tx) {
 
 function requireHost(tx: Tx) {
   const group = requireGroup(tx);
-  if (!group.hostIdentity.isEqual(tx.sender)) throw new SenderError("only the host can change this setting");
+  if (!group.hostIdentity.isEqual(requireActor(tx))) throw new SenderError("only the host can change this setting");
   return group;
+}
+
+export function createGroupInTx(tx: Tx, name: string | undefined) {
+  let code = randomCode(tx);
+  while (tx.db.group.code.find(code)) code = randomCode(tx);
+  const now = nowMs(tx);
+  const groupId = newId(tx, "g", id => !!tx.db.group.id.find(id));
+  tx.db.group.insert({ id: groupId, code, hostIdentity: requireActor(tx), name,
+    status: "lobby", date: nextSaturday(now), windowStart: "17:00", windowEnd: "23:00",
+    demoMode: false, showWhoCompromised: false, confidence: undefined, latestRunId: undefined,
+    runCounter: 0, excludedPlaceIds: [], replanFor: undefined, previewNonce: undefined, createdAt: now });
+  return { groupId, code };
 }
 
 export const createGroup = spacetimedb.procedure(
   { name: t.option(t.string()) },
   t.object("CreateGroupResult", { groupId: t.string(), code: t.string() }),
-  (ctx, { name }) =>
-    ctx.withTx((tx) => {
-      let code = randomCode(tx);
-      while (tx.db.group.code.find(code)) code = randomCode(tx);
-      const now = nowMs(tx);
-      const groupId = newId(tx, "g", (id) => !!tx.db.group.id.find(id));
-      tx.db.group.insert({
-        id: groupId,
-        code,
-        hostIdentity: tx.sender,
-        name,
-        status: "lobby",
-        date: nextSaturday(now),
-        windowStart: "17:00",
-        windowEnd: "23:00",
-        demoMode: false,
-        showWhoCompromised: false,
-        confidence: undefined,
-        latestRunId: undefined,
-        runCounter: 0,
-        excludedPlaceIds: [],
-        replanFor: undefined,
-        previewNonce: undefined,
-        createdAt: now,
-      });
-      return { groupId, code };
-    }),
+  (ctx, { name }) => ctx.withTx(tx => createGroupInTx(tx, name)),
 );
 
 export const joinGroup = spacetimedb.procedure(
@@ -79,15 +69,30 @@ export const joinGroup = spacetimedb.procedure(
     ctx.withTx((tx) => {
       const g = tx.db.group.code.find(code.trim().toUpperCase());
       if (!g) throw new SenderError("no group with that code");
-      const existing = membersOf(tx.db, g.id).find(m => m.identity.isEqual(tx.sender));
-      if (existing) return { memberId: existing.id, groupId: g.id };
+      const principal = requireActor(tx);
+      const accountSession = tx.db.account_session.identity.find(tx.sender);
+      const account = accountSession?.accountId && tx.db.account.id.find(accountSession.accountId);
+      const select = (memberId: string) => {
+        if (!account || !accountSession) return;
+        const id = membershipKey(account.id, g.id);
+        if (!tx.db.account_membership.id.find(id)) tx.db.account_membership.insert({ id, accountId: account.id,
+          groupId: g.id, memberId, role: g.hostIdentity.isEqual(principal) ? "host" : "member" });
+        tx.db.account_session.identity.update({ ...accountSession, activeGroupId: g.id });
+      };
+      const existing = membersOf(tx.db, g.id).find(m => m.identity.isEqual(principal));
+      if (existing) { select(existing.id); return { memberId: existing.id, groupId: g.id }; }
+      // Account huddles are invitation-only. A legacy code or a copied URL is
+      // not consent from the addressed account and must not bypass the inbox.
+      const accountHost = tx.db.account.principal.find(g.hostIdentity);
+      if (accountHost && !g.hostIdentity.isEqual(principal))
+        throw new SenderError("Open the invitation in your Huddle inbox to join this huddle.");
       if (g.status !== "lobby" && g.status !== "eliciting") throw new SenderError("this huddle has already planned");
       const memberId = newId(tx, "m", (id) => !!tx.db.member.id.find(id));
       tx.db.member.insert({
         id: memberId,
         groupId: g.id,
-        identity: tx.sender,
-        name: name.trim().slice(0, 40),
+        identity: principal,
+        name: account ? account.displayName : name.trim().slice(0, 40),
         originLat: undefined,
         originLng: undefined,
         ready: false,
@@ -95,6 +100,8 @@ export const joinGroup = spacetimedb.procedure(
         joinedAt: nowMs(tx),
       });
       invalidateAgent(tx, g.id);
+      select(memberId);
+      if (account) connectHuddleContacts(tx, account.id, g.id);
       return { memberId, groupId: g.id };
     }),
 );

@@ -1,72 +1,132 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useProcedure, useReducer } from "spacetimedb/react";
 import { procedures, reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
-import { useAgentMessages, useAgentRun, type AgentPlan } from "../agentData";
+import { useAgentMessages, useAgentPreferences, useAgentRun, type AgentPlan, type AgentStructuredPreferences } from "../agentData";
+import { EMPTY_CONTEXT, useAccount, useAccountContext, type AccountContext } from "../accountData";
+import { PreferenceFields } from "./PreferenceFields";
+import { useCatalogListings } from "../catalogData";
 import { useVotes } from "../data";
 import PlanMap from "./PlanMap";
+import MeetupCalendarAction from "./MeetupCalendarAction";
 
 export function AgentPrefs() {
-  const { group, agent, agentNeeds, isHost } = useGroup();
-  const submit = useReducer(reducers.submitAgentPrefs);
-  const confirm = useReducer(reducers.confirmAgentNeeds);
+  const { agentNeeds, group, session } = useGroup();
+  const account = useAccount();
+  const profile = useAccountContext();
+  const structured = useAgentPreferences();
+  if (account === undefined || agentNeeds === undefined || profile === undefined || structured === undefined || (structured && structured.memberId !== session.memberId)) return <p className="card" role="status">Loading your private needs…</p>;
+  return <AgentPrefsForm key={`${account?.accountId ?? "guest"}:${group.id}:${session.memberId}`} initialProfile={profile?.context ?? EMPTY_CONTEXT} initialStructured={structured?.structured} />;
+}
+
+function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile: AccountContext; initialStructured?: AgentStructuredPreferences }) {
+  const { group, agent, agentNeeds, isHost, session } = useGroup();
+  const account = useAccount();
+  const submit = useReducer(reducers.saveAgentPreferences);
+  const saveContext = useReducer(reducers.saveAccountContext);
   const find = useReducer(reducers.findAgentPlans);
   const { run, busy, error } = useRun();
-  const [draft, setDraft] = useState<string | null>(null);
-  const text = draft ?? agentNeeds?.text ?? "";
+  const [draft, setDraft] = useState<AccountContext>(() => {
+    const hard = agentNeeds?.result?.hard;
+    return { ...initialProfile, ...(initialStructured ? {
+      budgetMaxPerPerson: initialStructured.budgetMaxPerPerson,
+      maxOutingMinutes: initialStructured.maxOutingMinutes,
+      dietary: initialStructured.dietary,
+      allergies: initialStructured.allergies,
+    } : {}), ...(hard ? {
+      budgetMaxPerPerson: hard.budgetMaxPerPerson, maxOutingMinutes: hard.maxOutingMinutes ?? null,
+      dietary: hard.dietary, allergies: hard.allergies,
+    } : {}), preferences: agentNeeds?.text ?? initialProfile.preferences };
+  });
+  const [remember, setRemember] = useState(false);
+  const untouched = useRef(true);
+  const [notice, setNotice] = useState("");
+  const lastSubmitted = useRef<string | null>(null);
+  const lastApplied = useRef(agentNeeds?.revision ?? -1);
   const needs = agentNeeds?.result;
-  const allReady = agent?.confirmedMemberIds.length === group.members.length && group.members.length >= 2;
-  const blocked = !!needs?.questions.length || !!needs?.hard.allergies.length;
   const interpreting = !!agentNeeds && !needs && !agentNeeds.error;
+  const allReady = agent?.confirmedMemberIds.length === group.members.length && group.members.length >= 2;
+  useEffect(() => {
+    if (untouched.current && !agentNeeds && !initialStructured) {
+      setDraft(current => JSON.stringify(current) === JSON.stringify(initialProfile) ? current : initialProfile);
+    }
+  }, [initialProfile, initialStructured, agentNeeds]);
+  useEffect(() => {
+    if (!needs || !agentNeeds || lastApplied.current === agentNeeds.revision) return;
+    lastApplied.current = agentNeeds.revision;
+    if (lastSubmitted.current !== JSON.stringify(draft)) return;
+    setDraft(current => ({ ...current, budgetMaxPerPerson: needs.hard.budgetMaxPerPerson,
+      maxOutingMinutes: needs.hard.maxOutingMinutes ?? null, dietary: needs.hard.dietary, allergies: needs.hard.allergies }));
+  }, [agentNeeds, needs, draft]);
+  const saved = !!agentNeeds?.confirmed && !!needs && agentNeeds.text === draft.preferences.trim()
+    && needs.hard.budgetMaxPerPerson === draft.budgetMaxPerPerson && (needs.hard.maxOutingMinutes ?? null) === draft.maxOutingMinutes
+    && JSON.stringify(needs.hard.dietary) === JSON.stringify(draft.dietary) && JSON.stringify(needs.hard.allergies) === JSON.stringify(draft.allergies);
   return <div className="space-y-5">
-    <h1 className="shout text-[48px]">What do you want?</h1>
-    <section className="card card-note space-y-3">
-      <p>Your prompt and summary are private. The coordinator considers everyone's needs without publishing their prompts or caps.</p>
-      <label className="block font-bold" htmlFor="agent-prompt">Your private request</label>
-      <textarea id="agent-prompt" className="input min-h-32" maxLength={4000} value={text}
-        placeholder="Vegetarian, under $25 for the whole outing, a meal and something fun afterward"
-        onChange={e => setDraft(e.target.value)} />
-      <button className="btn btn-primary w-full" disabled={busy || !text.trim() || interpreting}
-        onClick={() => run(() => submit({ text }))}>{interpreting ? "Claude is reading your needs…" : "Review my needs privately"}</button>
+    <div><h1 className="shout text-[48px]">Your kind of outing</h1><p className="on-sky mt-3">Set what matters. Leave everything else flexible.</p></div>
+    <section className="card space-y-5" aria-label="Your private preferences">
+      <p>Your limits and prompt stay private. The coordinator uses them to plan for everyone.</p>
+      <PreferenceFields value={draft} onChange={value => { untouched.current = false; setDraft(value); }} budgetCeiling={agentNeeds?.result?.hard.budgetMaxPerPerson} />
+      <div className="space-y-2"><label className="block font-bold" htmlFor="agent-prompt">Anything else? (optional)</label>
+        <textarea id="agent-prompt" className="input min-h-32" maxLength={4000} value={draft.preferences}
+          placeholder="Burgers sound good. Somewhere quiet, then a walk…"
+          onChange={e => { untouched.current = false; setDraft({ ...draft, preferences: e.target.value }); }} />
+        <p className="muted">Tell Claude your mood, preferences or other restrictions. A blank prompt is fine.</p>
+      </div>
+      {account ? <label className="check"><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />Remember these choices as my private defaults</label> : null}
+      <button className="btn btn-sun w-full" disabled={busy || interpreting} onClick={() => run(async () => {
+        untouched.current = false;
+        lastSubmitted.current = JSON.stringify(draft);
+        await submit({ text: draft.preferences, structuredJson: JSON.stringify({
+          budgetMaxPerPerson: draft.budgetMaxPerPerson, maxOutingMinutes: draft.maxOutingMinutes,
+          dietary: draft.dietary, allergies: draft.allergies, maxTravelMinutes: needs?.hard.maxTravelMinutes ?? initialStructured?.maxTravelMinutes ?? null,
+        }) });
+        try { sessionStorage.removeItem(`huddle:draft:${group.id}`); } catch { /* Optional draft storage. */ }
+        if (remember && account) { await saveContext({ contextJson: JSON.stringify(draft) }); setNotice("Your own choices were also saved as private defaults."); }
+      })}>{interpreting ? "Claude is checking your extra request…" : "Save & ready"}</button>
+      {saved ? <p className="sticker sticker-lime" role="status">Your needs are saved. Ready ✓</p> : interpreting ? <p role="status">Checking only what needs interpretation. Your sliders are already explicit.</p> : <p className="muted">Saving is your ready action. No separate review step is needed.</p>}
+      {agentNeeds?.confirmed && !saved && !interpreting ? <p className="muted" role="status">You have unsaved changes. Save & ready to apply them to this Huddle.</p> : null}
+      {notice ? <p role="status">{notice}</p> : null}
       {agentNeeds?.error ? <p className="error" role="alert">{agentNeeds.error}</p> : null}
     </section>
-    {needs ? <section className="card space-y-3" aria-label="Your private needs summary">
-      <h2 className="card-title">Check your needs</h2>
-      <dl className="space-y-2">
-        <div><dt className="font-bold">Whole-outing budget, per person</dt><dd>{needs.hard.budgetMaxPerPerson == null ? "No cap stated" : `$${needs.hard.budgetMaxPerPerson} across all stops`}</dd></div>
-        <div><dt className="font-bold">Dietary requirements</dt><dd>{needs.hard.dietary.join(", ") || "None stated"}</dd></div>
-        <div><dt className="font-bold">Allergies</dt><dd>{needs.hard.allergies.join(", ") || "None stated"}</dd></div>
-        <div><dt className="font-bold">Must reject</dt><dd>{[...needs.hard.vetoCuisines, ...needs.hard.vetoCategories, ...needs.hard.rejectedTerms].join(", ") || "None stated"}</dd></div>
-        <div><dt className="font-bold">Travel limit</dt><dd>{needs.hard.maxTravelMinutes == null ? "None stated" : `${needs.hard.maxTravelMinutes} minutes from your starting location`}</dd></div>
-      </dl>
-      <h3 className="font-bold">Preferences</h3>
-      <ul>{needs.preferences.map(p => <li key={p}>{p}</li>)}</ul>
-      {needs.questions.length ? <div className="card-note p-3"><h3 className="font-bold">Please clarify privately</h3><ul>{needs.questions.map(q => <li key={q}>{q}</li>)}</ul></div> : null}
+    {needs ? <section className="card space-y-3" aria-label="Your private needs summary"><h2 className="card-title">Your private summary</h2>
+      <p><strong>Whole-outing budget:</strong> {needs.hard.budgetMaxPerPerson == null ? "Flexible" : `$${needs.hard.budgetMaxPerPerson} per person across all stops`}</p>
+      <p><strong>Time available:</strong> {needs.hard.maxOutingMinutes == null ? "Flexible" : `${needs.hard.maxOutingMinutes} minutes for the whole outing`}</p>
+      <p><strong>Dietary requirements:</strong> {needs.hard.dietary.join(", ") || "None"}</p>
+      <p><strong>Allergies:</strong> {needs.hard.allergies.join(", ") || "None stated"}</p>
+      {needs.preferences.length ? <p><strong>Your vibe:</strong> {needs.preferences.join(" · ")}</p> : null}
+      {[...needs.hard.vetoCuisines, ...needs.hard.vetoCategories, ...needs.hard.rejectedTerms].length ? <p><strong>Must reject:</strong> {[...needs.hard.vetoCuisines, ...needs.hard.vetoCategories, ...needs.hard.rejectedTerms].join(", ")}</p> : null}
+      {needs.questions.length ? <div className="card-note p-3 space-y-2" role="status"><h3 className="font-bold">One thing to clarify privately</h3><ul>{needs.questions.map(q => <li key={q}>{q}</li>)}</ul><p className="muted">Update the relevant choice or your optional prompt above, then Save & ready again.</p></div> : null}
       {needs.warnings.map(w => <p className="muted" key={w}>{w}</p>)}
-      <p className="muted">To correct the summary or answer a question, edit your prompt above and request another review.</p>
-      <button className="btn btn-primary" disabled={busy || blocked || agentNeeds?.confirmed || text !== agentNeeds?.text}
-        onClick={() => run(() => confirm({ revision: agentNeeds!.revision }))}>{agentNeeds?.confirmed ? "Your needs are confirmed ✓" : "Confirm my needs"}</button>
     </section> : null}
-    <section className="card space-y-3">
-      <h2 className="card-title">Group readiness</h2>
-      <ul>{group.members.map(m => <li key={m.id}>{m.name}: {agent?.confirmedMemberIds.includes(m.id) ? "needs confirmed ✓" : "reviewing private needs"}</li>)}</ul>
-      {isHost ? <button className="btn btn-primary w-full" disabled={busy || !allReady || agent?.status === "planning" || group.status === "lobby"}
-        onClick={() => run(() => find())}>Find plans</button> : <p className="muted">The host can find plans when everyone confirms.</p>}
-      {!allReady ? <p className="muted">Waiting for everyone to confirm their current needs.</p> : null}
+    <section className="card space-y-3"><h2 className="card-title">Your people</h2>
+      <ul className="space-y-2">{group.members.map(m => <li key={m.id}>{m.name}{m.id === session.memberId ? " (you)" : ""}: {agent?.confirmedMemberIds.includes(m.id) ? "ready ✓" : "choosing private needs"}</li>)}</ul>
+      {isHost ? <button className="btn btn-sun w-full" disabled={busy || !saved || !allReady || agent?.status === "planning" || group.status === "lobby"} onClick={() => run(() => find())}>Find plans</button> : <p className="muted">The host can find plans when everyone has saved their needs.</p>}
+      {!allReady ? <p className="muted">Waiting for at least two people, each with saved needs.</p> : null}
     </section>
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;
 }
 
 export function AgentPlanCard({ plan, recommended = false }: { plan: AgentPlan; recommended?: boolean }) {
+  const listings = useCatalogListings();
   return <section className="card space-y-3">
     {recommended ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
-    <div className="flex justify-between gap-3"><h2 className="card-title">{plan.title}</h2><span className="sticker sticker-lime">Est. ${plan.costPerPerson}/person total</span></div>
-    <ol className="space-y-2">{plan.stops.map(stop => <li key={stop.placeId}>
-      <strong>{stop.name}</strong><p className="muted">{stop.start}–{stop.end} · {stop.category} · est. ${stop.costPerPerson}/person</p>
-    </li>)}</ol>
+    <div className="flex flex-wrap justify-between gap-3"><h2 className="card-title">{plan.title}</h2><span className="sticker sticker-lime">Est. ${plan.costPerPerson}/person total</span></div>
+    <ol className="space-y-4">{plan.stops.map(stop => {
+      const place = listings.get(stop.placeId);
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stop.name} ${place?.address ?? `${stop.lat},${stop.lng}`}`)}${place?.googlePlaceId ? `&query_place_id=${encodeURIComponent(place.googlePlaceId)}` : ""}`;
+      return <li key={stop.placeId} className="venue-details space-y-2">
+        <strong className="text-lg">{stop.name}</strong><p className="muted">{stop.start}–{stop.end} · {stop.category} · est. ${stop.costPerPerson}/person</p>
+        {place?.address ? <p className="text-sm">{place.address}</p> : null}
+        {place && Number.isFinite(place.rating) && place.rating > 0 ? <p className="text-sm"><strong>★ {place.rating.toFixed(1)}/5</strong>{place.reviewCount > 0 ? ` · ${place.reviewCount.toLocaleString()} reviews` : ""} <span className="muted">· {place.observation ? `${place.observation.source}, observed ${new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "America/Los_Angeles" }).format(new Date(place.observation.fetchedAt))}` : "cached catalog rating"}</span></p> : null}
+        {place?.dietary?.length && stop.category !== "activity" ? <p className="text-sm">Listed dietary options: {place.dietary.map(d => d.replaceAll("_", " ")).join(", ")}</p> : null}
+        {place?.observation?.url ? <a className="font-bold underline text-sm" href={place.observation.url} target="_blank" rel="noopener noreferrer">Rating source ↗</a> : null}
+        <a className="font-bold underline text-sm" href={mapsUrl} target="_blank" rel="noopener noreferrer">View venue details on Google Maps ↗</a>
+        {stop.category !== "activity" ? <p className="muted">Confirm current menu options and allergy handling directly with the venue.</p> : null}
+      </li>;
+    })}</ol>
     <p>{plan.whyLine}</p>
     <details><summary>Data limitations</summary><ul className="muted">{plan.limitations.map(l => <li key={l}>{l}</li>)}</ul></details>
   </section>;
@@ -138,6 +198,7 @@ export function AgentVote() {
         {votes?.myVote === p.id ? "Your vote ✓" : `Vote ${p.title}`} · {counts[p.id] ?? 0}
       </button></div>)}
     <p className="on-sky">{votes?.total ?? 0} of {group.members.length} voted</p>
+    {winner ? <MeetupCalendarAction runId={runId} planId={winner.id} isHost={isHost} /> : null}
     <p className="card card-note">Booking is a simulation. No restaurant will be called or reserved.</p>
     <div className="flex flex-wrap gap-3">
       <button className="btn" disabled={busy || !complete || leaders.length < 2 || !!winner}

@@ -16,7 +16,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--server", required=True)
     parser.add_argument("--database", required=True)
-    parser.add_argument("--agent", action="store_true", help="Run the coordinator flow smoke instead of legacy swipes")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--agent", action="store_true", help="Run the coordinator flow smoke instead of legacy swipes")
+    mode.add_argument("--accounts", action="store_true", help="Run the isolated account/membership smoke")
+    mode.add_argument("--accounts-flow", action="store_true", help="Run account/friends/invitations, preferences, Claude and simulated booking")
     parser.add_argument("--api-base-url", help="Optional authenticated health checks for the coordinator API")
     parser.add_argument("--voice-base-url")
     parser.add_argument("--voice-scenario", choices=("confirm", "full"), default="confirm")
@@ -38,7 +41,7 @@ def main():
     else:
         env.pop("VOICE_BASE_URL", None)
     try:
-        runner = "agent-smoke.mjs" if args.agent else "smoke.mjs"
+        runner = "accounts-flow-smoke.mjs" if args.accounts_flow else "accounts-smoke.mjs" if args.accounts else "agent-smoke.mjs" if args.agent else "smoke.mjs"
         result = subprocess.run(["node", str(root / "scripts" / runner)],
                                 cwd=root, env=env, timeout=240)
     except (OSError, subprocess.TimeoutExpired) as err:

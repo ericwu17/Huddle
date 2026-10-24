@@ -8,6 +8,7 @@ import type { ReadDb, View } from "./lib/types";
 import { FEATURES } from "./lib/constants";
 import { availablePlans } from "./lib/availability";
 import { currentGroup, currentMember, membersOf, parse } from "./lib/util";
+import { principalFor } from "./lib/account-state";
 
 const pub = (name: string) => ({ name, public: true as const });
 
@@ -44,7 +45,7 @@ export const my_group = spacetimedb.view(
     return {
       id: g.id, code: g.code, status: g.status, date: g.date, windowStart: g.windowStart, windowEnd: g.windowEnd,
       demoMode: g.demoMode, showWhoCompromised: g.showWhoCompromised, confidence: g.confidence,
-      latestRunId: g.latestRunId, replanFor: g.replanFor, isHost: g.hostIdentity.isEqual(ctx.sender),
+      latestRunId: g.latestRunId, replanFor: g.replanFor, isHost: !!principalFor(ctx.db, ctx.sender)?.isEqual(g.hostIdentity),
       myMemberId: currentMember(ctx.db, ctx.sender)?.id,
     };
   },

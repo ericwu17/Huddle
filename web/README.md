@@ -4,8 +4,30 @@ React 19 + React Router v7 (data mode, `createBrowserRouter`) + Vite + Tailwind.
 
 ## Current direction October 24
 
+Branch-only account review: [ACCOUNTS_RUNBOOK.md](../docs/ACCOUNTS_RUNBOOK.md)
+uses isolated Maincloud `huddle-account-max-check` and local port 5174. `/login`
+supports registration/sign-in; `/start` lists only the signed-in account's saved
+huddles. Logout revokes the device binding and clears cached group state. Do not
+point this branch UI at the shared module before its additive account code is
+reviewed and deliberately deployed. Friends, in-app invitation links, private saved defaults and optional preference
+sliders are implemented on the isolated branch. See the account runbook for
+review steps; no shared rollout before Max approves it. Home text is invitation
+intent with reviewed contact matching and a picker-only fallback. `/connectors`
+contains optional per-user Google Calendar and host-Mac Messages settings. See
+[connector contract](../docs/CONNECTORS_CONTRACT.md); real provider writes remain
+unverified. A public branch UI tunnel requires one exact hostname in
+`HUDDLE_PREVIEW_HOST`, and both API/module frontend-base settings must target
+that same preview database.
+
+Max authorized the combined account/connector/catalog push to main after syncing
+`156697c`. Shared backend activation still needs the matching module and API;
+a Vercel frontend build alone cannot supply those services. The isolated preview
+now has 130 venues. Plan cards read `catalog_venues` for scraped IDs, address,
+ratings and source observation dates, keeping the bundled lookup for older IDs.
+Menus/photos/takeout/seating from `details.json` remain a follow-up integration.
+
 Read [current product context](../docs/CURRENT_CONTEXT.md) and the
-[interface proposal](../docs/INTERFACE_PROPOSAL.md). The target is a shadcn UI for
+[interface proposal](../docs/INTERFACE_PROPOSAL.md). The illustrated design in `Design.md` guides the UI for
 each participant's prompt/clarification, coordinator progress, validated plans,
 explanations and group choice. New huddles now use private needs confirmation,
 one Claude coordinator, validated plans, current votes and simulated booking.
@@ -17,8 +39,9 @@ Keep Vite and FastAPI separate locally. For this phase, shared access uses
 Vercel, Maincloud and a designated laptop's FastAPI through a public tunnel.
 Accept that laptop's availability dependency temporarily; hosted API migration
 is deferred. Follow [the approved agent flow](../docs/AGENT_FLOW_PLAN.md) when changing
-swipe/progress gates or shared contracts. Accounts, contacts, history, voice
-input and personal keys remain staged proposals. Keep raw participant prompts
+swipe/progress gates or shared contracts. Accounts and contacts work in the
+isolated preview; inferred history, voice input and personal keys remain later
+work. Keep raw participant prompts
 and private budget caps out of shared agent messages.
 
 ## Run against the shared Maincloud backend

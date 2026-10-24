@@ -5,8 +5,8 @@ import type { Booking } from "../types";
 export default function AgentPhaseNav({ ctx, booking }: { ctx: GroupContext; booking: Booking | null | undefined }) {
   const { pathname } = useLocation();
   const steps = [
-    { route: "lobby", label: "Join", open: true },
-    { route: "prefs", label: "Private needs", open: ctx.group.status !== "lobby" },
+    { route: "lobby", label: "People & invites", open: true },
+    { route: "prefs", label: "Private needs", open: true },
     { route: "plans", label: "Coordinator & plans", open: !!ctx.group.latestRunId },
     { route: "vote", label: "Vote", open: ctx.agent?.status === "ready" },
     { route: "call", label: "Booking simulation", open: !!booking && booking.runId === ctx.group.latestRunId },

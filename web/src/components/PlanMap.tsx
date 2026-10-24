@@ -91,6 +91,8 @@ function StreetMap({ plan, lines }: Props) {
       scrollWheelZoom: false, // let the page scroll past the map
       dragging: !L.Browser.mobile, // one finger scrolls the page; pinch still zooms
       zoomControl: true,
+      zoomAnimation: false,
+      markerZoomAnimation: false,
     });
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -98,8 +100,9 @@ function StreetMap({ plan, lines }: Props) {
     }).addTo(map);
     mapRef.current = map;
     return () => {
-      map.remove();
       mapRef.current = null;
+      map.stop();
+      map.remove();
     };
   }, []);
 
@@ -126,10 +129,13 @@ function StreetMap({ plan, lines }: Props) {
     });
     if (plan.stops.length > 0) {
       const bounds = L.latLngBounds(plan.stops.map((s) => [s.lat, s.lng] as L.LatLngTuple));
-      map.fitBounds(bounds, { padding: [48, 48], maxZoom: 16 });
+      // Bounds can update immediately before navigation removes the map. Do not
+      // leave a pan/zoom frame targeting a pane that has already been detached.
+      map.stop();
+      map.fitBounds(bounds, { padding: [48, 48], maxZoom: 16, animate: false });
     }
     return () => {
-      layer.remove();
+      if (mapRef.current === map) { map.stop(); layer.remove(); }
     };
   }, [plan, lines]);
 

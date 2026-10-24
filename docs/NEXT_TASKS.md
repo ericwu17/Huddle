@@ -1,98 +1,154 @@
-# Current task: coordinator demo polish (in progress)
+# Current task: accounts, preferences and coordinator polish (in progress)
 
-Updated October 24, 2026 after Max requested release to main. This task remains
-open: the connected coordinator works, but UI, Claude behavior and scraped-data
-integration still need polishing. This note supersedes earlier statements that
-Bright Data scraping is deferred. Owners below are a suggested split for Max,
-Eric Chen and Eric Wu to coordinate before editing overlapping files. Eric Wu has
-implemented Bright Data → SpacetimeDB; the catalog is committed but not yet
-published ([go live](BRIGHTDATA.md#go-live)).
-The [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) records the deferred
-propose → validate → revise design and the handoff after ingestion is ready.
+Updated October 24, 2026. The expanded account/preference work is implemented on
+the review branch, using isolated Maincloud `huddle-account-max-check` and local
+Vite on port 5174. Max now authorized sync, conflict resolution and a main push
+for both Erics to test. The merged review module has the 130-venue catalog;
+shared backend activation remains separate from Git/Vercel frontend deployment.
+Eric Wu's scraping/ingestion files remain unchanged by this integration.
 
-**Input/acceptance planning, not implemented:** see
-[PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md) for optional
-budget/time sliders, an optional prompt, flexible defaults, one Save & ready
-action, targeted clarifications and 30 proposed acceptance scenarios. It replaces
-mandatory separate review/confirmation in the proposed next flow, not today's
-live behavior. The Claude planner rewrite remains deferred.
+## Implemented in the isolated preview
 
-**Product proposal, not implemented:** [PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md)
-adds a prompt-first signed-in home, contacts, account-scoped invitation inbox and
-editable saved defaults/today's overrides. Known-contact joining would need no
-QR or invitation link. External SMS remains a later delivery adapter. Establish
-accounts/memberships and prove invite/accept before expanding memory features.
+- [x] Username/password registration and sign-in, eight-character minimum,
+  show/hide password, logout, stable account ownership and saved memberships.
+- [x] Exact-username friend requests, reciprocal contacts, an Invite friends
+  dropdown, durable in-app invitation messages and addressed opening links.
+  Accepting joins/selects without marking ready; copied links and legacy codes
+  cannot bypass invitation ownership for account huddles. QR UI is removed.
+- [x] Private editable defaults in SpacetimeDB, editable outing autofill and an
+  explicit Remember choice. Other accounts cannot see those defaults.
+- [x] Optional cumulative-budget/whole-outing-time sliders, Flexible defaults,
+  optional prompt, dietary/allergy controls and one Save & ready action.
+  Known allergies can finish input without redundant confirmation; missing
+  venue allergy evidence still prevents unsupported food recommendations.
+- [x] Cached rating/review-count/source context for Claude and cached ratings on
+  place cards. These are evidence labels, not verified menu or allergy claims.
+- [x] 99 Python checks passed; 129 server checks passed with one opt-in test
+  skipped; 41 connected checks passed using real Claude and an explicitly
+  simulated booking. The final desktop/mobile browser rerun passed 30 assertions
+  after the map fix, with no page/console errors or mobile overflow. Five real
+  API preference/example scenarios also passed.
+
+See [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md) for preview operation/evidence,
+[ACCOUNTS_CONTRACT.md](ACCOUNTS_CONTRACT.md) for ownership and
+[PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md) for scenarios.
+The [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) records the still
+deferred propose → validate → revise design and catalog handoff.
+
+## Invitation and calendar expansion
+
+- [x] Home invitation prompt resolves actual friends through Claude, previews
+  recipients and sends only after explicit Start & invite. A picker fallback
+  works without Claude; invitation text never seeds private needs.
+- [x] Connectors tab, encrypted per-account Google OAuth, private primary-calendar
+  free/busy, common-time selection, manual Berkeley date/time fallback and
+  separate agreed-meetup action after current votes and event opt-in.
+- [x] Opt-in Max-Mac Messages adapter and durable invitation outbox with visible
+  submitted/unavailable/unknown states and no automatic ambiguous resend.
+- [x] Google client settings saved privately; preview API reports Google
+  configured and Mac Messages ready. The 14-check OAuth start/denied-callback/
+  replay/disconnect smoke passed without Google authorization or provider writes.
+- [ ] Complete participant-owned real Google consent and availability/event test.
+- [x] Make Max's Mac Messages sender available; only Boolean readiness was read.
+- [ ] Verify one explicit invitation
+  to a known consenting recipient. Mock tests do not prove actual delivery.
+
+See [CONNECTORS_CONTRACT.md](CONNECTORS_CONTRACT.md). No provider events or
+messages were created by the automated acceptance checks.
+
+- [x] Fix matching 90-minute food requests: accept one-meal coordinator plans
+  throughout API/module/voting/simulation, preserving real hard limits and legacy
+  templates. Real Claude replay: three Asian-food options, 75 minutes, $12–$25.
+- [x] Add designated-owner Mac Contacts lookup, private selected friend-address
+  links, recipient-setting precedence and explicit eligible invitation sending.
+  The real lookup returned two Eric records; no phone numbers were printed.
+- [x] Max reports Google Calendar connects after approving the Google test user.
+- [x] Merge Eric's catalog snapshot path with account/connector validation;
+  activate 130 venues in the preview and rerun the 41-check connected flow.
+  Newly scraped IDs pass API planning; public catalog views supply card metadata.
+- [ ] Wire `data/brightdata/details.json` through an agreed bounded contract for
+  menu evidence, photos/attribution, takeout and suitable seating. These are
+  collected files, not already active planner features.
+- [ ] Fix Max's Mac Messages sending/history setup. The real invitation is
+  visible in Messages with Not Delivered; receipt is not confirmed.
+- [ ] Confirm a real invitation reaches the intended Eric after Max links the
+  correct contact and explicitly sends it; submitted alone is not a receipt.
 
 ## Next work, in parallel
 
 | Workstream | Suggested lead | Concrete work | Done when |
 | --- | --- | --- | --- |
-| Update UI | Eric Chen | Apply the illustrated Huddle theme from Design.md with consistent accessible controls; simplify Join → private needs → coordinator/plans → vote → simulation; make loading, retry, blocked and reconnect states clear; improve plan/category labels, map readability and mobile layouts. Keep private corrections distinct from shared discussion. | Two physical phones can complete the flow without guidance, reopen plans and understand why planning is blocked. |
-| Finish Claude behavior | Max | Review realistic prompts: specific foods, mixed stop categories, dietary needs, explicit exclusions and soft wishes. Reduce unnecessary clarifications, preserve every hard restriction, and improve grounded explanations using verified venue facts. Verify each person's input matters; retain the current cap and revision guards. | A reviewed scenario set passes using real Claude, including contradictory needs and provider timeout; no fabricated facts, private disclosures or automatic cap raises. |
-| Preference acceptance plan (draft) | Max + Eric Chen | Review optional budget/time sliders with Flexible defaults, optional prompt/restriction chips and one Save & ready action. Distinguish input ambiguity from missing venue evidence; use scenarios P01–P30 before implementation. | Approved semantics and reusable fixtures cover omissions, negation, cumulative caps, duration, allergies, categories, clarifications and stale/private state; no runtime changes claimed. |
-| Claude proposes and revises (deferred follow-up) | Max | After the database catalog contract is agreed, let Claude construct itineraries and repair them from structured validation feedback. Remove Python itinerary enumeration/preference ranking from this new path; Python validates hard constraints and factual consistency. See the dedicated follow-up plan. | Claude uses the database snapshot to propose and revise; only validated current plans become selectable, with bounded calls and private, explicit compromise approval when needed. |
-| Compromise flow (deferred follow-up) | Max + Eric Chen | Max requested replacing a dead-end “no plan” outcome with specific compromise proposals and a clear next action. Identify what prevents a plan, propose negotiable changes, and obtain explicit approval from affected users before applying them. Improve evidence-blocked messages so users are not told to rewrite a correct allergy. | No dead-end null result in the user journey; suggestions remain clearly conditional until approved and validated. Existing cap increases still require owner acceptance of a private trade offer; unknown allergy evidence never becomes a safety claim. |
-| Scrape and refresh venue data (built; publish pending) | Eric Wu | Build Bright Data ingestion into SpacetimeDB; collect source URLs and fetched-at times for venue/menu/review/hours/price evidence; deduplicate and validate categories and dietary tags. Hand off the actual schema, read path, version/refresh behavior and sample records. | Validated Berkeley records exist in SpacetimeDB with stable IDs, source/freshness and explicit unknowns; planner integration is a separate next step. |
-| Integrate refreshed candidates | Max + scraping owner | Agree a versioned catalog/evidence shape before changing shared models. Feed the same snapshot to FastAPI and the module's venue validation; republish/restart both together. Extend the public fact whitelist only with supported evidence. | New venue IDs are accepted consistently by API, module and UI; source/freshness is visible and a full venue is excluded on replacement. |
-| Backend reliability | Max + Eric Wu | Rehearse API/tunnel stop-and-restart, provider errors and reconnect; preserve saved context and expose explicit retries. Keep one operator for the shared URL. Test budget edits during planning/booking, repeated clicks and late callbacks after replan. | Recovery needs no data reset, and stale results or actions never become current. |
-| Frontend release and rehearsal | Eric Chen + Max | Verify the main commit's Vercel status and public Maincloud variables, refresh into a new agent huddle, run physical-phone and solo tests, and fix remaining console/loading/navigation issues. | The deployed UI uses coordinator mode and completes the same flow as local Vite. |
+| Branch review and UI finish | Max + Eric Chen | Review the verified account, friend-picker, inbox, private-input, plan and mobile flow with Max; the map-fix browser rerun passed. Keep accessible controls and the illustrated theme from Design.md. | Max can complete the two-account flow without guidance; refresh/re-entry and maps work without console errors. |
+| Rich venue evidence | Max + Eric Wu | The basic catalog handoff is reviewed. Wire the separately collected menu items/prices, takeout, seating and attributed photos through a bounded contract; keep Eric's scraping pipeline separate. | Evidence distinguishes menu labels, inferred tags, estimates and unknowns; source URLs/fetch times survive the runtime path. |
+| Shared catalog release | Max + Eric Wu | Basic integration passes on the 130-venue preview. Coordinate matching shared module/API activation and catalog publish, then verify the released UI. | Newly scraped IDs work on the shared app with consistent hours/prices/categories and source dates; no data reset or secret exposure. |
+| Claude proposes and revises (follow-up) | Max | Implement the reviewed propose → validate → revise design after the catalog contract is agreed. Claude constructs alternatives; Python validates facts and hard constraints rather than enumerating complete choices. | Bounded calls and structured repair feedback produce grounded current plans; errors/evidence gaps have useful next actions. |
+| Personalized meal costs (approved rule, follow-up implementation) | Max + Eric Chen | Review participant assignments and item-price shapes across API/module/UI. Each person pays for their own meal plus later stops, such as their dessert; they do not pay for somebody else's meal. Keep the existing shared-stop runtime unchanged until that contract is agreed. | Each person's full outing total is correct and fits their own cap. Missing/default prices never prove actual affordability, and caps cannot be pooled. |
+| Meal-quality and preference scenarios | Max + Eric Chen | Review vegan meal versus steak/fries, optional dessert, split takeout with evidenced seating, duration, categories and soft wishes. Distinguish input ambiguity from unavailable venue evidence. | Useful alternatives are independently supported; no fabricated vegan/allergen/menu facts or extra activity forced by a template. |
+| Conditional compromise | Max + Eric Chen | Explain the actual blocking evidence or requirement and offer a specific next action. Obtain the affected owner's explicit approval for permitted changes; cap increases still require acceptance of a current private offer. | No unexplained dead end, silently relaxed limit or selectable unvalidated compromise. |
+| Restart and release rehearsal | Max + Eric Chen | Rehearse API/tunnel recovery and provider failures, then test physical phones. After approval, sync main, resolve conflicts, coordinate additive module/UI release without a reset and verify Vercel. | Saved context survives recovery, stale votes/bookings stay blocked and the released UI matches the reviewed branch. |
 
-Bright Data adds candidates and factual evidence; it cannot guarantee a valid
-choice for every possible set of budgets, allergies, hours and vetoes. Never
-silently relax a restriction to force a result. Scraped menus/reviews alone do
-not certify allergy or cross-contact safety. Live availability requires explicit
-evidence; otherwise show it as unknown. A failed scrape can use the last valid
-snapshot, but must not claim that snapshot is current availability.
+Reviewed ingestion retains basic venue facts, hours, rating/review count
+and inferred dietary tags; `/catalog` includes source/fetch evidence and ratings
+but excludes review text/star distributions. Without Yelp data, `priceLevel`
+may remain null and meal costs may default to $25. The basic snapshot/read path
+is reviewed and tested; richer detail and item-assignment contracts remain open. A default
+$25 estimate cannot prove a real hard cap, and inferred dietary tags do not
+verify vegan options or allergen safety. More reviews are secondary to the
+menu/takeout/seating evidence needed for the current example. See the full
+[planner handoff](CLAUDE_PLANNER_FOLLOWUP.md).
 
-## Solo test now
+## Solo test on this branch
 
-1. Open the updated app at `/start`, create a **new** huddle and copy its actual
-   four-character code. Existing legacy huddles retain the old flow.
-2. From the repository root, replace `YOUR_CODE` below with that code:
+Use [the account runbook](ACCOUNTS_RUNBOOK.md) to start the isolated preview.
+The old `demo-friends.mjs YOUR_CODE` guest/code flow does not join new account
+huddles and is not the acceptance path for this branch.
 
-   ```sh
-   SPACETIMEDB_URI=https://maincloud.spacetimedb.com \
-   SPACETIMEDB_DB=huddle-calhacks \
-   node scripts/demo-friends.mjs YOUR_CODE --fast
-   ```
+1. Open [the preview](http://localhost:5174/start) in a normal browser profile and
+   a separate private profile or another browser. Ordinary tabs share identity.
+2. Register two distinct test accounts. Exercise Show/Hide password, sign-out
+   and sign-in. Save one account's private defaults and confirm the other cannot
+   see them.
+3. Add the second account's exact username in **Friends**. Accept its friend
+   request in the other profile. Start a huddle with the **Invite friends**
+   dropdown, then open the recipient's inbox message/link and accept.
+4. Set private budget/time/dietary choices or leave them Flexible. Leave the
+   prompt blank if desired and use **Save & ready** once for each participant.
+   Only the host starts **Find plans**.
+5. Inspect plans, grounded reasons, cached rating labels and the map. Both users
+   vote; the host explicitly starts **Simulate booking** after the group choice.
+   This is a simulation, not a restaurant call.
+6. Lower a budget, check that old choices/actions become unusable, then refresh,
+   sign out/in and reopen the saved huddle. Check that private context remains
+   owned by the correct account.
 
-3. Click **I'm ready** in your browser. The script joins Sam, Jordan and Riley
-   using separate simulated identities, submits their seeded needs, confirms
-   them and later votes for the coordinator recommendation.
-4. Submit your own prompt (for example, a meal and activity under $25 for the
-   whole outing), review the summary and click **Confirm my needs**.
-5. When all four are confirmed, click **Find plans**, inspect the options and
-   shared discussion, then **Go to vote**. Cast your vote. Only you, as host,
-   start **Simulate booking** after the full group choice is complete.
-6. Change your own budget to a lower cap and review/confirm again. Old choices
-   must disappear; regenerated totals must fit the new cap. Refresh to check
-   persistence. Stop the helper with Ctrl+C when finished.
+For the repeatable connected simulation, target only the isolated preview:
 
-The friends are scripted test actors, not three autonomous agents or real
-people. The coordinator makes real Claude calls. You can also use a separate
-browser profile/device for a second manually controlled participant; tabs in
-the same browser profile normally share an identity. Solo testing supplements,
-but does not replace, the physical-phone rehearsal.
+```sh
+SPACETIMEDB_URI=https://maincloud.spacetimedb.com \
+SPACETIMEDB_DB=huddle-account-max-check \
+node scripts/accounts-flow-smoke.mjs
+```
 
-## Scope and remaining priorities
+The script creates synthetic accounts, tests ownership/friends/invitations,
+uses real Claude for planning and completes a simulated booking. Its test people
+are not autonomous agents or real recipients; it sends no SMS/email. The
+preview module must use its simulation configuration from the runbook. Browser
+mobile emulation supplements, rather than replaces, a physical-phone check.
 
-- [ ] UI polish with the illustrated Huddle theme and accessible shared controls.
-- [ ] Real-prompt Claude quality/constraint/category review.
-- [ ] Deferred Claude propose → validate → revise flow; Python validates hard
-  constraints and factual consistency instead of assembling/ranking itineraries.
-- [ ] Deferred compromise flow and targeted conflict/evidence explanations; the
-  current release retains blocked states while this follow-up is designed.
-- [x] Bright Data scraping, normalization and shared catalog integration ([BRIGHTDATA.md](BRIGHTDATA.md)).
-- [ ] Publish the live catalog: module republish, API restart, `collect.py publish` ([go live](BRIGHTDATA.md#go-live)).
-- [ ] Use the venue details (menus, takeout, seating, dietary evidence) in coordinator facts.
-- [ ] Physical-phone rehearsal, public Vercel flow and restart recovery.
-- [ ] Keep documentation and honesty labels aligned with what is actually live.
-- [ ] Review the staged profiles/contacts/invitation proposal; account and
-  membership ownership must be proven before remembered context or QR-less joining.
+## Release gate and remaining scope
 
-Accounts/password login, contacts/history, voice prompt input, personal keys,
-vendor/MCP management, real restaurant calls, live booking and persistent hosted
-API migration remain later work. Do not expand into those before the current
-demo flow is reliable. No mathematical satisfaction/fairness pitch is claimed.
-Use [the runbook](AGENT_RUNBOOK.md) for operation and
-[verification](AGENT_VERIFICATION.md) for completed checks.
+- [x] Finish the map-fix browser rerun: 30 assertions passed, no page/console errors.
+- [ ] Complete Max's guided visual review with the separate test-bot browser.
+- [ ] Verify two physical phones and restart/reconnect behavior.
+- [x] Review the actual Bright Data catalog export and use its existing snapshot contract.
+- [ ] Implement the deferred Claude proposal/repair and personalized-cost work.
+- [x] Max authorized the Git release; main is synced and content conflicts resolved.
+- [ ] Coordinate matching shared module/API/catalog activation before claiming
+  the account frontend works on shared Vercel. Preserve secrets and existing data.
+
+General SMS/email/push providers, voice prompt input,
+inferred memory/actual-visit history, personal keys, vendor/MCP settings, real
+restaurant calls and hosted-API migration remain later work. Account recovery
+and profile/account management beyond this preview are listed in the account
+contract. No mathematical satisfaction/fairness claim is made. The task remains
+open for the reviewed follow-ups and demo polish.
