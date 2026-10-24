@@ -5,12 +5,14 @@
   "type": "module",
   "//": "SpacetimeDB module (Eric Chen). Haydn owns src/geo.ts and src/replan.ts.",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "spacetimedb": "2.13.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.7"
   }
 }

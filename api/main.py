@@ -112,8 +112,6 @@ def create_app(settings: Settings | None = None,
 
     @app.post("/offers", response_model=OffersResponse)
     async def offers(body: OffersRequest):
-        if body.options.preview:
-            raise stubs.StubInputError("preview response shape needs team agreement", 409)
         # Baseline is accepted as an opaque caller-owned ID; this stub makes no trades.
         return stubs.offers()
 

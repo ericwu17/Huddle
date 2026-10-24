@@ -1,6 +1,6 @@
-// Place list the module uses for candidate ids, phone numbers and stub plans.
-// TODO(H8): switch to ../../../data/places.json once v1 exists (fake data until then).
-import placesData from "../../../data/places.fake.json";
+// One active stub catalog shared with FastAPI. No copied IDs, prices, or names.
+// The real-data switch remains a later phase coordinated with the API.
+import placesData from "../../../api/fixtures/places.fake.json";
 
 export type Place = {
   id: string;
@@ -11,7 +11,7 @@ export type Place = {
   lng: number;
   costPerPerson: number;
   dwellMinutes: number;
-  phone: string;
+  phone: string | null;
   dietary: string[];
 };
 

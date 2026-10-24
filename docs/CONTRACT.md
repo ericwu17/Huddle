@@ -31,7 +31,11 @@ Features 0-7 are "aspects" scored in [0,1]. Features 8-12 are 0/1 one-hot (activ
 - **Time:** local time HH:MM 24h strings; dates ISO YYYY-MM-DD; timestamps in ms since epoch.
 - **Default plan window for the demo:** Saturday 17:00-23:00 local.
 - **IDs:** strings.
-- **Money:** US dollars, per person.
+- **Money:** US dollars, per person. Each member's private `budgetMaxPerPerson`
+  caps the sum across all stops in the outing. Null means uncapped; zero is a
+  real cap. Parsing, planning, voting, council, and fallback paths cannot raise
+  or remove an existing cap. Only that member explicitly accepting a current
+  private trade offer may raise it.
 
 ## S5.2 Data shapes
 
@@ -171,7 +175,12 @@ Every request carries header `X-Huddle-Secret`. All endpoints are stateless: cal
  "warnings": []}
 ```
 
-`excludePlaceIds` removes those places from the candidate set (used by the re-plan loop). `preview: true` skips pareto, explanations, and offers, uses fewer samples (100), and returns only the top plan's robustness (used for the confidence ring).
+`excludePlaceIds` removes those places from the candidate set (used by the re-plan loop).
+`preview: true` uses the same response envelope and Plan shape, with `plans`
+containing at most one Safe plan, `pareto: []`, and no compromise explanations.
+The confidence ring reads `plans[0]?.robustness ?? 0`. A real implementation uses
+fewer samples (100); the synthetic stub honestly reports `stats.samples: 0` and
+labels confidence as canned. No feasible plan means `plans: []` for either mode.
 
 **POST /offers** (private trade offers; same body as /plan plus `baselinePlanId`)
 
@@ -215,7 +224,13 @@ Every request carries header `X-Huddle-Secret`. All endpoints are stateless: cal
 4. **Validator (our code):** every number in a message must match a value in that speaker's tool outputs or the public facts (small tolerance); the chosen plan must be in the acceptable set; no message may contain a member's name unless `showWho` is true. An invalid advocate message is dropped and logged. An invalid chair message, a pick outside the set, or a chair timeout sets `fallbackUsed: true` and `chosenPlanId` = the Safe plan.
 5. **No user free text enters any council prompt.** Only structured values (tool outputs, plan facts, enums).
 6. **Labels:** when `showWho` is false (default), advocates are "Advocate A/B/C/D", shuffled by the seed each run, and names are stripped from text.
-7. **Streaming:** each message is POSTed to `POST {SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route/council-message` (header `X-Huddle-Secret`) as soon as it passes validation.
+7. **Delivery:** phase-zero council returns the transcript in `messages`; the
+   caller persists/replays it. `X-Huddle-Stub: true` identifies a synthetic HTTP
+   response and must be preserved as the run's `stub` flag. A future live adapter
+   may POST validated messages to
+   `{SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route/council-message` with
+   `X-Huddle-Secret`. Response ingestion and callbacks deduplicate by run, round,
+   speaker, and member identity so the same transcript is stored once.
 8. **Latency:** target 10 s total; hard 8 s timeout per call. A timed-out advocate is skipped for that round.
 
 **CouncilMessage** (what SpacetimeDB stores and the UI shows):

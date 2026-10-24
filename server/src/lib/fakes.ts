@@ -3,6 +3,7 @@
 // Every shape follows docs/CONTRACT.md S5.3. Randomness is seeded from runId/memberId.
 import { FEATURES, K } from "./constants";
 import { PLACES, placeById, type Place } from "./places";
+import { planFitsBudgets } from "./budgets";
 
 type Posterior = { mean: number[]; cov: number[][] };
 type Member = { memberId: string; name: string; posterior?: Posterior; hard?: any };
@@ -63,7 +64,7 @@ function parsePrefs(body: { text: string }) {
     },
     soft,
     posterior: diagPosterior(mean, sd),
-    warnings: [],
+    warnings: ["SYNTHETIC STUB: local fallback preference fixture; not an LLM result."],
   };
 }
 
@@ -97,29 +98,30 @@ function stop(p: Place, start: string, end: string) {
   };
 }
 
-function plan(body: { runId: string; members: Member[]; excludePlaceIds?: string[]; options?: any }) {
+function plan(body: { runId: string; members: Member[]; excludePlaceIds?: string[]; options?: any;
+                      window?: { start: string; end: string } }) {
   const exclude = new Set(body.excludePlaceIds ?? []);
   const rand = seeded(body.runId);
-  const byCat = (c: Place["category"]) => PLACES.filter((p) => p.category === c && !exclude.has(p.id));
-  const meals = byCat("meal");
-  const acts = byCat("activity");
-  const desserts = byCat("dessert");
   const kinds = [
     { kind: "safe", robustness: 0.93, i: 0 },
     { kind: "bold", robustness: 0.78, i: 1 },
     { kind: "budget", robustness: 0.81, i: 2 },
   ];
-  const names = body.members.map((m) => m.name);
-  const plans = kinds.map(({ kind, robustness, i }) => {
-    const m = meals[i % meals.length];
-    const a = acts[i % acts.length];
-    const d = desserts[i % desserts.length];
-    const stops = [stop(m, "18:00", "19:15"), stop(a, "19:30", "20:45"), stop(d, "21:00", "21:30")];
+  const asMinutes = (time: string) => Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
+  const asClock = (minute: number) => `${String(Math.floor(minute / 60)).padStart(2, "0")}:${String(minute % 60).padStart(2, "0")}`;
+  const candidates = kinds.map(({ kind, robustness }) => {
+    let current = asMinutes(body.window?.start ?? "17:00");
+    const stops = (["meal", "activity", "dessert"] as const).map((category) => {
+      const place = placeById(`stub_${kind}_${category}`)!;
+      const end = current + place.dwellMinutes;
+      const result = stop(place, asClock(current), asClock(end));
+      current = end + 15;
+      return result;
+    });
     const perMember = body.members.map((mem) => {
       const ratioMean = round2(0.7 + rand() * 0.25);
       return { memberId: mem.memberId, ratioMean, ratioP10: round2(ratioMean - 0.15) };
     });
-    const giver = body.members[i % Math.max(body.members.length, 1)];
     return {
       id: `plan_${kind}_${body.runId}`,
       kind,
@@ -127,29 +129,29 @@ function plan(body: { runId: string; members: Member[]; excludePlaceIds?: string
       costPerPerson: stops.reduce((s, x) => s + x.costPerPerson, 0),
       robustness,
       perMember,
-      whyLine: names.length >= 2 ? `${names[0]} gave up novelty; ${names[1]} accepted a longer walk.` : "",
-      gaveUp: giver ? [{ memberId: giver.memberId, feature: "novelty", text: "novelty" }] : [],
+      whyLine: "SYNTHETIC STUB: fixed fallback itinerary; scores are canned.",
+      gaveUp: [],
     };
   });
+  const plans = candidates.filter((candidate) => planFitsBudgets(candidate, body.members) &&
+    candidate.stops.every((s) => !exclude.has(s.placeId) && s.end <= (body.window?.end ?? "23:00") &&
+      body.members.every((member) => {
+        const place = placeById(s.placeId)!;
+        const hard = member.hard ?? {};
+        return !(hard.vetoCuisines ?? []).includes(place.cuisine) &&
+          !(hard.vetoCategories ?? []).includes(place.category) &&
+          (hard.dietary ?? []).every((diet: string) => place.dietary.includes(diet));
+      })));
+  if (plans.length && !plans.some((p) => p.kind === "safe"))
+    plans.reduce((best, p) => p.robustness > best.robustness ? p : best).kind = "safe";
+  plans.sort((a, b) => Number(b.kind === "safe") - Number(a.kind === "safe"));
   const preview = body.options?.preview === true;
-  if (preview) {
-    // Fake confidence that rises with swipes: cuisine_american's variance starts at 1 and
-    // shrinks per swipe, so ~4 swipes each crosses 0.9.
-    const v11 = body.members.map((m) => m.posterior?.cov[11]?.[11] ?? 1);
-    plans[0].robustness = round2(0.95 - 0.25 * (v11.reduce((s, x) => s + x, 0) / Math.max(v11.length, 1)));
-  }
   const minRatio = (p: (typeof plans)[number]) => Math.min(...p.perMember.map((x) => x.ratioMean), 1);
   const meanRatio = (p: (typeof plans)[number]) =>
     p.perMember.reduce((s, x) => s + x.ratioMean, 0) / Math.max(p.perMember.length, 1);
   const pareto = preview
     ? []
-    : [
-        ...plans.map((p) => ({ planId: p.id, meanRatio: round2(meanRatio(p)), minRatio: round2(minRatio(p)), robustness: p.robustness })),
-        ...Array.from({ length: 9 }, (_, i) => {
-          const mr = round2(0.55 + rand() * 0.35);
-          return { planId: `plan_x${i}_${body.runId}`, meanRatio: mr, minRatio: round2(mr - 0.1 - rand() * 0.2), robustness: round2(0.3 + rand() * 0.5) };
-        }),
-      ];
+    : plans.map((p) => ({ planId: p.id, meanRatio: round2(meanRatio(p)), minRatio: round2(minRatio(p)), robustness: p.robustness }));
   return {
     runId: body.runId,
     plans: preview ? plans.slice(0, 1) : plans,
@@ -162,24 +164,15 @@ function plan(body: { runId: string; members: Member[]; excludePlaceIds?: string
         sd: round2(Math.sqrt(m.posterior?.cov[i]?.[i] ?? 1)),
       })),
     })),
-    stats: { candidatePlans: 64, feasiblePlans: 48, samples: preview ? 100 : 300, elapsedMs: 5 },
+    stats: { candidatePlans: candidates.length, feasiblePlans: plans.length, samples: 0, elapsedMs: 0 },
     relaxationHints: [],
-    warnings: ["stub: fake plans from places.fake.json"],
+    warnings: ["SYNTHETIC STUB: fixed itineraries from the shared API fixture catalog; no optimization or inference."],
   };
 }
 
-function offers(body: { runId: string; members: Member[]; excludePlaceIds?: string[] }) {
-  const to = body.members[2] ?? body.members[0];
-  if (!to) return { offers: [] };
-  const bold = plan({ ...body, runId: `${body.runId}_o1` }).plans[1];
-  return {
-    offers: [
-      {
-        offerId: `o1_${body.runId}`, toMemberId: to.memberId, type: "budget", amount: 7, unit: "usd",
-        plan: { ...bold, id: `plan_offer1_${body.runId}` }, robustnessGain: 0.08, minRatioGain: 0.07,
-      },
-    ],
-  };
+function offers(_body: unknown) {
+  // Match phase-zero FastAPI: do not fabricate a beneficial budget concession.
+  return { offers: [] };
 }
 
 function roulette(body: { plans: { id: string; robustness: number }[]; seed?: number }) {
@@ -197,26 +190,17 @@ function council(body: { runId: string; plans: any[]; members: Member[]; options
   const labels = ["A", "B", "C", "D"].map((l) => `Advocate ${l}`);
   const rand = seeded(`${body.runId}:${body.options?.seed ?? 7}`);
   const order = body.members.map((m, i) => ({ m, i, k: rand() })).sort((x, y) => x.k - y.k);
-  const [safe, bold, budget] = body.plans;
-  const now = Date.now();
+  const safe = body.plans.find((p) => p.kind === "safe");
+  const now = 1792886400000; // Frozen synthetic timestamp, not a live event.
   const messages: any[] = [];
   for (const round of [1, 2]) {
     order.forEach(({ m }, idx) => {
       const score = safe?.perMember?.find((p: any) => p.memberId === m.memberId)?.ratioMean ?? 0.8;
-      const likesBold = idx % 2 === 1;
       messages.push({
         runId: body.runId, round, speaker: "advocate", label: labels[idx % 4], memberId: m.memberId,
         planId: null,
-        stance: {
-          [safe?.id]: likesBold ? "accept" : "support",
-          [bold?.id]: likesBold ? "support" : "accept",
-          [budget?.id]: "accept",
-        },
-        text: round === 1
-          ? `The Safe plan scores ${score} for me and stays inside my limits.`
-          : likesBold
-            ? `I still lean Bold, but Safe at ${score} is fine for me.`
-            : `Agreed with the room: Safe works, ${score} for me.`,
+        stance: Object.fromEntries(body.plans.map((p) => [p.id, "accept"])),
+        text: "SYNTHETIC STUB: canned advocate; no preference reasoning was performed.",
         cited: [{ tool: "my_score", field: "ratioMean", value: score }],
         ts: now + messages.length,
       });
@@ -224,7 +208,7 @@ function council(body: { runId: string; plans: any[]; members: Member[]; options
   }
   messages.push({
     runId: body.runId, round: 3, speaker: "chair", label: "Chair", memberId: null, planId: safe?.id ?? null,
-    text: `Everyone accepts Safe and nobody opposes it. Robustness ${safe?.robustness}. Recommended: Safe.`,
+    text: "SYNTHETIC STUB: chair selects the supplied Safe plan; no live council ran.",
     cited: [{ tool: "plan_facts", field: "robustness", value: safe?.robustness }],
     ts: now + messages.length,
   });

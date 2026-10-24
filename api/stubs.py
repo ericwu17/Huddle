@@ -176,8 +176,6 @@ def fixture_eligible(plan: Plan, request: PlanRequest, by_id: dict[str, Place]) 
 
 
 def plan(request: PlanRequest, places: list[Place]) -> PlanResponse:
-    if request.options.preview:
-        raise StubInputError("preview response shape needs team agreement; use preview=false", 409)
     by_id = {p.id: p for p in places}
     candidates = []
     feasible = []
@@ -219,16 +217,22 @@ def plan(request: PlanRequest, places: list[Place]) -> PlanResponse:
         warnings.append(f"Dropped {dropped} veto entries beyond the per-member cap of two; cuisines take precedence.")
     if not feasible:
         warnings.append("No fixed fixture fits the supplied constraints; no cap was raised. Relaxation hint entries are undefined.")
+    feasible_count = len(feasible)
+    if request.options.preview:
+        # Same S5 PlanResponse envelope consumed by server/src/prefs.ts.
+        # Preview has at most one Safe plan, no Pareto points or compromises.
+        feasible = [p for p in feasible if p.kind == "safe"][:1]
+        warnings.append("SYNTHETIC STUB preview: confidence is canned, not learned.")
     return PlanResponse(
         runId=request.runId, plans=feasible,
         pareto=[Pareto(planId=p.id, meanRatio=p.perMember[0].ratioMean,
                        minRatio=p.perMember[0].ratioMean, robustness=p.robustness)
-                for p in feasible[:request.options.topK]],
+                for p in feasible[:request.options.topK]] if not request.options.preview else [],
         posteriorSummary=[dict(memberId=m.memberId, features=[
             dict(name=f, mean=m.posterior.mean[i], sd=sqrt(max(0, m.posterior.cov[i][i])))
             for i, f in enumerate(FEATURES)
         ]) for m in request.members],
-        stats=dict(candidatePlans=len(candidates), feasiblePlans=len(feasible), samples=0, elapsedMs=0),
+        stats=dict(candidatePlans=len(candidates), feasiblePlans=feasible_count, samples=0, elapsedMs=0),
         relaxationHints=[], warnings=warnings,
     )
 

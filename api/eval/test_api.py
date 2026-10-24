@@ -226,9 +226,6 @@ class APIBoundaryTests(unittest.TestCase):
         body["members"][0]["hard"]["budgetMaxPerPerson"] = -1
         self.post("/plan", body, 422)
         body = deepcopy(self.body)
-        body["options"]["preview"] = True
-        self.post("/plan", body, 409)
-        body = deepcopy(self.body)
         body["options"]["seed"] = 7
         self.post("/plan", body, 422)
         body = deepcopy(self.body)
@@ -253,6 +250,20 @@ class APIBoundaryTests(unittest.TestCase):
         posterior["mean"][0] = float("nan")
         with self.assertRaises(ValidationError):
             Posterior.model_validate(posterior)
+
+    def test_preview_uses_existing_envelope_and_respects_caps(self):
+        body = deepcopy(self.body)
+        body["options"]["preview"] = True
+        result = self.plan(body)
+        PlanResponse.model_validate(result)
+        self.assertEqual(len(result["plans"]), 1)
+        self.assertEqual(result["plans"][0]["kind"], "safe")
+        self.assertEqual(result["pareto"], [])
+        self.assertEqual(result["stats"]["samples"], 0)
+        self.assertEqual(result, self.plan(body))
+        self.assertIn("confidence is canned", result["warnings"][-1])
+        body["members"][0]["hard"]["budgetMaxPerPerson"] = 13
+        self.assertEqual(self.plan(body)["plans"], [])
 
     def test_mismatched_plan_total_rejected(self):
         plan = self.plan()["plans"][0]
