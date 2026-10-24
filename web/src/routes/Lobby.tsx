@@ -89,12 +89,12 @@ export default function Lobby() {
       </section>
 
       <div className="grid grid-cols-2 gap-3">
-        {agent ? <Link className="btn btn-sun" to={`/g/${session.groupId}/prefs`}>{agent.confirmedMemberIds.includes(session.memberId) ? "Edit my private needs" : "Set my needs & get ready"}</Link> : <button className="btn btn-primary" disabled={busy || me?.ready} onClick={() => run(() => setReady())}>{me?.ready ? "Ready ✓" : "I'm ready"}</button>}
+        {agent ? <Link className="btn btn-sun" to={`/g/${session.groupId}/prefs`}>{agent.confirmedMemberIds.includes(session.memberId) ? "Edit my private needs" : "Start huddle"}</Link> : <button className="btn btn-primary" disabled={busy || me?.ready} onClick={() => run(() => setReady())}>{me?.ready ? "Ready ✓" : "I'm ready"}</button>}
         <button className="btn" disabled={busy} onClick={shareLocation}>
           Use my location
         </button>
       </div>
-      <p className="on-sky muted">Each person saves their own private needs. The host can find plans once 2+ people are ready.</p>
+      <p className="card !py-3 text-sm">Each person saves their own private needs. The host can find plans once 2+ people are ready.</p>
       {agent && account ? <CalendarTimeSelector /> : null}
 
       {isHost && !agent && (
