@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
 import type { Plan } from "../types";
 
@@ -11,7 +13,7 @@ const token = import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
 type Props = { plan: Plan; lines: [number, number][][] };
 
 export default function PlanMap(props: Props) {
-  return token ? <MapboxMap {...props} /> : <SvgMap {...props} />;
+  return token ? <MapboxMap {...props} /> : <StreetMap {...props} />;
 }
 
 function MapboxMap({ plan, lines }: Props) {
@@ -76,48 +78,81 @@ function MapboxMap({ plan, lines }: Props) {
   return <div ref={container} className="card h-64 w-full overflow-hidden !p-0" />;
 }
 
-// No Mapbox token: plot stops on a plain box so the screen still works.
-function SvgMap({ plan, lines }: Props) {
-  const W = 360;
-  const H = 240;
-  const pad = 24;
-  const pts = [...plan.stops.map((s) => [s.lng, s.lat] as [number, number]), ...lines.flat()];
-  if (pts.length === 0) return null;
-  const lngs = pts.map((p) => p[0]);
-  const lats = pts.map((p) => p[1]);
-  const [minX, maxX, minY, maxY] = [
-    Math.min(...lngs),
-    Math.max(...lngs),
-    Math.min(...lats),
-    Math.max(...lats),
-  ];
-  const sx = (lng: number) => pad + ((lng - minX) / (maxX - minX || 1)) * (W - 2 * pad);
-  const sy = (lat: number) => H - pad - ((lat - minY) / (maxY - minY || 1)) * (H - 2 * pad);
+// No Mapbox token: a free OpenStreetMap street map (no key needed)
+// with big numbered pins, a cased route line and a legend, so it reads on a phone.
+function StreetMap({ plan, lines }: Props) {
+  const container = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    const map = L.map(container.current!, {
+      center: [37.8716, -122.2727], // Berkeley
+      zoom: 15,
+      scrollWheelZoom: false, // let the page scroll past the map
+      dragging: !L.Browser.mobile, // one finger scrolls the page; pinch still zooms
+      zoomControl: true,
+    });
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    mapRef.current = map;
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const layer = L.layerGroup().addTo(map);
+    for (const line of lines) {
+      const pts = line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
+      // A white casing under the dashed line keeps it visible over busy streets.
+      L.polyline(pts, { color: "#fffdf7", weight: 10, opacity: 0.95, lineCap: "round" }).addTo(layer);
+      L.polyline(pts, { color: "#ff5fb4", weight: 5, dashArray: "2 10", lineCap: "round" }).addTo(layer);
+    }
+    plan.stops.forEach((s, i) => {
+      const icon = L.divIcon({
+        className: "map-pin",
+        html: `<span>${i + 1}</span>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+      });
+      L.marker([s.lat, s.lng], { icon, title: `${i + 1}. ${s.name}` })
+        .bindPopup(`<b>${i + 1}. ${escapeHtml(s.name)}</b><br>${s.start}–${s.end}`)
+        .addTo(layer);
+    });
+    if (plan.stops.length > 0) {
+      const bounds = L.latLngBounds(plan.stops.map((s) => [s.lat, s.lng] as L.LatLngTuple));
+      map.fitBounds(bounds, { padding: [48, 48], maxZoom: 16 });
+    }
+    return () => {
+      layer.remove();
+    };
+  }, [plan, lines]);
 
   return (
-    <div className="card">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
-        {lines.map((line, i) => (
-          <polyline
-            key={i}
-            fill="none"
-            stroke="#ff5fb4"
-            strokeWidth={4}
-            strokeDasharray="2 7"
-            strokeLinecap="round"
-            points={line.map(([lng, lat]) => `${sx(lng)},${sy(lat)}`).join(" ")}
-          />
-        ))}
+    <div className="card map-card">
+      <div ref={container} className="map-canvas" role="img" aria-label={`Map of ${plan.stops.length} stops`} />
+      <ol className="map-legend">
         {plan.stops.map((s, i) => (
-          <g key={s.placeId}>
-            <circle cx={sx(s.lng)} cy={sy(s.lat)} r={13} fill="#ffd23a" stroke="#16152b" strokeWidth={3} />
-            <text x={sx(s.lng)} y={sy(s.lat)} textAnchor="middle" dominantBaseline="central" fontSize={14} fontFamily="Anton, Impact, sans-serif" fill="#16152b">
-              {i + 1}
-            </text>
-          </g>
+          <li key={s.placeId}>
+            <span className="plan-dot">{i + 1}</span>
+            <span className="min-w-0">
+              <b>{s.name}</b>
+              <span className="muted block">
+                {s.start}–{s.end}
+              </span>
+            </span>
+          </li>
         ))}
-      </svg>
-      <p className="muted">No NEXT_PUBLIC_MAPBOX_TOKEN set: schematic map, north up.</p>
+      </ol>
     </div>
   );
+}
+
+function escapeHtml(text: string) {
+  return text.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }

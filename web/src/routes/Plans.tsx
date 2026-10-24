@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
 import { usePlanRun, useScout } from "../data";
 import { useGroup } from "../groupContext";
 import type { Plan } from "../types";
@@ -11,7 +10,7 @@ import CouncilPanel from "../components/council/CouncilPanel";
 import { Buddy } from "../doodle/Doodle";
 
 export default function Plans() {
-  const { group, session } = useGroup();
+  const { group } = useGroup();
   const runId = group.latestRunId;
   const planRun = usePlanRun(runId);
   const scout = useScout(runId);
@@ -58,9 +57,7 @@ export default function Plans() {
         />
       ))}
       <CouncilPanel runId={runId} plans={plans} council={planRun.council} />
-      <Link className="btn btn-primary w-full" to={`/g/${session.groupId}/vote`}>
-        {group.status === "voting" ? "Voting is open · Go vote ↗" : "Go vote ↗"}
-      </Link>
+      {group.status === "voting" && <p className="sticker sticker-sun">Voting is open: tap Next when you've read the debate</p>}
       <section className="card space-y-2">
         <h2 className="card-title">Consensus map</h2>
         <ConsensusMap pareto={result.pareto} plans={plans} onSelect={setSelectedId} />

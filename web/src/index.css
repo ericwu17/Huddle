@@ -323,3 +323,46 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .bubble-chair .council-cited { color: #b9b7cf; }
 .council-verdict { margin-top: 10px; font-size: 14px; white-space: normal; }
 .council-waiting { display: flex; align-items: center; gap: 12px; }
+
+/* Plan map: street tiles inside a paper card, big numbered pins, legend underneath */
+.map-card { padding: 0; overflow: hidden; }
+.map-canvas { height: 300px; width: 100%; background: #e8edf5; border-bottom: 3px solid var(--ink); }
+.map-legend { display: grid; gap: 8px; padding: 12px 16px 14px; margin: 0; list-style: none; font-size: 14px; }
+.map-legend li { display: flex; gap: 10px; align-items: center; }
+.map-pin { display: grid; place-items: center; }
+.map-pin span {
+  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--sun); color: var(--ink); border: 3px solid var(--ink); box-shadow: 2px 3px 0 var(--ink);
+  font-family: var(--display); font-size: 18px; line-height: 1;
+}
+.map-card .leaflet-container { font-family: var(--text); }
+.map-card .leaflet-popup-content { font-size: 14px; color: var(--ink); }
+.map-card .leaflet-control-attribution { font-size: 10px; }
+
+/* ---- Phases: progress on top, Back/Next at the bottom ---- */
+.phase-progress { display: grid; gap: 8px; }
+.phase-label { font-size: 14px; }
+
+.phase-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.phase-bar li > * { display: block; height: 12px; border-radius: 999px; border: 2.5px solid var(--ink); }
+.phase-bar .is-done > * { background: var(--lime); }
+.phase-bar .is-now > * { background: var(--sun); box-shadow: 2px 2px 0 var(--ink); transform: translateY(-1px); }
+.phase-bar .is-locked > * { background: rgb(255 255 255 / 0.35); border-color: rgb(22 21 43 / 0.45); }
+.phase-bar a:focus-visible { outline-offset: 2px; }
+
+.phase-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+  margin: 0 -16px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--deep) 55%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 22px 22px 0 0;
+}
+.phase-buttons { display: flex; justify-content: space-between; gap: 10px; }
+.phase-buttons .btn-primary { flex: 1; max-width: 70%; }
+.phase-hint { color: #fff; font-size: 13px; font-weight: 700; text-align: center; }

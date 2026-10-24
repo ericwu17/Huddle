@@ -4,7 +4,7 @@ import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
 import type { Session } from "../session";
 import type { GroupStatus } from "../types";
 import type { GroupContext } from "../groupContext";
-import StatusNav from "../components/StatusNav";
+import { PhaseFooter, PhaseProgress } from "../components/PhaseNav";
 import DemoBanner from "../components/DemoBanner";
 import ReplanBanner from "../components/ReplanBanner";
 import OffersInbox from "../components/OffersInbox";
@@ -105,11 +105,17 @@ export default function GroupLayout() {
           </span>
         </span>
       </header>
-      <StatusNav groupId={session.groupId} />
+      <PhaseProgress ctx={ctx} booking={booking} />
       <DemoBanner on={group.demoMode} />
       <ReplanBanner ctx={ctx} />
       <OffersInbox ctx={ctx} />
       <Outlet context={ctx} />
+      <PhaseFooter ctx={ctx} booking={booking} />
+      <p className="text-center">
+        <Link className="on-sky muted underline" to={`/g/${session.groupId}/judge`}>
+          Under the hood
+        </Link>
+      </p>
     </main>
   );
 }

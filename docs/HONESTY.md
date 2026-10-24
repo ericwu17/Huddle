@@ -8,6 +8,7 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | Nine fictional venues for the module's fakes; the API refuses them. Legacy and real catalogs remain lookup-compatible | `api/fixtures/places.fake.json` | in use by the module with its `STUB_MODE=true` (default) or in demo mode |
 | Integration checks use real module procedures and the native in-memory test datastore calling a localhost FastAPI without a Claude key (keyword parsing, Safe-fallback council), not a deployed database or browser subscriptions | `api/eval/check_integration.py`, `server/test/` | verified locally |
 | Demo group (Alex, Sam, Jordan, Riley) is seeded | `data/demo_group.json` | in use |
+| In a one-phone demo the other three members are simulated: separate identities that join by code, write the seeded preferences, swipe by a fixed taste rule, answer offers and vote (two with the chair, one for its own favourite). Their inputs still go through the real API | `scripts/demo-friends.mjs` | available; say so when used |
 | Module fakes are used when a group enters labeled demo mode; normal Maincloud planning now uses the real API. Scout remains cached and voice scripted | `server/src/lib/fakes.ts`, `server/src/lib/demo.ts` | fallback available; connected real-mode smoke stayed out of demo mode |
 | Cached plan run used when the api is unreachable | `data/cached_run.json` | placeholder (fake until H24) |
 | Scout results may come from a pre-warmed cache ("Checked earlier") | `data/scout_cache.json` | placeholder (fake until H24) |

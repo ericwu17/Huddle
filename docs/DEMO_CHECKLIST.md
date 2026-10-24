@@ -25,6 +25,10 @@ that future features already work. Current integration details: [HANDOFF.md](HAN
 - [ ] Keep both service laptops awake; name who will restart each service/tunnel.
 - [ ] Use four phones or four isolated browser profiles, so identities are distinct.
   Separate tabs in one profile share the same token and are not four people.
+  One-phone alternative: start a huddle on your phone, then run
+  `node scripts/demo-friends.mjs <CODE>` on a laptop. Sam, Jordan and Riley join,
+  write their own private preferences, swipe, answer offers and vote; you play Alex.
+  Say on stage that the other three are simulated (see HONESTY.md).
 - [ ] Agree on test preferences supported by the current parser, including a
   vegetarian and different private whole-outing budgets.
 - [ ] Prepare a teammate restaurant phone and verify consent/demo-only dialing

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
@@ -52,9 +51,6 @@ export default function Prefs() {
               {w}
             </p>
           ))}
-          <Link className="btn btn-sun w-full" to={`/g/${session.groupId}/swipe`}>
-            Next: swipe →
-          </Link>
         </section>
       )}
     </div>
