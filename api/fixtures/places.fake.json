@@ -1,0 +1,911 @@
+[
+  {
+    "lat": 37.8715,
+    "lng": -122.273,
+    "id": "stub_safe_meal",
+    "name": "SYNTHETIC Safe Meal",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 12.0,
+    "dwellMinutes": 75,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8715,
+    "lng": -122.27289999999999,
+    "id": "stub_safe_activity",
+    "name": "SYNTHETIC Safe Activity",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 2.0,
+    "dwellMinutes": 75,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8715,
+    "lng": -122.27279999999999,
+    "id": "stub_safe_dessert",
+    "name": "SYNTHETIC Safe Dessert",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 4.0,
+    "dwellMinutes": 30,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8716,
+    "lng": -122.273,
+    "id": "stub_bold_meal",
+    "name": "SYNTHETIC Bold Meal",
+    "category": "meal",
+    "cuisine": "latin",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 13.0,
+    "dwellMinutes": 75,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8716,
+    "lng": -122.27289999999999,
+    "id": "stub_bold_activity",
+    "name": "SYNTHETIC Bold Activity",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 3.0,
+    "dwellMinutes": 75,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8716,
+    "lng": -122.27279999999999,
+    "id": "stub_bold_dessert",
+    "name": "SYNTHETIC Bold Dessert",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 4.0,
+    "dwellMinutes": 30,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8717,
+    "lng": -122.273,
+    "id": "stub_budget_meal",
+    "name": "SYNTHETIC Budget Meal",
+    "category": "meal",
+    "cuisine": "american",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 10.0,
+    "dwellMinutes": 75,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8717,
+    "lng": -122.27289999999999,
+    "id": "stub_budget_activity",
+    "name": "SYNTHETIC Budget Activity",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 1.0,
+    "dwellMinutes": 75,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  },
+  {
+    "lat": 37.8717,
+    "lng": -122.27279999999999,
+    "id": "stub_budget_dessert",
+    "name": "SYNTHETIC Budget Dessert",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "Fictional fixture, Berkeley, CA",
+    "priceLevel": 1,
+    "costPerPerson": 3.0,
+    "dwellMinutes": 30,
+    "phone": null,
+    "dietary": [
+      "vegetarian",
+      "vegan",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "00:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 0,
+    "rating": 0.0,
+    "sources": [
+      "synthetic_stub"
+    ]
+  }
+]
