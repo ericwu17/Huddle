@@ -316,6 +316,11 @@ Paths are lowercase (SpacetimeDB requires it). 401 on a bad secret, 400 on a bad
 2. A's `server/src/replan.ts` defines `spacetimedb.procedure({ onSchedule: replan_job }, ...)` (or a reducer). It adds the booking's placeId to `group.excludedPlaceIds`, calls `startRun(tx, groupId)` from `plans.ts` (which runs plan, offers, scout and council on its own), and sets `group.replanFor = bookingId`. A also exports it from `server/src/index.ts` (tell B).
 3. The UI shows "That place is full. New plan ready" with a one-tap "Call again" (`start_booking`, which clears `replan_for`). Never auto-call. Other reasons (no_answer, refused, error) do not replan.
 
-**Env (set at publish; shell values for declared keys are picked up automatically):** `HUDDLE_SHARED_SECRET`, `FASTAPI_BASE_URL`, `VOICE_BASE_URL`, `COUNCIL_ENABLED`, `AGENT_LANGUAGE`, `STUB_SCENARIO` (fake call: `confirm` or `full`). Update without rebuilding: `spacetime publish huddle-dev --env-only`.
+**Env (set at publish; shell values for declared keys are picked up automatically):** `HUDDLE_SHARED_SECRET`, `FASTAPI_BASE_URL`, `STUB_MODE`, `VOICE_BASE_URL`, `COUNCIL_ENABLED`, `AGENT_LANGUAGE`, `STUB_SCENARIO` (fake call: `confirm` or `full`). Update without rebuilding: `spacetime publish huddle-dev --env-only`.
+
+`STUB_MODE` defaults to true in the module and API. Stub candidates share
+`api/fixtures/places.fake.json`; `data/places.json` remains intact for the later
+real-data mode. Frontend place lookups resolve synthetic, real, and legacy IDs.
+Do not set `STUB_MODE=false` until the real Python service is implemented.
 
 **Auth model** (hackathon grade, state this honestly): each phone's SpacetimeDB identity token sits in the browser's local storage; whoever has the token is that member. Service-to-module calls use the shared `X-Huddle-Secret`. This is not production security.

@@ -217,6 +217,19 @@ No service was deployed and no tunnel was opened by these changes. Once both
 processes are reachable, health and private service calls use the shared secret;
 no SpacetimeDB account or deployment token belongs in the Python service.
 
+To check Eric's deployed shared secret, run the following in the terminal where
+it is exported (it does not print the value):
+
+```sh
+/Users/maxli/Huddle/api/.venv/bin/python /Users/maxli/Huddle/api/eval/check_shared_secret.py
+```
+
+The checker targets `https://maincloud.spacetimedb.com`, database
+`huddle-calhacks`. It expects 401 without credentials and an authenticated 400
+for an impossible booking ID. The handler looks up that ID before any insert,
+so no booking or event is created. A missing environment value is reported
+explicitly; a secret exported in another terminal is not inherited automatically.
+
 ## Honesty and disclosure handoff
 
 The shared honesty/disclosure files should include these facts: nine fictional venues;

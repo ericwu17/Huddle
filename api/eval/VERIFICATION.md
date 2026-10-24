@@ -3,7 +3,7 @@
 Verified locally after Max explicitly confirmed the hacking period had started.
 
 - Python 3.12.5; FastAPI 0.116.1; Pydantic 2.11.7; uvicorn 0.35.0; httpx 0.28.1.
-- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **16 tests passed**, including preview responses.
+- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **19 tests passed**, including previews and the safe authentication checker.
 - Started uvicorn on `127.0.0.1:8000` with an ephemeral in-memory shared secret,
   ran `api/.venv/bin/python api/eval/smoke_http.py`: **all eight routes passed**.
   The HTTP runner checked successful auth, missing-auth rejection, synthetic
@@ -26,7 +26,8 @@ Verified locally after Max explicitly confirmed the hacking period had started.
 
 The integration follow-up resolves the five caller/API gaps documented in
 `api/README.md`. `npm run typecheck --prefix server` passes. Server tests use
-the official SpacetimeDB 2.13.0 native in-memory datastore via Vitest. The local
+the official SpacetimeDB 2.13.0 native in-memory datastore via Vitest (11 tests
+with local HTTP enabled; 10 plus one skipped without it). The local
 HTTP runner checks four members, four swipes each, preview confidence, automatic
 planning, empty offers, roulette, and nine council messages through real module
 procedures calling a temporary FastAPI server. It also verifies current caps
@@ -36,6 +37,13 @@ frontend lookup of all synthetic/real IDs.
 No SpacetimeDB host was published, no live backend was modified, and browser
 subscriptions, network deployment configuration, and persistence across host
 restarts are not covered by the in-memory procedure checks.
+
+The live `huddle-calhacks` call-event route on Maincloud was reachable and
+returned 401 to a no-secret request for an impossible booking ID. The user's
+exported credential is in a separate terminal and was not available to the
+agent's process, so its match against the deployed secret is not claimed here.
+`check_shared_secret.py` can verify that match from the user's terminal without
+printing credentials or creating an event.
 
 Reproduce with the exact setup/run/check commands in `api/README.md`. The tests
 generate fresh credentials at runtime and do not store or print them.

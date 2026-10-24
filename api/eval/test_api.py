@@ -9,12 +9,14 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from fastapi.testclient import TestClient
+import httpx
 from pydantic import ValidationError
 
 from api.delivery import LocalCouncilDelivery
 from api.main import Settings, create_app
 from api.models import FEATURES, Plan, PlanResponse, Posterior, RouletteResponse, CouncilResponse
 from api.stubs import feature_vector, fixture_places, prior
+from api.eval.check_shared_secret import PROBE, verify
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 
@@ -287,6 +289,36 @@ class StartupTests(unittest.TestCase):
                 with TestClient(create_app(Settings(secrets.token_urlsafe(), places_path=path))):
                     pass
 
+
+class SharedSecretCheckTests(unittest.TestCase):
+    def test_accepts_only_auth_then_missing_booking_without_secret_disclosure(self):
+        secret = secrets.token_urlsafe(32)
+        calls = []
+
+        def respond(request):
+            calls.append(request)
+            self.assertEqual(json.loads(request.content), PROBE)
+            if request.headers.get("X-Huddle-Secret") == secret:
+                return httpx.Response(400, json={"error": "unknown booking " + PROBE["bookingId"]})
+            return httpx.Response(401)
+
+        with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+            ok, message = verify(client, secret)
+        self.assertTrue(ok)
+        self.assertEqual(len(calls), 2)
+        self.assertNotIn(secret, message)
+
+    def test_rejected_secret_and_unexpected_errors_are_not_success(self):
+        for status in (401, 404, 302, 500):
+            with httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(
+                status if request.headers.get("X-Huddle-Secret") else 401))) as client:
+                self.assertFalse(verify(client, secrets.token_urlsafe())[0])
+
+    def test_absent_secret_only_checks_public_auth_gate(self):
+        with httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(401))) as client:
+            ok, message = verify(client, None)
+        self.assertFalse(ok)
+        self.assertIn("not exported", message)
 
 if __name__ == "__main__":
     unittest.main()
