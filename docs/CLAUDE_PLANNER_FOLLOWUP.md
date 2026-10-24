@@ -6,7 +6,7 @@ Claude propose/revise loop and takeout/seating remain follow-ups. This update
 supersedes older blanket allergy-block and personal-cost deferral notes below.
 
 Planned October 24, 2026 at Max's request. **Deferred; not implemented in this
-change.** Eric Wu is currently building Bright Data → SpacetimeDB ingestion.
+change.** Eric Wu has completed the basic Bright Data → SpacetimeDB ingestion.
 This plan changes the next planner design, not the live endpoint shapes or
 current runtime. Keep local FastAPI + tunnel + Maincloud and one coordinator.
 The broader demo-polish task remains open.
@@ -15,11 +15,10 @@ The broader demo-polish task remains open.
 `AgentCatalog` snapshot contract, `venue`/`catalog_state`, public catalog views
 and authenticated atomic catalog push. This code is merged with accounts/
 connectors and verified with 130 active venues in `huddle-account-max-check`;
-new scraped IDs reach FastAPI/Claude and public rating metadata. Shared rollout
-is pending. The handoff questions below about that basic snapshot are resolved;
-menu/photo/takeout/seating evidence, individual meal assignments and the full
-Claude propose/validate/revise loop remain follow-ups. `details.json` is a
-collected file, not already an active planner contract.
+new scraped IDs reach FastAPI/Claude and public rating metadata. Shared rollout is active. Basic snapshot, menu items/prices, attributed photos
+and owner-private meal assignments are now implemented. Takeout/seating and
+the full Claude propose/validate/revise loop remain follow-ups. See the menu
+extension above for the active `details.json` read contract.
 
 Subsequent [preference/acceptance planning](PREFERENCE_ACCEPTANCE_PLAN.md)
 proposes optional budget/time sliders, an optional prompt, flexible defaults and

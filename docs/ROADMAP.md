@@ -19,7 +19,7 @@ The shared deployment passed 41 connected, 14 OAuth-wiring and 30 desktop/mobile
 browser checks with no browser errors/overflow. Source verification passed 99
 Python tests, 129 server tests/one opt-in skip, build and lint before rollout.
 The isolated review environment is still separate and available. The remaining
-Claude proposal/revision, rich-menu/photo/seating and provider-write follow-ups
+Claude proposal/revision, takeout/seating and provider-write follow-ups
 are still open. See [operations](ACCOUNTS_RUNBOOK.md).
 
 - [x] Review Eric Chen's Windows API launcher on main; it hosts the existing API

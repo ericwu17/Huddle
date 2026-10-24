@@ -1,8 +1,39 @@
 # Accounts, invitations, preferences and connectors: operations
 
-## Shared Vercel release — October 24, 2026
+## Current menu release — October 24, 2026
 
-The tested account/catalog release `a029fb6` is active on shared Maincloud
+The shared module and API now support the [menu extension](MENU_RECOMMENDATIONS.md).
+Maincloud `huddle-calhacks` holds snapshot
+`2026-10-24T22:29:05Z-d5490f3f-menu-20bc1232fca7`: **130 venues, 950 menu items,
+386 photo records**, with Eric Wu's specific category labels. The existing shared
+API URL and port 8000 are unchanged. Messages/Contacts remain disabled there.
+The new API process is kept awake with a PID-bound `caffeinate` process; recreate
+that guard when restarting it, and keep the existing tunnel running.
+
+Before/after identifier checks preserved all **31 groups, 66 members and 24 plan
+runs** present immediately before this update. No data reset or credential change
+occurred. Synthetic shared checks passed **49 account/menu/privacy/voting/booking
+simulation assertions** and **15 OAuth wiring assertions**. Local verification
+passed **110 API tests**, **160 native module tests** (one opt-in skip), build/lint,
+**30 desktop/mobile browser assertions** after the latest UI merge, and additional
+provisional/untimed UI checks. No external messages, Google grants/events or real
+restaurant bookings were made by these checks.
+
+The merged frontend keeps the updated sidebar, vote display, walking map and
+single SPA entry. QR/code-sharing UI remains removed; account Huddles use
+addressed friend invitations. Push main to update Vercel, then verify its deployment.
+The restart commands below still apply. For every new scrape use:
+
+```sh
+.venv/bin/python scripts/publish-menu-catalog.py --database huddle-calhacks --publish
+```
+
+An ordinary basic `collect.py publish` can replace menu evidence; publish the
+joined menu snapshot after updating both committed data files.
+
+## Initial account foundation release — October 24, 2026
+
+The initial account/catalog release `a029fb6` activated shared Maincloud
 **`huddle-calhacks`**, with [Vercel login](https://huddle-two-neon.vercel.app/login).
 The public frontend was already deployed from that commit. The shared API was
 restarted from it on Max's Mac, port **8000**, behind the existing tunnel

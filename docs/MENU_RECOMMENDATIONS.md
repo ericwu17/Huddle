@@ -154,9 +154,9 @@ Changing a tunnel hostname requires updating the allowlist again.
 - 110 Python checks passed after merging Eric Wu's category-label update.
 - 160 native module tests passed; one opt-in HTTP test skipped.
 - Frontend build and lint passed; the existing bundle-size advisory remains.
-- 49 connected preview checks passed with real Claude, private menu selections,
+- 49 connected preview checks and 49 shared checks passed with real Claude, private menu selections,
   per-person costs, current votes, a simulated booking and allergy suggestions.
-- 15 preview OAuth wiring checks passed without granting Google access/events.
+- 15 preview and 15 shared OAuth wiring checks passed without granting Google access/events.
 - 30 desktop/mobile account-to-menu-to-simulation browser checks passed with no
   page/console errors, warnings or mobile overflow.
 - 13 additional desktop/mobile browser checks passed for provisional allergy
@@ -172,3 +172,8 @@ Changing a tunnel hostname requires updating the allowlist again.
 
 All fixture people and booking actions in these checks are synthetic/simulated.
 No texts, Google grants/events or restaurant calls were sent by these tests.
+
+Shared backend activation preserved every pre-update group/member/run identifier
+(31/66/24). The API remains at the existing shared tunnel on Max's Mac. The
+latest UI reconciliation keeps the sidebar/vote/map/SPA changes while preserving
+friend invitations and all menu/provisional guards; QR/code sharing was removed.

@@ -6,9 +6,9 @@ endpoints, tables and legacy huddles remain compatible. Never encode agent
 results as fake posteriors, robustness or utility ratios.
 
 The [propose/validate/revise follow-up](CLAUDE_PLANNER_FOLLOWUP.md) is planned,
-not part of this implemented wire contract. Venue snapshots, catalog versions,
-structured validation feedback and compromise states require a coordinated API,
-module and UI contract update after reviewing Eric Wu's ingestion schema.
+not part of this implemented wire contract. Venue snapshots, menus and catalog
+versions are implemented; arbitrary itinerary construction and structured
+propose/revise feedback remain a coordinated follow-up.
 
 ## Menu and provisional extension (October 24)
 
