@@ -38,6 +38,11 @@ export const runScoutJob = spacetimedb.procedure(
 );
 
 export function insertCouncilMessage(tx: Tx, m: any) {
+  // One advocate message per member/round, one chair message per run. Replaying
+  // a response or receiving the same future callback must not duplicate rows.
+  const duplicate = Array.from(tx.db.council_message.runId.filter(m.runId)).some((row) =>
+    row.round === m.round && row.speaker === m.speaker && row.memberId === (m.memberId ?? undefined));
+  if (duplicate) return;
   tx.db.council_message.insert({
     id: 0n, runId: m.runId, round: m.round, speaker: m.speaker, label: m.label,
     memberId: m.memberId ?? undefined, planId: m.planId ?? undefined,
@@ -84,7 +89,9 @@ export const runCouncilJob = spacetimedb.procedure(
         return;
       }
       if (!res.stub) {
-        // The real api already POSTed each message to /councilMessage as it passed validation.
+        // Ingest the documented response transcript too. The idempotent insert
+        // handles any messages already delivered by a future streaming adapter.
+        for (const message of res.data.messages ?? []) insertCouncilMessage(tx, message);
         finishCouncil(tx, job.runId, res.data);
         return;
       }

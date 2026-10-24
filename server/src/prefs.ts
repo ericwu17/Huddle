@@ -5,7 +5,8 @@ import { requireMember } from "./groups";
 import { planMembers, startRun } from "./plans";
 import { callApi } from "./lib/api";
 import { CONFIDENCE_TARGET, MAX_SWIPES, MIN_SWIPES, PREVIEW_DEBOUNCE_MS } from "./lib/constants";
-import { PLACES } from "./lib/places";
+import { placesForMode } from "./lib/places";
+import { guardPlanResult, preserveBudget } from "./lib/budgets";
 import type { Proc } from "./lib/types";
 import { at, membersOf, nowMs, parse } from "./lib/util";
 
@@ -59,7 +60,7 @@ function fetchNextPair(ctx: Proc, memberId: string) {
   const { posterior, alreadySeen, swipeCount } = readPrefs(ctx, memberId);
   if (swipeCount >= MAX_SWIPES || !posterior) return;
   const res = callApi(ctx, "/elicit/next", {
-    memberId, posterior, alreadySeen, candidatePlaceIds: PLACES.map((p) => p.id), focusPlaceIds: [],
+    memberId, posterior, alreadySeen, candidatePlaceIds: placesForMode(ctx.env.STUB_MODE).map((p) => p.id), focusPlaceIds: [],
   });
   if (!res.ok) throw new Error(`elicit/next failed: ${JSON.stringify(res.error)}`);
   const { a, b, category } = res.data;
@@ -76,15 +77,21 @@ export const runParseJob = spacetimedb.procedure(
     const res = callApi(ctx, "/parse-prefs", { text, memberId: job.memberId });
     if (!res.ok) throw new Error(`parse-prefs failed: ${JSON.stringify(res.error)}`);
     const { hard, posterior, warnings } = res.data;
-    ctx.withTx((tx) => {
+    const applied = ctx.withTx((tx) => {
       const prefs = tx.db.private_prefs.memberId.find(job.memberId);
-      if (!prefs) return;
+      // A delayed parse cannot overwrite a more recent preference submission.
+      if (!prefs || prefs.text !== text) return false;
+      const protectedBudget = preserveBudget(parse(prefs.hardJson), hard);
       tx.db.private_prefs.memberId.update({
-        ...prefs, hardJson: JSON.stringify(hard), priorJson: JSON.stringify(posterior),
-        posteriorJson: JSON.stringify(posterior), warningsJson: JSON.stringify(warnings ?? []), updatedAt: nowMs(tx),
+        ...prefs, hardJson: JSON.stringify(protectedBudget.hard), priorJson: JSON.stringify(posterior),
+        posteriorJson: JSON.stringify(posterior), warningsJson: JSON.stringify([
+          ...(warnings ?? []), ...(protectedBudget.preserved
+            ? ["Existing outing budget preserved; increases require accepting a private offer."] : []),
+        ]), updatedAt: nowMs(tx),
       });
+      return true;
     });
-    fetchNextPair(ctx, job.memberId);
+    if (applied) fetchNextPair(ctx, job.memberId);
     return {};
   },
 );
@@ -131,11 +138,11 @@ export const runPreviewJob = spacetimedb.procedure(
       options: { samples: 100, tau: 0.6, topK: 60, preview: true },
     });
     if (!res.ok) throw new Error(`preview plan failed: ${JSON.stringify(res.error)}`);
-    const confidence: number = res.data.plans?.[0]?.robustness ?? 0;
     // Stopping rule: confidence >= 0.9 and everyone has >= 4 swipes, or everyone hit the cap.
     ctx.withTx((tx) => {
       const g = tx.db.group.id.find(job.groupId);
       if (!g || g.previewNonce !== job.nonce || g.status !== "eliciting") return;
+      const confidence: number = guardPlanResult(res.data, planMembers(tx, g.id)).plans?.[0]?.robustness ?? 0;
       const members = membersOf(tx.db, g.id);
       const enough = members.every((m) => m.swipeCount >= MIN_SWIPES) && confidence >= CONFIDENCE_TARGET;
       const capped = members.every((m) => m.swipeCount >= MAX_SWIPES);

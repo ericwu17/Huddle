@@ -25,7 +25,8 @@ function post<T>(ctx: Proc, base: string, path: string, body: unknown, idempoten
         body: path === "/health" ? undefined : JSON.stringify(body),
         timeout: TimeDuration.fromMillis(API_TIMEOUT_MS),
       });
-      if (res.status >= 200 && res.status < 300) return { ok: true, data: res.json() as T, stub: false };
+      if (res.status >= 200 && res.status < 300)
+        return { ok: true, data: res.json() as T, stub: res.headers.get("x-huddle-stub") === "true" };
       last = { ok: false, error: { path, status: res.status, message: res.text().slice(0, 500) } };
       if (res.status < 500) break; // 4xx will not get better on retry
     } catch (e) {
@@ -35,7 +36,7 @@ function post<T>(ctx: Proc, base: string, path: string, body: unknown, idempoten
   return last;
 }
 
-// /council posts messages as it goes, so it is not retried.
+// Future live council calls may have delivery side effects, so do not retry them.
 const NOT_IDEMPOTENT = new Set(["/council"]);
 
 export function callApi<T = any>(ctx: Proc, path: string, body: unknown): ApiResult<T> {

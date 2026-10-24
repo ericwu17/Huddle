@@ -8,6 +8,7 @@ import { requireMember } from "./groups";
 import { callApi } from "./lib/api";
 import { COUNCIL_CAP_MS } from "./lib/constants";
 import { fakeApi } from "./lib/fakes";
+import { guardPlanResult, planFitsBudgets } from "./lib/budgets";
 import type { Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs, parse } from "./lib/util";
 
@@ -78,7 +79,10 @@ export const runPlanJob = spacetimedb.procedure(
     ctx.withTx((tx) => {
       const run = tx.db.plan_run.runId.find(job.runId);
       if (!run) return;
-      tx.db.plan_run.runId.update({ ...run, status: "done", resultJson: JSON.stringify(data), stub });
+      // Recheck current caps inside the commit transaction, not just the earlier
+      // request snapshot: a member may have lowered a cap while HTTP was in flight.
+      const guarded = guardPlanResult(data, planMembers(tx, run.groupId));
+      tx.db.plan_run.runId.update({ ...run, status: "done", resultJson: JSON.stringify(guarded), stub });
       tx.db.offers_job.insert({ ...at(tx), runId: job.runId });
       tx.db.scout_job.insert({ ...at(tx), runId: job.runId });
       tx.db.voting_cap_job.insert({ ...at(tx, COUNCIL_CAP_MS), runId: job.runId });
@@ -127,10 +131,21 @@ export const acceptOffer = spacetimedb.reducer({ offerId: t.string() }, (tx, { o
   const me = requireMember(tx);
   const o = tx.db.offer.id.find(offerId);
   if (!o || o.toMemberId !== me.id || o.status !== "open") throw new SenderError("no such offer");
+  const group = tx.db.group.id.find(me.groupId);
+  const run = tx.db.plan_run.runId.find(o.runId);
+  if (!group || group.latestRunId !== o.runId || run?.groupId !== me.groupId)
+    throw new SenderError("offer is stale");
+  if (!Number.isFinite(o.amount) || o.amount <= 0 || o.amount > 15 ||
+      !((o.type === "budget" && o.unit === "usd") || (o.type === "travel" && o.unit === "min")))
+    throw new SenderError("invalid offer");
   const prefs = tx.db.private_prefs.memberId.find(me.id);
   const hard = parse(prefs?.hardJson) ?? {};
-  if (o.type === "budget" && hard.budgetMaxPerPerson != null) hard.budgetMaxPerPerson += o.amount;
-  if (o.type === "travel" && hard.maxTravelMinutes != null) hard.maxTravelMinutes += o.amount;
+  const field = o.type === "budget" ? "budgetMaxPerPerson" : "maxTravelMinutes";
+  if (typeof hard[field] !== "number" || !Number.isFinite(hard[field]) || hard[field] < 0)
+    throw new SenderError("offer has no finite limit to raise");
+  hard[field] += o.amount; // Only this authenticated, owner-only acceptance raises a cap.
+  const members = planMembers(tx, me.groupId).map((member) => member.memberId === me.id ? { ...member, hard } : member);
+  if (!planFitsBudgets(parse(o.planJson), members)) throw new SenderError("offer no longer fits current budgets");
   if (prefs) tx.db.private_prefs.memberId.update({ ...prefs, hardJson: JSON.stringify(hard), updatedAt: nowMs(tx) });
   tx.db.offer.id.update({ ...o, status: "accepted" });
   startRun(tx, me.groupId);
@@ -149,7 +164,8 @@ export const castVote = spacetimedb.reducer({ name: "vote" }, { runId: t.string(
   const run = tx.db.plan_run.runId.find(runId);
   if (!run || run.groupId !== me.groupId) throw new SenderError("no such run");
   const plans: any[] = parse(run.resultJson)?.plans ?? [];
-  if (!plans.some((p) => p.id === planId)) throw new SenderError("not one of this run's plans");
+  if (!plans.some((p) => p.id === planId && planFitsBudgets(p, planMembers(tx, me.groupId))))
+    throw new SenderError("plan is unavailable under current budgets");
   const id = `${runId}:${me.id}`;
   const row = { id, runId, memberId: me.id, planId };
   if (tx.db.vote.id.find(id)) tx.db.vote.id.update(row);
@@ -164,8 +180,11 @@ export const doRoulette = spacetimedb.procedure(
       const me = requireMember(tx);
       const run = tx.db.plan_run.runId.find(runId);
       if (!run || run.groupId !== me.groupId) throw new SenderError("no such run");
-      return (parse(run.resultJson)?.plans ?? []).map((p: any) => ({ id: p.id, robustness: p.robustness }));
+      const currentMembers = planMembers(tx, me.groupId);
+      return (parse(run.resultJson)?.plans ?? []).filter((p: any) => planFitsBudgets(p, currentMembers))
+        .map((p: any) => ({ id: p.id, robustness: p.robustness }));
     });
+    if (!plans.length) throw new SenderError("no plans fit current budgets");
     const seed = Number(ctx.timestamp.toMillis() % 100000n);
     const res = callApi(ctx, "/roulette", { plans, seed });
     if (!res.ok) throw new SenderError(`roulette failed: ${res.error.message}`);

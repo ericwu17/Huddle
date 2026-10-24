@@ -7,6 +7,8 @@ import { replan } from "./replan";
 import { callVoice } from "./lib/api";
 import { fakeCallEvents } from "./lib/fakes";
 import { placeById } from "./lib/places";
+import { planFitsBudgets } from "./lib/budgets";
+import { planMembers } from "./plans";
 import type { Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs, parse } from "./lib/util";
 
@@ -44,6 +46,8 @@ export const startBooking = spacetimedb.reducer(
     const plan = (parse(run.resultJson)?.plans ?? []).find((p: any) => p.id === planId);
     const stop = plan?.stops?.[stopIndex];
     if (!stop) throw new SenderError("no such stop");
+    if (!planFitsBudgets(plan, planMembers(tx, me.groupId)))
+      throw new SenderError("plan is unavailable under current budgets");
     const g = tx.db.group.id.find(me.groupId)!;
     const bookingId = newId(tx, "b", (id) => !!tx.db.booking.id.find(id));
     tx.db.booking.insert({
