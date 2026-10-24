@@ -22,7 +22,6 @@ export default function Home() {
   const invitations = useHuddleInvitations();
   const { run, busy, error } = useRun();
   const [name, setName] = useState("");
-  const [confirming, setConfirming] = useState<string | null>(null);
   const request = useRef<string | null>(null);
   const [params] = useSearchParams();
   const requestedGroup = params.get("open");
@@ -90,15 +89,13 @@ export default function Home() {
       {memberships === undefined ? <p role="status">Loading your huddles…</p> : !memberships.length ? <p className="muted">Huddles you start or join show up here, on any device you sign in on.</p> :
         <ul className="space-y-3">{memberships.map(m => <li key={m.id} className="social-row">
           <p><strong>Huddle {m.code}</strong><br /><span className="muted">{m.date} · {m.role} · {m.status}</span></p>
-          {confirming === m.groupId ? <div className="flex flex-wrap gap-2">
-            <button className="btn btn-danger" disabled={busy} onClick={() => run(async () => { await remove({ groupId: m.groupId }); setConfirming(null); })}>Remove</button>
-            <button className="btn" disabled={busy} onClick={() => setConfirming(null)}>Keep</button>
-          </div> : <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             <button className="btn" disabled={busy} onClick={() => open(m)}>Open</button>
-            <button className="btn btn-quiet" disabled={busy} aria-label={`Remove huddle ${m.code} from your list`} onClick={() => setConfirming(m.groupId)}>Remove</button>
-          </div>}
+            <button className="btn btn-quiet" disabled={busy} aria-label={`Remove huddle ${m.code} from your list`}
+              onClick={() => run(() => remove({ groupId: m.groupId }))}>Remove</button>
+          </div>
         </li>)}</ul>}
-      {confirming ? <p className="muted" role="status">This removes it from your list only. Others in the huddle keep it.</p> : null}
+      {memberships?.length ? <p className="muted">Remove takes a huddle off your list only. Others in it keep it.</p> : null}
     </section> : <p className="card !py-3 text-sm">Want your huddles on every device? <Link className="underline font-bold" to="/login">Sign in or create an account</Link></p>}
   </>}</AccountShell>;
 }

@@ -29,7 +29,7 @@ export default function PlanningHuddle({ members, start }: { members: Member[]; 
     const id = setInterval(() => setTick(t => t + 1), 2400);
     return () => clearInterval(id);
   }, []);
-  const cast = members.slice(0, 6);
+  const cast = members.slice(0, 5);
   if (hidden) {
     return <button className="planning-pill btn btn-sun" onClick={() => setHidden(false)}>Planning… show the huddle</button>;
   }
@@ -42,14 +42,14 @@ export default function PlanningHuddle({ members, start }: { members: Member[]; 
         <p className="muted">Everyone's advocates are talking it over. No booking is being made.</p>
         <div className="planning-stage" aria-hidden="true">
           <div className="planning-chair">
-            <Buddy who="Coordinator" pose="ear" size={84} crown boil />
+            <span className="planning-figure is-chair"><Buddy who="Coordinator" pose="ear" size={84} crown boil /></span>
             <span className="planning-name">Coordinator</span>
           </div>
           <ul className="planning-ring">
             {cast.map((m, i) => (
               <li key={m.id} className={i === speaker ? "is-speaking" : ""}>
                 {i === speaker ? <p className="planning-bubble">{line}</p> : <p className="planning-bubble is-quiet"><span className="dots"><i /><i /><i /></span></p>}
-                <Buddy who={m.name} pose={i === speaker ? "argue" : "huddle"} size={64} boil={i === speaker} />
+                <span className="planning-figure" style={{ animationDelay: `${i * -0.37}s` }}><Buddy who={m.name} pose={i === speaker ? "argue" : i % 2 ? "wave" : "huddle"} size={64} boil={i === speaker} /></span>
                 <span className="planning-name">{m.name}'s advocate</span>
               </li>
             ))}

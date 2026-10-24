@@ -113,6 +113,15 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
   </div>;
 }
 
+// Every option gets its own street map; straight segments are only the
+// fallback the map draws if the walking route can't be fetched.
+function OptionMap({ plan }: { plan: AgentPlan }) {
+  const stops = plan.stops.filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lng));
+  if (!stops.length) return null;
+  const lines = stops.slice(1).map((s, i) => [[stops[i].lng, stops[i].lat], [s.lng, s.lat]] as [number, number][]);
+  return <PlanMap plan={{ ...plan, stops }} lines={lines} />;
+}
+
 export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1 }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number }) {
   const listings = useCatalogListings();
   const ready = isReadyAgentPlan(plan);
@@ -164,17 +173,14 @@ export function AgentPlans() {
   if (agent?.status === "planning") return <section className="card space-y-3" role="status"><h1 className="card-title">Your coordinator is planning</h1><p>Considering confirmed prompts and checking catalog itineraries. No booking is being made.</p></section>;
   const result = planRun?.result;
   const active = !!agent && ["ready", "blocked"].includes(agent.status) && result?.inputRevision === agent.revision;
-  const first = active ? result?.plans[0] : undefined;
   const hasChoices = active && !!(result?.plans.length || result?.suggestions?.length);
   const canDiscuss = hasChoices;
-  const lines = first?.stops.slice(1).map((s, i) => [[first.stops[i].lng, first.stops[i].lat], [s.lng, s.lat]] as [number, number][]) ?? [];
   return <div className="space-y-5">
     <h1 className="shout text-[48px]">Your group’s plans</h1>
     {agent?.error ? <p className="card error" role="alert">{agent.error}</p> : null}
     {!active && !result?.conflicts.length ? <p className="card">Review everyone's current needs before generating plans.</p> : null}
     {result?.conflicts.map(c => <p className="card card-note" key={c}>{c}</p>)}
-    {first ? <PlanMap plan={first} lines={lines} /> : null}
-    {active ? result?.plans.map((plan, index) => <AgentPlanCard key={plan.id} plan={plan} optionNumber={index + 1} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} />) : null}
+    {active ? result?.plans.map((plan, index) => <div key={plan.id} className="space-y-3"><OptionMap plan={plan} /><AgentPlanCard plan={plan} optionNumber={index + 1} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} /></div>) : null}
     {active ? <OtherOptions suggestions={result?.suggestions ?? []} orders={orders} startAt={(result?.plans.length ?? 0) + 1} /> : null}
     <section className="card space-y-3">
       <h2 className="card-title">Coordinator and group conversation</h2>
@@ -226,7 +232,7 @@ export function AgentVote() {
     <Link className="btn" to={`/g/${session.groupId}/plans`}>Read plans and conversation</Link>
     {!choices.length ? <p className="card">No options yet. The host can find plans after everyone saves their needs.</p> : null}
     {choices.map((choice, index) => <div key={choice.id} className={`vote-option ${votes?.myVote === choice.id ? "is-mine" : ""}`}>
-      {"stops" in choice ? <AgentPlanCard plan={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} />
+      {"stops" in choice ? <><OptionMap plan={choice} /><AgentPlanCard plan={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} /></>
         : <AgentSuggestionCard suggestion={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} />}
       <VoteChoice planId={choice.id} title={`Option ${index + 1}`} votes={votes} members={group.members} myMemberId={session.memberId}
         busy={busy || !("stops" in choice) && !listings.has(choice.placeId)} onVote={() => run(() => vote({ runId, planId: choice.id }))} />
