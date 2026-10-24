@@ -69,6 +69,46 @@ collect.py publish ──POST /catalog──▶ SpacetimeDB venue + catalog_stat
 
 Contract details: `docs/CONTRACT.md` S5.5 "Live venue catalog", and the `catalog` field in `docs/AGENT_CONTRACT.md`.
 
+## Venue details: menus, takeout, seating, photos, dietary evidence
+
+`collect.py details` builds `data/brightdata/details.json`, one record per catalog venue, from three sources:
+
+| Fact | Source | Notes |
+|---|---|---|
+| Ratings, review counts, star distribution | Google Maps (Bright Data) | With the scrape's `fetchedAt` and listing URL. |
+| Takeout, delivery, dine-in, outdoor seating, `servesVegetarianFood`, price level | Google Places API (New), by place ID | Needs `GOOGLE_PLACES_API_KEY`. One call per venue (about $0.02–0.03), cached in `google_places.json`. A field Google omits stays `null`. |
+| Photos with author attribution | Google Places | `photoUri` plus `authorAttributions`. Google Maps listing photos are also kept, with `attribution: null` because the scrape doesn't name their authors. |
+| Online ordering | Google Maps "Place an order" action | Says ordering exists. It doesn't say whether that's pickup or delivery, so it's kept separate from takeout. |
+| Seating notes | Google Maps | "…accessible seating" notes and "Located in" (e.g. inside a park or market). Public parks/plazas within 250 m are listed as **inferred**, with seating marked unverified. |
+| Menus with item prices | The venue's website, HTML or text PDF | Fetched via Web Unlocker (`BRIGHTDATA_UNLOCKER_ZONE`) or `--fetch direct`. Claude (`CLAUDE_MODEL_SMART`) lists items as JSON. Code keeps an item only if its quote is verbatim on the page and contains the name, price and labels. Cached in `menus.json`. |
+
+**Rules:**
+- **Unknown values stay unknown.** Every fact is `{value, source, url, fetchedAt}`. An unknown fact is `value: null` plus a `reason`, never `false`.
+- **Dietary tags carry `evidence`.**
+  - `explicit_menu`: a label printed next to the item, the item's own text, or its menu section heading, with the quote and page URL.
+  - `inferred`: a Google listing attribute or category, which is not menu evidence.
+  - A label the page doesn't define (e.g. "V" with no legend) keeps `tag: null`. Phrases that mention a diet without claiming it ("vegetarian-fed beef", "not vegan") are ignored.
+- **`safetyNote` on every record:** no tag establishes allergen or cross-contact safety.
+- **Menu `status`** is one of:
+  - `ok`;
+  - `no_menu_found`;
+  - `menu_in_ordering_app` (DoorDash, Clover, Toast… are JavaScript apps we can't read);
+  - `fetch_failed`, `extraction_failed`;
+  - `unknown` (not fetched).
+  Image-only PDFs are listed per page as "not read".
+- **Highlights:** `menu.highlights` picks out vegan items, steak, fries and desserts from the verified items.
+
+Sample run (2026-10-24, `--fetch direct --no-places`, 5 venues):
+- 4 menus extracted: The Butcher's Son, Nation's, Super Duper, Wood Tavern (lunch PDF; its dinner and dessert PDFs are image-only).
+- Little Gem's menu is only on DoorDash.
+- Takeout and dine-in are unknown until a Places key is set.
+
+```bash
+api/.venv/bin/python -m pip install -r data/reviews/requirements.txt   # anthropic, pypdf
+api/.venv/bin/python data/reviews/collect.py details --limit 20          # Places + menus via Web Unlocker
+api/.venv/bin/python data/reviews/collect.py details --only p_006 --fetch direct --no-places
+```
+
 ## Outputs
 
 - `data/raw/brightdata_<source>_<kind>_<time>.json` (gitignored): every raw response, along with what was asked.

@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import brightdata as bd  # noqa: E402
 import collect  # noqa: E402
 import source_gmaps  # noqa: E402
+import source_places  # noqa: E402
 import source_yelp  # noqa: E402
 
 WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -93,6 +94,10 @@ class Classify(unittest.TestCase):
         self.assertEqual(collect.classify(["Cocktail bar"]), ("hangout", "activity"))
         self.assertEqual(collect.classify(["Barbecue restaurant"]), ("restaurant", "meal"))
         self.assertEqual(collect.classify(["Park"]), ("hangout", "activity"))
+        self.assertEqual(collect.classify(["Wine bar"]), ("hangout", "activity"))
+        self.assertIsNone(collect.classify(["Supermarket", "Cafe", "Deli"]))  # Berkeley Bowl
+        self.assertEqual(collect.classify(["Bubble tea store", "Cafe"]), ("boba", "dessert"))
+        self.assertIsNone(collect.classify(["Wine store"]))  # real 2026-10-24 record: a shop, not a hangout
         self.assertIsNone(collect.classify(["Parking garage"]))
         self.assertIsNone(collect.classify(["Hardware store"]))
 
@@ -145,6 +150,12 @@ class Matching(unittest.TestCase):
                                                 "phone": ""}))
         # Same name across town: not the same place.
         self.assertFalse(collect.same_place(a, {"name": "Imm Thai", "lat": 37.8600, "lng": -122.2550, "phone": ""}))
+        # A different Google place next door never takes a catalog place's id (real 2026-10-24 case).
+        catalog = [{"id": "p_008", "googlePlaceId": "ChIJcomal", "name": "Comal", "lat": 37.8697, "lng": -122.2685, "phone": ""}]
+        nextdoor = {"name": "Comal Next Door", "lat": 37.8697, "lng": -122.2686, "phone": ""}
+        self.assertIsNone(collect.catalog_match(nextdoor, {"place_id": "ChIJnextdoor"}, catalog))
+        self.assertEqual(collect.catalog_match(nextdoor, {"place_id": "ChIJcomal"}, catalog)["id"], "p_008")
+        self.assertEqual(collect.catalog_match({**nextdoor, "name": "Comal"}, None, catalog)["id"], "p_008")  # Yelp-only
         # Same phone, no coordinates on one side.
         self.assertTrue(collect.same_place({**a, "phone": "+15105551234"},
                                            {"name": "IMM", "lat": None, "lng": None, "phone": "+15105551234"}))
@@ -223,6 +234,45 @@ class BuildAndMerge(unittest.TestCase):
         self.assertEqual(len(again), len(merged))
         fresh = collect.merge(self.catalog, rows, {"meal": 5, "dessert": 5, "activity": 5}, log=lambda *_: None)
         self.assertEqual([p["id"] for p in fresh], [p["id"] for p in merged])
+
+    def test_priced_merge_looks_up_new_meals_once(self):
+        bd.save_raw("gmaps", "discover", {}, [], [
+            gmaps_rec("ChIJe", "Pricey Place", 37.8705, -122.2690, ["French restaurant"], phone_number="(510) 555-0201",
+                      reviews_count=900),
+            gmaps_rec("ChIJf", "Unpriced Place", 37.8706, -122.2650, ["Thai restaurant"], phone_number="(510) 555-0202",
+                      reviews_count=800),
+            gmaps_rec("ChIJg", "Third Place", 37.8707, -122.2620, ["Pizza restaurant"], phone_number="(510) 555-0203",
+                      reviews_count=700),
+            gmaps_rec("ChIJh", "Flaky Place", 37.8708, -122.2600, ["Burger restaurant"], phone_number="(510) 555-0204",
+                      reviews_count=600),
+        ])
+        rows = collect.build(log=lambda *_: None)
+        answers = {"ChIJe": "PRICE_LEVEL_EXPENSIVE", "ChIJf": None, "ChIJg": "PRICE_LEVEL_INEXPENSIVE"}
+        calls = []
+
+        def fake(key, gid):
+            calls.append(gid)
+            if gid == "ChIJh":
+                return {"priceLevel": None, "fetchedAt": "2026-10-24T20:00:00Z", "error": "HTTP 503"}
+            return {"priceLevel": answers[gid], "fetchedAt": "2026-10-24T20:00:00Z"}
+        saved = (source_places.lookup, source_places.load_key)
+        source_places.lookup, source_places.load_key = fake, lambda: "test-key"
+        try:
+            merged, prices = collect.priced_merge(self.catalog, rows, {"meal": 2}, log=lambda *_: None)
+            again, _ = collect.priced_merge(self.catalog, rows, {"meal": 2}, log=lambda *_: None)
+        finally:
+            source_places.lookup, source_places.load_key = saved
+        new = {p["name"]: p for p in merged if p["id"].startswith("bd_")}
+        self.assertEqual(set(new), {"Pricey Place", "Third Place"})  # the unpriced one is passed over
+        self.assertEqual((new["Pricey Place"]["priceLevel"], new["Pricey Place"]["costPerPerson"]), (3, 45))
+        self.assertEqual((new["Third Place"]["priceLevel"], new["Third Place"]["costPerPerson"]), (1, 12))
+        self.assertNotIn("ChIJh", prices)  # a failed lookup is not cached as "no price"
+        self.assertEqual([p["id"] for p in again], [p["id"] for p in merged])
+        self.assertEqual(calls.count("ChIJe"), 1)  # cached in prices.json: paid once
+        payload = collect.snapshot_payload(merged, rows, [], "2026-10-24T20:00:00Z", prices)
+        ev = next(v["evidence"] for v in payload["venues"] if v["place"]["name"] == "Pricey Place")
+        self.assertEqual(ev["sources"][0], {"source": "google_places", "url": None,
+                                            "fetchedAt": "2026-10-24T20:00:00Z", "rating": None, "reviewCount": None})
 
     def test_publish_payload(self):
         rows = collect.build(log=lambda *_: None)

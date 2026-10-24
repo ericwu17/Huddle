@@ -71,6 +71,8 @@ class Client:
             status, text = e.code, e.read().decode(errors="replace")
         except urllib.error.URLError as e:
             raise BrightDataError(f"{path}: {e.reason}") from e
+        except (TimeoutError, ConnectionError) as e:  # a read can time out after the connection opened
+            raise BrightDataError(f"{path}: {type(e).__name__}: {e}") from e
         try:
             return status, json.loads(text)
         except json.JSONDecodeError:

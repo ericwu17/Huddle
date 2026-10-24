@@ -7,6 +7,7 @@ Measured 2026-10-24 (brightdata_googlemaps.md): discover_by=location returned 20
 from __future__ import annotations
 
 import math
+import re
 
 from brightdata import Client, as_list, cut_url, e164, is_error, pick, strip_people
 
@@ -66,6 +67,30 @@ def gcids(rec: dict) -> list[str]:
     return [i["gcid"] for i in items if isinstance(i, dict) and isinstance(i.get("gcid"), str)]
 
 
+def detail_entries(rec: dict, field: str) -> list[dict]:
+    return [d for d in rec.get("business_details") or [] if isinstance(d, dict) and d.get("field_name") == field]
+
+
+def order_links(rec: dict) -> list[dict]:
+    """The listing's "Place an order" actions: evidence of online ordering, not of takeout."""
+    out = []
+    for d in detail_entries(rec, "action"):
+        text = " ".join((d.get("details") or "").split())
+        if re.search(r"place an order|order online", text, re.I):
+            out.append({"label": "Place an order", "url": cut_url(d.get("link"))})
+    return out
+
+
+def listing_photos(rec: dict, limit: int = 3) -> list[str]:
+    """Listing photo URLs. The scrape does not say who took them."""
+    urls = [rec.get("main_image")] + list(rec.get("photos_and_videos") or [])
+    out = []
+    for u in urls:
+        if isinstance(u, str) and u.startswith("https://") and u not in out:
+            out.append(u)
+    return out[:limit]
+
+
 def normalize(rec: dict) -> dict | None:
     """Keep what the app uses. Hours come from open_hours: business_details text is relative to scrape time."""
     if is_error(rec) or not rec.get("place_id"):
@@ -96,5 +121,9 @@ def normalize(rec: dict) -> dict | None:
         "permanently_closed": rec.get("permanently_closed"),
         "top_reviews": strip_people(rec.get("top_reviews")),
         "reviews_snippets": strip_people(rec.get("reviews_snippets")),
+        "order_links": order_links(rec),
+        "located_in": next((" ".join(d["details"].split()) for d in detail_entries(rec, "locatedin")
+                            if d.get("details")), None),
+        "photos": listing_photos(rec),
         "found_by": found_by(rec),
     }

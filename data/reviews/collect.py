@@ -37,8 +37,11 @@ DATA = HERE.parent
 sys.path.insert(0, str(DATA))
 
 import brightdata as bd  # noqa: E402
+import details  # noqa: E402
 import fetch_places as fp  # noqa: E402
 import source_gmaps  # noqa: E402
+import source_menus  # noqa: E402
+import source_places  # noqa: E402
 import source_yelp  # noqa: E402
 
 OUT = DATA / "brightdata"
@@ -66,12 +69,12 @@ BOBA = terms("bubble tea", "boba", "tea house", "teahouse", "tea room", "tea sho
 PLAY = terms("board game", "escape room", "arcade", "bowling", "karaoke", "museum", "cinema", "movie theater",
              "comedy club", "live music", "music venue", "billiard", "climbing", "mini golf", "pottery")
 SWEET = terms("cafe", "coffee", "dessert", "ice cream", "gelato", "frozen yogurt", "bakery", "bakeries", "donut",
-              "patisserie", "creperie", "chocolate", "cupcake", "juice")
+              "patisserie", "creperie", "chocolate", "cupcake", "juice", "bagel")
 CUISINE_WORDS = sorted({w.replace("_", " ") for keys in fp.CUISINE_TYPES.values() for w in keys})
 FOOD = terms("restaurant", "grill", "diner", "taqueria", "bistro", "eatery", "steakhouse", "deli", "kitchen",
              "gastropub", "noodle", "dumpling", "hot pot", "poke", "salad", "soup", "burger", "bbq", "food",
              "fast food", "falafel", "brunch", "breakfast", "pho", "wings", *CUISINE_WORDS)
-FUN = terms("bar", "pub", "brewery", "brewpub", "wine", "cocktail", "lounge", "night club", "nightclub", "arcade",
+FUN = terms("bar", "pub", "brewery", "brewpub", "wine bar", "winery", "cocktail", "lounge", "night club", "nightclub", "arcade",
             "bowling", "karaoke", "board game", "escape room", "museum", "art gallery", "gallery", "music venue",
             "live music", "concert", "comedy", "theater", "theatre", "cinema", "movie", "park", "garden",
             "botanical", "amusement", "billiard", "pool hall", "climbing", "mini golf", "pottery", "jazz",
@@ -107,8 +110,16 @@ def plain(text: str) -> str:
     return text.lower().replace("é", "e").replace("&", " and ")
 
 
+# A place whose primary category is a shop is not a stop, whatever it also sells (a supermarket
+# lists "Cafe" and "Deli" too: Berkeley Bowl, 2026-10-24).
+NOT_A_STOP = terms("supermarket", "grocery", "grocery store", "convenience store", "liquor store", "beer store",
+                   "wine store", "market", "gas station", "pharmacy", "department store", "shopping mall", "caterer")
+
+
 def classify(categories: list[str]) -> tuple[str, str] | None:
     """(group, Huddle category) from the first category that says anything; the first is the primary."""
+    if categories and NOT_A_STOP.search(plain(categories[0])):
+        return None
     for cat in categories:
         for pattern, group, category in KINDS:
             if pattern.search(plain(cat)):
@@ -262,6 +273,18 @@ def best_match(row: dict, candidates: list[dict]):
     return candidates[i] if score > 0 else None
 
 
+def catalog_match(row: dict, g: dict | None, catalog: list[dict], by_gid: dict | None = None):
+    """A Google record matches a catalog place by place id only: a different id is a different
+    place, however similar the name ("Comal" vs "Comal Next Door"). Names and phones decide only
+    against catalog places with no Google id, or for Yelp-only records."""
+    if by_gid is None:
+        by_gid = {p["googlePlaceId"]: p for p in catalog if p.get("googlePlaceId")}
+    if g:
+        return by_gid.get(g.get("place_id") or g.get("key")) or best_match(
+            row, [p for p in catalog if not p.get("googlePlaceId")])
+    return best_match(row, catalog)
+
+
 def in_box(lat, lng, box=fp.BERKELEY) -> bool:
     lo, hi = box["rectangle"]["low"], box["rectangle"]["high"]
     return (lat is not None and lng is not None and lo["latitude"] <= lat <= hi["latitude"]
@@ -321,7 +344,7 @@ def unify(latest: dict, first_seen: dict, found: dict, catalog: list[dict]) -> l
                "name": top["name"], "address": top["address"] or (y or {}).get("address", ""),
                "lat": lat, "lng": lng, "phone": top["phone"] or (y or {}).get("phone", ""),
                "distance_mi": None if lat is None else round(meters(*DOWNTOWN, lat, lng) / 1609.34, 2)}
-        huddle = (g and by_gid.get(g["key"])) or best_match(row, catalog)
+        huddle = catalog_match(row, g, catalog, by_gid)
         keys = [("gmaps", g["key"]) if g else None, ("yelp", y["key"]) if y else None]
         seen = [first_seen[k] for k in keys if k in first_seen]
         row.update({"huddleId": huddle["id"] if huddle else None,
@@ -405,7 +428,7 @@ def row_texts(row: dict) -> list[str]:
     return list(g.get("categories") or []) + list(g.get("services") or []) + list(y.get("categories") or [])
 
 
-def to_place(row: dict, pid: str):
+def to_place(row: dict, pid: str, price_level: int | None = None):
     g, y = row.get("google") or {}, row.get("yelp") or {}
     hours = parse_hours(g.get("open_hours")) or parse_hours(y.get("hours"))
     rating = g.get("rating") if g.get("rating") is not None else y.get("rating")
@@ -413,7 +436,7 @@ def to_place(row: dict, pid: str):
         return None
     category = row["category"]
     categories = list(g.get("categories") or []) + list(y.get("categories") or [])
-    level = y.get("price_level")
+    level = y.get("price_level") or price_level
     if category == "meal":
         cost = fp.MEAL_PRICE.get(LEVEL_NAMES[level - 1], 25) if level else 25
     elif category == "dessert":
@@ -449,8 +472,14 @@ def stable_id(row: dict) -> str:
     return "bd_" + hashlib.sha1(row["bdId"].encode()).hexdigest()[:10]
 
 
-def merge(catalog: list[dict], rows: list[dict], add: dict, log=print) -> list[dict]:
-    """Enrich matched places (only empty priceLevel, extra dietary tags, sources) and append new ones."""
+def merge(catalog: list[dict], rows: list[dict], add: dict, log=print, prices: dict | None = None,
+          missing: list | None = None, skip: set = frozenset()) -> list[dict]:
+    """Enrich matched places (only empty priceLevel, extra dietary tags, sources) and append new ones.
+
+    With `prices` (place ID -> Google Places result), a new meal needs a known price: a place
+    Google gives no price is passed over, and one not looked up yet goes into `missing`
+    (counting toward the target) for priced_merge to look up. Without it, unpriced meals cost 25.
+    """
     catalog = json.loads(json.dumps(catalog))
     by_id = {p["id"]: p for p in catalog}
     enriched = 0
@@ -466,18 +495,29 @@ def merge(catalog: list[dict], rows: list[dict], add: dict, log=print) -> list[d
             p["sources"] = p["sources"] + ["brightdata"]
         enriched += json.dumps(p) != before
     added = {c: [] for c in add}
+    pending = {c: 0 for c in add}
     taken = set(by_id)
-    gids = {p.get("googlePlaceId") for p in catalog if p.get("googlePlaceId")}
     for row in sorted(rows, key=lambda r: -reviews(r)):
         cat = row["category"]
-        if cat not in add or len(added[cat]) >= add[cat] or row.get("huddleId"):
+        if cat not in add or len(added[cat]) + pending[cat] >= add[cat] or row.get("huddleId"):
             continue
         g = row.get("google") or {}
-        if g.get("place_id") in gids or best_match(row, catalog) or g.get("temporarily_closed"):
+        if catalog_match(row, row.get("google"), catalog) or g.get("temporarily_closed"):
             continue
         if not in_box(row["lat"], row["lng"]):
             continue
-        place = to_place(row, stable_id(row))
+        level = None
+        if prices is not None and cat == "meal" and not (row.get("yelp") or {}).get("price_level"):
+            gid = g.get("place_id")
+            if not gid or gid in skip or (gid in prices and not prices[gid].get("priceLevel")):
+                continue
+            if gid not in prices:
+                if missing is not None and to_place(row, stable_id(row)) is not None:
+                    missing.append(gid)
+                    pending[cat] += 1
+                continue
+            level = fp.PRICE_NUM.get(prices[gid]["priceLevel"])
+        place = to_place(row, stable_id(row), level)
         if place is None or place["id"] in taken:
             continue
         catalog.append(place)
@@ -492,6 +532,31 @@ def merge(catalog: list[dict], rows: list[dict], add: dict, log=print) -> list[d
     return catalog
 
 
+def priced_merge(catalog: list[dict], rows: list[dict], add: dict, log=print) -> tuple[list[dict], dict]:
+    """merge, looking up each candidate new meal on Google Places first (cached, paid once)."""
+    path = OUT / "google_places.json"
+    prices = read_json(path, {})
+    key, failed = None, set()
+    for _ in range(20):
+        missing: list = []
+        merge(catalog, rows, add, log=lambda *_: None, prices=prices, missing=missing, skip=failed)
+        if not missing:
+            break
+        key = key or source_places.load_key()
+        log(f"prices: looking up {len(missing)} new restaurants on Google Places")
+        for gid in missing:
+            result = source_places.lookup(key, gid)
+            if "error" in result:
+                failed.add(gid)  # passed over this run, retried next time
+            else:
+                prices[gid] = result
+        write_json(path, prices)
+    unpriced = sum(1 for v in prices.values() if not v.get("priceLevel"))
+    if prices:
+        log(f"prices: {len(prices) - unpriced} priced, {unpriced} without a Google price (not added)")
+    return merge(catalog, rows, add, log=log, prices=prices, skip=failed), prices
+
+
 # publish: the merged catalog straight into SpacetimeDB (POST /catalog, server/src/lib/catalog.ts).
 # The module validates the whole snapshot and swaps it in atomically; every coordinator request
 # then carries it to FastAPI, so no republish or restart is needed.
@@ -499,9 +564,12 @@ def merge(catalog: list[dict], rows: list[dict], add: dict, log=print) -> list[d
 MAX_ACTIVE = {"meal": 80, "activity": 50, "dessert": 30}  # same caps as server/src/lib/catalog.ts
 
 
-def evidence_for(row: dict | None, fetched: dict) -> dict:
+def evidence_for(row: dict | None, fetched: dict, price: dict | None = None) -> dict:
     """Source URL, fetch time and rating per source, only as the scrape recorded them."""
     sources = []
+    if price and price.get("priceLevel"):  # where a new venue's price came from
+        sources.append({"source": "google_places", "url": None, "fetchedAt": price.get("fetchedAt"),
+                        "rating": None, "reviewCount": None})
     for source, sub, key in (("gmaps", (row or {}).get("google"), "place_id"), ("yelp", (row or {}).get("yelp"), "biz_id")):
         if not sub:
             continue
@@ -516,7 +584,8 @@ def evidence_for(row: dict | None, fetched: dict) -> dict:
     return {"sources": sources}
 
 
-def snapshot_payload(catalog: list[dict], rows: list[dict], snaps: list[dict], generated_at: str) -> dict:
+def snapshot_payload(catalog: list[dict], rows: list[dict], snaps: list[dict], generated_at: str,
+                     prices: dict | None = None) -> dict:
     by_place: dict = {}
     for r in rows:
         if r.get("huddleId"):
@@ -526,7 +595,9 @@ def snapshot_payload(catalog: list[dict], rows: list[dict], snaps: list[dict], g
     for s in snaps:
         k = (s["source"], s["key"])
         fetched[k] = max(fetched.get(k, s["fetched_at"]), s["fetched_at"])
-    venues = [{"place": p, "evidence": evidence_for(by_place.get(p["id"]), fetched)} for p in catalog]
+    venues = [{"place": p, "evidence": evidence_for(by_place.get(p["id"]), fetched,
+                                                     (prices or {}).get(p.get("googlePlaceId")) if p["id"].startswith("bd_") else None)}
+              for p in catalog]
     digest = hashlib.sha256(json.dumps(venues, sort_keys=True).encode()).hexdigest()[:8]
     return {"version": f"{generated_at}-{digest}", "generatedAt": generated_at, "venues": venues}
 
@@ -648,6 +719,76 @@ def cmd_refresh(args) -> None:
     sys.exit(0 if run_jobs(jobs) else 1)
 
 
+def latest_fetches(snaps: list[dict]) -> dict:
+    fetched: dict = {}
+    for s in snaps:
+        k = (s["source"], s["key"])
+        fetched[k] = max(fetched.get(k, s["fetched_at"]), s["fetched_at"])
+    return fetched
+
+
+def cmd_details(args) -> None:
+    """Takeout, seating, photos, menus and dietary evidence for the catalog -> data/brightdata/details.json."""
+    rows = read_json(OUT / "places.json", None)
+    if rows is None:
+        sys.exit("data/brightdata/places.json is missing: run discover or build first.")
+    snap = read_json(OUT / "catalog.json", None)  # the last publish (or --dry-run) snapshot
+    targets = [v["place"] for v in snap["venues"]] if snap else read_json(PLACES, [])
+    if args.only:
+        wanted = {x.strip() for x in args.only.split(",")}
+        targets = [t for t in targets if t["id"] in wanted]
+    if args.limit:
+        targets = targets[:args.limit]
+    by_gid = {r["google"]["place_id"]: r for r in rows if r.get("google")}
+    places_path, menus_path = OUT / "google_places.json", OUT / "menus.json"
+    google, menus = read_json(places_path, {}), read_json(menus_path, {})
+    if args.places:
+        key = source_places.load_key()
+        for t in targets:
+            gid = t.get("googlePlaceId")
+            if gid and (args.refresh or gid not in google):
+                result = source_places.lookup(key, gid, args.photos)
+                if "error" in result:
+                    print(f"  places: {t['name']}: {result['error']} (left unknown)")
+                    continue
+                google[gid] = result
+                write_json(places_path, google)
+    if args.menus:
+        client = zone = None
+        if args.fetch == "unlocker":
+            zone = bd.env_value("BRIGHTDATA_UNLOCKER_ZONE")
+            if not zone:
+                sys.exit("Set BRIGHTDATA_UNLOCKER_ZONE (a Web Unlocker zone name) or pass --fetch direct.")
+            client = bd.Client(bd.load_key())
+        for t in targets:
+            mkey = t.get("googlePlaceId") or t["id"]
+            if t["category"] == "activity" or (mkey in menus and not args.refresh):
+                continue
+            website = ((by_gid.get(t.get("googlePlaceId")) or {}).get("google") or {}).get("website")
+            try:
+                menus[mkey] = source_menus.menu_for(t["name"], website, args.fetch, client, zone)
+            except Exception as e:  # one bad site must not stop a long batch; the reason is kept
+                menus[mkey] = {"status": "fetch_failed", "website": website, "pages": [], "items": [], "legend": None,
+                               "extractedAt": None, "reason": f"unexpected error: {type(e).__name__}: {e}"[:300]}
+            m = menus[mkey]
+            print(f"  menu: {t['name']}: {m['status']}, {len(m['items'])} items" + (f" ({m['reason']})" if m.get("reason") else ""))
+            write_json(menus_path, menus)
+    fetched = latest_fetches(read_json(OUT / "snapshots.json", []))
+    order = {t["id"]: i for i, t in enumerate([v["place"] for v in snap["venues"]] if snap else targets)}
+    # A full run replaces the file (venues no longer in the catalog go); --only/--limit update in place.
+    out = {} if not (args.only or args.limit) else {d["id"]: d for d in read_json(OUT / "details.json", [])}
+    for t in targets:
+        gid = t.get("googlePlaceId")
+        out[t["id"]] = details.venue_details(t, by_gid.get(gid), google.get(gid), menus.get(gid or t["id"]),
+                                             fetched, rows)
+    write_json(OUT / "details.json", sorted(out.values(), key=lambda d: order.get(d["id"], len(order))))
+    done = [out[t["id"]] for t in targets]
+    print(f"details: {len(done)} venues -> {OUT / 'details.json'}; menus ok {sum(d['menu']['status'] == 'ok' for d in done)}, "
+          f"takeout known {sum(d['takeout']['value'] is not None for d in done)}, "
+          f"with photos {sum(bool(d['photos']) for d in done)}, "
+          f"explicit menu dietary {sum(d['dietaryCoverage'] == 'explicit_menu' for d in done)}")
+
+
 def cmd_fetch(args) -> None:
     """Download a finished job by snapshot id (when discover/refresh stopped waiting), then build."""
     records = bd.Client(bd.load_key()).wait(args.snapshot, timeout_s=args.wait)
@@ -662,7 +803,7 @@ def cmd_merge(args) -> None:
     if rows is None:
         sys.exit("data/brightdata/places.json is missing: run discover or build first.")
     catalog = read_json(PLACES, [])
-    merged = merge(catalog, rows, parse_add(args.add))
+    merged, _ = priced_merge(catalog, rows, parse_add(args.add))
     for problem in fp.validate(merged):
         if "no phone" not in problem:
             print("  note:", problem)
@@ -681,7 +822,7 @@ def cmd_publish(args) -> None:
     rows = read_json(OUT / "places.json", None)
     if rows is None:
         sys.exit("data/brightdata/places.json is missing: run discover or build first.")
-    catalog = merge(read_json(PLACES, []), rows, parse_add(args.add))
+    catalog, prices = priced_merge(read_json(PLACES, []), rows, parse_add(args.add))
     counts = {c: sum(p["category"] == c for p in catalog) for c in MAX_ACTIVE}
     over = {c: n for c, n in counts.items() if n > MAX_ACTIVE[c]}
     if over:
@@ -689,7 +830,7 @@ def cmd_publish(args) -> None:
     problems = [x for x in fp.validate(catalog) if "no phone" not in x]
     if problems:
         sys.exit("Not publishing an invalid catalog:\n  " + "\n  ".join(problems))
-    payload = snapshot_payload(catalog, rows, read_json(OUT / "snapshots.json", []), bd.now_iso())
+    payload = snapshot_payload(catalog, rows, read_json(OUT / "snapshots.json", []), bd.now_iso(), prices)
     write_json(OUT / "catalog.json", payload)  # the snapshot as sent; the last good one stays live on failure
     sourced = sum(bool(v["evidence"]["sources"]) for v in payload["venues"])
     print(f"Snapshot {payload['version']}: {counts}, {sourced} with Bright Data evidence "
@@ -732,6 +873,15 @@ def main() -> None:
     f.add_argument("--source", choices=["gmaps", "yelp"], required=True)
     f.add_argument("--kind", default="discover", choices=["discover", "refresh", "catalog"])
     f.add_argument("--wait", type=int, default=3600, help="seconds to wait if it is still running")
+    dt = sub.add_parser("details", help="takeout, seating, photos, menus and dietary evidence for the catalog")
+    dt.add_argument("--only", help="comma list of catalog ids (p_005,bd_…)")
+    dt.add_argument("--limit", type=int, help="first N catalog venues")
+    dt.add_argument("--no-places", dest="places", action="store_false", help="skip Google Places lookups")
+    dt.add_argument("--no-menus", dest="menus", action="store_false", help="skip website menus")
+    dt.add_argument("--fetch", choices=["unlocker", "direct"], default="unlocker",
+                    help="how to fetch websites: Bright Data Web Unlocker (default) or plain HTTPS")
+    dt.add_argument("--photos", type=int, default=2, help="Google Places photos per venue")
+    dt.add_argument("--refresh", action="store_true", help="look up again even when cached")
     sub.add_parser("build", help="rebuild data/brightdata/ from data/raw/ without calling the API")
     m = sub.add_parser("merge", help="fold Bright Data into data/places.json, keeping existing ids")
     m.add_argument("--add", help="new places per category, e.g. meal=10,dessert=5,activity=5")
@@ -740,7 +890,7 @@ def main() -> None:
     pb.add_argument("--add", help="new places per category, e.g. meal=10,dessert=5,activity=5")
     pb.add_argument("--dry-run", action="store_true", help="write data/brightdata/catalog.json, do not send")
     args = ap.parse_args()
-    {"probe": cmd_probe, "discover": cmd_discover, "refresh": cmd_refresh, "fetch": cmd_fetch, "build": lambda a: build(),
+    {"probe": cmd_probe, "discover": cmd_discover, "refresh": cmd_refresh, "fetch": cmd_fetch, "details": cmd_details, "build": lambda a: build(),
      "merge": cmd_merge, "publish": cmd_publish}[args.cmd](args)
 
 
