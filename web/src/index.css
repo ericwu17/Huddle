@@ -165,7 +165,7 @@ body {
 }
 .btn:hover:not(:disabled) { transform: translate(-1px, -2px); box-shadow: 5px 7px 0 var(--ink); }
 .btn:active:not(:disabled) { transform: translate(3px, 4px); box-shadow: 1px 1px 0 var(--ink); }
-.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn:disabled { cursor: not-allowed; background: #ebe8dd; color: #4a4860; border-color: rgb(22 21 43 / 0.55); box-shadow: 2px 3px 0 rgb(22 21 43 / 0.35); }
 .btn-primary { background: var(--pink); color: #fff; }
 .btn-sun { background: var(--sun); }
 .btn-cobalt { background: var(--cobalt); color: #fff; }
@@ -223,7 +223,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 
 /* ---- Group shell ---- */
 .topbar { display: flex; align-items: center; gap: 12px; }
-.logo { font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; text-shadow: 0 2px 0 var(--cobalt), 0 4px 0 var(--deep); }
+.logo { font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--ink); }
 .code-tag { padding: 2px 12px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; box-shadow: 3px 3px 0 var(--ink); }
 .me-tag { margin-left: auto; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
 
@@ -471,9 +471,8 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .btn-quiet { background: transparent; box-shadow: none; border-color: rgb(22 21 43 / 0.45); }
 .btn-quiet:hover { background: var(--note); }
 .btn-danger { background: var(--red); color: #fff; }
-.sidebar-account { display: grid; gap: 8px; justify-items: start; }
-.sidebar-account .btn-quiet { color: #fff; border-color: rgb(255 255 255 / 0.7); }
-.sidebar-account .btn-quiet:hover { color: var(--ink); }
+.sidebar-account { display: grid; gap: 8px; justify-items: start; padding: 12px 14px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 16px; box-shadow: 2px 3px 0 var(--ink); }
+.sidebar-account .btn-quiet { color: var(--ink); border-color: var(--ink); min-height: 40px; padding: 6px 16px; }
 
 /* Planning: the group's advocates huddle in the middle of the screen */
 .planning-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgb(22 21 43 / 0.45); }

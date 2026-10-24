@@ -103,6 +103,6 @@ export default function Home() {
           </div>}
         </li>)}</ul>}
       {confirming ? <p className="muted" role="status">This removes it from your list only. Others in the huddle keep it.</p> : null}
-    </section> : <p className="on-sky">Want your huddles on every device? <Link className="underline font-bold" to="/login">Sign in or create an account</Link></p>}
+    </section> : <p className="card !py-3 text-sm">Want your huddles on every device? <Link className="underline font-bold" to="/login">Sign in or create an account</Link></p>}
   </>}</AccountShell>;
 }
