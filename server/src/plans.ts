@@ -8,6 +8,7 @@ import { requireMember } from "./groups";
 import { apiFor } from "./lib/demo";
 import { COUNCIL_CAP_MS } from "./lib/constants";
 import { guardPlanResult, planFitsBudgets } from "./lib/budgets";
+import { availablePlans } from "./lib/availability";
 import type { Proc, Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs, parse } from "./lib/util";
 
@@ -165,9 +166,8 @@ export const castVote = spacetimedb.reducer({ name: "vote" }, { runId: t.string(
   const me = requireMember(tx);
   const run = tx.db.plan_run.runId.find(runId);
   if (!run || run.groupId !== me.groupId) throw new SenderError("no such run");
-  const plans: any[] = parse(run.resultJson)?.plans ?? [];
-  if (!plans.some((p) => p.id === planId && planFitsBudgets(p, planMembers(tx, me.groupId))))
-    throw new SenderError("plan is unavailable under current budgets");
+  if (!availablePlans(tx.db, me.groupId, runId).some((p) => p.id === planId))
+    throw new SenderError("plan is no longer available; choose a current plan");
   const id = `${runId}:${me.id}`;
   const row = { id, runId, memberId: me.id, planId };
   if (tx.db.vote.id.find(id)) tx.db.vote.id.update(row);
@@ -178,22 +178,29 @@ export const doRoulette = spacetimedb.procedure(
   { runId: t.string() },
   t.object("RouletteResult", { planId: t.string() }),
   (ctx, { runId }) => {
-    const plans = ctx.withTx((tx) => {
+    const input = ctx.withTx((tx) => {
       const me = requireMember(tx);
       const run = tx.db.plan_run.runId.find(runId);
       if (!run || run.groupId !== me.groupId) throw new SenderError("no such run");
-      const currentMembers = planMembers(tx, me.groupId);
-      return (parse(run.resultJson)?.plans ?? []).filter((p: any) => planFitsBudgets(p, currentMembers))
-        .map((p: any) => ({ id: p.id, robustness: p.robustness }));
+      return { groupId: me.groupId, plans: availablePlans(tx.db, me.groupId, runId)
+        .map((p) => ({ id: p.id, robustness: p.robustness })) };
     });
-    if (!plans.length) throw new SenderError("no plans fit current budgets");
+    if (!input.plans.length) throw new SenderError("no current plans fit current budgets");
     const seed = Number(ctx.timestamp.toMillis() % 100000n);
-    const res = apiFor(ctx, groupIdOf(ctx, runId), "/roulette", { plans, seed });
+    const res = apiFor(ctx, input.groupId, "/roulette", { plans: input.plans, seed });
     if (!res.ok) throw new SenderError(`roulette failed: ${res.error.message}`);
-    ctx.withTx((tx) => {
-      const run = tx.db.plan_run.runId.find(runId);
-      if (run) tx.db.plan_run.runId.update({ ...run, rouletteJson: JSON.stringify(res.data) });
+    return ctx.withTx((tx) => {
+      const me = requireMember(tx);
+      const planId = res.data?.planId;
+      // HTTP may finish after a cap changed, a re-plan started, or the caller
+      // joined another group. Never persist/return an unchecked external pick.
+      if (me.groupId !== input.groupId || typeof planId !== "string" ||
+          !input.plans.some((p) => p.id === planId) ||
+          !availablePlans(tx.db, input.groupId, runId).some((p) => p.id === planId))
+        throw new SenderError("roulette choice is no longer available; choose again");
+      const run = tx.db.plan_run.runId.find(runId)!;
+      tx.db.plan_run.runId.update({ ...run, rouletteJson: JSON.stringify(res.data) });
+      return { planId };
     });
-    return { planId: res.data.planId };
   },
 );

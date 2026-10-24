@@ -33,6 +33,12 @@ export function requireGroup(tx: Tx) {
   return g;
 }
 
+function requireHost(tx: Tx) {
+  const group = requireGroup(tx);
+  if (!group.hostIdentity.isEqual(tx.sender)) throw new SenderError("only the host can change this setting");
+  return group;
+}
+
 export const createGroup = spacetimedb.procedure(
   { name: t.option(t.string()) },
   t.object("CreateGroupResult", { groupId: t.string(), code: t.string() }),
@@ -107,11 +113,11 @@ export const setOrigin = spacetimedb.reducer({ lat: t.f64(), lng: t.f64() }, (tx
 });
 
 export const setDemoMode = spacetimedb.reducer({ on: t.bool() }, (tx, { on }) => {
-  const g = requireGroup(tx);
+  const g = requireHost(tx);
   tx.db.group.id.update({ ...g, demoMode: on });
 });
 
 export const setShowWhoCompromised = spacetimedb.reducer({ on: t.bool() }, (tx, { on }) => {
-  const g = requireGroup(tx);
+  const g = requireHost(tx);
   tx.db.group.id.update({ ...g, showWhoCompromised: on });
 });

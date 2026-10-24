@@ -10,6 +10,7 @@ import { fakeApi } from "../src/lib/fakes";
 import { PLACES, LIVE_PLACES, placeById, placesForMode } from "../src/lib/places";
 import { PLACE_BY_ID } from "../../web/src/places";
 import { insertCouncilMessage } from "../src/council";
+import { recordCallEvent } from "../src/booking";
 import { planMembers, startRun } from "../src/plans";
 import requestFixture from "../../api/fixtures/plan.request.json";
 import demo from "../../data/demo_group.json";
@@ -70,6 +71,260 @@ function session(env: Record<string, string | undefined> = {}, responder?: any) 
   };
   return { test, users, group, proc, reduce, start, runPlan, replay };
 }
+
+function setCap(s: ReturnType<typeof session>, cap: number, member = 0) {
+  // Simulate a preference update committed while a procedure/queued job waits.
+  // No parser or API process is used by these race checks.
+  const prefs = s.test.db.private_prefs.memberId.find(s.users[member].id)!;
+  s.test.db.private_prefs.memberId.update({ ...prefs,
+    hardJson: JSON.stringify({ ...JSON.parse(prefs.hardJson!), budgetMaxPerPerson: cap }) });
+}
+
+function plansOf(s: ReturnType<typeof session>, runId: string): any[] {
+  return JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!).plans;
+}
+
+function queueBooking(s: ReturnType<typeof session>, runId: string, plan: any) {
+  s.reduce(s.users[0].auth, (tx) => exports.startBooking(tx, { runId, planId: plan.id, stopIndex: 0 }));
+  return [...s.test.db.call_job.iter()].at(-1)!;
+}
+
+describe("host settings", () => {
+  it("rejects member changes to privacy and fallback settings", () => {
+    const s = session();
+    for (const on of [true, false]) {
+      // Start each attempt with the opposite host-selected value.
+      s.reduce(s.users[0].auth, (tx) => exports.setDemoMode(tx, { on: !on }));
+      s.reduce(s.users[0].auth, (tx) => exports.setShowWhoCompromised(tx, { on: !on }));
+      expect(() => s.reduce(s.users[1].auth, (tx) => exports.setDemoMode(tx, { on }))).toThrow();
+      expect(() => s.reduce(s.users[1].auth, (tx) => exports.setShowWhoCompromised(tx, { on }))).toThrow();
+      const group = s.test.db.group.id.find(s.group.groupId)!;
+      expect(group.demoMode).toBe(!on);
+      expect(group.showWhoCompromised).toBe(!on);
+    }
+  });
+
+  it("lets the host turn both settings on and off", () => {
+    const s = session();
+    for (const on of [true, false]) {
+      s.reduce(s.users[0].auth, (tx) => exports.setDemoMode(tx, { on }));
+      s.reduce(s.users[0].auth, (tx) => exports.setShowWhoCompromised(tx, { on }));
+      const group = s.test.db.group.id.find(s.group.groupId)!;
+      expect(group.demoMode).toBe(on);
+      expect(group.showWhoCompromised).toBe(on);
+    }
+  });
+});
+
+describe("stale choices and budget changes", () => {
+  it("rejects new unaffordable votes/bookings and stops counting old votes", () => {
+    for (const cap of [17, 13, 0]) {
+      const s = session();
+      const runId = s.runPlan();
+      const safe = plansOf(s, runId).find((p) => p.costPerPerson === 18);
+      s.reduce(s.users[0].auth, (tx) => exports.castVote(tx, { runId, planId: safe.id }));
+      setCap(s, cap, 2); // Another person's limit constrains the whole outing.
+      expect(() => s.reduce(s.users[0].auth, (tx) => exports.castVote(tx, { runId, planId: safe.id }))).toThrow();
+      expect(() => queueBooking(s, runId, safe)).toThrow();
+      expect(s.test.db.booking.count()).toBe(0n);
+      expect(s.test.db.call_job.count()).toBe(0n);
+      expect(exports.my_votes(s.test.viewContext(s.users[0].auth))).toEqual([]);
+      expect(s.test.db.vote.count()).toBe(1n); // History survives; it is not an active vote.
+    }
+  });
+
+  it("keeps an affordable vote and permits re-voting on the current run", () => {
+    const s = session();
+    const runId = s.runPlan();
+    const plans = plansOf(s, runId);
+    s.reduce(s.users[0].auth, (tx) => exports.castVote(tx, { runId, planId: plans[0].id }));
+    setCap(s, 17);
+    const affordable = plans.find((p) => p.costPerPerson === 14);
+    s.reduce(s.users[0].auth, (tx) => exports.castVote(tx, { runId, planId: affordable.id }));
+    expect(exports.my_votes(s.test.viewContext(s.users[0].auth)).map((v) => v.planId)).toEqual([affordable.id]);
+    expect(s.test.db.vote.count()).toBe(1n);
+    expect(queueBooking(s, runId, affordable)).toBeTruthy();
+  });
+
+  it("rejects votes, roulette and bookings from a superseded run", () => {
+    const s = session();
+    const oldRunId = s.runPlan();
+    const plan = plansOf(s, oldRunId)[0];
+    s.reduce(s.users[0].auth, (tx) => exports.castVote(tx, { runId: oldRunId, planId: plan.id }));
+    s.runPlan();
+    expect(() => s.reduce(s.users[0].auth, (tx) => exports.castVote(tx, { runId: oldRunId, planId: plan.id }))).toThrow();
+    expect(() => exports.doRoulette(s.proc(s.users[0].auth), { runId: oldRunId })).toThrow();
+    expect(() => queueBooking(s, oldRunId, plan)).toThrow();
+    expect(exports.my_votes(s.test.viewContext(s.users[0].auth))).toEqual([]);
+    expect(s.test.db.booking.count()).toBe(0n);
+  });
+
+  it("sends roulette only currently affordable plans", () => {
+    let sent: any[] = [];
+    const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, (_test: any, req: any, bytes: Uint8Array) => {
+      const body = JSON.parse(new TextDecoder().decode(bytes));
+      if (new URL(req.uri).pathname === "/roulette") sent = body.plans;
+      return json(fakeApi(new URL(req.uri).pathname, body));
+    });
+    const runId = s.runPlan();
+    const affordable = plansOf(s, runId).find((p) => p.costPerPerson === 14);
+    setCap(s, 17);
+    expect(exports.doRoulette(s.proc(s.users[0].auth), { runId }).planId).toBe(affordable.id);
+    expect(sent.map((p) => p.id)).toEqual([affordable.id]);
+  });
+
+  it("rejects an unknown roulette plan without storing it", () => {
+    const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, (_test: any, req: any, bytes: Uint8Array) => {
+      const body = JSON.parse(new TextDecoder().decode(bytes));
+      return json(new URL(req.uri).pathname === "/roulette" ? { planId: "not-a-candidate", weights: {} }
+        : fakeApi(new URL(req.uri).pathname, body));
+    });
+    const runId = s.runPlan();
+    expect(() => exports.doRoulette(s.proc(s.users[0].auth), { runId })).toThrow();
+    expect(s.test.db.plan_run.runId.find(runId)!.rouletteJson).toBeUndefined();
+  });
+
+  it("rechecks roulette after a budget drops or the run is replaced in flight", () => {
+    for (const change of ["budget", "run"]) {
+      const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, (_test: any, req: any, bytes: Uint8Array) => {
+        const body = JSON.parse(new TextDecoder().decode(bytes));
+        if (new URL(req.uri).pathname === "/roulette") {
+          if (change === "budget") setCap(s, 17);
+          else s.start();
+          return json({ planId: body.plans[0].id, weights: {} });
+        }
+        return json(fakeApi(new URL(req.uri).pathname, body));
+      });
+      const runId = s.runPlan();
+      expect(() => exports.doRoulette(s.proc(s.users[0].auth), { runId })).toThrow();
+      expect(s.test.db.plan_run.runId.find(runId)!.rouletteJson).toBeUndefined();
+    }
+  });
+
+  it("keeps a roulette result if it still fits the budget after the request", () => {
+    const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, (_test: any, req: any, bytes: Uint8Array) => {
+      const body = JSON.parse(new TextDecoder().decode(bytes));
+      if (new URL(req.uri).pathname === "/roulette") {
+        setCap(s, 17);
+        return json({ planId: body.plans[2].id, weights: {} }); // Budget fixture is $14.
+      }
+      return json(fakeApi(new URL(req.uri).pathname, body));
+    });
+    const runId = s.runPlan();
+    const affordable = plansOf(s, runId).find((p) => p.costPerPerson === 14);
+    expect(exports.doRoulette(s.proc(s.users[0].auth), { runId }).planId).toBe(affordable.id);
+    expect(JSON.parse(s.test.db.plan_run.runId.find(runId)!.rouletteJson!).planId).toBe(affordable.id);
+  });
+
+  it("hides a stored roulette choice once it exceeds a current cap", () => {
+    const s = session();
+    const runId = s.runPlan();
+    const row = s.test.db.plan_run.runId.find(runId)!;
+    const safe = plansOf(s, runId).find((p) => p.costPerPerson === 18);
+    s.test.db.plan_run.runId.update({ ...row, rouletteJson: JSON.stringify({ planId: safe.id, weights: {} }) });
+    setCap(s, 17);
+    const visible = exports.my_plan_runs(s.test.viewContext(s.users[0].auth)).find((r) => r.runId === runId)!;
+    expect(visible.rouletteJson).toBeUndefined();
+    expect(s.test.db.plan_run.runId.find(runId)!.rouletteJson).toBeTruthy();
+  });
+
+  it("fails an invalid queued booking without contacting voice or auto-calling another place", () => {
+    for (const change of ["budget", "run"]) {
+      let calls = 0;
+      const s = session({ VOICE_BASE_URL: "https://local-test.invalid" }, () => { calls++; return json({ accepted: true }, false); });
+      const runId = s.runPlan();
+      const job = queueBooking(s, runId, plansOf(s, runId)[0]);
+      if (change === "budget") setCap(s, 17);
+      else s.runPlan();
+      exports.runCallJob(s.proc(), { job });
+      expect(calls).toBe(0);
+      expect(s.test.db.booking.id.find(job.bookingId)!.status).toBe("failed");
+      expect(s.test.db.booking.id.find(job.bookingId)!.failReason).toBe("error");
+      expect(s.test.db.booking.count()).toBe(1n);
+      expect(s.test.db.fake_event_job.count()).toBe(0n);
+      expect([...s.test.db.call_event.iter()].map((e) => e.type)).toEqual(["failed"]);
+    }
+  });
+
+  it("dispatches a still-affordable queued booking once", () => {
+    let calls = 0;
+    const s = session({ VOICE_BASE_URL: "https://local-test.invalid" }, () => { calls++; return json({ accepted: true }, false); });
+    const runId = s.runPlan();
+    const job = queueBooking(s, runId, plansOf(s, runId).find((p) => p.costPerPerson === 14));
+    setCap(s, 17);
+    exports.runCallJob(s.proc(), { job });
+    exports.runCallJob(s.proc(), { job });
+    expect(calls).toBe(1);
+    expect(s.test.db.booking.id.find(job.bookingId)!.status).toBe("calling");
+  });
+
+  it("does not let late callbacks for an old booking overwrite the current group run", () => {
+    for (const type of ["confirmed", "failed"]) {
+      const s = session({ VOICE_BASE_URL: "https://local-test.invalid" }, () => json({ accepted: true }, false));
+      const oldRun = s.runPlan();
+      const job = queueBooking(s, oldRun, plansOf(s, oldRun)[0]);
+      exports.runCallJob(s.proc(), { job });
+      const currentRun = s.runPlan();
+      s.reduce(internal, (tx) => recordCallEvent(tx, { bookingId: job.bookingId, type, reason: type === "failed" ? "full" : undefined }));
+      const group = s.test.db.group.id.find(s.group.groupId)!;
+      expect(group.latestRunId).toBe(currentRun);
+      expect(group.status).toBe("planned");
+      expect(group.replanFor).toBeUndefined();
+      expect(s.test.db.call_event.count()).toBe(1n); // Keep the event history.
+    }
+  });
+
+  it("does not mark the group booked if its budget changed during an already dispatched call", () => {
+    const s = session({ VOICE_BASE_URL: "https://local-test.invalid" }, () => json({ accepted: true }, false));
+    const runId = s.runPlan();
+    const job = queueBooking(s, runId, plansOf(s, runId)[0]);
+    exports.runCallJob(s.proc(), { job });
+    setCap(s, 17);
+    s.reduce(internal, (tx) => recordCallEvent(tx, { bookingId: job.bookingId, type: "confirmed" }));
+    expect(s.test.db.booking.id.find(job.bookingId)!.status).toBe("confirmed"); // External fact, not undone.
+    expect(s.test.db.group.id.find(s.group.groupId)!.status).toBe("planned");
+  });
+
+  it("does not revive a rejected queued booking when a late confirmation arrives", () => {
+    const s = session();
+    const runId = s.runPlan();
+    const job = queueBooking(s, runId, plansOf(s, runId)[0]);
+    setCap(s, 17);
+    exports.runCallJob(s.proc(), { job });
+    s.reduce(internal, (tx) => recordCallEvent(tx, { bookingId: job.bookingId, type: "confirmed" }));
+    expect(s.test.db.booking.id.find(job.bookingId)!.status).toBe("failed");
+    expect(s.test.db.group.id.find(s.group.groupId)!.status).toBe("planned");
+    expect(s.test.db.call_event.count()).toBe(2n);
+  });
+
+  it("preserves normal synthetic confirmation and full-to-replan without duplicate dispatch", () => {
+    for (const scenario of ["confirm", "full"]) {
+      const s = session({ STUB_SCENARIO: scenario });
+      const runId = s.runPlan();
+      const job = queueBooking(s, runId, plansOf(s, runId)[0]);
+      exports.runCallJob(s.proc(), { job });
+      exports.runCallJob(s.proc(), { job });
+      expect(s.test.db.fake_event_job.count()).toBe(scenario === "confirm" ? 8n : 6n);
+      s.replay();
+      const group = s.test.db.group.id.find(s.group.groupId)!;
+      expect(s.test.db.booking.count()).toBe(1n);
+      if (scenario === "confirm") {
+        expect(group.status).toBe("booked");
+        expect(s.test.db.booking.id.find(job.bookingId)!.status).toBe("confirmed");
+      } else {
+        expect(group.status).toBe("planned");
+        expect(group.latestRunId).not.toBe(runId);
+        expect(group.replanFor).toBe(job.bookingId);
+        const next = [...s.test.db.plan_job.iter()].find((j) => j.runId === group.latestRunId)!;
+        exports.runPlanJob(s.proc(), { job: next });
+        expect(plansOf(s, group.latestRunId!).length).toBeGreaterThan(0);
+        expect(plansOf(s, group.latestRunId!).flatMap((p) => p.stops.map((stop: any) => stop.placeId)))
+          .not.toContain(s.test.db.booking.id.find(job.bookingId)!.placeId);
+        expect(s.test.db.booking.count()).toBe(1n); // A replacement still needs a new tap.
+      }
+    }
+  });
+});
 
 describe("cumulative budget rules", () => {
   it("uses one active stub catalog while retaining real and frontend lookups", () => {
