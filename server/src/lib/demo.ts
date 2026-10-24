@@ -22,8 +22,10 @@ function enterDemo(ctx: Proc, groupId: string) {
   });
 }
 
-const reason = (r: ApiResult<unknown>) =>
-  r.ok ? "" : `${r.error.path} ${r.error.status ?? ""} ${r.error.message}`.slice(0, 200);
+// This reason becomes a group-visible plan warning. Remote response bodies and
+// exception text can echo private preferences or credentials; never include them.
+const reason = (r: ApiResult<unknown>) => r.ok ? "" :
+  `${r.error.path}${r.error.status == null ? " unavailable or timed out" : ` HTTP ${r.error.status}`}`;
 
 // Same result shape as callApi; `demo` says why fakes were used, if they were.
 export function apiFor<T = any>(ctx: Proc, groupId: string, path: string, body: unknown): DemoResult<T> {

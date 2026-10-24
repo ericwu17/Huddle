@@ -70,6 +70,7 @@
 - [ ] Live scout via Bright Data (needs `docs/BRIGHTDATA.md`)
 - [x] Council panel `web/src/components/council/` (functional pass; replays synthetic messages, not a live LLM council; restyle at H19)
 - [x] Privacy fix: names hidden in plan text and offers unless showWhoCompromised
+- [x] Raw HTTP error bodies/exception details removed from public fallback warnings; tested alongside cumulative budgets during service failures. Module publish still pending.
 - [~] Experiment harness `docs/experiments/`: cumulative budgets and returned-plan validation fixed; corrected five-baseline run/chart regenerated with zero selected-plan budget violations. Earlier numbers withdrawn. "Ours" and swipe learning wait for Eric Wu's real API; placeholder features still limit pitch claims.
 - [x] Draft demo script and submission checklist in `docs/DEMO_CHECKLIST.md`; final rehearsal/submission still pending
 - [ ] README, Devpost writeup, secret scan, submission checklist

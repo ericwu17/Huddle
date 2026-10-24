@@ -81,6 +81,7 @@
 - CLI archive matched the official 2.13.0 SHA-256; version/login and management reads passed. The environment-only voice URL update succeeded; API URL/stub mode stayed unchanged. No secret was printed.
 - Experiment follow-up: 22 regression checks passed; corrected baselines cover 1,000 feasible groups with zero selected-plan budget violations. An independent Decimal audit checked all 5,000 selected outing totals/caps, and a separate rerun produced byte-identical CSVs/chart. No live API was called or API file changed. Old experimental numbers are withdrawn; the real solver comparison remains pending.
 - After merging `059292a`: server typecheck passed; `npm test --prefix server` passed 11 tests with the opt-in HTTP test skipped. No API server was started for that check. The new demo-mode module was not published by Max.
+- Backend privacy follow-up: a failing regression reproduced raw service error details leaking into group-visible fallback warnings. Those warnings now contain only endpoint/status or generic unavailability. Server typecheck and 14 native integration tests pass (one opt-in API HTTP test skipped), including tight cumulative caps, a cap lowered during a failed request, and no repeated outbound requests once fallback mode is active. `api/` was untouched; the module update still needs a coordinated publish.
 
 ## Operating
 

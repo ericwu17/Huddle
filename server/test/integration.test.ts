@@ -137,6 +137,54 @@ describe("cumulative budget rules", () => {
 });
 
 describe("SpacetimeDB procedure integration", () => {
+  it("does not copy private service errors into group-visible fallback warnings", () => {
+    const privateDetail = "PRIVATE_TEST_ONLY budget=17 preference=quiet service-secret=test-value";
+    for (const failure of ["http", "exception"]) {
+      const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, () => {
+        if (failure === "exception") throw new Error(privateDetail);
+        return { ...json({ detail: privateDetail }, false), code: 500 };
+      });
+      const run = s.test.db.plan_run.runId.find(s.runPlan())!;
+      const result = JSON.parse(run.resultJson!);
+      expect(result.warnings.some((warning: string) => warning.startsWith("fallback:"))).toBe(true);
+      expect(JSON.stringify(result.warnings)).not.toContain(privateDetail);
+      expect(JSON.stringify(result.warnings)).not.toContain("service-secret");
+      expect(s.test.db.group.id.find(s.group.groupId)!.demoMode).toBe(true);
+    }
+  });
+
+  it("keeps a tight cumulative cap during failure and avoids repeated external calls", () => {
+    let requests = 0;
+    const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, () => {
+      requests++;
+      throw new Error("offline");
+    });
+    const prefs = s.test.db.private_prefs.memberId.find(s.users[0].id)!;
+    s.test.db.private_prefs.memberId.update({ ...prefs, hardJson: JSON.stringify({ ...s.users[0].hard, budgetMaxPerPerson: 17 }) });
+    for (let i = 0; i < 2; i++) {
+      const run = s.test.db.plan_run.runId.find(s.runPlan())!;
+      expect(run.status).toBe("done");
+      expect(run.stub).toBe(true);
+      expect(JSON.parse(run.resultJson!).plans.map((p: any) => p.costPerPerson)).toEqual([14]);
+      expect(JSON.parse(s.test.db.private_prefs.memberId.find(s.users[0].id)!.hardJson!).budgetMaxPerPerson).toBe(17);
+    }
+    expect(requests).toBe(2); // One idempotent retry, then the group stays in fallback mode.
+    expect(s.test.db.group.id.find(s.group.groupId)!.demoMode).toBe(true);
+  });
+
+  it("rechecks a cap lowered while the request fails before storing fallback plans", () => {
+    const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, (test: any) => {
+      const prefs = test.db.private_prefs.memberId.find(s.users[0].id)!;
+      test.db.private_prefs.memberId.update({ ...prefs, hardJson: JSON.stringify({ ...s.users[0].hard, budgetMaxPerPerson: 13 }) });
+      throw new Error("offline after cap change");
+    });
+    const run = s.test.db.plan_run.runId.find(s.runPlan())!;
+    expect(run.status).toBe("done");
+    expect(JSON.parse(run.resultJson!).plans).toEqual([]);
+    expect(JSON.parse(s.test.db.private_prefs.memberId.find(s.users[0].id)!.hardJson!).budgetMaxPerPerson).toBe(13);
+    expect(s.test.db.group.id.find(s.group.groupId)!.demoMode).toBe(true);
+  });
+
   it("stores only affordable fallback plans when HTTP fails", () => {
     const s = session({ FASTAPI_BASE_URL: "https://local-test.invalid" }, () => { throw new Error("offline"); });
     const runId = s.runPlan();
