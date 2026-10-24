@@ -22,6 +22,7 @@ $RECYCLE.BIN/
 
 # Environment & secrets
 .env
+Huddle\.env
 .env.*
 !.env.example
 *.pem
