@@ -19,6 +19,23 @@ Bright Data → SpacetimeDB ingestion. Review his schema/read path, agree a vers
 venue snapshot contract and prove newly scraped records reach the planner before
 the deferred agent rewrite. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 
+**Preference UX proposal, planning only:** omitted options on first submission
+mean flexible. Optional budget/whole-outing-duration sliders and an optional
+prompt feed one Save & ready action; only genuine consequential ambiguity asks
+for a targeted clarification. A blank edit cannot erase prior restrictions or
+raise an established cap. Input readiness and missing venue evidence are separate.
+See [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md) for the proposed
+behavior and 30 acceptance scenarios. Current contracts/confirmation remain live.
+
+**Further product proposal, not implemented:** a prompt-first signed-in home,
+contacts and durable account-scoped invitations would replace QR/code/link
+sharing for known contacts. Saved personal context would provide editable
+defaults, with today's mood/limits separate and controlled by each user. Start
+with an in-app inbox; literal SMS is a separate later delivery adapter. See
+[PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md). The current
+illustrated design direction is [Design.md](../Design.md); account/notification
+features and planner changes remain follow-ups.
+
 ## Goal
 
 Huddle helps a group turn everyone's individual prompts into an outing they can

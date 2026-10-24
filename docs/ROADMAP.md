@@ -36,6 +36,14 @@ define the next implementation phase.
   its versioned venue snapshot to FastAPI and module validation.
 - [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
   constraints and factual consistency. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+- [ ] Review [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md):
+  optional budget/time sliders, optional prompt, flexible defaults, one ready
+  action and targeted clarifications. Thirty scenarios are specified, not yet
+  implemented or executed as an acceptance suite.
+- [ ] Review [PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md):
+  prompt-first home, stable accounts/contacts, in-app invitations without QR or
+  invitation links, and editable saved context. Stage external SMS separately;
+  no account, notification or memory implementation is claimed.
 - [ ] Rehearse with physical phones; browser mobile emulation is not that test.
 - [ ] Consider removing legacy endpoints only after teammate review; they remain
   compatible for existing groups and older frontend clients.

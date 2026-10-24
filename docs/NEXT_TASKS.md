@@ -9,12 +9,26 @@ confirmed that Eric Wu is currently implementing Bright Data → SpacetimeDB.
 The [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) records the deferred
 propose → validate → revise design and the handoff after ingestion is ready.
 
+**Input/acceptance planning, not implemented:** see
+[PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md) for optional
+budget/time sliders, an optional prompt, flexible defaults, one Save & ready
+action, targeted clarifications and 30 proposed acceptance scenarios. It replaces
+mandatory separate review/confirmation in the proposed next flow, not today's
+live behavior. The Claude planner rewrite remains deferred.
+
+**Product proposal, not implemented:** [PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md)
+adds a prompt-first signed-in home, contacts, account-scoped invitation inbox and
+editable saved defaults/today's overrides. Known-contact joining would need no
+QR or invitation link. External SMS remains a later delivery adapter. Establish
+accounts/memberships and prove invite/accept before expanding memory features.
+
 ## Next work, in parallel
 
 | Workstream | Suggested lead | Concrete work | Done when |
 | --- | --- | --- | --- |
-| Update UI | Eric Chen | Apply the agreed shadcn direction; simplify Join → private needs → coordinator/plans → vote → simulation; make loading, retry, blocked and reconnect states clear; improve plan/category labels, map readability and mobile layouts. Keep private corrections distinct from shared discussion. | Two physical phones can complete the flow without guidance, reopen plans and understand why planning is blocked. |
+| Update UI | Eric Chen | Apply the illustrated Huddle theme from Design.md with consistent accessible controls; simplify Join → private needs → coordinator/plans → vote → simulation; make loading, retry, blocked and reconnect states clear; improve plan/category labels, map readability and mobile layouts. Keep private corrections distinct from shared discussion. | Two physical phones can complete the flow without guidance, reopen plans and understand why planning is blocked. |
 | Finish Claude behavior | Max | Review realistic prompts: specific foods, mixed stop categories, dietary needs, explicit exclusions and soft wishes. Reduce unnecessary clarifications, preserve every hard restriction, and improve grounded explanations using verified venue facts. Verify each person's input matters; retain the current cap and revision guards. | A reviewed scenario set passes using real Claude, including contradictory needs and provider timeout; no fabricated facts, private disclosures or automatic cap raises. |
+| Preference acceptance plan (draft) | Max + Eric Chen | Review optional budget/time sliders with Flexible defaults, optional prompt/restriction chips and one Save & ready action. Distinguish input ambiguity from missing venue evidence; use scenarios P01–P30 before implementation. | Approved semantics and reusable fixtures cover omissions, negation, cumulative caps, duration, allergies, categories, clarifications and stale/private state; no runtime changes claimed. |
 | Claude proposes and revises (deferred follow-up) | Max | After the database catalog contract is agreed, let Claude construct itineraries and repair them from structured validation feedback. Remove Python itinerary enumeration/preference ranking from this new path; Python validates hard constraints and factual consistency. See the dedicated follow-up plan. | Claude uses the database snapshot to propose and revise; only validated current plans become selectable, with bounded calls and private, explicit compromise approval when needed. |
 | Compromise flow (deferred follow-up) | Max + Eric Chen | Max requested replacing a dead-end “no plan” outcome with specific compromise proposals and a clear next action. Identify what prevents a plan, propose negotiable changes, and obtain explicit approval from affected users before applying them. Improve evidence-blocked messages so users are not told to rewrite a correct allergy. | No dead-end null result in the user journey; suggestions remain clearly conditional until approved and validated. Existing cap increases still require owner acceptance of a private trade offer; unknown allergy evidence never becomes a safety claim. |
 | Scrape and refresh venue data (in progress) | Eric Wu | Build Bright Data ingestion into SpacetimeDB; collect source URLs and fetched-at times for venue/menu/review/hours/price evidence; deduplicate and validate categories and dietary tags. Hand off the actual schema, read path, version/refresh behavior and sample records. | Validated Berkeley records exist in SpacetimeDB with stable IDs, source/freshness and explicit unknowns; planner integration is a separate next step. |
@@ -61,7 +75,7 @@ but does not replace, the physical-phone rehearsal.
 
 ## Scope and remaining priorities
 
-- [ ] UI polish and shadcn migration.
+- [ ] UI polish with the illustrated Huddle theme and accessible shared controls.
 - [ ] Real-prompt Claude quality/constraint/category review.
 - [ ] Deferred Claude propose → validate → revise flow; Python validates hard
   constraints and factual consistency instead of assembling/ranking itineraries.
@@ -70,6 +84,8 @@ but does not replace, the physical-phone rehearsal.
 - [ ] Bright Data scraping, normalization and shared catalog/evidence integration.
 - [ ] Physical-phone rehearsal, public Vercel flow and restart recovery.
 - [ ] Keep documentation and honesty labels aligned with what is actually live.
+- [ ] Review the staged profiles/contacts/invitation proposal; account and
+  membership ownership must be proven before remembered context or QR-less joining.
 
 Accounts/password login, contacts/history, voice prompt input, personal keys,
 vendor/MCP management, real restaurant calls, live booking and persistent hosted

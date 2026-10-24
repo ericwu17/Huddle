@@ -10,6 +10,12 @@ Claude-built itineraries and bounded revision from Python validation feedback,
 using Eric Wu's SpacetimeDB venue catalog. That work is deferred. The body below
 records the current first version, where Python enumerates candidate itineraries.
 
+The newer [preference acceptance proposal](PREFERENCE_ACCEPTANCE_PLAN.md) plans
+optional sliders/prompt, flexible defaults and one Save & ready action with
+targeted clarification. It supersedes the next-design recommendation for a
+mandatory separate confirmation screen; the implemented behavior below remains
+unchanged until a coordinated migration.
+
 ## Agreed operating setup
 
 Keep the current setup: Vercel frontend, SpacetimeDB Maincloud and FastAPI on one

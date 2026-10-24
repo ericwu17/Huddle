@@ -5,6 +5,18 @@ Proposed enhancements, October 24, 2026. Extend the
 username/password accounts, personal context, contacts and a prompt-driven
 start screen. These are proposed changes, not currently implemented features.
 
+**Latest product proposal:** [PROFILE_CONTACTS_PROPOSAL.md](PROFILE_CONTACTS_PROPOSAL.md)
+describes a prompt-first home, account-linked contacts, durable invitation inbox,
+and editable saved context. Known contacts would join without QR/code/invitation
+links; external SMS is a separate later adapter. This is a staged proposal,
+not an implemented replacement for the current join flow.
+
+The newer [preference plan](PREFERENCE_ACCEPTANCE_PLAN.md) proposes optional
+budget/time sliders, flexible defaults and one Save & ready action instead of
+mandatory separate review/confirmation. The illustrated theme in
+[Design.md](../Design.md) supersedes the stock shadcn visual treatment below;
+accessible component primitives may still be used under Huddle's custom theme.
+
 The core flow is now all members' prompts -> confirmed needs -> agent proposals
 -> code validation -> discussion/choice. Retire mandatory swipes and numerical
 confidence from the replacement UI after the shared contract migration. The

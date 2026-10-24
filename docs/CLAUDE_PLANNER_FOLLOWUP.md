@@ -6,6 +6,12 @@ This plan changes the next planner design, not the live endpoint shapes or
 current runtime. Keep local FastAPI + tunnel + Maincloud and one coordinator.
 The broader demo-polish task remains open.
 
+Subsequent [preference/acceptance planning](PREFERENCE_ACCEPTANCE_PLAN.md)
+proposes optional budget/time sliders, an optional prompt, flexible defaults and
+one Save & ready action instead of a mandatory separate review/confirm sequence.
+It separates input ambiguity from venue-evidence gaps. These are proposed changes
+to step 1 below; neither preference UX nor planner changes are implemented here.
+
 ## Responsibility change
 
 Today Python enumerates feasible itineraries, sends at most 120 of them to
