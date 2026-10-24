@@ -11,6 +11,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import TypeAdapter
+from dotenv import load_dotenv
 
 from . import stubs
 from .delivery import CouncilDelivery, LocalCouncilDelivery
@@ -28,7 +29,10 @@ class Settings:
     places_path: Path | None = None
 
     @classmethod
-    def from_env(cls):
+    def from_env(cls, env_file: Path | None = None):
+        # Exported deployment values take precedence over the private local file.
+        # Avoid interpolation so secrets containing ${...} remain literal.
+        load_dotenv(env_file or Path(__file__).parent / ".env", override=False, interpolate=False)
         mode = os.getenv("STUB_MODE", "true").lower()
         if mode not in ("true", "false"):
             raise RuntimeError("STUB_MODE must be true or false")

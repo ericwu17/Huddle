@@ -3,7 +3,7 @@
 Verified locally after Max explicitly confirmed the hacking period had started.
 
 - Python 3.12.5; FastAPI 0.116.1; Pydantic 2.11.7; uvicorn 0.35.0; httpx 0.28.1.
-- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **20 tests passed**, including dietary filtering, previews, and the safe authentication checker.
+- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **21 tests passed**, including private env-file loading, dietary filtering, previews, and the safe authentication checker.
 - Started uvicorn on `127.0.0.1:8000` with an ephemeral in-memory shared secret,
   ran `api/.venv/bin/python api/eval/smoke_http.py`: **all eight routes passed**.
   The HTTP runner checked successful auth, missing-auth rejection, synthetic

@@ -5,8 +5,10 @@ from decimal import Decimal
 import json
 from pathlib import Path
 import secrets
+import os
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 import httpx
@@ -292,6 +294,17 @@ class APIBoundaryTests(unittest.TestCase):
 
 
 class StartupTests(unittest.TestCase):
+    def test_private_env_file_loads_without_overriding_exported_values(self):
+        secret = secrets.token_urlsafe()
+        exported = secrets.token_urlsafe()
+        with TemporaryDirectory() as folder:
+            path = Path(folder) / ".env"
+            path.write_text(f"HUDDLE_SHARED_SECRET='{secret}'\nSTUB_MODE=true\n")
+            with patch.dict(os.environ, {}, clear=True):
+                self.assertEqual(Settings.from_env(path).secret, secret)
+            with patch.dict(os.environ, {"HUDDLE_SHARED_SECRET": exported}, clear=True):
+                self.assertEqual(Settings.from_env(path).secret, exported)
+
     def test_missing_secret_and_real_mode_fail_closed(self):
         for settings in (Settings(""), Settings("   "), Settings(secrets.token_urlsafe(), False)):
             with self.assertRaises(RuntimeError):
@@ -335,7 +348,7 @@ class SharedSecretCheckTests(unittest.TestCase):
         with httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(401))) as client:
             ok, message = verify(client, None)
         self.assertFalse(ok)
-        self.assertIn("not exported", message)
+        self.assertIn("not configured", message)
 
 if __name__ == "__main__":
     unittest.main()

@@ -24,7 +24,13 @@ The `read` prompt syntax above is for **zsh**, the workspace shell. In bash use
 `read -r -s -p 'Local shared secret: ' HUDDLE_SHARED_SECRET` instead.
 Enter a local secret at the prompt; do not put it in a tracked file. For running
 only the service, install `requirements.txt`; httpx is a test-only dependency.
-The app reads exported environment variables, not `.env` files automatically.
+The app automatically loads `api/.env`; exported environment variables take
+precedence. For persistent local setup, copy `api/.env.example` to `api/.env`,
+fill in the shared secret privately, and set `STUB_MODE=true`. The optional
+`ANTHROPIC_API_KEY` is reserved for a later phase and remains unused by stubs.
+Do not put values in the tracked example or any frontend environment variable.
+After filling the private file, no secret export commands are needed in a fresh
+terminal. Restart FastAPI after changing the file.
 
 In a second terminal, from the same repository root:
 
@@ -225,7 +231,7 @@ it is exported (it does not print the value):
 /Users/maxli/Huddle/api/.venv/bin/python /Users/maxli/Huddle/api/eval/check_shared_secret.py
 ```
 
-The checker targets `https://maincloud.spacetimedb.com`, database
+The checker also loads `api/.env`. It targets `https://maincloud.spacetimedb.com`, database
 `huddle-calhacks`. It expects 401 without credentials and an authenticated 400
 for an impossible booking ID. The handler looks up that ID before any insert,
 so no booking or event is created. A missing environment value is reported
@@ -237,7 +243,7 @@ The shared honesty/disclosure files should include these facts: nine fictional v
 four canned preference fixtures; unchanged identity/update posterior; three
 fixed itineraries; synthetic utility, robustness, pareto, council transcript and
 timestamps; empty offers; no live council delivery. Dependencies: Python standard
-library, FastAPI/Starlette, Pydantic, uvicorn, httpx for checks (plus their transitive
+library, FastAPI/Starlette, Pydantic, uvicorn, python-dotenv, httpx for checks (plus their transitive
 dependencies); SpacetimeDB's native module test harness and Vitest for server
 checks. Implementation assisted by OpenAI Codex. Official FastAPI, Pydantic,
 and SpacetimeDB documentation was consulted. No external data/model API was called.

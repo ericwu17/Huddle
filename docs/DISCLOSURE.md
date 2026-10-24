@@ -30,6 +30,6 @@ Every library, API, and AI tool used. Cal Hacks requires this.
 | Vitest and SpacetimeDB 2.13.0 native module test harness | B/C development checks |
 | Pipecat, Silero VAD | D |
 
-Phase-zero API runtime uses only FastAPI, uvicorn, and Pydantic; httpx is used
+Phase-zero API runtime uses FastAPI, uvicorn, Pydantic, and python-dotenv; httpx is used
 for checks. No numpy, Anthropic SDK, model calls, or live council are implemented
 in that phase. All Python dependencies and their versions are listed under `api/`.
