@@ -1,14 +1,17 @@
 import { Link, useLocation } from "react-router";
 import type { GroupContext } from "../groupContext";
 import type { Booking } from "../types";
+import { isReadyAgentPlan, useAgentRun } from "../agentData";
 
 export default function AgentPhaseNav({ ctx, booking }: { ctx: GroupContext; booking: Booking | null | undefined }) {
   const { pathname } = useLocation();
+  const planRun = useAgentRun(ctx.group.latestRunId);
+  const canVote = ctx.agent?.status === "ready" && planRun?.result?.inputRevision === ctx.agent.revision && planRun.result.plans.some(isReadyAgentPlan);
   const steps = [
     { route: "lobby", label: "People & invites", open: true },
     { route: "prefs", label: "Private needs", open: true },
     { route: "plans", label: "Coordinator & plans", open: !!ctx.group.latestRunId },
-    { route: "vote", label: "Vote", open: ctx.agent?.status === "ready" },
+    { route: "vote", label: "Vote", open: canVote },
     { route: "call", label: "Booking simulation", open: !!booking && booking.runId === ctx.group.latestRunId },
   ];
   return <nav className="card flex flex-wrap gap-3 text-sm" aria-label="Huddle steps">

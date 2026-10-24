@@ -15,8 +15,20 @@ export function estimatedTravelMinutes(a: { lat: number; lng: number }, b: { lat
   return km / (km <= 1.2 ? 4.5 : 18) * 60;
 }
 
-export function planFitsAgentRequirements(plan: any, members: { hard: any }[]): boolean {
-  if (!planFitsBudgets(plan, members) || plan.stops.length < 1 || plan.stops.length > 3) return false;
+type MemberRequirement = { memberId?: string; hard: any };
+export function planFitsAgentRequirements(plan: any, members: MemberRequirement[], options: {
+  mode?: "proposal" | "selectable"; personalTotals?: Map<string, number>;
+} = {}): boolean {
+  if (options.mode !== "proposal" && plan?.status === "provisional") return false;
+  if (plan?.status !== undefined && !["ready", "provisional"].includes(plan.status)) return false;
+  // The public cost remains the sum of catalog estimates. Own-order plans use
+  // independently validated private totals for the current members' caps.
+  const own = plan?.costModel === "own_orders";
+  if (!planFitsBudgets(plan, own ? members.map(m => ({ hard: m.hard ? { budgetMaxPerPerson: null } : null })) : members) ||
+      plan.stops.length < 1 || plan.stops.length > 3) return false;
+  if (own && members.some(m => !m.memberId || !options.personalTotals?.has(m.memberId) ||
+      !planFitsBudgets({ costPerPerson: options.personalTotals.get(m.memberId)!,
+        stops: [{ costPerPerson: options.personalTotals.get(m.memberId)! }] }, [m]))) return false;
   // A short dinner can be complete at one meal venue. A tagless activity alone
   // must not sidestep dietary/allergy checks for a requested food outing.
   if (plan.stops.length === 1 && plan.stops[0].category !== "meal") return false;
@@ -31,7 +43,8 @@ export function planFitsAgentRequirements(plan: any, members: { hard: any }[]): 
   return members.every(({ hard }) => {
     // No catalog allergen evidence exists yet. A saved allergy is allowed to be
     // Ready, but never turns an unverified food result into a votable plan.
-    if (hard?.allergies?.length && plan.stops.some((stop: any) => stop.category !== "activity")) return false;
+    if (hard?.allergies?.length && plan.stops.some((stop: any) => stop.category !== "activity") &&
+        !(options.mode === "proposal" && plan.status === "provisional")) return false;
     const limit = hard?.maxOutingMinutes;
     return limit == null || typeof limit === "number" && Number.isFinite(limit) && limit >= duration;
   });

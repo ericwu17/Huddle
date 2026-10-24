@@ -11,8 +11,20 @@ export type AgentHard = {
 export type AgentNeedsResult = { hard: AgentHard; preferences: string[]; questions: string[]; warnings: string[] };
 export type AgentNeeds = { memberId: string; text: string; revision: number; result: AgentNeedsResult | null; confirmed: boolean; error?: string };
 export type AgentState = { groupId: string; revision: number; status: string; activeRunId?: string; error?: string; confirmedMemberIds: string[] };
-export type AgentPlan = { id: string; title: string; stops: PlanStop[]; costPerPerson: number; whyLine: string; limitations: string[]; travelMinutes: number };
-export type AgentResult = { mode: "agent"; runId: string; inputRevision: number; plans: AgentPlan[]; recommendedPlanId: string | null; rationale: string; conflicts: string[]; warnings: string[] };
+export type AgentPlan = { id: string; title: string; stops: PlanStop[]; costPerPerson: number; whyLine: string; limitations: string[]; travelMinutes: number;
+  status?: "ready" | "provisional"; summary?: string; costModel?: "own_orders"; costRange?: { min: number; max: number } };
+export type AgentSuggestion = { id: string; placeId: string; summary: string; limitations: string[] };
+export type AgentResult = { mode: "agent"; runId: string; inputRevision: number; plans: AgentPlan[]; recommendedPlanId: string | null; rationale: string; conflicts: string[]; warnings: string[]; suggestions?: AgentSuggestion[] };
+export type AgentOrder = { id: string; runId: string; memberId: string; planId: string; items: { placeId: string; itemId: string | null }[]; total: number };
+
+export function isReadyAgentPlan(plan: AgentPlan) { return plan.status === undefined || plan.status === "ready"; }
+
+export function useAgentOrders(runId: string | null, memberId: string) {
+  const [rows, ready] = useTable(tables.myAgentOrders);
+  return useMemo(() => ready ? rows.filter(row => row.runId === runId && row.memberId === memberId).map(row => ({
+    ...row, items: JSON.parse(row.itemsJson) as AgentOrder["items"],
+  })) : [], [rows, ready, runId, memberId]);
+}
 
 export function useAgentState(): AgentState | null | undefined {
   const [rows, ready] = useTable(tables.myAgentSession);

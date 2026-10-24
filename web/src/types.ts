@@ -23,12 +23,25 @@ export const FEATURES = [
 
 export type LatLng = { lat: number; lng: number };
 
+export type MenuItem = {
+  id: string;
+  name: string;
+  section: string;
+  description: string;
+  labels: string[];
+  price: number | null;
+  sourceUrl: string;
+  fetchedAt: string;
+};
+export type VenuePhoto = { url: string; sourceUrl: string; attribution: string };
+
 // Public subset of a Place (S5.2), read from the place list in places.ts.
 export type Place = {
   id: string;
   name: string;
   category: Category;
   cuisine: string;
+  label?: string;
   address: string;
   lat: number;
   lng: number;
@@ -39,6 +52,9 @@ export type Place = {
   reviewCount: number;
   googlePlaceId?: string;
   sources?: string[];
+  foodStyle?: string;
+  menu?: { status: string; items: MenuItem[] };
+  photos?: VenuePhoto[];
 };
 
 export type Hard = {

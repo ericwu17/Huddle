@@ -23,7 +23,10 @@ const CLOCK = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 
 export type EvidenceSource = { source: string; url: string | null; fetchedAt: string | null;
   rating: number | null; reviewCount: number | null };
-export type Evidence = { sources: EvidenceSource[] };
+export type MenuItem = { id: string; name: string; section: string; description: string; labels: string[];
+  price: number | null; sourceUrl: string; fetchedAt: string };
+export type Evidence = { sources: EvidenceSource[]; foodStyle?: string;
+  menu?: { status: string; items: MenuItem[] }; photos?: { url: string; sourceUrl: string; attribution: string }[] };
 export type CatalogSnapshot = { version: string; places: Place[]; evidence: Record<string, Evidence> };
 
 const num = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
@@ -31,6 +34,8 @@ const text = (v: unknown, max: number): v is string => typeof v === "string" && 
 const isObject = (v: unknown): v is Record<string, any> => !!v && typeof v === "object" && !Array.isArray(v);
 const sameKeys = (o: Record<string, any>, keys: string[]) =>
   Object.keys(o).length === keys.length && keys.every((k) => k in o);
+const webUrl = (value: unknown): value is string => text(value, 2000) &&
+  /^https?:\/\/[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?(?::\d{1,5})?(?:[/?#][^\s]*)?$/.test(value);
 
 // The reason a place breaks the contract (docs/CONTRACT.md S5.2), or null.
 export function placeProblem(p: any): string | null {
@@ -80,7 +85,35 @@ export function cleanEvidence(e: any): Evidence | string {
     if (reviewCount !== null && !(Number.isInteger(reviewCount) && reviewCount >= 0)) return "evidence reviewCount";
     sources.push({ source: s.source, url, fetchedAt, rating, reviewCount });
   }
-  return { sources };
+  const result: Evidence = { sources };
+  if (e.foodStyle != null) {
+    if (!text(e.foodStyle, 120)) return "evidence.foodStyle";
+    result.foodStyle = e.foodStyle;
+  }
+  if (e.menu != null) {
+    if (!isObject(e.menu) || !text(e.menu.status, 80) || !Array.isArray(e.menu.items) || e.menu.items.length > 85)
+      return "evidence.menu";
+    const seen = new Set<string>();
+    const items: MenuItem[] = [];
+    for (const item of e.menu.items) {
+      if (!isObject(item) || !text(item.id, 200) || !item.id || seen.has(item.id) ||
+          !text(item.name, 300) || !item.name.trim() || !text(item.section, 200) || !text(item.description, 2000) ||
+          !Array.isArray(item.labels) || item.labels.length > 20 || !item.labels.every((label: unknown) => text(label, 80)) ||
+          item.price !== null && !(num(item.price) && item.price >= 0 && Number(item.price.toFixed(2)) === item.price) ||
+          !webUrl(item.sourceUrl) || !text(item.fetchedAt, 40) || !Number.isFinite(Date.parse(item.fetchedAt)))
+        return "evidence.menu.items";
+      seen.add(item.id);
+      items.push({ id: item.id, name: item.name, section: item.section, description: item.description,
+        labels: [...item.labels], price: item.price, sourceUrl: item.sourceUrl, fetchedAt: item.fetchedAt });
+    }
+    result.menu = { status: e.menu.status, items };
+  }
+  if (e.photos != null) {
+    if (!Array.isArray(e.photos) || e.photos.length > 3 || e.photos.some((photo: any) =>
+      !isObject(photo) || !webUrl(photo.url) || !webUrl(photo.sourceUrl) || !text(photo.attribution, 500))) return "evidence.photos";
+    result.photos = e.photos.map((photo: any) => ({ url: photo.url, sourceUrl: photo.sourceUrl, attribution: photo.attribution }));
+  }
+  return result;
 }
 
 // Validates the whole push before writing anything. Throws on the first problem.

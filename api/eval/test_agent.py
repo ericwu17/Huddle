@@ -52,7 +52,7 @@ class Model:
             value = (self.extracted or needs()).model_dump()
         else:
             value = {"choices": [{"candidateId": "invented" if self.bad else self.context["candidates"][0]["candidateId"],
-                                  "reasonIds": ["total", "sequence"]}]}
+                                  "reasonIds": [r for r in ("total", "sequence") if r in self.context["reasonTypes"]]}]}
             if self.prefer_rating:
                 value["choices"][0]["reasonIds"] = ["ratings"]
             if self.all_reasons:
@@ -112,7 +112,7 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         for plan in with_activity:
             self.assertEqual(plan.costPerPerson, sum(stop.costPerPerson for stop in plan.stops))
             self.assertLessEqual(plan.costPerPerson, 25)
-            self.assertTrue(all("vegetarian" in self.catalog.places[self.catalog.index[stop.placeId]].dietary
+            self.assertTrue(plan.status == "provisional" or all("vegetarian" in self.catalog.places[self.catalog.index[stop.placeId]].dietary
                                 for stop in plan.stops if stop.category != "activity"))
 
     async def test_matching_burger_requests_can_select_a_grounded_meal_within_ninety_minutes(self):
@@ -137,20 +137,18 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(plan.travelMinutes, 0)
         self.assertTrue(all(len(plan.stops) >= 2 for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
 
-    async def test_meal_only_does_not_shorten_visits_or_weaken_budget_dietary_or_allergy_limits(self):
-        for body, explanation in [(meal_request(duration=60), "time"), (meal_request(cap=0), "budget"),
-                                  (meal_request(dietary=["vegan"]), "dietary"), (meal_request(allergies=["peanut"]), "allergy")]:
+    async def test_impossible_limits_get_untimed_ideas_and_unknown_diets_get_provisional_plans(self):
+        for body in [meal_request(duration=60), meal_request(cap=0)]:
             model = Model()
             result = await coordinate(model, self.catalog, body)
             self.assertFalse(result.plans)
-            self.assertEqual(model.calls, 0)
-            self.assertIn(explanation, result.conflicts[0])
-            self.assertNotIn("$30", result.conflicts[0])
-            self.assertNotIn("peanut", result.conflicts[0])
-        vegetarian = await coordinate(Model(), self.catalog, meal_request(dietary=["vegetarian"]))
-        self.assertTrue(vegetarian.plans)
-        self.assertTrue(all("vegetarian" in self.catalog.places[self.catalog.index[plan.stops[0].placeId]].dietary
-                            for plan in vegetarian.plans))
+            self.assertTrue(result.suggestions)
+            self.assertEqual(model.calls, 1)
+        for body in [meal_request(dietary=["vegan"]), meal_request(allergies=["peanut"])]:
+            result = await coordinate(Model(), self.catalog, body)
+            self.assertTrue(result.plans)
+            self.assertTrue(all(plan.status == "provisional" for plan in result.plans))
+            self.assertNotIn("peanut", result.rationale)
 
     async def test_all_six_supported_public_reasons_are_valid_and_do_not_trigger_a_retry(self):
         model = Model(all_reasons=True)
@@ -159,14 +157,14 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(model.calls, 1)
         self.assertIn("cached", result.plans[0].whyLine)
 
-    async def test_zero_budget_is_not_uncapped_and_no_candidates_never_calls_model(self):
+    async def test_zero_budget_keeps_cap_and_shows_only_untimed_ideas(self):
         body = request()
         body.members[0].needs.hard.budgetMaxPerPerson = 0
-        model = Model()
-        result = await coordinate(model, self.catalog, body)
+        result = await coordinate(Model(), self.catalog, body)
         self.assertFalse(result.plans)
-        self.assertTrue(result.conflicts)
-        self.assertEqual(model.calls, 0)
+        self.assertTrue(result.suggestions)
+        self.assertEqual(body.members[0].needs.hard.budgetMaxPerPerson, 0)
+        self.assertTrue(all("not verified" in idea.limitations[0] for idea in result.suggestions))
 
     async def test_null_cap_and_whole_outing_change(self):
         body = request()
@@ -176,14 +174,15 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result.plans)
         self.assertTrue(all(p.costPerPerson <= 12 for p in result.plans))
 
-    async def test_unknown_allergy_evidence_blocks_without_model_guessing(self):
+    async def test_unknown_allergy_evidence_allows_provisional_suggestions(self):
         body = request()
         body.members[0].needs.hard.allergies = ["peanut"]
         model = Model()
         result = await coordinate(model, self.catalog, body)
-        self.assertFalse(result.plans)
-        self.assertIn("allergy", result.conflicts[0])
-        self.assertEqual(model.calls, 0)
+        self.assertTrue(result.plans)
+        self.assertTrue(all(plan.status == "provisional" for plan in result.plans))
+        self.assertEqual(model.calls, 1)
+        self.assertNotIn("peanut", result.rationale)
 
     async def test_max_vegan_steak_and_dessert_scenario_explains_the_catalog_gap(self):
         body = request(members=[
@@ -193,10 +192,9 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         ])
         model = Model()
         result = await coordinate(model, self.catalog, body)
-        self.assertFalse(result.plans)
-        self.assertIn("dietary", result.conflicts[0])
-        self.assertIn("verified dietary venue data", result.conflicts[0])
-        self.assertEqual(model.calls, 0)
+        self.assertTrue(result.plans)
+        self.assertTrue(all(plan.status == "provisional" for plan in result.plans))
+        self.assertEqual(model.calls, 1)
         self.assertEqual(body.members[0].needs.hard.dietary, ["vegan"])
 
     def test_agent_can_offer_dinner_and_dessert_without_forcing_an_activity(self):
@@ -208,11 +206,12 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(tuple(self.catalog.places[i].category for i in plan.stops) != ("meal", "dessert")
                             for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
 
-    async def test_invalid_model_id_never_becomes_a_plan(self):
-        from fastapi import HTTPException
-        with self.assertRaises(HTTPException) as error:
-            await coordinate(Model(bad=True), self.catalog, request())
-        self.assertEqual(error.exception.status_code, 502)
+    async def test_invalid_model_id_gets_only_labeled_real_catalog_ideas(self):
+        result = await coordinate(Model(bad=True), self.catalog, request())
+        self.assertFalse(result.plans)
+        self.assertTrue(result.suggestions)
+        self.assertTrue(all(idea.placeId in self.catalog.index for idea in result.suggestions))
+        self.assertIn("Claude could not complete", result.warnings[0])
 
     async def test_private_interpretation_cannot_raise_or_remove_prior_cap(self):
         for cap in [None, 50]:
@@ -307,12 +306,12 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(len(plan.stops) == 1 and plan.costPerPerson <= 16 for plan in lower_budget.values()))
 
     async def test_service_missing_credentials_is_explicit_no_synthetic_plan(self):
-        from fastapi import HTTPException
         model = Model()
         model.available = False
-        with self.assertRaises(HTTPException) as error:
-            await coordinate(model, self.catalog, request())
-        self.assertEqual(error.exception.status_code, 503)
+        result = await coordinate(model, self.catalog, request())
+        self.assertFalse(result.plans)
+        self.assertTrue(result.suggestions)
+        self.assertIn("Claude could not complete", result.warnings[0])
 
     def test_excluded_ids_and_hard_rejections(self):
         body = request()

@@ -60,8 +60,39 @@ class EvidenceSource(Model):
     reviewCount: Annotated[int, Field(ge=0)] | None = None
 
 
+class MenuItem(Model):
+    id: Identifier
+    name: Annotated[str, Field(min_length=1, max_length=300)]
+    section: Annotated[str, Field(max_length=200)] = ""
+    description: Annotated[str, Field(max_length=2000)] = ""
+    labels: list[Annotated[str, Field(max_length=80)]] = Field(default_factory=list, max_length=15)
+    price: Money | None = None
+    sourceUrl: Annotated[str, Field(max_length=1000, pattern=r"^https?://[^\s]+$")]
+    fetchedAt: Annotated[str, Field(max_length=40)]
+
+
+class MenuEvidence(Model):
+    status: Annotated[str, Field(max_length=80)]
+    items: list[MenuItem] = Field(default_factory=list, max_length=85)
+
+    @model_validator(mode="after")
+    def unique_ids(self):
+        if len({item.id for item in self.items}) != len(self.items):
+            raise ValueError("duplicate menu item IDs")
+        return self
+
+
+class VenuePhoto(Model):
+    url: Annotated[str, Field(max_length=2000, pattern=r"^https?://[^\s]+$")]
+    sourceUrl: Annotated[str, Field(max_length=2000, pattern=r"^https?://[^\s]+$")]
+    attribution: Annotated[str, Field(max_length=1000)] = ""
+
+
 class Evidence(Model):
     sources: list[EvidenceSource] = Field(default_factory=list, max_length=5)
+    foodStyle: Annotated[str, Field(max_length=120)] | None = None
+    menu: MenuEvidence | None = None
+    photos: list[VenuePhoto] = Field(default_factory=list, max_length=3)
 
 
 class AgentCatalog(Model):
@@ -106,12 +137,35 @@ class AgentPlan(Model):
     whyLine: Text
     limitations: list[Text]
     travelMinutes: Money
+    status: Literal["ready", "provisional"] = "ready"
+    summary: Text = "Catalog outing suggestion."
+    costModel: Literal["own_orders"] | None = None
+    costRange: dict[Literal["min", "max"], Money] | None = None
 
     @model_validator(mode="after")
     def single_stop_is_meal(self):
         if len(self.stops) == 1 and self.stops[0].category != "meal":
             raise ValueError("a single-stop coordinator outing must be a meal")
         return self
+
+
+class AgentSuggestion(Model):
+    id: Identifier
+    placeId: Identifier
+    summary: Text
+    limitations: list[Text] = Field(default_factory=list, max_length=8)
+
+
+class OrderItem(Model):
+    placeId: Identifier
+    itemId: Identifier | None = None
+
+
+class PrivateOrder(Model):
+    memberId: Identifier
+    planId: Identifier
+    items: list[OrderItem] = Field(default_factory=list, max_length=3)
+    total: Money
 
 
 class AgentPlanResponse(Model):
@@ -123,3 +177,6 @@ class AgentPlanResponse(Model):
     rationale: str
     conflicts: list[Text]
     warnings: list[Text]
+    suggestions: list[AgentSuggestion] = Field(default_factory=list, max_length=3)
+    # Service-to-module only. Removed before the group-readable result is saved.
+    privateOrders: list[PrivateOrder] = Field(default_factory=list, max_length=72)

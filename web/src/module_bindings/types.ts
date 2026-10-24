@@ -94,6 +94,16 @@ export const AgentNeedsJob = __t.object("AgentNeedsJob", {
 });
 export type AgentNeedsJob = __Infer<typeof AgentNeedsJob>;
 
+export const AgentOrder = __t.object("AgentOrder", {
+  id: __t.string(),
+  runId: __t.string(),
+  memberId: __t.string(),
+  planId: __t.string(),
+  itemsJson: __t.string(),
+  total: __t.f64(),
+});
+export type AgentOrder = __Infer<typeof AgentOrder>;
+
 export const AgentPlanJob = __t.object("AgentPlanJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),
@@ -252,6 +262,7 @@ export const ConnectorConfigurationResult = __t.object("ConnectorConfigurationRe
   googleConfigured: __t.bool(),
   messagesConfigured: __t.bool(),
   externalInvitesConfigured: __t.bool(),
+  googleCallbackUrl: __t.option(__t.string()),
 });
 export type ConnectorConfigurationResult = __Infer<typeof ConnectorConfigurationResult>;
 
@@ -536,6 +547,19 @@ export const MyAgentNeedsRow = __t.object("MyAgentNeedsRow", {
   error: __t.option(__t.string()),
 });
 export type MyAgentNeedsRow = __Infer<typeof MyAgentNeedsRow>;
+
+export const MyAgentOrderRow = __t.object("MyAgentOrderRow", {
+  id: __t.string(),
+  runId: __t.string(),
+  memberId: __t.string(),
+  planId: __t.string(),
+  itemsJson: __t.string(),
+  total: __t.f64(),
+});
+export type MyAgentOrderRow = __Infer<typeof MyAgentOrderRow>;
+
+export const MyAgentOrders = __t.object("MyAgentOrders", {});
+export type MyAgentOrders = __Infer<typeof MyAgentOrders>;
 
 export const MyAgentPreferences = __t.object("MyAgentPreferences", {});
 export type MyAgentPreferences = __Infer<typeof MyAgentPreferences>;

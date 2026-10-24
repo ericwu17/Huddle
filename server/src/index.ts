@@ -15,6 +15,7 @@ export {
   createAgentGroup, submitAgentPrefs, confirmAgentNeeds, findAgentPlans,
   runAgentNeedsJob, runAgentPlanJob, postAgentDiscussion, my_agent_session, my_agent_needs,
   saveAgentPreferences, my_agent_preferences,
+  my_agent_orders,
 } from "./agent";
 export { registerAccount, loginAccount, logoutAccount, selectHuddle, runAccountExpiryJob,
   my_account, my_account_memberships } from "./accounts";

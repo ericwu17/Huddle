@@ -29,7 +29,8 @@ check(registered[0], "Synthetic account registers against the explicit preview")
 try {
   const configured = await call(token, "connector_status");
   check(configured[0], "API reports Google OAuth configured through Maincloud");
-  check(configured.every(value => typeof value === "boolean"), "Connector readiness exposes booleans only");
+  check(configured.slice(0, 3).every(value => typeof value === "boolean"), "Connector readiness exposes booleans without credentials");
+  if (configured[3]?.[0] === 0) check(configured[3][1] === `${api}/connectors/google/callback`, "Setup displays the exact public callback for this API");
   const settings = (await view(token, "my_connectors"))[0];
   check(settings && settings[1] === false && settings[4] === "disconnected" && settings[6] === false, "Messages and event consent default off; Calendar starts disconnected");
   let denied = false;

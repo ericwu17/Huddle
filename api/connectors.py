@@ -429,6 +429,7 @@ class ConnectorService:
         google = self._google_ready()
         messages = await self._messages_ready()
         return ConnectorStatus(googleConfigured=google, messagesConfigured=messages,
+            googleCallbackUrl=self.settings.google_redirect_uri if google else None,
             googleStatus="configured; each account must connect" if google else "setup required",
             messagesStatus="host Mac ready; recipient opt-in required" if messages else "unavailable or disabled on API host")
 

@@ -3,6 +3,9 @@ import { SenderError } from "spacetimedb/server";
 import type { ReadDb, Tx } from "./types";
 import { at, membersOf, nowMs, parse } from "./util";
 import { planFitsAgentRequirements } from "./agent-constraints";
+import { validateOrders } from "./agent-orders";
+import { catalogSnapshot } from "./catalog";
+import { LIVE_PLACES } from "./places";
 
 export const isAgent = (db: ReadDb, groupId: string) => !!db.agent_session.groupId.find(groupId);
 
@@ -50,8 +53,19 @@ export function agentPlans(db: ReadDb, groupId: string, runId: string): any[] {
   if (!group || group.latestRunId !== runId || run?.groupId !== groupId || run.status !== "done" ||
       session?.status !== "ready" || session.activeRunId !== runId || result?.mode !== "agent" ||
       result.inputRevision !== session.revision || !allAgentNeedsConfirmed(db, groupId)) return [];
-  const members = membersOf(db, groupId).map(m => ({ hard: parse(db.private_prefs.memberId.find(m.id)?.hardJson) }));
-  return Array.isArray(result.plans) ? result.plans.filter((p: any) => planFitsAgentRequirements(p, members)) : [];
+  const members = membersOf(db, groupId).map(m => ({ memberId: m.id, hard: parse(db.private_prefs.memberId.find(m.id)?.hardJson) }));
+  const catalog = catalogSnapshot(db);
+  return Array.isArray(result.plans) ? result.plans.filter((plan: any) => {
+    if (plan.status === "provisional") return false;
+    const rows = Array.from(db.agent_order.runId.filter(runId)).filter(row => row.planId === plan.id).map(row => ({
+      memberId: row.memberId, planId: row.planId, items: parse(row.itemsJson), total: row.total,
+    }));
+    const verified = plan.costModel === "own_orders" ? validateOrders(plan, rows,
+      members.map(member => ({ memberId: member.memberId, needs: { hard: member.hard } })),
+      catalog?.places ?? LIVE_PLACES, catalog?.evidence ?? {}, true) : null;
+    if (plan.costModel === "own_orders" && (!verified || verified.requiresProvisional)) return false;
+    return planFitsAgentRequirements(plan, members, { personalTotals: verified?.totals });
+  }) : [];
 }
 
 export function agentBallot(db: ReadDb, groupId: string, runId: string) {

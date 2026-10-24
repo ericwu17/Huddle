@@ -89,6 +89,7 @@ import MyAccountRow from "./my_account_table";
 import MyAccountContextRow from "./my_account_context_table";
 import MyAccountMembershipsRow from "./my_account_memberships_table";
 import MyAgentNeedsRow from "./my_agent_needs_table";
+import MyAgentOrdersRow from "./my_agent_orders_table";
 import MyAgentPreferencesRow from "./my_agent_preferences_table";
 import MyAgentSessionRow from "./my_agent_session_table";
 import MyBookingsRow from "./my_bookings_table";
@@ -156,6 +157,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyAgentNeedsRow),
+  myAgentOrders: __table({
+    name: 'my_agent_orders',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAgentOrdersRow),
   myAgentPreferences: __table({
     name: 'my_agent_preferences',
     indexes: [
@@ -365,6 +373,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "my_account_memberships": Omit<typeof tablesSchema.schemaType.tables["myAccountMemberships"], "accessorName"> & { readonly accessorName: "my_account_memberships" };
     /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
     readonly "my_agent_needs": Omit<typeof tablesSchema.schemaType.tables["myAgentNeeds"], "accessorName"> & { readonly accessorName: "my_agent_needs" };
+    /** @deprecated Use `myAgentOrders` instead. This alias will be removed in the next major version. */
+    readonly "my_agent_orders": Omit<typeof tablesSchema.schemaType.tables["myAgentOrders"], "accessorName"> & { readonly accessorName: "my_agent_orders" };
     /** @deprecated Use `myAgentPreferences` instead. This alias will be removed in the next major version. */
     readonly "my_agent_preferences": Omit<typeof tablesSchema.schemaType.tables["myAgentPreferences"], "accessorName"> & { readonly accessorName: "my_agent_preferences" };
     /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
@@ -429,6 +439,7 @@ const tableAccessorAliases = {
   "my_account_context": "myAccountContext",
   "my_account_memberships": "myAccountMemberships",
   "my_agent_needs": "myAgentNeeds",
+  "my_agent_orders": "myAgentOrders",
   "my_agent_preferences": "myAgentPreferences",
   "my_agent_session": "myAgentSession",
   "my_bookings": "myBookings",
@@ -481,6 +492,8 @@ export type DbView = __DbViewBase & {
   readonly "my_account_memberships": __DbViewBase["myAccountMemberships"];
   /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
   readonly "my_agent_needs": __DbViewBase["myAgentNeeds"];
+  /** @deprecated Use `myAgentOrders` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_orders": __DbViewBase["myAgentOrders"];
   /** @deprecated Use `myAgentPreferences` instead. This alias will be removed in the next major version. */
   readonly "my_agent_preferences": __DbViewBase["myAgentPreferences"];
   /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
@@ -537,6 +550,8 @@ export type Tables = __TablesBase & {
   readonly "my_account_memberships": __TablesBase["myAccountMemberships"];
   /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
   readonly "my_agent_needs": __TablesBase["myAgentNeeds"];
+  /** @deprecated Use `myAgentOrders` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_orders": __TablesBase["myAgentOrders"];
   /** @deprecated Use `myAgentPreferences` instead. This alias will be removed in the next major version. */
   readonly "my_agent_preferences": __TablesBase["myAgentPreferences"];
   /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */

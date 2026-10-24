@@ -5,6 +5,7 @@ import schema, * as api from "../src/index";
 import { LIVE_PLACES } from "../src/lib/places";
 import { recordCallEvent } from "../src/booking";
 import { catalogSnapshot, findPlace, ingestCatalog, MAX_ACTIVE } from "../src/lib/catalog";
+import { cents, itemContradictsDiet, orderRequiresProvisional } from "../src/lib/agent-orders";
 
 const internal = TestAuth.internal();
 const needs = (cap = 30, hard: any = {}) => ({ hard: { budgetMaxPerPerson: cap, dietary: [], allergies: [],
@@ -362,5 +363,232 @@ describe("live venue catalog", () => {
     const s = setup(); s.ready(); s.plan();
     expect(s.captured()).not.toHaveProperty("catalog");
     expect(api.catalog_status(s.test.viewContext(s.users[0].auth))).toBeUndefined();
+  });
+});
+
+describe("menu proposals and private own orders", () => {
+  const item = (id = "beans", price: number | null = 10, extra: any = {}) => ({ id, name: "Bean plate", section: "Meals",
+    description: "Rice and beans", labels: ["vegetarian", "vegan"], price,
+    sourceUrl: "https://venue.example/menu", fetchedAt: "2026-10-24T18:00:00Z", ...extra });
+  const evidence = (items = [item(), item("large", 20)]) => ({ sources: [], foodStyle: "Mexican",
+    menu: { status: "source_menu", items }, photos: [{ url: "https://venue.example/photo.jpg",
+      sourceUrl: "https://venue.example", attribution: "Venue website" }] });
+  const push = (s: ReturnType<typeof setup>, menu = evidence(), version = "menu-v1") =>
+    s.reduce(internal, tx => ingestCatalog(tx, { version, generatedAt: "2026-10-24T18:00:00Z",
+      venues: LIVE_PLACES.map(place => ({ place, evidence: place.id === "p_002" ? menu : { sources: [] } })) }));
+  const own = (s: ReturnType<typeof setup>, change: (data: any) => void = () => {}) => s.transform(data => {
+    data.plans = data.plans.slice(0, 1);
+    Object.assign(data.plans[0], { costModel: "own_orders", status: "ready", summary: "One outing with personal meal choices.",
+      costRange: { min: 20, max: 30 } });
+    data.privateOrders = s.users.map((user, i) => ({ memberId: user.id, planId: "choice-1",
+      items: [{ placeId: "p_002", itemId: i ? "large" : "beans" }], total: i ? 30 : 20 }));
+    change(data);
+  });
+  const deniesActions = (s: ReturnType<typeof setup>, runId: string, planId = "choice-1") => {
+    expect(() => s.vote(0, runId, planId)).toThrow();
+    expect(() => api.doRoulette(s.proc(s.users[0].auth), { runId })).toThrow();
+    expect(() => s.reduce(s.users[0].auth, tx => api.startBooking(tx, { runId, planId, stopIndex: 1 }))).toThrow();
+    expect(() => s.reduce(s.users[0].auth, tx => api.confirmMeetup(tx, { runId, planId }))).toThrow();
+    expect(s.test.db.booking.count()).toBe(0n);
+    expect(s.test.db.meetup.count()).toBe(0n);
+  };
+
+  it("charges each member only their own priced meal plus activity, and keeps order details private", () => {
+    const s = setup(); push(s);
+    s.save(0, { budgetMaxPerPerson: 20 }); s.save(1, { budgetMaxPerPerson: 30 }); own(s);
+    const runId = s.plan();
+    const run = s.test.db.plan_run.runId.find(runId)!;
+    expect(run.status).toBe("done");
+    expect(JSON.parse(run.resultJson!).plans[0]).toMatchObject({ costPerPerson: 22, costRange: { min: 20, max: 30 }, status: "ready" });
+    expect(run.resultJson).not.toContain("privateOrders");
+    expect(run.resultJson).not.toContain('"itemId"');
+    for (let i = 0; i < 2; i++) {
+      const orders = api.my_agent_orders(s.test.viewContext(s.users[i].auth));
+      expect(orders).toHaveLength(1);
+      expect(orders[0]).toMatchObject({ memberId: s.users[i].id, runId, planId: "choice-1", total: i ? 30 : 20 });
+      expect(JSON.parse(orders[0].itemsJson)[0].itemId).toBe(i ? "large" : "beans");
+    }
+    expect(api.my_agent_orders(s.test.viewContext(TestAuth.fromJwtPayload('{"iss":"agent-test","sub":"outsider"}', new ConnectionId(99n))))).toEqual([]);
+    s.vote(0, runId); s.vote(1, runId); s.book(0, runId);
+    expect(s.test.db.booking.count()).toBe(1n);
+  });
+
+  it("adds a selected later dessert to each private total without charging anyone else's meal", () => {
+    const s = setup();
+    const dessert = LIVE_PLACES.find(place => place.category === "dessert")!;
+    const dessertItem = item("sweet", 4, { name: "Sorbet", section: "Desserts", description: "Fruit and sugar" });
+    s.reduce(internal, tx => ingestCatalog(tx, { version: "dessert", generatedAt: "2026-10-24T18:00:00Z",
+      venues: LIVE_PLACES.map(place => ({ place: place.id === dessert.id ? { ...place, hours: Object.fromEntries(
+        ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map(day => [day, [["10:00", "23:59"]]])) } : place,
+      evidence: place.id === "p_002" ? evidence() : place.id === dessert.id ? evidence([dessertItem]) : { sources: [] } })) }));
+    s.save(0, { budgetMaxPerPerson: 24 }); s.save(1, { budgetMaxPerPerson: 34 });
+    own(s, data => {
+      data.plans[0].stops.push({ placeId: dessert.id, name: dessert.name, category: "dessert", lat: dessert.lat, lng: dessert.lng,
+        costPerPerson: dessert.costPerPerson, start: "22:00", end: `22:${String(dessert.dwellMinutes).padStart(2, "0")}` });
+      data.plans[0].costPerPerson += dessert.costPerPerson;
+      data.plans[0].costRange = { min: 24, max: 34 };
+      for (const row of data.privateOrders) { row.items.push({ placeId: dessert.id, itemId: "sweet" }); row.total += 4; }
+    });
+    const runId = s.plan();
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))[0].total).toBe(24);
+  });
+
+  it.each(["allergy", "unknown item", "unpriced item", "unsupported diet", "contradictory ingredients"])(
+    "accepts an explicit provisional %s proposal for display and rejects every action", reason => {
+      const s = setup();
+      const menu = evidence(reason === "unpriced item" ? [item("beans", null), item("large", 20)] :
+        reason === "contradictory ingredients" ? [item("beans", 10, { name: "Chicken plate" }), item("large", 20)] : undefined);
+      push(s, menu);
+      s.save(0, { budgetMaxPerPerson: 30, allergies: reason === "allergy" ? ["peanut"] : [],
+        dietary: reason === "unsupported diet" ? ["kosher"] : reason === "contradictory ingredients" ? ["vegetarian"] : [] });
+      s.save(1, { budgetMaxPerPerson: 30 });
+      own(s, data => {
+        data.plans[0].status = "provisional";
+        if (reason === "unknown item") data.privateOrders[0].items[0].itemId = null;
+        if (["unknown item", "unpriced item"].includes(reason)) {
+          data.privateOrders[0].total = 22; data.plans[0].costRange.min = 22;
+        }
+      });
+      const runId = s.plan();
+      expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+      expect(s.test.db.group.id.find(s.group.groupId)?.status).toBe("planned");
+      expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toHaveLength(1);
+      deniesActions(s, runId);
+    });
+
+  it.each(["allergy", "unknown item", "unpriced item", "unsupported diet", "contradictory ingredients"])(
+    "rejects a forged ready %s proposal before writing orders", reason => {
+      const s = setup();
+      push(s, evidence(reason === "unpriced item" ? [item("beans", null), item("large", 20)] :
+        reason === "contradictory ingredients" ? [item("beans", 10, { description: "Chicken and rice" }), item("large", 20)] : undefined));
+      s.save(0, { budgetMaxPerPerson: 30, allergies: reason === "allergy" ? ["peanut"] : [],
+        dietary: reason === "unsupported diet" ? ["kosher"] : reason === "contradictory ingredients" ? ["vegetarian"] : [] });
+      s.save(1, { budgetMaxPerPerson: 30 });
+      own(s, data => {
+        if (reason === "unknown item") data.privateOrders[0].items[0].itemId = null;
+        if (["unknown item", "unpriced item"].includes(reason)) {
+          data.privateOrders[0].total = 22; data.plans[0].costRange.min = 22;
+        }
+      });
+      const runId = s.plan();
+      expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+      expect(s.test.db.agent_order.count()).toBe(0n); deniesActions(s, runId);
+    });
+
+  it("allows selected item labels to support a diet even when the venue tag is absent", () => {
+    const s = setup(); push(s); s.save(0, { budgetMaxPerPerson: 30, dietary: ["vegan"] }); s.save(1);
+    own(s); const runId = s.plan();
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    expect(() => s.vote(0, runId)).not.toThrow();
+  });
+
+  it.each(["missing item", "missing member", "duplicate member", "duplicate item", "other venue", "wrong total", "fractional cent", "over cap", "wrong range", "extra target"])(
+    "rejects %s own-order data atomically", reason => {
+      const s = setup(); push(s); s.save(0, { budgetMaxPerPerson: 20 }); s.save(1, { budgetMaxPerPerson: 30 });
+      own(s, data => {
+        const row = data.privateOrders[0];
+        if (reason === "missing item") row.items[0].itemId = "invented-id";
+        if (reason === "missing member") data.privateOrders.pop();
+        if (reason === "duplicate member") data.privateOrders[1].memberId = row.memberId;
+        if (reason === "duplicate item") row.items.push({ ...row.items[0] });
+        if (reason === "other venue") row.items[0].placeId = "p_003";
+        if (reason === "wrong total") row.total = 19;
+        if (reason === "fractional cent") row.total = 20.001;
+        if (reason === "over cap") { row.items[0].itemId = "large"; row.total = 30; data.plans[0].costRange.min = 30; }
+        if (reason === "wrong range") data.plans[0].costRange.max = 31;
+        if (reason === "extra target") data.privateOrders.push({ ...row, planId: "invented-target" });
+      });
+      const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+      expect(s.test.db.agent_order.count()).toBe(0n);
+    });
+
+  it("revalidates current private caps and menu prices before voting and booking", () => {
+    for (const changed of ["cap", "price"]) {
+      const s = setup(); push(s); s.save(0, { budgetMaxPerPerson: 20 }); s.save(1, { budgetMaxPerPerson: 30 }); own(s);
+      const runId = s.plan(); s.vote(0, runId); s.vote(1, runId);
+      if (changed === "cap") s.reduce(internal, tx => {
+        const pref = tx.db.private_prefs.memberId.find(s.users[0].id)!;
+        tx.db.private_prefs.memberId.update({ ...pref, hardJson: JSON.stringify({ ...JSON.parse(pref.hardJson!), budgetMaxPerPerson: 19 }) });
+      });
+      else push(s, evidence([item("beans", 11), item("large", 20)]), "changed-price");
+      deniesActions(s, runId);
+    }
+  });
+
+  it("hides prior private orders immediately after a normal preference edit", () => {
+    const s = setup(); push(s); s.ready(); own(s); const runId = s.plan();
+    expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toHaveLength(1);
+    s.save(0, { budgetMaxPerPerson: 19 });
+    expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toEqual([]);
+    expect(api.my_agent_orders(s.test.viewContext(s.users[1].auth))).toEqual([]); deniesActions(s, runId);
+  });
+
+  it("keeps untimed suggestions display-only, including private totals above a current cap", () => {
+    const s = setup(); push(s); s.save(0, { budgetMaxPerPerson: 5 }); s.save(1, { budgetMaxPerPerson: 5 });
+    s.transform(data => {
+      data.plans = []; data.recommendedPlanId = null;
+      data.suggestions = [{ id: "untimed", placeId: "p_002", summary: "A place to discuss after reviewing cost.", limitations: ["Over the current cap."] }];
+      data.privateOrders = s.users.map(user => ({ memberId: user.id, planId: "untimed", items: [{ placeId: "p_002", itemId: "beans" }], total: 10 }));
+    });
+    const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    expect(JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!).suggestions).toHaveLength(1);
+    expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))[0].total).toBe(10);
+    deniesActions(s, runId, "untimed");
+  });
+
+  it("accepts explicitly provisional legacy allergy results without inventing private orders", () => {
+    const s = setup(); s.save(0, { allergies: ["peanut"] }); s.save(1);
+    s.transform(data => { for (const plan of data.plans) plan.status = "provisional"; });
+    const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    expect(s.test.db.agent_order.count()).toBe(0n); deniesActions(s, runId);
+  });
+
+  it("accepts null optional cost fields from FastAPI's legacy response serialization", () => {
+    const s = setup(); s.ready();
+    s.transform(data => {
+      for (const plan of data.plans) { plan.costModel = null; plan.costRange = null; plan.rawPrompt = "PRIVATE_EXTRA"; }
+      data.privateOrders = []; data.suggestions = []; data.privateCaps = "PRIVATE_EXTRA";
+    });
+    const runId = s.plan(), run = s.test.db.plan_run.runId.find(runId)!;
+    expect(run.status).toBe("done"); expect(run.resultJson).not.toContain("PRIVATE_EXTRA");
+    expect(JSON.parse(run.resultJson!).plans[0]).not.toHaveProperty("costModel");
+    expect(() => s.vote(0, runId)).not.toThrow();
+  });
+
+  it("accepts provider-outage catalog suggestions without inventing a private order or price", () => {
+    const s = setup(); s.ready();
+    s.transform(data => {
+      data.plans = []; data.recommendedPlanId = null; data.privateOrders = [];
+      data.suggestions = [{ id: "offline-idea", placeId: "p_002", summary: "A catalog venue to explore.", limitations: ["Coordinator unavailable."] }];
+    });
+    const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toEqual([]);
+    deniesActions(s, runId, "offline-idea");
+  });
+
+  it("rejects malformed menu evidence before replacing any catalog rows", () => {
+    const s = setup(); push(s);
+    const original = s.test.db.venue.id.find("p_002")!.evidenceJson;
+    const bad = [
+      { ...evidence(), foodStyle: "x".repeat(121) },
+      evidence([item(), item()]), evidence(Array.from({ length: 86 }, (_, i) => item(`item-${i}`))),
+      evidence([item("beans", 10.001)]), evidence([item("beans", 10, { sourceUrl: "javascript:alert(1)" })]),
+      evidence([item("beans", 10, { fetchedAt: "soon" })]),
+      { ...evidence(), photos: [{ url: "file:///private/photo.jpg", sourceUrl: "https://venue.example", attribution: "Venue" }] },
+      { ...evidence(), photos: Array.from({ length: 4 }, () => evidence().photos[0]) },
+    ];
+    for (const menu of bad) expect(() => push(s, menu, "invalid")).toThrow(/evidence/);
+    expect(s.test.db.catalog_state.id.find(0)?.version).toBe("menu-v1");
+    expect(s.test.db.venue.id.find("p_002")!.evidenceJson).toBe(original);
+  });
+
+  it("handles decimal cents without rounding and recognizes explicit dietary contradictions", () => {
+    expect(cents(19.99)).toBe(1999n); expect(cents(0.001)).toBeNull(); expect(cents(0.1 + 0.2)).toBeNull();
+    expect(itemContradictsDiet(item("a", 10, { name: "Chicken salad" }), "vegetarian")).toBe(true);
+    expect(itemContradictsDiet(item("a", 10, { name: "Vegan chicken salad" }), "vegan")).toBe(false);
+    expect(itemContradictsDiet(item("a", 10, { name: "Oat milk tea" }), "vegan")).toBe(false);
+    expect(orderRequiresProvisional({ category: "meal", dietary: [] }, item("a", 10, { labels: ["vegan"] }),
+      { dietary: ["vegetarian"], allergies: [] })).toBe(false);
   });
 });

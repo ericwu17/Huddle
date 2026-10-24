@@ -7,7 +7,7 @@ import AccountShell, { AccountRequired } from "../components/AccountShell";
 import { useRun } from "../useRun";
 import MacContactsConnector from "../components/MacContactsConnector";
 
-type ConnectorConfiguration = { googleConfigured: boolean; messagesConfigured: boolean; externalInvitesConfigured: boolean };
+type ConnectorConfiguration = { googleConfigured: boolean; messagesConfigured: boolean; externalInvitesConfigured: boolean; googleCallbackUrl?: string };
 type ConnectorSettings = { messageEnabled: boolean; messageDestination: string; messageStatus: string; calendarStatus: string; calendarEmail?: string; calendarEventConsent: boolean; calendarError?: string };
 
 function ConnectorForm({ initial, configuration }: { initial: ConnectorSettings | null; configuration: ConnectorConfiguration | null }) {
@@ -50,6 +50,15 @@ function ConnectorForm({ initial, configuration }: { initial: ConnectorSettings 
       })}>{initial?.calendarStatus === "pending" ? "Continue connecting Google Calendar" : "Connect Google Calendar"}</button> : null}
         {initial && initial.calendarStatus !== "disconnected" ? <button className="btn" disabled={busy} onClick={() => run(async () => { await disconnect(); setNotice("Your Google Calendar is disconnected from Huddle."); })}>Disconnect Google Calendar</button> : null}</div>
       {!calendarConnected ? <p className="muted">This preview uses Google’s test mode. If Google shows 403/access_denied, ask the host to add your exact Google email under Auth Platform → Audience → Test users, then reconnect.</p> : null}
+      {configuration?.googleCallbackUrl ? <details className="space-y-3"><summary className="font-bold">Google Calendar setup details</summary>
+        <p className="muted">The host must register this exact callback as an authorized redirect URI for the Google OAuth web client. Update it when the API’s public address changes.</p>
+        <label className="block font-bold" htmlFor="google-callback">Public callback URL</label>
+        <input id="google-callback" className="input" readOnly value={configuration.googleCallbackUrl} onFocus={e => e.target.select()} />
+        <button className="btn" disabled={busy} onClick={() => run(async () => {
+          if (!navigator.clipboard) throw new Error("Select and copy the callback URL above.");
+          await navigator.clipboard.writeText(configuration.googleCallbackUrl!); setNotice("The public Google callback URL was copied.");
+        })}>Copy callback URL</button>
+      </details> : null}
       {initial?.calendarError ? <p className="error" role="alert">{initial.calendarError}</p> : null}
       <label className="check"><input type="checkbox" checked={initial?.calendarEventConsent ?? false} disabled={busy || (!calendarConnected && !initial?.calendarEventConsent)} onChange={e => run(() => eventConsent({ enabled: e.target.checked }))} />Allow Huddle to add an agreed meetup to my calendar</label>
       <p className="muted">This is a separate opt-in. After everyone votes, the host explicitly adds the agreed meetup to calendars that opted in. It does not reserve a restaurant.</p>

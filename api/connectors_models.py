@@ -31,6 +31,7 @@ class ConnectorStatus(Model):
     messagesConfigured: bool
     googleStatus: str
     messagesStatus: str
+    googleCallbackUrl: str | None = None
 
 
 class GoogleStartRequest(Model):

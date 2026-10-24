@@ -4,13 +4,16 @@ import { useProcedure, useReducer } from "spacetimedb/react";
 import { procedures, reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
-import { useAgentMessages, useAgentPreferences, useAgentRun, type AgentPlan, type AgentStructuredPreferences } from "../agentData";
+import { isReadyAgentPlan, useAgentMessages, useAgentOrders, useAgentPreferences, useAgentRun, type AgentOrder, type AgentPlan, type AgentStructuredPreferences, type AgentSuggestion } from "../agentData";
 import { EMPTY_CONTEXT, useAccount, useAccountContext, type AccountContext } from "../accountData";
 import { PreferenceFields } from "./PreferenceFields";
 import { useCatalogListings } from "../catalogData";
 import { useVotes } from "../data";
 import PlanMap from "./PlanMap";
 import MeetupCalendarAction from "./MeetupCalendarAction";
+import AgentVenueDetails from "./AgentVenueDetails";
+import { dollars } from "../venueFormatting";
+import PrivateOrderSummary from "./PrivateOrderSummary";
 
 export function AgentPrefs() {
   const { agentNeeds, group, session } = useGroup();
@@ -109,32 +112,56 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
   </div>;
 }
 
-export function AgentPlanCard({ plan, recommended = false }: { plan: AgentPlan; recommended?: boolean }) {
+function shortSummary(summary: string) {
+  const sentence = summary.trim().match(/^.*?[.!?](?:\s|$)/)?.[0].trim() ?? summary.trim();
+  return sentence.length > 240 ? `${sentence.slice(0, 237).trimEnd()}…` : sentence;
+}
+
+export function AgentPlanCard({ plan, order, recommended = false }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean }) {
   const listings = useCatalogListings();
+  const ready = isReadyAgentPlan(plan);
+  const cost = plan.costRange ? `Est. ${dollars(plan.costRange.min)}–${dollars(plan.costRange.max)}/person` : `Est. ${dollars(plan.costPerPerson)}/person total`;
   return <section className="card space-y-3">
-    {recommended ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
-    <div className="flex flex-wrap justify-between gap-3"><h2 className="card-title">{plan.title}</h2><span className="sticker sticker-lime">Est. ${plan.costPerPerson}/person total</span></div>
+    <div className="flex flex-wrap gap-2">{recommended && ready ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
+      {!ready ? <span className="sticker sticker-pink">Suggested · confirm details</span> : null}</div>
+    <div className="flex flex-wrap justify-between gap-3"><h2 className="card-title">{plan.title}</h2><span className="sticker sticker-lime">{cost}</span></div>
+    {plan.summary || plan.whyLine ? <p>{shortSummary(plan.summary || plan.whyLine)}</p> : null}
+    <PrivateOrderSummary order={order} listings={listings} stops={plan.stops} />
     <ol className="space-y-4">{plan.stops.map(stop => {
       const place = listings.get(stop.placeId);
-      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stop.name} ${place?.address ?? `${stop.lat},${stop.lng}`}`)}${place?.googlePlaceId ? `&query_place_id=${encodeURIComponent(place.googlePlaceId)}` : ""}`;
       return <li key={stop.placeId} className="venue-details space-y-2">
-        <strong className="text-lg">{stop.name}</strong><p className="muted">{stop.start}–{stop.end} · {stop.category} · est. ${stop.costPerPerson}/person</p>
-        {place?.address ? <p className="text-sm">{place.address}</p> : null}
-        {place && Number.isFinite(place.rating) && place.rating > 0 ? <p className="text-sm"><strong>★ {place.rating.toFixed(1)}/5</strong>{place.reviewCount > 0 ? ` · ${place.reviewCount.toLocaleString()} reviews` : ""} <span className="muted">· {place.observation ? `${place.observation.source}, observed ${new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "America/Los_Angeles" }).format(new Date(place.observation.fetchedAt))}` : "cached catalog rating"}</span></p> : null}
-        {place?.dietary?.length && stop.category !== "activity" ? <p className="text-sm">Listed dietary options: {place.dietary.map(d => d.replaceAll("_", " ")).join(", ")}</p> : null}
-        {place?.observation?.url ? <a className="font-bold underline text-sm" href={place.observation.url} target="_blank" rel="noopener noreferrer">Rating source ↗</a> : null}
-        <a className="font-bold underline text-sm" href={mapsUrl} target="_blank" rel="noopener noreferrer">View venue details on Google Maps ↗</a>
-        {stop.category !== "activity" ? <p className="muted">Confirm current menu options and allergy handling directly with the venue.</p> : null}
+        <strong className="text-lg">{stop.name}</strong><p className="muted">{!ready ? "Proposed " : ""}{stop.start}–{stop.end} · {stop.category} · venue estimate {dollars(stop.costPerPerson)}/person</p>
+        <AgentVenueDetails place={place} name={stop.name} lat={stop.lat} lng={stop.lng} />
       </li>;
     })}</ol>
-    <p>{plan.whyLine}</p>
-    <details><summary>Data limitations</summary><ul className="muted">{plan.limitations.map(l => <li key={l}>{l}</li>)}</ul></details>
+    {!ready ? <p className="muted">Confirm the missing details before this can become a group choice. No limits have been changed.</p> : null}
+    {plan.limitations.length ? <details><summary>Details to confirm</summary><ul className="muted">{plan.limitations.map(l => <li key={l}>{l}</li>)}</ul></details> : null}
+  </section>;
+}
+
+function OtherOptions({ suggestions, orders, noFit }: { suggestions: AgentSuggestion[]; orders: AgentOrder[]; noFit: boolean }) {
+  const listings = useCatalogListings();
+  if (!suggestions.length) return null;
+  return <section className="space-y-4" aria-label="Other options to explore">
+    <div className="card space-y-2"><h2 className="card-title">Other options to explore</h2><p>{noFit ? "No checked itinerary fits everyone’s current requirements and time. " : ""}These venues are untimed alternatives to explore; they are not confirmed to fit. No limits were changed.</p></div>
+    {suggestions.map(suggestion => {
+      const place = listings.get(suggestion.placeId);
+      return <article key={suggestion.id} className="card space-y-3">
+        <span className="sticker sticker-pink">Explore · confirm details</span>
+        <h3 className="card-title">{place?.name ?? "Venue to explore"}</h3>
+        <p>{shortSummary(suggestion.summary)}</p>
+        <PrivateOrderSummary order={orders.find(order => order.planId === suggestion.id)} listings={listings} alternative />
+        <AgentVenueDetails place={place} name={place?.name ?? "Berkeley venue"} lat={place?.lat} lng={place?.lng} />
+        {suggestion.limitations.length ? <details><summary>Details to confirm</summary><ul className="muted">{suggestion.limitations.map(l => <li key={l}>{l}</li>)}</ul></details> : null}
+      </article>;
+    })}
   </section>;
 }
 
 export function AgentPlans() {
   const { group, agent, session, isHost } = useGroup();
   const planRun = useAgentRun(group.latestRunId);
+  const orders = useAgentOrders(group.latestRunId, session.memberId);
   const messages = useAgentMessages(group.latestRunId);
   const find = useReducer(reducers.findAgentPlans);
   const post = useReducer(reducers.postAgentDiscussion);
@@ -142,8 +169,10 @@ export function AgentPlans() {
   const [message, setMessage] = useState("");
   if (agent?.status === "planning") return <section className="card space-y-3" role="status"><h1 className="card-title">Your coordinator is planning</h1><p>Considering confirmed prompts and checking catalog itineraries. No booking is being made.</p></section>;
   const result = planRun?.result;
-  const active = agent?.status === "ready" && result?.inputRevision === agent.revision;
-  const first = active ? result?.plans[0] : null;
+  const active = !!agent && ["ready", "blocked"].includes(agent.status) && result?.inputRevision === agent.revision;
+  const canDiscuss = active && agent?.status === "ready";
+  const readyPlans = active ? result?.plans.filter(isReadyAgentPlan) ?? [] : [];
+  const first = readyPlans[0];
   const lines = first?.stops.slice(1).map((s, i) => [[first.stops[i].lng, first.stops[i].lat], [s.lng, s.lat]] as [number, number][]) ?? [];
   return <div className="space-y-5">
     <h1 className="shout text-[48px]">Your group’s plans</h1>
@@ -151,21 +180,22 @@ export function AgentPlans() {
     {!active && !result?.conflicts.length ? <p className="card">Review everyone's current needs before generating plans.</p> : null}
     {result?.conflicts.map(c => <p className="card card-note" key={c}>{c}</p>)}
     {first ? <PlanMap plan={first} lines={lines} /> : null}
-    {active ? result?.plans.map(plan => <AgentPlanCard key={plan.id} plan={plan} recommended={plan.id === result.recommendedPlanId} />) : null}
+    {active ? result?.plans.map(plan => <AgentPlanCard key={plan.id} plan={plan} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} />) : null}
+    {active ? <OtherOptions suggestions={result?.suggestions ?? []} orders={orders} noFit={!readyPlans.length} /> : null}
     <section className="card space-y-3">
       <h2 className="card-title">Coordinator and group conversation</h2>
       <p className="muted">This conversation is shared. Update hard requirements privately on the Needs screen.</p>
       <ol className="space-y-3">{messages.map(m => <li key={String(m.id)}><strong>{m.label}</strong><p>{m.text}</p></li>)}</ol>
-      {active ? <form className="space-y-2" onSubmit={e => { e.preventDefault(); void run(async () => { await post({ text: message }); setMessage(""); }); }}>
+      {canDiscuss ? <form className="space-y-2" onSubmit={e => { e.preventDefault(); void run(async () => { await post({ text: message }); setMessage(""); }); }}>
         <label htmlFor="group-discussion">Message everyone</label>
         <textarea id="group-discussion" className="input" maxLength={2000} value={message} onChange={e => setMessage(e.target.value)} />
         <button className="btn" disabled={busy || !message.trim()}>Send to group</button>
       </form> : null}
-      {active ? <p className="muted">The coordinator considers this discussion next time the host chooses Find plans again.</p> : null}
+      {canDiscuss ? <p className="muted">The coordinator considers this discussion next time the host chooses Find plans again.</p> : null}
     </section>
     <div className="flex flex-wrap gap-3">
       <Link className="btn" to={`/g/${session.groupId}/prefs`}>Edit my private needs</Link>
-      {active ? <Link className="btn btn-primary" to={`/g/${session.groupId}/vote`}>Go to vote</Link> : null}
+      {readyPlans.length ? <Link className="btn btn-primary" to={`/g/${session.groupId}/vote`}>Go to vote</Link> : null}
       {isHost && agent?.status !== "needs" ? <button className="btn" disabled={busy} onClick={() => run(() => find())}>Find plans again</button> : null}
     </div>
     {error ? <p className="error" role="alert">{error}</p> : null}
@@ -177,6 +207,7 @@ export function AgentVote() {
   const navigate = useNavigate();
   const runId = group.latestRunId;
   const planRun = useAgentRun(runId);
+  const orders = useAgentOrders(runId, session.memberId);
   const votes = useVotes(runId, session.memberId);
   const vote = useReducer(reducers.vote);
   const spin = useProcedure(procedures.doRoulette);
@@ -184,7 +215,7 @@ export function AgentVote() {
   const { run, busy, error } = useRun();
   const result = planRun?.result;
   if (!runId || agent?.status !== "ready" || result?.inputRevision !== agent.revision) return <section className="card"><p>These choices are not current. Review your needs and plans first.</p><Link to={`/g/${session.groupId}/prefs`}>Review needs</Link></section>;
-  const plans = result.plans;
+  const plans = result.plans.filter(isReadyAgentPlan);
   const counts = votes?.counts ?? {};
   const complete = votes?.total === group.members.length;
   const top = Math.max(0, ...Object.values(counts));
@@ -193,14 +224,15 @@ export function AgentVote() {
   return <div className="space-y-5">
     <h1 className="shout text-[48px]">Choose together</h1>
     <Link className="btn" to={`/g/${session.groupId}/plans`}>Read plans and conversation</Link>
-    {plans.map(p => <div key={p.id} className="space-y-2"><AgentPlanCard plan={p} recommended={p.id === result.recommendedPlanId} />
+    {!plans.length ? <section className="card space-y-3"><p>These suggestions need details confirmed before anyone can vote, spin, book or add a meetup to calendars.</p><Link className="underline font-bold" to={`/g/${session.groupId}/plans`}>Explore the suggestions</Link></section> : null}
+    {plans.map(p => <div key={p.id} className="space-y-2"><AgentPlanCard plan={p} order={orders.find(order => order.planId === p.id)} recommended={p.id === result.recommendedPlanId} />
       <button className="btn w-full" disabled={busy} onClick={() => run(() => vote({ runId, planId: p.id }))}>
         {votes?.myVote === p.id ? "Your vote ✓" : `Vote ${p.title}`} · {counts[p.id] ?? 0}
       </button></div>)}
-    <p className="on-sky">{votes?.total ?? 0} of {group.members.length} voted</p>
+    {plans.length ? <p className="on-sky">{votes?.total ?? 0} of {group.members.length} voted</p> : null}
     {winner ? <MeetupCalendarAction runId={runId} planId={winner.id} isHost={isHost} /> : null}
-    <p className="card card-note">Booking is a simulation. No restaurant will be called or reserved.</p>
-    <div className="flex flex-wrap gap-3">
+    {plans.length ? <p className="card card-note">Booking is a simulation. No restaurant will be called or reserved.</p> : null}
+    {plans.length ? <div className="flex flex-wrap gap-3">
       <button className="btn" disabled={busy || !complete || leaders.length < 2 || !!winner}
         onClick={() => run(() => spin({ runId }))}>Resolve tie: equal-chance Spin</button>
       {isHost ? <button className="btn btn-primary" disabled={busy || !winner} onClick={() => run(async () => {
@@ -208,7 +240,7 @@ export function AgentVote() {
         await book({ runId, planId: winner.id, stopIndex: winner.stops.findIndex(s => s.category === "meal") });
         navigate(`/g/${session.groupId}/call`);
       })}>{winner ? `Simulate booking ${winner.title}` : "Waiting for a complete group choice"}</button> : <p className="on-sky">The host starts the simulation after everyone votes.</p>}
-    </div>
+    </div> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;
 }

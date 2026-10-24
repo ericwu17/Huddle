@@ -105,12 +105,13 @@ export const runCalendarRevokeJob = spacetimedb.procedure(
 );
 
 export const connectorStatus = spacetimedb.procedure({}, t.object("ConnectorConfigurationResult", {
-  googleConfigured: t.bool(), messagesConfigured: t.bool(), externalInvitesConfigured: t.bool(),
+  googleConfigured: t.bool(), messagesConfigured: t.bool(), externalInvitesConfigured: t.bool(), googleCallbackUrl: t.option(t.string()),
 }), ctx => {
   ctx.withTx(tx => requireAccount(tx));
   const response = ctx.env.FASTAPI_BASE_URL ? callApi(ctx, "/connectors/status", {}) : null;
   const available = response?.ok && !response.stub ? response.data : {};
   return { googleConfigured: available.googleConfigured === true, messagesConfigured: available.messagesConfigured === true,
+    googleCallbackUrl: typeof available.googleCallbackUrl === "string" && /^https?:\/\//.test(available.googleCallbackUrl) && available.googleCallbackUrl.length <= 2000 ? available.googleCallbackUrl : undefined,
     externalInvitesConfigured: available.messagesConfigured === true && externalEnabled(ctx) };
 });
 
