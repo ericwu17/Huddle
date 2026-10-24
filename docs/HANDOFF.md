@@ -11,6 +11,7 @@
 - **Frontend:** Eric Chen reported the Maincloud flow passes. The rapid Plans-to-Vote transition and reopening Plans still need a browser regression check; do not infer those are fixed from the voice stub landing.
 - **Max's CLI is ready:** version 2.13.0 at `/Users/maxli/.local/bin/spacetime`, logged into Max's own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified `FASTAPI_BASE_URL` and `STUB_MODE=true` stayed unchanged. No module/schema deploy or data reset was performed.
 - **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
+- **Current work split:** Eric Wu is working in `api/`; Max's current changes are experiments and documentation. Coordinate before touching that folder or evaluating the changing service.
 
 | Piece | Real or fake right now |
 | --- | --- |
@@ -44,7 +45,7 @@
 - [ ] Next phase, when started: real `/parse-prefs`, then the L1 solver (filter, normalize, enumerate, maximin). The dietary rule must apply to meals and desserts only (commit 88a6746 already does this). No real solver/learning/LLM work was added during the first phase.
 - [ ] Note: only ~7 real activities are open after 7:30 PM Saturday; places carry an extra `googlePlaceId` field.
 - [ ] Keep temporary backend changes compatible with the shared contract; sync main before merging/pushing. Max is authorized to cover backend fixes; unresolved shared-shape changes still need agreement.
-- [ ] Review `docs/experiments/README.md` method before any number goes on a slide.
+- [x] Review experiment method: cumulative-budget bug fixed, API-plan validator and regression checks added; corrected baseline results regenerated. Old numbers withdrawn. Final pitch claim and real API comparison still pending; see [experiments/README.md](experiments/README.md).
 
 ### Eric Wu
 
@@ -68,7 +69,7 @@
 2. **Keep both Python services and tunnels awake:** Max owns the API process/tunnel; Eric Wu owns voice. Report new URLs after a tunnel restart and update the matching module setting. Real voice remains a later phase.
 3. **Demo-mode fallbacks:** fill `data/cached_run.json` from a real run; auto demo mode when `/health` fails.
 4. **`server/src/geo.ts`:** Mapbox route geometry + leg times with `geo_cache`. Needs `MAPBOX_TOKEN`. Fallback is straight lines.
-5. **Rerun experiments** after places.json v2 and Max's real `/plan` (`python docs/experiments/sim.py`).
+5. **Rerun experiments** after places.json v2 and Eric Wu's real API are ready. Baselines run without API calls by default; opt-in commands and failure reporting are in [experiments/README.md](experiments/README.md#reproduce). Demo rehearsal and submission checklist: [DEMO_CHECKLIST.md](DEMO_CHECKLIST.md).
 
 ## Verification after pulling the voice stub
 
@@ -78,6 +79,7 @@
 - `node --check scripts/smoke.mjs`: syntax passed. Live voice-originated full scenario passed in group `NV86`; final confirm passed in group `ZYA6`, including no duplicate replay, privacy, voting and council checks. Offers skipped as expected.
 - Earlier tunnel checks passed all eight API routes; API and Maincloud health returned 200 with nine synthetic places. The later smoke runs verified calls through both separate Python services, using scripted results.
 - CLI archive matched the official 2.13.0 SHA-256; version/login and management reads passed. The environment-only voice URL update succeeded; API URL/stub mode stayed unchanged. No secret was printed.
+- Experiment follow-up: 22 regression checks passed; corrected baselines cover 1,000 feasible groups with zero selected-plan budget violations. An independent Decimal audit checked all 5,000 selected outing totals/caps, and a separate rerun produced byte-identical CSVs/chart. No live API was called or API file changed. Old experimental numbers are withdrawn; the real solver comparison remains pending.
 
 ## Operating
 

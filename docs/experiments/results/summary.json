@@ -11,97 +11,112 @@
     "outdoor",
     "novelty"
   ],
+  "flatCategories": [
+    "activity",
+    "dessert"
+  ],
   "A": {
     "groups": 1000,
-    "redrawn": 4,
-    "vetoesDropped": 3,
+    "redrawn": 14,
+    "vetoesDropped": 2,
     "timeFeasiblePlans": {
       "meal-activity-dessert": 1280,
       "activity-meal": 169
     },
-    "elapsedSec": 1.0
+    "elapsedSec": 0.3,
+    "budgetViolations": 0,
+    "oursAttempted": 0,
+    "oursScored": 0,
+    "oursErrors": {}
   },
   "seed": 7,
+  "placesSha256": "5365185d9fdda1ff3c4c4f1b51e558ae028f2e2fee89877ac988bdde6b7c3100",
+  "generatedAt": "2026-10-23T22:13:48-07:00",
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "matplotlib": "3.11.2"
+  },
   "summary": [
     {
       "method": "random",
       "groups": 1000,
-      "minRatio": 0.6949006063808927,
-      "minRatio_lo": 0.6846859691054131,
-      "minRatio_hi": 0.705136602992029,
-      "gini": 0.05914019462939853,
-      "gini_lo": 0.05630802619349307,
-      "gini_hi": 0.06203802925343417,
+      "minRatio": 0.6415568357359342,
+      "minRatio_lo": 0.6305631618897197,
+      "minRatio_hi": 0.6522392672770444,
+      "gini": 0.07230276248491065,
+      "gini_lo": 0.06869690005078523,
+      "gini_hi": 0.07573071472850312,
       "below50": 0.0,
       "below50_lo": 0.0,
-      "below50_hi": 0.0,
-      "meanRatio": 0.8078764241509553,
-      "meanRatio_lo": 0.7987614847468093,
-      "meanRatio_hi": 0.8169393460472664
+      "below50_hi": 0.0038267584855551234,
+      "meanRatio": 0.771211492342415,
+      "meanRatio_lo": 0.7616666541840872,
+      "meanRatio_hi": 0.7807951919500272
     },
     {
       "method": "plurality",
       "groups": 1000,
-      "minRatio": 0.7889083763699766,
-      "minRatio_lo": 0.7774651708743386,
-      "minRatio_hi": 0.8005952896811428,
-      "gini": 0.05273601607535336,
-      "gini_lo": 0.049558710483027596,
-      "gini_hi": 0.055741346176094456,
+      "minRatio": 0.7641543281716088,
+      "minRatio_lo": 0.752069652169892,
+      "minRatio_hi": 0.7770070559826068,
+      "gini": 0.0594274566141102,
+      "gini_lo": 0.05589550431300706,
+      "gini_hi": 0.06288678936925914,
       "below50": 0.0,
       "below50_lo": 0.0,
-      "below50_hi": 0.0,
-      "meanRatio": 0.912993170245485,
-      "meanRatio_lo": 0.9070380910836939,
-      "meanRatio_hi": 0.9183103418240525
+      "below50_hi": 0.0038267584855551234,
+      "meanRatio": 0.9071842475603951,
+      "meanRatio_lo": 0.9012362476139448,
+      "meanRatio_hi": 0.913262242585498
     },
     {
       "method": "utilitarian",
       "groups": 1000,
-      "minRatio": 0.8314279295597102,
-      "minRatio_lo": 0.8207845462716621,
-      "minRatio_hi": 0.841239158047741,
-      "gini": 0.03853178585104455,
-      "gini_lo": 0.036072825529985635,
-      "gini_hi": 0.04098739863146974,
+      "minRatio": 0.798450037756847,
+      "minRatio_lo": 0.7873828958671145,
+      "minRatio_hi": 0.8098670039467336,
+      "gini": 0.046699926048507666,
+      "gini_lo": 0.04381239790124889,
+      "gini_hi": 0.049494571798081415,
       "below50": 0.0,
       "below50_lo": 0.0,
-      "below50_hi": 0.0,
-      "meanRatio": 0.9446976993876421,
-      "meanRatio_lo": 0.9412388617754348,
-      "meanRatio_hi": 0.9481861214392918
+      "below50_hi": 0.0038267584855551234,
+      "meanRatio": 0.9349396333082118,
+      "meanRatio_lo": 0.9310417352341256,
+      "meanRatio_hi": 0.9390662750300846
     },
     {
       "method": "maximin",
       "groups": 1000,
-      "minRatio": 0.8373185786205267,
-      "minRatio_lo": 0.8276880868095746,
-      "minRatio_hi": 0.8468588643376834,
-      "gini": 0.03730455759870087,
-      "gini_lo": 0.035013834871380455,
-      "gini_hi": 0.039586852690770565,
+      "minRatio": 0.8049589595377717,
+      "minRatio_lo": 0.7940836418022197,
+      "minRatio_hi": 0.8160817252850066,
+      "gini": 0.04513701048222024,
+      "gini_lo": 0.042451107518150635,
+      "gini_hi": 0.047995835576916064,
       "below50": 0.0,
       "below50_lo": 0.0,
-      "below50_hi": 0.0,
-      "meanRatio": 0.9409183157823561,
-      "meanRatio_lo": 0.9369267754004432,
-      "meanRatio_hi": 0.9445906275329142
+      "below50_hi": 0.0038267584855551234,
+      "meanRatio": 0.9303978835322905,
+      "meanRatio_lo": 0.9260705478181249,
+      "meanRatio_hi": 0.9348126781325072
     },
     {
       "method": "nash",
       "groups": 1000,
-      "minRatio": 0.8328262011084657,
-      "minRatio_lo": 0.8219971311101653,
-      "minRatio_hi": 0.8428987278920242,
-      "gini": 0.03811930312991253,
-      "gini_lo": 0.03563113387494835,
-      "gini_hi": 0.040432011310535095,
+      "minRatio": 0.7993898892535788,
+      "minRatio_lo": 0.788307125993304,
+      "minRatio_hi": 0.8102721475469361,
+      "gini": 0.04645626935709338,
+      "gini_lo": 0.04362529790136631,
+      "gini_hi": 0.0492507228756656,
       "below50": 0.0,
       "below50_lo": 0.0,
-      "below50_hi": 0.0,
-      "meanRatio": 0.9445901369095417,
-      "meanRatio_lo": 0.9408519047563447,
-      "meanRatio_hi": 0.9480508954752371
+      "below50_hi": 0.0038267584855551234,
+      "meanRatio": 0.9348757175501763,
+      "meanRatio_lo": 0.9307271522592673,
+      "meanRatio_hi": 0.9390220650644343
     }
   ],
   "paired": [
@@ -110,18 +125,18 @@
       "vs": "maximin",
       "metric": "minRatio",
       "groups": 1000,
-      "meanDiff": -0.1424179722396339,
-      "lo": -0.15238540303569081,
-      "hi": -0.13200488871352303
+      "meanDiff": -0.1634021238018375,
+      "lo": -0.1747549583003878,
+      "hi": -0.1529563145635424
     },
     {
       "method": "random",
       "vs": "maximin",
       "metric": "gini",
       "groups": 1000,
-      "meanDiff": 0.021835637030697668,
-      "lo": 0.01967139458479656,
-      "hi": 0.023971765841710978
+      "meanDiff": 0.0271657520026904,
+      "lo": 0.024596917603047847,
+      "hi": 0.029840696696962894
     },
     {
       "method": "random",
@@ -137,18 +152,18 @@
       "vs": "maximin",
       "metric": "minRatio",
       "groups": 1000,
-      "meanDiff": -0.04841020225054993,
-      "lo": -0.05414092383937604,
-      "hi": -0.04272061468895478
+      "meanDiff": -0.040804631366163066,
+      "lo": -0.046029507747631586,
+      "hi": -0.03575503052816164
     },
     {
       "method": "plurality",
       "vs": "maximin",
       "metric": "gini",
       "groups": 1000,
-      "meanDiff": 0.015431458476652489,
-      "lo": 0.013612635760392587,
-      "hi": 0.017277020013193495
+      "meanDiff": 0.014290446131889957,
+      "lo": 0.01263749298832379,
+      "hi": 0.0161164801890859
     },
     {
       "method": "plurality",
@@ -164,18 +179,18 @@
       "vs": "maximin",
       "metric": "minRatio",
       "groups": 1000,
-      "meanDiff": -0.005890649060816457,
-      "lo": -0.007559573617930498,
-      "hi": -0.004390532265127364
+      "meanDiff": -0.006508921780924638,
+      "lo": -0.008126159021887841,
+      "hi": -0.00495077611990663
     },
     {
       "method": "utilitarian",
       "vs": "maximin",
       "metric": "gini",
       "groups": 1000,
-      "meanDiff": 0.0012272282523436786,
-      "lo": 0.0007544143978559858,
-      "hi": 0.0017827500792957048
+      "meanDiff": 0.0015629155662874245,
+      "lo": 0.0009973619539294788,
+      "hi": 0.0021730032508515524
     },
     {
       "method": "utilitarian",
@@ -191,18 +206,18 @@
       "vs": "maximin",
       "metric": "minRatio",
       "groups": 1000,
-      "meanDiff": -0.004492377512060903,
-      "lo": -0.005840031132251395,
-      "hi": -0.0032130067859926395
+      "meanDiff": -0.005569070284192995,
+      "lo": -0.007098453113181781,
+      "hi": -0.004194133891086526
     },
     {
       "method": "nash",
       "vs": "maximin",
       "metric": "gini",
       "groups": 1000,
-      "meanDiff": 0.000814745531211659,
-      "lo": 0.00041537388109934206,
-      "hi": 0.0012602721435913049
+      "meanDiff": 0.0013192588748731407,
+      "lo": 0.0007961984213809068,
+      "hi": 0.0019047716874796535
     },
     {
       "method": "nash",
@@ -216,7 +231,7 @@
   ],
   "curveB": null,
   "notes": [
-    "ours SKIPPED: FASTAPI_BASE_URL is not set (the solver is not ready). No ours numbers were produced.",
-    "Experiment B SKIPPED: FASTAPI_BASE_URL is not set (/elicit/* not available). Scaffolding only."
+    "ours SKIPPED: real API evaluation is disabled or its health check did not pass. No ours numbers were produced.",
+    "Experiment B SKIPPED: real API evaluation disabled or health check failed. Scaffolding only."
   ]
 }

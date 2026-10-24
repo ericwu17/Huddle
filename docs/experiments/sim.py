@@ -7,9 +7,10 @@ Only the place features (data/places.json) are real data.
 Experiment A: compare group-choice rules on ~1,000 synthetic groups.
   Baselines (random, plurality, utilitarian, maximin, Nash) see the TRUE
   synthetic tastes (oracle). "ours" calls the api POST /plan when
-  FASTAPI_BASE_URL is set; otherwise it is skipped (never faked).
+  --with-api is passed and the service reports non-stub health; otherwise it
+  is skipped (never faked).
 Experiment B: random vs uncertainty-based swipe selection. Needs the api's
-  /elicit/next and /elicit/update; skipped until FASTAPI_BASE_URL is set.
+  /elicit/next and /elicit/update; also requires --with-api.
 
 Utility, normalization, ratios, hard filter, and plan enumeration follow
 build-brief C3/C4 (templates [meal, activity, dessert] and [activity, meal],
@@ -21,15 +22,21 @@ Run: python docs/experiments/sim.py            (all defaults, seed 7)
 
 import argparse
 import csv
+from datetime import datetime
+import hashlib
+from importlib.metadata import PackageNotFoundError, version
 import itertools
 import json
 import math
 import os
+import platform
+import re
 import sys
 import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import numpy as np
 
@@ -197,11 +204,16 @@ def place_filter(places, hard):
     return mask
 
 
-def feasible_plans(group, plans, mask, lat, lng):
+def feasible_plans(group, plans, mask, lat, lng, costs):
     """Per template: (stop index array, plan index into the global list) passing the group's filter."""
     out = {}
+    caps = [h["budgetMaxPerPerson"] for h in group["hard"]
+            if h["budgetMaxPerPerson"] is not None]
     for tpl, (S, _) in plans.items():
         keep = mask[S].all(axis=1) if len(S) else np.zeros(0, dtype=bool)
+        if caps:
+            # An outing's cap covers every stop, not each place separately.
+            keep &= costs[S].sum(axis=1) <= min(caps) + 1e-9
         for h, (olat, olng) in zip(group["hard"], group["origins"]):
             if h["maxTravelMinutes"] is not None:
                 first = travel_minutes(haversine_km(olat, olng, lat[S[:, 0]], lng[S[:, 0]]))
@@ -266,12 +278,35 @@ class Api:
     def __init__(self, base, secret, timeout=15):
         self.base, self.secret, self.timeout = base.rstrip("/"), secret or "", timeout
 
-    def post(self, path, body):
-        req = urllib.request.Request(self.base + path, data=json.dumps(body).encode(),
+    def request(self, path, body=None):
+        req = urllib.request.Request(self.base + path,
+                                     data=json.dumps(body).encode() if body is not None else None,
                                      headers={"Content-Type": "application/json",
-                                              "X-Huddle-Secret": self.secret}, method="POST")
+                                              "X-Huddle-Secret": self.secret},
+                                     method="POST" if body is not None else "GET")
         with urllib.request.urlopen(req, timeout=self.timeout) as r:
+            if r.headers.get("X-Huddle-Stub", "").lower() == "true":
+                raise ValueError("synthetic API response")
             return json.loads(r.read())
+
+    def post(self, path, body):
+        return self.request(path, body)
+
+
+def real_api(base, secret, place_count):
+    """Fail closed: a configured URL alone never authorizes scoring stub output."""
+    if not base or not secret:
+        return None, "API evaluation skipped: configure FASTAPI_BASE_URL and HUDDLE_SHARED_SECRET privately."
+    api = Api(base, secret)
+    try:
+        health = api.request("/health")
+        if not isinstance(health, dict) or health.get("ok") is not True or health.get("stub") is not False:
+            return None, "API evaluation skipped: /health must explicitly report ok=true and stub=false."
+        if health.get("placesLoaded") != place_count:
+            return None, "API evaluation skipped: service/catalog place counts differ."
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError) as err:
+        return None, f"API evaluation skipped: health check failed ({type(err).__name__})."
+    return api, None
 
 
 def ours_request(g, group):
@@ -287,20 +322,117 @@ def ours_request(g, group):
             "options": {"samples": 300, "tau": 0.6, "topK": 60, "preview": False}}
 
 
-def ours_ratios(resp, places, v, Vmax):
-    """Evaluate the api's Safe plan under the TRUE synthetic tastes."""
-    plans = resp.get("plans") or []
+def finite_number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def clock_minutes(value):
+    if not isinstance(value, str) or not re.fullmatch(r"(?:[01]\d|2[0-3]):[0-5]\d", value):
+        raise ValueError("invalid HH:MM time")
+    h, minute = map(int, value.split(":"))
+    return h * 60 + minute
+
+
+def validate_plan(plan, places, group, request):
+    """Independently validate catalog facts and full-outing feasibility before scoring.
+
+    Does not import the solver or trust its claimed utility/cost/feasibility.
+    Raises ValueError with a non-sensitive reason; returns catalog indices.
+    """
+    if not isinstance(plan, dict) or not isinstance(plan.get("id"), str) or not plan["id"]:
+        raise ValueError("missing plan id")
+    if plan.get("kind") not in ("safe", "bold", "budget"):
+        raise ValueError("invalid plan kind")
+    if not finite_number(plan.get("robustness")) or not 0 <= plan["robustness"] <= 1:
+        raise ValueError("invalid robustness")
+    stops = plan.get("stops")
+    if not isinstance(stops, list) or not stops or not all(isinstance(s, dict) for s in stops):
+        raise ValueError("invalid stops")
+    ids = {p["id"]: i for i, p in enumerate(places)}
+    stop_ids = [s.get("placeId") for s in stops]
+    if any(not isinstance(pid, str) or pid not in ids for pid in stop_ids):
+        raise ValueError("unknown placeId")
+    if len(set(stop_ids)) != len(stop_ids):
+        raise ValueError("repeated placeId")
+    indices = [ids[pid] for pid in stop_ids]
+    if tuple(places[i]["category"] for i in indices) not in TEMPLATES:
+        raise ValueError("invalid plan template")
+    if set(stop_ids) & set(request.get("excludePlaceIds", [])):
+        raise ValueError("excluded placeId")
+    mask = place_filter(places, group["hard"])
+    if not mask[indices].all():
+        raise ValueError("place violates group hard constraints")
+    total = 0.0
+    previous = None
+    window_start = clock_minutes(request["window"]["start"])
+    window_end = clock_minutes(request["window"]["end"])
+    for stop, i in zip(stops, indices):
+        p = places[i]
+        if stop.get("category") != p["category"]:
+            raise ValueError("stop category differs from catalog")
+        for field in ("lat", "lng", "costPerPerson"):
+            value = stop.get(field)
+            if not finite_number(value) or not math.isclose(value, p[field], rel_tol=0, abs_tol=1e-7):
+                raise ValueError(f"stop {field} differs from catalog")
+        if stop["costPerPerson"] < 0:
+            raise ValueError("negative stop cost")
+        total += p.get("costPerPerson") or 0
+        start, end = clock_minutes(stop.get("start")), clock_minutes(stop.get("end"))
+        dwell = p.get("dwellMinutes") or DEFAULT_DWELL[p["category"]]
+        if start % GRID or end - start != dwell or not window_start <= start < end <= window_end:
+            raise ValueError("stop violates grid, dwell or outing window")
+        intervals = (p.get("hours") or {}).get(DAY, [])
+        def covers(interval):
+            opening, closing = map(hhmm, interval)
+            if closing <= opening:
+                closing += 24 * 60
+            return opening <= start and end <= closing
+        if not any(covers(interval) for interval in intervals):
+            raise ValueError("place closed during stop")
+        if previous is not None:
+            last, last_end = previous
+            leg = float(travel_minutes(haversine_km(last["lat"], last["lng"], p["lat"], p["lng"])))
+            if start + 1e-9 < last_end + leg:
+                raise ValueError("insufficient travel time between stops")
+        previous = p, end
+    if not finite_number(plan.get("costPerPerson")) or not math.isclose(plan["costPerPerson"], total, rel_tol=0, abs_tol=1e-7):
+        raise ValueError("plan total differs from sum of catalog stop costs")
+    first = places[indices[0]]
+    for hard, origin in zip(group["hard"], group["origins"]):
+        cap = hard["budgetMaxPerPerson"]
+        if cap is not None and total > cap + 1e-9:
+            raise ValueError("outing exceeds a member cumulative budget")
+        travel_cap = hard["maxTravelMinutes"]
+        if travel_cap is not None and origin is not None:
+            leg = float(travel_minutes(haversine_km(*origin, first["lat"], first["lng"])))
+            if leg > travel_cap + 1e-9:
+                raise ValueError("first leg exceeds a member travel cap")
+    return indices
+
+
+def ours_ratios(resp, places, v, Vmax, group, request):
+    """Validate ALL returned plans, then evaluate Safe under TRUE synthetic tastes."""
+    if not isinstance(resp, dict) or resp.get("runId") != request["runId"]:
+        return None, "invalid response runId"
+    plans = resp.get("plans")
+    if not isinstance(plans, list):
+        return None, "invalid plans array"
     if not plans:
         return None, "no plans returned"
-    plan = next((p for p in plans if p.get("kind") == "safe"), plans[0])
-    ids = {p["id"]: i for i, p in enumerate(places)}
-    stops = [ids.get(s.get("placeId")) for s in plan.get("stops", [])]
-    if not stops or None in stops:
-        return None, "plan uses a placeId not in our places file"
-    vals = v[:, stops]
-    if np.isnan(vals).any():
-        return None, "plan uses a place our hard filter rejects"
-    return vals.mean(1) / Vmax, None
+    try:
+        validated = [validate_plan(p, places, group, request) for p in plans]
+        if len({p["id"] for p in plans}) != len(plans) or len({p["kind"] for p in plans}) != len(plans):
+            raise ValueError("duplicate plan id or kind")
+        safe = next((i for i, p in enumerate(plans) if p["kind"] == "safe"), None)
+        if safe is None:
+            raise ValueError("missing Safe plan")
+        vals = v[:, validated[safe]]
+        ratios = vals.mean(1) / Vmax
+        if not np.isfinite(ratios).all() or np.any(ratios < -1e-9) or np.any(ratios > 1 + 1e-9):
+            raise ValueError("ratios outside shared feasible universe")
+    except (ValueError, KeyError, TypeError) as err:
+        return None, str(err) if isinstance(err, ValueError) else "malformed plan"
+    return ratios, None
 
 
 # --------------------------------------------------------------- metrics ---
@@ -318,6 +450,17 @@ def bootstrap_ci(x, rng, B=2000):
     return float(x.mean()), float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5))
 
 
+def proportion_ci(x):
+    """Wilson 95% interval: zero observed failures does not imply zero risk."""
+    n = len(x)
+    p = float(np.mean(x))
+    z = 1.959963984540054
+    denominator = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / denominator
+    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denominator
+    return p, 0.0 if p == 0 else max(0.0, center - half), 1.0 if p == 1 else min(1.0, center + half)
+
+
 def run_experiment_a(args, places, X, api, rng):
     starts, ok = open_matrix(places)
     t0 = time.time()
@@ -325,48 +468,75 @@ def run_experiment_a(args, places, X, api, rng):
     n_plans = {"-".join(t): len(S) for t, (S, _) in plans.items()}
     print(f"[A] time-feasible plans (group-independent): {n_plans} in {time.time() - t0:.1f}s")
     center = (float(lat.mean()), float(lng.mean()))
+    costs = np.array([p.get("costPerPerson") or 0 for p in places])
 
     rows, notes = [], []
     resampled = dropped = 0
     ours_errors = {}
     n_ours = args.ours_groups if args.ours_groups is not None else args.groups
     if api is None:
-        notes.append("ours SKIPPED: FASTAPI_BASE_URL is not set (the solver is not ready). No ours numbers were produced.")
+        notes.append("ours SKIPPED: real API evaluation is disabled or its health check did not pass. No ours numbers were produced.")
     t0 = time.time()
     for g in range(args.groups):
         while True:
             group = make_group(rng, places, center)
             mask = place_filter(places, group["hard"])
-            feas = feasible_plans(group, plans, mask, lat, lng)
+            feas = feasible_plans(group, plans, mask, lat, lng, costs)
             if sum(len(f) for f in feas.values()):
                 break
             resampled += 1  # no feasible plan: draw a new group
+            if resampled > max(1000, args.groups * 100):
+                raise ValueError("Too many infeasible groups; inspect the catalog/constraints instead of redrawing forever")
         dropped += group["vetoesDropped"]
         v = normalized_place_values(group["theta"], X, places, mask)
         V = np.concatenate([v[:, plans[t][0][feas[t]]].mean(2) for t in TEMPLATES], axis=1)
         Vmax = V.max(1)
         Vmax = np.where(Vmax > 0, Vmax, 1.0)
         R = V / Vmax[:, None]
-        picks = {m: R[:, j] for m, j in choose_baselines(rng, R).items()}
+        totals = np.concatenate([costs[plans[t][0][feas[t]]].sum(1) for t in TEMPLATES])
+        caps = [h["budgetMaxPerPerson"] for h in group["hard"] if h["budgetMaxPerPerson"] is not None]
+        cap = min(caps) if caps else None
+        if cap is not None and np.any(totals > cap + 1e-9):
+            raise AssertionError("Cumulative budget violation in baseline feasible universe")
+        chosen = choose_baselines(rng, R)
+        picks = {m: R[:, j] for m, j in chosen.items()}
+        picked_costs = {m: float(totals[j]) for m, j in chosen.items()}
+        sequences = [sequence for t in TEMPLATES for sequence in plans[t][0][feas[t]]]
+        picked_stops = {m: [places[int(i)]["id"] for i in sequences[j]] for m, j in chosen.items()}
         if api is not None and g < n_ours:
             try:
-                r, err = ours_ratios(api.post("/plan", ours_request(g, group)), places, v, Vmax)
+                request = ours_request(g, group)
+                response = api.post("/plan", request)
+                r, err = ours_ratios(response, places, v, Vmax, group, request)
             except (urllib.error.URLError, TimeoutError, ValueError, OSError) as e:
                 r, err = None, f"request failed: {type(e).__name__}"
             if r is not None:
                 picks["ours"] = r
+                safe = next(p for p in response["plans"] if p["kind"] == "safe")
+                picked_costs["ours"] = safe["costPerPerson"]
+                picked_stops["ours"] = [s["placeId"] for s in safe["stops"]]
             else:
                 ours_errors[err] = ours_errors.get(err, 0) + 1
         for m, r in picks.items():
             rows.append({"group": g, "method": m, "members": len(r), "rho": round(group["rho"], 3),
                          "feasiblePlans": R.shape[1], "minRatio": float(r.min()),
-                         "meanRatio": float(r.mean()), "gini": gini(r), "below50": int(r.min() < 0.5)})
+                         "meanRatio": float(r.mean()), "gini": gini(r), "below50": int(r.min() < 0.5),
+                         "costPerPerson": picked_costs[m], "groupBudgetCap": cap,
+                         "stopPlaceIds": json.dumps(picked_stops[m]),
+                         "budgetViolation": int(cap is not None and picked_costs[m] > cap + 1e-9)})
     elapsed = time.time() - t0
     print(f"[A] {args.groups} groups in {elapsed:.1f}s ({resampled} infeasible groups redrawn, {dropped} vetoes dropped by the cap)")
     for err, c in ours_errors.items():
         notes.append(f"ours: {c} groups excluded ({err})")
+    attempted = min(args.groups, n_ours) if api is not None else 0
+    scored = sum(r["method"] == "ours" for r in rows)
+    if attempted:
+        notes.append(f"ours API coverage: {scored}/{attempted} groups scored, {attempted - scored} failed or returned invalid/empty plans. "
+                     "Utility summaries are conditional on success; use paired rows for matched comparisons and report failures alongside them.")
     return rows, notes, {"groups": args.groups, "redrawn": resampled, "vetoesDropped": dropped,
-                         "timeFeasiblePlans": n_plans, "elapsedSec": round(elapsed, 1)}
+                         "timeFeasiblePlans": n_plans, "elapsedSec": round(elapsed, 1),
+                         "budgetViolations": sum(r["budgetViolation"] for r in rows),
+                         "oursAttempted": attempted, "oursScored": scored, "oursErrors": ours_errors}
 
 
 def summarize_a(rows, rng):
@@ -379,7 +549,8 @@ def summarize_a(rows, rng):
         rs = list(by[m].values())
         s = {"method": m, "groups": len(rs)}
         for key in ["minRatio", "gini", "below50", "meanRatio"]:
-            s[key], s[key + "_lo"], s[key + "_hi"] = bootstrap_ci([r[key] for r in rs], rng)
+            values = [r[key] for r in rs]
+            s[key], s[key + "_lo"], s[key + "_hi"] = proportion_ci(values) if key == "below50" else bootstrap_ci(values, rng)
         summary.append(s)
     refs = [m for m in ["ours", "maximin"] if m in by]
     paired = []
@@ -403,7 +574,9 @@ def run_experiment_b(args, places, X, api, rng):
     SIMULATED users answer each swipe by Bradley-Terry on their synthetic taste.
     Needs the api's /elicit/update (both policies) and /elicit/next (uncertainty policy)."""
     if api is None:
-        return None, ["Experiment B SKIPPED: FASTAPI_BASE_URL is not set (/elicit/* not available). Scaffolding only."]
+        return None, ["Experiment B SKIPPED: real API evaluation disabled or health check failed. Scaffolding only."]
+    if args.b_users == 0:
+        return None, ["Experiment B SKIPPED: --b-users 0 (plan evaluation only)."]
     meals = [i for i, p in enumerate(places) if p["category"] == "meal"]
     ids = [places[i]["id"] for i in meals]
     swipes = list(range(1, 13))
@@ -460,12 +633,12 @@ def write_csv(path, rows):
     if not rows:
         return
     with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
 
 
-def make_chart(path, summary, curve):
+def make_chart(path, summary, curve, flat=None):
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -480,8 +653,8 @@ def make_chart(path, summary, curve):
     err = [[s["minRatio"] - s["minRatio_lo"] for s in summary], [s["minRatio_hi"] - s["minRatio"] for s in summary]]
     colors = ["#2a6fdb" if n == "ours" else "#8a94a6" for n in names]
     ax.bar(names, y, yerr=err, capsize=4, color=colors)
-    for i, s in enumerate(summary):
-        ax.text(i, 0.02, f"{s['below50'] * 100:.0f}% <50%", ha="center", fontsize=8, color="white")
+    for i, value in enumerate(y):
+        ax.text(i, value + err[1][i] + 0.015, f"{value * 100:.1f}%", ha="center", fontsize=9)
     ax.set_ylim(0, 1)
     ax.set_ylabel("worst member's ratio (mean, 95% CI)")
     ax.set_title("SIMULATED: worst-off member by choice rule", fontsize=10)
@@ -495,8 +668,12 @@ def make_chart(path, summary, curve):
         ax.set_ylim(0, 1)
         ax.legend()
         ax.set_title("SIMULATED: learning curve", fontsize=10)
-    fig.text(0.5, 0.005, "Synthetic groups and tastes; real place features. Not user data.", ha="center", fontsize=8)
-    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    footnote = "Synthetic groups/tastes; cached places. Cumulative budgets enforced; feasible groups only.\n"
+    footnote += "Oracle baselines; no implemented-solver result." if "ours" not in names else "API comparison uses a truth-centered posterior, not learned preferences."
+    if {"activity", "dessert"} <= set(flat or []):
+        footnote += "\nConstant features limit interpretation; the below-50% metric currently has no signal."
+    fig.text(0.5, 0.015, footnote, ha="center", fontsize=8)
+    fig.tight_layout(rect=(0, 0.13, 1, 1))
     fig.savefig(path, dpi=150)
     plt.close(fig)
     return True
@@ -507,14 +684,30 @@ def flat_features(X):
     return [FEATURES[k] for k in range(K) if np.ptp(X[:, k]) < 1e-12]
 
 
+def flat_categories(places, X):
+    return [category for category in DEFAULT_DWELL
+            if (idx := [i for i, p in enumerate(places) if p["category"] == category])
+            and np.all(np.ptp(X[idx], axis=0) < 1e-12)]
+
+
 def write_readme(path, args, meta, summary, paired, curve, notes, chart, out_rel):
     s = {r["method"]: r for r in summary}
     pct = lambda x: f"{x * 100:.1f}%"
+    floor_note = ("With the current flat features, activities and desserts get normalized value 1. "
+                  "Every two-stop plan therefore has utility at least 0.5 and every three-stop plan at least 2/3. "
+                  "The below-50% metric cannot distinguish these rules on this dataset. Better features may change the results in either direction."
+                  if {"activity", "dessert"} <= set(meta["flatCategories"]) else
+                  "Interpret the below-50% rate alongside its interval, feature coverage and infeasible-group redraws; it is not a real-user failure rate.")
     L = ["# Experiments (SIMULATED)", "",
          "> **Everything here is SIMULATED.** Groups, tastes, constraints, and swipes are synthetic; "
          "ground truth is the synthetic taste vector. Only place features come from real data "
-         f"(`{meta['places']}`). Regenerate with `python docs/experiments/sim.py`.", "",
-         f"Seed {args.seed}; {meta['A']['groups']} groups of 3-5; generated {time.strftime('%Y-%m-%d %H:%M')}.", ""]
+         f"(`{meta['places']}`); review aspects may still be placeholders.", "",
+         f"Seed {args.seed}; {meta['A']['groups']} feasible groups of 3-5; generated {meta['generatedAt']}.", "",
+         "**Correction:** the earlier results did not enforce cumulative outing budgets. "
+         "Those numbers and the earlier chart are withdrawn; all outputs below were regenerated with total-cost checks.", "",
+         f"**Feasibility audit:** {meta['A']['budgetViolations']} selected-plan budget violations; "
+         f"{meta['A']['redrawn']} infeasible groups redrawn. Results describe feasible groups only, "
+         "not the probability that an arbitrary group can find an outing.", ""]
     if meta["flat"]:
         L += [f"**Caveat:** these features are identical for every place in this file, so they carry no signal: "
               f"{', '.join(meta['flat'])}. Rerun once `data/places.json` v2 (real review aspects) lands.", ""]
@@ -528,8 +721,8 @@ def write_readme(path, args, meta, summary, paired, curve, notes, chart, out_rel
             L.append(f"- {m}: worst member at {pct(s[m]['minRatio'])} of ideal; "
                      f"{pct(s[m]['below50'])} of groups leave someone below 50%.")
     L += ["", "Baselines are oracles: they see each synthetic member's true taste. "
-          "\"ours\" sees it only through a posterior (mean = true taste, sd "
-          f"{OURS_POSTERIOR_SD}) and plans under uncertainty.", "",
+          "The optional \"ours\" comparison also supplies the true taste as its posterior mean "
+          f"with sd {OURS_POSTERIOR_SD}; this is an oracle-centered uncertainty test, not evidence of learning from swipes.", "",
           "## Experiment A: choice rules", "",
           "| method | groups | worst ratio (95% CI) | Gini (95% CI) | share with someone < 50% (95% CI) | mean ratio |",
           "| --- | --- | --- | --- | --- | --- |"]
@@ -538,9 +731,9 @@ def write_readme(path, args, meta, summary, paired, curve, notes, chart, out_rel
                  f"| {r['gini']:.3f} [{r['gini_lo']:.3f}, {r['gini_hi']:.3f}] "
                  f"| {pct(r['below50'])} [{pct(r['below50_lo'])}, {pct(r['below50_hi'])}] | {r['meanRatio']:.3f} |")
     L += ["", "Paired differences (method minus reference, same groups, bootstrap 95% CI over groups):", "",
-          "| method | vs | metric | diff | 95% CI |", "| --- | --- | --- | --- | --- |"]
+          "| method | vs | metric | matched groups | diff | 95% CI |", "| --- | --- | --- | --- | --- | --- |"]
     for p in paired:
-        L.append(f"| {p['method']} | {p['vs']} | {p['metric']} | {p['meanDiff']:+.3f} | [{p['lo']:+.3f}, {p['hi']:+.3f}] |")
+        L.append(f"| {p['method']} | {p['vs']} | {p['metric']} | {p['groups']} | {p['meanDiff']:+.3f} | [{p['lo']:+.3f}, {p['hi']:+.3f}] |")
     L += ["", "## Experiment B: swipe selection", ""]
     if curve:
         L += ["| swipes | random | uncertainty |", "| --- | --- | --- |"]
@@ -555,18 +748,38 @@ def write_readme(path, args, meta, summary, paired, curve, notes, chart, out_rel
           f"travel cap p={P_TRAVEL_CAP} from {TRAVEL_CAPS} min, origin uniform within {ORIGIN_RADIUS_KM} km of the places' centroid. "
           "Groups with no feasible plan are redrawn.",
           "- Hard filter: build-brief C4, except the dietary check applies to meals and desserts only "
-          "(activities have no dietary tags, so the literal rule leaves any group with a vegetarian zero plans; flagged to C).",
-          "- Utility, per-member per-category range normalization, plan utility (mean over stops), ratio to the member's best feasible plan: build-brief C3. "
+          "(the agreed contract correction). Sum every stop's catalog cost and reject an outing above any member's non-null budget. Null is uncapped; zero is a real cap. No cap is raised.",
+          "- Utility, per-member per-category range normalization over the common group-hard-filtered place set, plan utility (mean over stops), ratio to the member's best group-feasible plan: build-brief C3. "
           "A category where a member's utility is flat gives every place 1.0.",
           "- Plans: build-brief C4 templates, 15-min start grid in Sat 17:00-23:00, each stop starts on the grid after travel (haversine x1.3; 4.5 km/h up to 1.2 km, else 18 km/h), all stops open for their dwell, first leg within each member's travel cap.",
           "- Rules: random feasible plan; plurality (each member votes one favorite, most votes wins); utilitarian (max sum of ratios); maximin (max min ratio, tie-break sum); Nash (max product of ratios). Ties broken at random.",
-          "- Metrics per group: min ratio, Gini of ratios, whether min ratio < 0.5. Means with bootstrap 95% CIs (2,000 resamples).",
+          "- Metrics per group: min ratio, Gini of ratios, whether min ratio < 0.5. Continuous means and paired differences use bootstrap 95% CIs (2,000 resamples); the below-50% rate uses a Wilson 95% interval, including when no failures are observed.",
+          "- " + floor_note,
+          "- Maximin optimizes the same worst-member score used for evaluation under oracle tastes. Its win on that score is expected by construction; it does not establish that the implemented solver or real users do better.",
+          "- Optional API outputs are accepted only after non-stub health and per-response stub checks. Every returned plan is checked for known IDs, templates, exclusions, catalog costs/coordinates, cumulative budgets, vetoes, dietary needs, hours, dwell, grid, window and travel. Report invalid/empty/request failures separately; success-only utility is not an overall success rate.",
           "", "Files: " + ", ".join(f"`{out_rel}/{f}`" for f in
                                      ["exp_a_groups.csv", "exp_a_summary.csv", "exp_a_paired.csv", "summary.json"]
                                      + (["exp_b_curve.csv"] if curve else [])
                                      + (["chart.png"] if chart else []))]
     if chart:
         L += ["", f"![SIMULATED results]({out_rel}/chart.png)"]
+    L += ["", "## Reproduce", "",
+          "Python 3.11+; from the repository root:", "", "```sh",
+          "python3 -m venv docs/experiments/.venv",
+          "docs/experiments/.venv/bin/python -m pip install -r docs/experiments/requirements.txt",
+          "docs/experiments/.venv/bin/python -m unittest discover -s docs/experiments -p 'test_*.py' -v",
+          "docs/experiments/.venv/bin/python docs/experiments/sim.py --no-api", "```", "",
+          f"Input SHA-256: `{meta['placesSha256']}`. Runtime versions: `{json.dumps(meta['runtime'], sort_keys=True)}`.", "",
+          "API evaluation is opt-in and does not load `api/.env` or modify that folder. "
+          "When Eric confirms the real service is ready, configure `FASTAPI_BASE_URL` and "
+          "`HUDDLE_SHARED_SECRET` privately in the environment or ignored root `.env`. "
+          "Use a separate output directory so the baseline report stays intact:", "", "```sh",
+          "docs/experiments/.venv/bin/python docs/experiments/sim.py --with-api --ours-groups 100 --b-users 0 \\",
+          "  --out docs/experiments/api-results --readme docs/experiments/API_RESULTS.md", "```", "",
+          "A stub, unavailable API or catalog-count mismatch produces no `ours` numbers. "
+          "`--b-users 0` skips learning evaluation; enable it only after `/elicit/*` is real. "
+          "An explicitly requested API evaluation exits nonzero if health fails, any requested plan is not scored, or the requested learning run fails entirely. "
+          "Review method and API failure coverage with Max before presenting any numbers."]
     Path(path).write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
@@ -579,14 +792,22 @@ def main():
     ap.add_argument("--places", default=str(REPO / "data" / "places.json"))
     ap.add_argument("--out", default=str(HERE / "results"))
     ap.add_argument("--readme", default=str(HERE / "README.md"))
-    ap.add_argument("--no-api", action="store_true", help="ignore FASTAPI_BASE_URL")
+    api_flags = ap.add_mutually_exclusive_group()
+    api_flags.add_argument("--no-api", action="store_true", help="baselines only (default)")
+    api_flags.add_argument("--with-api", action="store_true", help="explicitly enable real API evaluation after a non-stub health check")
     args = ap.parse_args()
+    if args.groups < 1 or args.b_users < 0 or (args.ours_groups is not None and args.ours_groups < 0):
+        ap.error("groups must be positive; ours-groups and b-users must be nonnegative")
 
     rng = np.random.default_rng(args.seed)
     places, X = load_places(args.places)
-    base, secret = load_env()
-    api = None if (args.no_api or not base) else Api(base, secret)
-    print(f"places: {len(places)} from {args.places}; api: {'ON ' + base if api else 'OFF (ours and B skipped)'}")
+    api, api_note = None, None
+    if args.with_api:
+        base, secret = load_env()
+        api, api_note = real_api(base, secret, len(places))
+    print(f"places: {len(places)} from {args.places}; api: {'ON (real health verified)' if api else 'OFF (ours and B skipped)'}")
+    if api_note:
+        print(api_note)
     flat = flat_features(X)
     if flat:
         print(f"WARNING: features constant across all places (no signal): {', '.join(flat)}")
@@ -602,13 +823,22 @@ def main():
     write_csv(out / "exp_a_paired.csv", paired)
     if curve:
         write_csv(out / "exp_b_curve.csv", curve)
-    chart = make_chart(out / "chart.png", summary, curve)
-    notes = notes_a + notes_b + ([] if chart else ["matplotlib not installed: chart skipped, CSVs written."])
+    flat_cats = flat_categories(places, X)
+    chart = make_chart(out / "chart.png", summary, curve, flat_cats)
+    notes = ([api_note] if api_note else []) + notes_a + notes_b + ([] if chart else ["matplotlib not installed: chart skipped, CSVs written."])
     try:
         places_rel = Path(args.places).resolve().relative_to(REPO).as_posix()
     except ValueError:
         places_rel = args.places
-    meta = {"places": places_rel, "flat": flat, "A": meta_a, "seed": args.seed}
+    runtime = {"python": platform.python_version(), "numpy": np.__version__}
+    try:
+        runtime["matplotlib"] = version("matplotlib")
+    except PackageNotFoundError:
+        runtime["matplotlib"] = None
+    meta = {"places": places_rel, "flat": flat, "flatCategories": flat_cats, "A": meta_a, "seed": args.seed,
+            "placesSha256": hashlib.sha256(Path(args.places).read_bytes()).hexdigest(),
+            "generatedAt": datetime.now(ZoneInfo("America/Los_Angeles")).isoformat(timespec="seconds"),
+            "runtime": runtime}
     (out / "summary.json").write_text(json.dumps({"label": "SIMULATED", **meta, "summary": summary,
                                                   "paired": paired, "curveB": curve, "notes": notes}, indent=2),
                                       encoding="utf-8")
@@ -623,6 +853,8 @@ def main():
     for n in notes:
         print("note:", n)
     print(f"\nwrote {out} and {args.readme}")
+    return int(args.with_api and (api is None or meta_a["oursScored"] < meta_a["oursAttempted"]
+                                  or (args.b_users > 0 and curve is None)))
 
 
 if __name__ == "__main__":

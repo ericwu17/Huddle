@@ -5,7 +5,7 @@ Every library, API, and AI tool used. Cal Hacks requires this.
 ## AI tools used to build Huddle
 
 - Claude Code (Anthropic), used by each teammate for code generation and review.
-- OpenAI Codex, used for the FastAPI stubs, caller integration fixes, and local verification.
+- OpenAI Codex, used for the FastAPI stubs, caller integration fixes, local/live verification, experiment feasibility corrections, and demo documentation.
 
 ## APIs and services
 
@@ -28,6 +28,7 @@ Every library, API, and AI tool used. Cal Hacks requires this.
 | Vite, React, React Router, Tailwind CSS, qrcode.react, Mapbox GL JS, oxlint | A |
 | FastAPI, uvicorn, pydantic, numpy, anthropic, httpx | C |
 | Vitest and SpacetimeDB 2.13.0 native module test harness | B/C development checks |
+| NumPy and Matplotlib | B/C synthetic evaluation, separate from the phase-zero API runtime |
 | Pipecat, Silero VAD | D |
 
 Phase-zero API runtime uses FastAPI, uvicorn, Pydantic, and python-dotenv; httpx is used
