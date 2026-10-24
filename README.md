@@ -22,7 +22,7 @@ The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
 
 ## Status
 
-- **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Connected to Max's separate FastAPI service with `STUB_MODE=true`; parse, learning, plans, scores and council remain synthetic.
+- **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Connected to the FastAPI service with `STUB_MODE=true`; parse, learning, plans, scores and council remain synthetic there. The real service (Claude parsing, swipe learning, Monte Carlo solver, offers, live council) is implemented behind `STUB_MODE=false` but Maincloud has not been switched; see [api/README.md](api/README.md) and [the switch-over steps](docs/LOCAL_TUNNELS.md#4-point-the-maincloud-module-at-the-tunnels).
 - **Voice:** Eric Wu's `/book` stub is connected at `https://restaurants-availability-barbie-lil.trycloudflare.com`. Live synthetic confirm and full-to-re-plan tests passed through Maincloud without duplicate event replay. The service is restored to `STUB_SCENARIO=confirm`. No real phone call is implemented.
 - **Access and coverage:** Max Li and Eric Wu are confirmed database Admins. Eric Chen is leaving and has exhausted his Claude session usage; Max can cover backend coding here. Max's CLI 2.13.0 is logged into his own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified the API URL and `STUB_MODE=true` stayed unchanged. No module/schema was deployed.
 - **Data:** no Bright Data account/key is available yet. Haydn owns the account, reviews and Mapbox routing; Eric Chen's booth/key task was temporary coverage. Review scores and live scout work remain blocked on that hand-off, not the stub demo.
@@ -40,8 +40,10 @@ api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-a
 ```
 
 FastAPI loads the ignored `api/.env` automatically. It needs the matching
-`HUDDLE_SHARED_SECRET` and `STUB_MODE=true`; `ANTHROPIC_API_KEY` is unused in this
-phase. Setup and checks: [api/README.md](api/README.md).
+`HUDDLE_SHARED_SECRET`. `STUB_MODE=true` serves the stubs; `STUB_MODE=false` serves the
+real service and uses `ANTHROPIC_API_KEY` (the module's `STUB_MODE` must match). Setup and
+checks: [api/README.md](api/README.md). Running both services from one laptop behind
+Cloudflare tunnels: [docs/LOCAL_TUNNELS.md](docs/LOCAL_TUNNELS.md).
 
 The current development tunnel is
 `https://conferencing-navigate-deleted-feedback.trycloudflare.com`. Keep the API,

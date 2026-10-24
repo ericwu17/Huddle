@@ -84,12 +84,13 @@
 - [x] All eight API routes passed HTTP checks through the development tunnel, including auth, deterministic responses and cumulative budgets
 - [x] CLI 2.13.0 installed and logged in; management reads and environment-only voice URL update verified (no module/schema deploy)
 - [~] Cover Eric Chen's backend work and remaining service integration
-- [ ] /parse-prefs with keyword fallback
-- [ ] L1 solver: filter, normalization, enumeration, maximin + Nash tie-break, three plans (note: only ~7 activities are open after 7:30 PM Sat; `places.json` has an extra `googlePlaceId` field)
-- [ ] Posterior update, active selection, Monte Carlo robustness, Pareto, posteriorSummary
-- [ ] /offers, /roulette
-- [ ] /council: advocates, chair, validator, POST to `/route/council-message`
-- [ ] eval: latency and determinism
+- [x] /parse-prefs with keyword fallback (Eric Wu; `STUB_MODE=false`)
+- [x] L1 solver: filter, normalization, enumeration, robustness + Nash tie-break, three plans (Eric Wu). Bold/Budget floor is relative when Safe is below 0.5; see [api/README.md](../api/README.md)
+- [x] Posterior update, active selection, Monte Carlo robustness, Pareto, posteriorSummary
+- [x] /offers, /roulette
+- [x] /council: advocates, chair, validator, optional POST to `/route/council-message` (`SPACETIMEDB_URI`/`SPACETIMEDB_DB`)
+- [~] eval: determinism and behavior tests in `api/eval/test_real.py`; latency measured ad hoc (demo `/plan` ~70-80 ms, council 6-12 s), no p50/p95 script yet
+- [ ] Switch Maincloud to the real API (module and API `STUB_MODE=false` together)
 
 ## D. Eric Wu: voice
 

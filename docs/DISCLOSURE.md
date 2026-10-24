@@ -31,6 +31,9 @@ Every library, API, and AI tool used. Cal Hacks requires this.
 | NumPy and Matplotlib | B/C synthetic evaluation, separate from the phase-zero API runtime |
 | Pipecat, Silero VAD | D |
 
-Phase-zero API runtime uses FastAPI, uvicorn, Pydantic, and python-dotenv; httpx is used
-for checks. No numpy, Anthropic SDK, model calls, or live council are implemented
-in that phase. All Python dependencies and their versions are listed under `api/`.
+The API runtime uses FastAPI, uvicorn, Pydantic, python-dotenv, NumPy, the Anthropic
+Python SDK and httpx (versions pinned in `api/requirements.txt`). With `STUB_MODE=false`
+it calls Claude Haiku 5.5 (preference parsing, council advocates) and Claude Sonnet 5.5
+(council chair) through the Anthropic API; stub mode makes no model calls. The real
+API (`api/catalog.py`, `parse.py`, `elicit.py`, `solver.py`, `council.py`, `llm.py`)
+was written with Claude Code.

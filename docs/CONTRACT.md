@@ -327,6 +327,8 @@ Paths are lowercase (SpacetimeDB requires it). 401 on a bad secret, 400 on a bad
 `STUB_MODE` defaults to true in the module and API. Stub candidates share
 `api/fixtures/places.fake.json`; `data/places.json` remains intact for the later
 real-data mode. Frontend place lookups resolve synthetic, real, and legacy IDs.
-Do not set `STUB_MODE=false` until the real Python service is implemented.
+The real Python service is implemented (`api/README.md`). Set `STUB_MODE=false`
+on the module and the API together, never one alone: the module sends candidate
+place IDs from its own catalog.
 
 **Auth model** (hackathon grade, state this honestly): each phone's SpacetimeDB identity token sits in the browser's local storage; whoever has the token is that member. Service-to-module calls use the shared `X-Huddle-Secret`. This is not production security.

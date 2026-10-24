@@ -114,7 +114,7 @@ class Place(Origin):
     category: Category
     cuisine: Cuisine
     address: str
-    priceLevel: Annotated[int, Field(ge=0, le=4)]
+    priceLevel: Annotated[int, Field(ge=0, le=4)] | None  # Google gives none for most activities
     costPerPerson: Money
     dwellMinutes: Annotated[int, Field(gt=0)]
     phone: str | None
@@ -124,6 +124,7 @@ class Place(Origin):
     reviewCount: Annotated[int, Field(ge=0)]
     rating: Annotated[Number, Field(ge=0, le=5)]
     sources: list[str]
+    googlePlaceId: str | None = None  # data/places.json carries it; not used by the solver
 
     @model_validator(mode="after")
     def complete(self):

@@ -6,7 +6,7 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | --- | --- | --- |
 | Place dataset is a cached snapshot (~45 Berkeley places from Google Places, pulled once) | `data/places.json` | planned |
 | Nine fictional venues shared by API/backend stubs; legacy and real catalogs remain lookup-compatible | `api/fixtures/places.fake.json` | in use with `STUB_MODE=true` (default) |
-| API parser recognizes four exact demo phrases; posterior updates are unchanged; scores, confidence, Pareto rows, and council text/timestamps are canned; offers are empty | `api/`, `server/src/lib/fakes.ts` | in use; synthetic labels included |
+| API parser recognizes four exact demo phrases; posterior updates are unchanged; scores, confidence, Pareto rows, and council text/timestamps are canned; offers are empty | `api/stubs.py`, `server/src/lib/fakes.ts` | in use with `STUB_MODE=true` only; synthetic labels included |
 | Stub integration checks use real module procedures and the native in-memory test datastore calling localhost FastAPI, not a deployed database or browser subscriptions | `api/eval/check_integration.py`, `server/test/` | verified locally |
 | Demo group (Alex, Sam, Jordan, Riley) is seeded | `data/demo_group.json` | in use |
 | The module returns fake plans / council / scout / call data until the real api and voice are wired | `server/src/lib/fakes.ts` | in use (H0-H13) |
@@ -17,6 +17,10 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | Any recorded fallback call is a real earlier call, labeled | demo | planned |
 | Evaluation numbers come from synthetic groups/tastes with cumulative budgets enforced. Earlier per-stop-budget results are withdrawn. Baselines know true tastes; optional "ours" also receives a truth-centered posterior, so it is not a learning evaluation. Flat aspect features make the below-50% metric uninformative. | `docs/experiments/` | corrected baselines only; real API comparison is opt-in, rejects stubs and invalid plans, and reports failure coverage; ours/swipe experiment still pending |
 | Review data is scraped via Bright Data (terms checked) | `data/reviews/` | planned |
-| Council messages are AI-generated under a validator | `api/` | planned |
+| Council messages are AI-generated (Claude Haiku advocates, Claude Sonnet chair) under our validator: numbers must come from the speaker's own tool outputs, no names or clock times; invalid advocate messages are dropped, an invalid or late chair falls back to the Safe plan | `api/council.py` | in use with `STUB_MODE=false` |
+| The real solver runs on placeholder place aspects (every place 0.5 for noise, romance, novelty, ...), so tastes like "quiet" or "romantic" do not change plans yet; plans differ by cuisine, cost, dietary tags, hours and distance. Every plan response says so | `data/places.json`, `api/solver.py` | in use with `STUB_MODE=false` until review data lands |
+| Robustness, ratios and confidence are model outputs: Monte Carlo over each member's estimated taste (a Gaussian learned from their text and swipes), not measured satisfaction | `api/solver.py`, `api/elicit.py` | in use with `STUB_MODE=false` |
+| Travel times are straight-line estimates (x1.3 detour, fixed walking/driving speeds), not routed ETAs | `api/catalog.py` | in use |
+| When Claude is unavailable or returns invalid output, preferences are parsed by keyword rules; the member sees a warning | `api/parse.py` | in use with `STUB_MODE=false` (fallback path) |
 | Auth is hackathon-grade: each phone is whoever holds its SpacetimeDB token (kept in local storage); services share one secret header | `server/src/http.ts` | in use |
 | Demo mode: if the api or voice service is unreachable (or the host turns demo mode on), the group switches to labeled synthetic data and a scripted call; plans carry a `fallback:` warning and the UI shows "Demo mode: cached data" | `server/src/lib/demo.ts` | in use |

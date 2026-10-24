@@ -11,13 +11,14 @@
 - **Frontend:** Eric Chen reported the Maincloud flow passes. The rapid Plans-to-Vote transition and reopening Plans still need a browser regression check; do not infer those are fixed from the voice stub landing.
 - **Max's CLI is ready:** version 2.13.0 at `/Users/maxli/.local/bin/spacetime`, logged into Max's own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified `FASTAPI_BASE_URL` and `STUB_MODE=true` stayed unchanged. No module/schema deploy or data reset was performed.
 - **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
+- **Real API implemented, not switched on:** `api/` now serves the real parser, learning, solver, offers and council with `STUB_MODE=false` ([api/README.md](../api/README.md)). Unit tests, the module integration check and a real-mode run of the module procedures pass locally. Maincloud and the running API still use `STUB_MODE=true`; switching needs the module and API flipped together ([LOCAL_TUNNELS.md](LOCAL_TUNNELS.md#4-point-the-maincloud-module-at-the-tunnels)).
 - **Current work split:** Eric Wu is working in `api/`; Max's current changes are experiments and documentation. Coordinate before touching that folder or evaluating the changing service.
 
 | Piece | Real or fake right now |
 | --- | --- |
 | Places | Max's synthetic fixture while `STUB_MODE=true`; real 45 Berkeley places in `data/places.json` for later |
-| Parse, swipes, plans, council | Max's stubs (canned) |
-| Offers | none (stub returns none, never faked) |
+| Parse, swipes, plans, council | Stubs (canned) on Maincloud; real implementation behind `STUB_MODE=false`, not switched on |
+| Offers | none from the stubs (never faked); real private offers behind `STUB_MODE=false` |
 | Scout badge | cached file, labeled "Checked earlier" |
 | Phone call | separate voice service, scripted confirm scenario; no phone call |
 | Re-plan on "full" | real logic, tested |
@@ -42,7 +43,7 @@
 - [x] Cover backend integration while Eric is away: voice URL configured; successful synthetic booking and voice-originated full-to-re-plan passed through Maincloud.
 - [ ] Keep the FastAPI server + Cloudflare tunnel running. If the URL changes, send the new one (see "Operating" below).
 - [x] First-phase API stubs, auth, deterministic fixtures, budget/dietary fixes, automatic private env loading, shared-secret verification and tunnel smoke checks.
-- [ ] Next phase, when started: real `/parse-prefs`, then the L1 solver (filter, normalize, enumerate, maximin). The dietary rule must apply to meals and desserts only (commit 88a6746 already does this). No real solver/learning/LLM work was added during the first phase.
+- [x] Real `/parse-prefs`, learning, solver, offers and council: implemented by Eric Wu behind `STUB_MODE=false` (dietary rule still meals and desserts only). Review [api/README.md](../api/README.md) decisions before relying on numbers.
 - [ ] Note: only ~7 real activities are open after 7:30 PM Saturday; places carry an extra `googlePlaceId` field.
 - [ ] Keep temporary backend changes compatible with the shared contract; sync main before merging/pushing. Max is authorized to cover backend fixes; unresolved shared-shape changes still need agreement.
 - [x] Review experiment method: cumulative-budget bug fixed, API-plan validator and regression checks added; corrected baseline results regenerated. Old numbers withdrawn. Final pitch claim and real API comparison still pending; see [experiments/README.md](experiments/README.md).
@@ -55,6 +56,8 @@
 - [ ] Add `web/.env.local`: `NEXT_PUBLIC_SPACETIMEDB_URI=https://maincloud.spacetimedb.com`, `NEXT_PUBLIC_SPACETIMEDB_DB=huddle-calhacks`.
 - [x] Claude API key shared privately with Max; current stubs do not use it.
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO.
+- [x] Real API in `api/` (`STUB_MODE=false`): 37 unit tests, module integration check, HTTP smoke in both modes, and a local real-mode run of the module procedures with live Claude.
+- [ ] Switch Maincloud to the real API with the team: API and module `STUB_MODE=false` together, then a new huddle.
 
 ### Haydn (out until Saturday)
 
@@ -69,7 +72,7 @@
 2. **Keep both Python services and tunnels awake:** Max owns the API process/tunnel; Eric Wu owns voice. Report new URLs after a tunnel restart and update the matching module setting. Real voice remains a later phase.
 3. **Demo-mode fallbacks:** done in `server/src/lib/demo.ts` (Eric Chen). A dead tunnel now flips that group to labeled demo mode instead of freezing parse/swipes; the host can also toggle it. **Needs a Maincloud publish after it is merged** (only then is it live). `data/cached_run.json` is still a placeholder; the labeled fakes serve that role.
 4. **`server/src/geo.ts`:** Mapbox route geometry + leg times with `geo_cache`. Needs `MAPBOX_TOKEN`. Fallback is straight lines.
-5. **Rerun experiments** after places.json v2 and Eric Wu's real API are ready. Baselines run without API calls by default; opt-in commands and failure reporting are in [experiments/README.md](experiments/README.md#reproduce). Demo rehearsal and submission checklist: [DEMO_CHECKLIST.md](DEMO_CHECKLIST.md).
+5. **Rerun experiments** after places.json v2; Eric Wu's real API is ready for the opt-in comparison (run it with `STUB_MODE=false`). Baselines run without API calls by default; opt-in commands and failure reporting are in [experiments/README.md](experiments/README.md#reproduce). Demo rehearsal and submission checklist: [DEMO_CHECKLIST.md](DEMO_CHECKLIST.md).
 
 ## Verification after pulling the voice stub
 

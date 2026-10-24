@@ -305,11 +305,20 @@ class StartupTests(unittest.TestCase):
             with patch.dict(os.environ, {"HUDDLE_SHARED_SECRET": exported}, clear=True):
                 self.assertEqual(Settings.from_env(path).secret, exported)
 
-    def test_missing_secret_and_real_mode_fail_closed(self):
-        for settings in (Settings(""), Settings("   "), Settings(secrets.token_urlsafe(), False)):
+    def test_missing_secret_and_mixed_catalogs_fail_closed(self):
+        synthetic = FIXTURES / "places.fake.json"
+        for settings in (Settings(""), Settings("   "), Settings("   ", False),
+                         Settings(secrets.token_urlsafe(), False, synthetic)):
             with self.assertRaises(RuntimeError):
                 with TestClient(create_app(settings)):
                     pass
+
+    def test_real_mode_starts_on_real_places_without_stub_header(self):
+        secret = secrets.token_urlsafe()
+        with TestClient(create_app(Settings(secret, False))) as client:
+            response = client.get("/health", headers={"X-Huddle-Secret": secret})
+        self.assertEqual(response.json(), dict(ok=True, stub=False, placesLoaded=45))
+        self.assertNotIn("X-Huddle-Stub", response.headers)
 
     def test_invalid_place_catalog_fails_startup(self):
         with TemporaryDirectory() as folder:
