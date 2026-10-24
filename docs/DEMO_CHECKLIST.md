@@ -30,6 +30,9 @@ that future features already work. Current integration details: [HANDOFF.md](HAN
 - [ ] Prepare a teammate restaurant phone and verify consent/demo-only dialing
   before any real voice test. The existing stub needs no phone call.
 - [ ] Decide live voice versus a labeled recording; check the chosen path end to end.
+- [ ] Coordinate deployment of Eric Chen's demo-mode safety net (`059292a`), then
+  verify a dead-service fallback and its visible label in an isolated test setup.
+  This code was merged; Max has not published the new module to Maincloud.
 
 ## Full-flow acceptance test (four users)
 

@@ -1,6 +1,6 @@
 # Hand-off (Eric Chen to Max; Haydn retains Part A)
 
-> Updated after connecting Eric Wu's voice stub and passing live synthetic confirm/full checks (latest main pulled: `881aa82`). H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md) and [CONTRACT.md](CONTRACT.md). Eric Chen is leaving and has exhausted his Claude session usage; Max is covering backend coding and integration in Codex.
+> Updated after live voice checks and corrected experiment baselines; latest main pulled: `059292a` (Eric Chen's demo-mode safety net, not published by Max). H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md) and [CONTRACT.md](CONTRACT.md). Eric Chen is leaving and has exhausted his Claude session usage; Max is covering backend coding and integration in Codex.
 
 ## Where things stand
 
@@ -80,6 +80,7 @@
 - Earlier tunnel checks passed all eight API routes; API and Maincloud health returned 200 with nine synthetic places. The later smoke runs verified calls through both separate Python services, using scripted results.
 - CLI archive matched the official 2.13.0 SHA-256; version/login and management reads passed. The environment-only voice URL update succeeded; API URL/stub mode stayed unchanged. No secret was printed.
 - Experiment follow-up: 22 regression checks passed; corrected baselines cover 1,000 feasible groups with zero selected-plan budget violations. An independent Decimal audit checked all 5,000 selected outing totals/caps, and a separate rerun produced byte-identical CSVs/chart. No live API was called or API file changed. Old experimental numbers are withdrawn; the real solver comparison remains pending.
+- After merging `059292a`: server typecheck passed; `npm test --prefix server` passed 11 tests with the opt-in HTTP test skipped. No API server was started for that check. The new demo-mode module was not published by Max.
 
 ## Operating
 
