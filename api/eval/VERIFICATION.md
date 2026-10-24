@@ -34,8 +34,8 @@ procedures calling a temporary FastAPI server. It also verifies current caps
 after delayed HTTP, private offer acceptance, duplicate transcript replay, and
 frontend lookup of all synthetic/real IDs.
 
-No SpacetimeDB host was published, no live backend was modified, and browser
-subscriptions, network deployment configuration, and persistence across host
+Those in-memory checks did not publish a SpacetimeDB host or modify a live
+backend. Browser subscriptions, network deployment configuration, and persistence across host
 restarts are not covered by the in-memory procedure checks.
 
 The live `huddle-calhacks` call-event route on Maincloud rejected a no-secret
@@ -47,3 +47,33 @@ Claude API call.
 
 Reproduce with the exact setup/run/check commands in `api/README.md`. The tests
 generate fresh credentials at runtime and do not store or print them.
+
+## Live voice integration follow-up
+
+Max used his invited Admin account and CLI 2.13.0 to set only `VOICE_BASE_URL`
+to `https://restaurants-availability-barbie-lil.trycloudflare.com` with an
+environment-only publish. Management reads verified the original FastAPI URL
+and `STUB_MODE=true` stayed unchanged. No module/schema deploy or data reset
+was performed. The following smoke runs created disposable synthetic groups
+and booking events in `huddle-calhacks`:
+
+- **Voice-originated full scenario: ALL PASS**, group `NV86`, runs
+  `run_NV86_1` to `run_NV86_2`. Exactly one six-event failure sequence;
+  replacement plans were nonempty and excluded the full restaurant; voting
+  reopened; only one booking existed, so no replacement was auto-called.
+- **Final confirm scenario: ALL PASS**, group `ZYA6`, runs
+  `run_ZYA6_1` to `run_ZYA6_2`. Voice health rejected missing auth and accepted
+  the saved secret. Exactly one eight-event confirm sequence, booked status,
+  API-backed plans, privacy, council storage, voting and roulette passed.
+  An additional injected failed/full callback verified the backend re-plan
+  route, bad-secret rejection and banner clearing. Council callback duplicate
+  suppression and storage also passed.
+- Offers skipped as expected: `/offers` deliberately returns none.
+- Eric Wu restored the voice service to `STUB_SCENARIO=confirm`; the final
+  check verified that health response. No real phone or model calls were made.
+
+Reproduce using `api/eval/check_live.py` and the exact command in
+[`api/README.md`](../README.md#check-the-live-connected-stubs). The helper loads
+the ignored `api/.env` without printing credentials. `node --check
+scripts/smoke.mjs` also passed. Browser rendering and persistence across host
+restarts remain outside these checks.

@@ -23,11 +23,11 @@ The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
 ## Status
 
 - **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Connected to Max's separate FastAPI service with `STUB_MODE=true`; parse, learning, plans, scores and council remain synthetic.
-- **Voice:** Eric Wu's `/book` stub is merged, with confirm/full event sequences and six passing local tests. Max's authenticated CLI check confirms `VOICE_BASE_URL` is unset; wiring and service-backed booking/re-plan checks remain pending. No real phone call is implemented.
-- **Access and coverage:** Max Li and Eric Wu are confirmed database Admins. Eric Chen is leaving and has exhausted his Claude session usage; Max can cover backend coding here. Max's Mac has CLI 2.13.0 installed and logged into his own account. Management reads verified the API tunnel URL and `STUB_MODE=true`; no CLI publish has been performed.
+- **Voice:** Eric Wu's `/book` stub is connected at `https://restaurants-availability-barbie-lil.trycloudflare.com`. Live synthetic confirm and full-to-re-plan tests passed through Maincloud without duplicate event replay. The service is restored to `STUB_SCENARIO=confirm`. No real phone call is implemented.
+- **Access and coverage:** Max Li and Eric Wu are confirmed database Admins. Eric Chen is leaving and has exhausted his Claude session usage; Max can cover backend coding here. Max's CLI 2.13.0 is logged into his own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified the API URL and `STUB_MODE=true` stayed unchanged. No module/schema was deployed.
 - **Data:** no Bright Data account/key is available yet. Haydn owns the account, reviews and Mapbox routing; Eric Chen's booth/key task was temporary coverage. Review scores and live scout work remain blocked on that hand-off, not the stub demo.
 - **What's done and what's next:** [docs/ROADMAP.md](docs/ROADMAP.md). **Current state, async tasks, operating commands:** [docs/HANDOFF.md](docs/HANDOFF.md).
-- **Smoke test:** `node scripts/smoke.mjs` (set `SPACETIMEDB_URI`, `SPACETIMEDB_DB`; secret from `.env`).
+- **Smoke test:** [Live check commands](api/README.md#check-the-live-connected-stubs) load the saved secret from `api/.env` and test both service scenarios. Each run creates a disposable synthetic group in the selected database.
 - **Honesty and disclosure:** [docs/HONESTY.md](docs/HONESTY.md), [docs/DISCLOSURE.md](docs/DISCLOSURE.md).
 
 ## Run the connected stubs

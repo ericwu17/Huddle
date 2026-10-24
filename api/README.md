@@ -15,12 +15,16 @@ auth rejection, deterministic fixtures and cumulative budget consistency. The
 saved Huddle secret also passed the non-mutating live backend check. Keep the
 API and tunnel running and the Mac awake while the team uses this URL.
 
-Eric Wu's voice stub has landed separately in `voice/`; its live connection is
-not established by these API checks. Eric Chen is leaving and has exhausted his
+Eric Wu's voice stub in `voice/` is connected at
+`https://restaurants-availability-barbie-lil.trycloudflare.com`. Separate live
+Maincloud checks passed its synthetic confirm and full-to-re-plan scenarios,
+including one event sequence per booking. It is restored to `confirm`; no real
+phone call was made. Eric Chen is leaving and has exhausted his
 Claude session usage, so Max is covering backend integration in this Codex
 session. Max Li and Eric Wu have confirmed database Admin roles. Max's CLI
 2.13.0 is installed and logged in; authenticated management reads verified the
-API URL and stub mode, with no publish performed. Current responsibilities and operating commands are in
+API URL and stub mode stayed unchanged after an environment-only publish of
+`VOICE_BASE_URL`. No module/schema was deployed. Current responsibilities and operating commands are in
 [`docs/HANDOFF.md`](../docs/HANDOFF.md).
 
 The real solver, Bayesian learning, Monte Carlo, Claude calls and live council
@@ -83,6 +87,35 @@ The last command starts a temporary localhost API with a generated test secret,
 runs real module procedures against it, then stops the API. No database is
 published and no real call or vendor API is used. This verifies module logic
 and HTTP contracts, not a deployed host, browser subscriptions, or durability.
+
+## Check the live connected stubs
+
+From the repository root, with Node installed and the matching shared secret
+saved privately in `api/.env`:
+
+```sh
+api/.venv/bin/python api/eval/check_live.py \
+  --server https://maincloud.spacetimedb.com \
+  --database huddle-calhacks \
+  --voice-base-url https://restaurants-availability-barbie-lil.trycloudflare.com \
+  --voice-scenario confirm
+```
+
+This loads `api/.env` without printing the secret (exported values take
+precedence) and runs `scripts/smoke.mjs`. Each run writes a disposable synthetic
+group and bookings to the explicitly selected database. It checks voice health
+authentication and stub mode before booking, API-backed plans, privacy,
+council storage, voting, roulette and one confirm event sequence. The confirm
+run also injects a failed/full callback to check backend re-planning.
+
+For a failure originating from the voice service itself, have Eric Wu restart
+only that API with `STUB_SCENARIO=full`, keeping its tunnel running. Run the
+same command with `--voice-scenario full`. This verifies replacement plans
+exclude the full restaurant, voting reopens, and no second call starts
+automatically. The flag selects assertions; it does not change the service.
+Restore the voice API to `STUB_SCENARIO=confirm` afterwards and rerun confirm.
+Both scenarios passed through Maincloud; offers skip because the stub returns
+none. These tests use scripted events and make no phone or model calls.
 
 ## Configuration
 

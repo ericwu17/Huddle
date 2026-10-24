@@ -6,6 +6,9 @@
 //
 // Needs SPACETIMEDB_URI, SPACETIMEDB_DB and HUDDLE_SHARED_SECRET (env or .env). Works on fakes or
 // real services. Each run creates a throwaway group in the target database.
+// Optional VOICE_BASE_URL checks a running synthetic voice service before booking.
+// SMOKE_VOICE_SCENARIO=full verifies a voice-originated failure and re-plan; it does not
+// switch the voice service's STUB_SCENARIO. Restart that service separately before the test.
 // Written by Eric Chen from his module test while Haydn is out (Haydn owns scripts/).
 import { readFileSync, existsSync } from "node:fs";
 
@@ -22,7 +25,13 @@ const conf = (k, d) => process.env[k] || fileEnv[k] || d;
 const base = conf("SPACETIMEDB_URI", "http://127.0.0.1:3000");
 const db = conf("SPACETIMEDB_DB", "huddle-local");
 const secret = conf("HUDDLE_SHARED_SECRET");
+const voiceBase = conf("VOICE_BASE_URL");
+const voiceScenario = conf("SMOKE_VOICE_SCENARIO", "confirm");
 if (!secret) { console.error("HUDDLE_SHARED_SECRET is not set (env or .env)"); process.exit(2); }
+if (!["confirm", "full"].includes(voiceScenario) || (voiceScenario === "full" && !voiceBase)) {
+  console.error("Use SMOKE_VOICE_SCENARIO=confirm|full; full requires VOICE_BASE_URL.");
+  process.exit(2);
+}
 console.log(`smoke: ${base} / ${db}`);
 const B = base;
 const D = `${B}/v1/database/${db}`;
@@ -32,6 +41,17 @@ const check = (name, ok, extra = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${extra ? "  " + extra : ""}`);
   if (!ok) fails++;
 };
+
+if (voiceBase) {
+  const url = `${voiceBase.replace(/\/$/, "")}/health`;
+  const missingAuth = await fetch(url);
+  const health = await fetch(url, { headers: { "X-Huddle-Secret": secret } });
+  const body = health.ok ? await health.json() : {};
+  check("voice health rejects missing auth", missingAuth.status === 401);
+  check("voice is authenticated synthetic scenario", health.ok && body.stub === true && body.scenario === voiceScenario, body.scenario ?? `HTTP ${health.status}`);
+  check("voice does not trigger module fake replay", health.headers.get("x-huddle-stub") !== "true");
+  if (fails) process.exit(1); // Never start bookings against an unverified or non-stub service.
+}
 
 async function newPhone() {
   const { token } = await (await fetch(`${B}/v1/identity`, { method: "POST" })).json();
@@ -147,12 +167,41 @@ check("4 votes, re-vote overwrote", votes.length === 4 && votes.filter((v) => v.
 const [rPlan] = await call(phones[1].tok, "do_roulette", [g.latest_run_id]);
 check("roulette returns one of the plans", result.plans.some((p) => p.id === rPlan), rPlan);
 
-// 5. Booking (fake call, confirm scenario)
+async function checkFullReplan(b) {
+  const after = (await view(host, "my_bookings")).find((row) => row.id === b.id);
+  check("booking marked failed/full", after.status === "failed" && after.fail_reason === "full");
+  const replanned = await until("re-plan run", async () => {
+    const gg = (await view(host, "my_group"))[0];
+    return gg.replan_for === b.id && gg.latest_run_id !== g.latest_run_id ? gg : null;
+  }, 20000);
+  check("re-plan: replan_for set, new run started", !!replanned, replanned?.latest_run_id);
+  const newRun = await until("re-plan run done", async () => (await view(host, "my_plan_runs")).find((row) => row.run_id === replanned.latest_run_id && row.status === "done"), 30000);
+  const plans = JSON.parse(newRun.result_json).plans;
+  const newPlaces = plans.flatMap((p) => p.stops.map((s) => s.placeId));
+  check("re-plan: replacement plans exist", plans.length > 0);
+  check("re-plan: new plans exclude the full restaurant", !newPlaces.includes(b.place_id), b.place_id);
+  await until("vote reopens after re-plan", async () => (await view(host, "my_group"))[0].status === "voting", 30000);
+  check("re-plan: vote reopens", true);
+  return { replanned, newRun };
+}
+
+// 5. Booking through the configured service (or module fake when its URL is unset).
 await call(phones[0].tok, "start_booking", [g.latest_run_id, result.plans[0].id, 0]);
+if (voiceScenario === "full") {
+  const failed = await until("voice-originated full failure", async () => (await view(host, "my_bookings")).find((b) => b.status === "failed" && b.fail_reason === "full"), 25000);
+  await until("voice full ended event", async () => (await view(host, "my_call_events")).some((e) => e.booking_id === failed.id && e.type === "ended"), 10000);
+  const types = (await view(host, "my_call_events")).filter((e) => e.booking_id === failed.id).map((e) => e.type);
+  check("one full voice sequence (no injected failure or duplicate replay)", types.join(">") === "dialing>connected>transcript>transcript>failed>ended", types.join(">"));
+  await checkFullReplan(failed);
+  check("re-plan never auto-calls another restaurant", (await view(host, "my_bookings")).length === 1);
+  console.log(fails ? `\n${fails} FAILED` : "\nALL PASS (voice-originated full scenario)");
+  process.exit(fails ? 1 : 0);
+}
 const booking = await until("booking confirmed", async () => (await view(host, "my_bookings")).find((b) => b.status === "confirmed"), 20000);
 await until("ended event", async () => (await view(host, "my_call_events")).some((e) => e.booking_id === booking.id && e.type === "ended"), 10000);
 const evs = (await view(host, "my_call_events")).filter((e) => e.booking_id === booking.id).map((e) => e.type);
 check("call events end confirmed/ended", evs.includes("confirmed") && evs.at(-1) === "ended", evs.join(">"));
+check("one confirm sequence (no duplicate replay)", evs.join(">") === "dialing>connected>transcript>transcript>slot_offered>transcript>confirmed>ended");
 check("status -> booked", (await view(host, "my_group"))[0].status === "booked");
 
 // 6. Voice route: failed/full from the voice service
@@ -164,18 +213,7 @@ const post = (body, s = secret) =>
 check("route rejects bad secret", (await post({ bookingId: b2.id, type: "failed", reason: "full" }, "wrong")).status === 401);
 const failRes = await post({ bookingId: b2.id, type: "failed", reason: "full", ts: Date.now() });
 check("route accepts failed/full", failRes.ok, failRes.ok ? "" : `${failRes.status} ${await failRes.text()}`);
-const b2after = (await view(host, "my_bookings")).find((b) => b.id === b2.id);
-check("booking marked failed/full", b2after.status === "failed" && b2after.fail_reason === "full");
-const replanned = await until("re-plan run", async () => {
-  const gg = (await view(host, "my_group"))[0];
-  return gg.replan_for === b2.id && gg.latest_run_id !== g.latest_run_id ? gg : null;
-}, 20000);
-check("re-plan: replan_for set, new run started", !!replanned, replanned?.latest_run_id);
-const newRun = await until("re-plan run done", async () => (await view(host, "my_plan_runs")).find((r) => r.run_id === replanned.latest_run_id && r.status === "done"), 30000);
-const newPlaces = JSON.parse(newRun.result_json).plans.flatMap((p) => p.stops.map((s) => s.placeId));
-check("re-plan: new plans exclude the full restaurant", !newPlaces.includes(b2.place_id), b2.place_id);
-await until("vote reopens after re-plan", async () => (await view(host, "my_group"))[0].status === "voting", 30000);
-check("re-plan: vote reopens", true);
+const { replanned, newRun } = await checkFullReplan(b2);
 await call(phones[0].tok, "start_booking", [replanned.latest_run_id, JSON.parse(newRun.result_json).plans[0].id, 0]);
 check("call again clears the banner", (await until("banner cleared", async () => (await view(host, "my_group"))[0].replan_for == null ? true : null, 10000)) === true);
 const postCouncil = (memberId, label) => fetch(`${D}/route/council-message`, {

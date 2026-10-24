@@ -37,24 +37,36 @@ sequence is used only when `VOICE_BASE_URL` is unset.
 Send the tunnel URL to Max (covering backend integration while Eric Chen is
 away), or Eric Chen. Max and Eric Wu are now Admin collaborators on
 `huddle-calhacks`; use your own CLI login. Max's CLI 2.13.0 and login are ready,
-and management reads are verified. `VOICE_BASE_URL` is confirmed absent; no
-publish has been performed from Max's CLI. An administrator with a ready CLI runs:
+and management reads are verified. Max set `VOICE_BASE_URL` with an
+environment-only publish and verified the API URL/stub mode stayed unchanged.
+For a new tunnel URL, an administrator updates only that setting (keep other
+module configuration out of the publishing shell):
 
 ```sh
-VOICE_BASE_URL=https://<random>.trycloudflare.com spacetime publish huddle-calhacks -s maincloud --env-only
+VOICE_BASE_URL=https://<random>.trycloudflare.com spacetime publish huddle-calhacks -s https://maincloud.spacetimedb.com --env-only --no-config
 ```
 
 Each `cloudflared` restart gives a new URL, so send it again. To switch scenario,
 restart uvicorn only (the URL stays the same): `STUB_SCENARIO=full voice/.venv/bin/python -m uvicorn ...`.
-Exported values override `voice/.env`. Switch back to `confirm` afterwards so the
-smoke test passes.
+Exported values override `voice/.env`. Switch back to `confirm` afterwards and
+rerun the confirm smoke check.
 
 ## Check
 
 ```sh
 voice/.venv/bin/python -m unittest discover -s voice/eval -v
-SPACETIMEDB_URI=https://maincloud.spacetimedb.com SPACETIMEDB_DB=huddle-calhacks node scripts/smoke.mjs  # after VOICE_BASE_URL is set
+api/.venv/bin/python api/eval/check_live.py \
+  --server https://maincloud.spacetimedb.com --database huddle-calhacks \
+  --voice-base-url https://restaurants-availability-barbie-lil.trycloudflare.com \
+  --voice-scenario confirm
 ```
+
+The live helper loads the matching shared secret privately from `api/.env`
+(exported values win) and creates a disposable synthetic group/bookings.
+After restarting the voice API in full mode, use `--voice-scenario full` to
+verify voice-originated failure, restaurant exclusion, reopened voting and no
+automatic replacement call. The flag does not switch the service's mode.
+Restore the API to confirm afterwards; keep the tunnel running throughout.
 
 The uvicorn log prints one line per event with the module's status code. A `400
 unknown booking` means the booking ID doesn't exist on the module (for example a
@@ -62,9 +74,11 @@ hand-made curl). That call stops; this is expected.
 
 ## Current status
 
-The stub was pulled from main at `7cb6613`; all six voice unit tests pass in
-Max's Python environment. Live URL wiring and service-backed confirm/full
-re-plan verification remain pending. Until those pass, a working app booking
-may still be the module's built-in fallback. No Twilio, Pipecat or real call has
-been exercised by these stub tests. Keep the voice server and tunnel running
-while teammates test, and restore `STUB_SCENARIO=confirm` after the full case.
+The stub is connected at
+`https://restaurants-availability-barbie-lil.trycloudflare.com`. All six unit
+tests passed in Max's Python environment. Live Maincloud checks passed both
+confirm and voice-originated full-to-re-plan, each with exactly one event
+sequence. The full case excluded the restaurant, reopened voting and did not
+start another booking automatically. The final check verified the service was
+restored to `STUB_SCENARIO=confirm`. No Twilio, Pipecat or real call was exercised.
+Keep the voice server and tunnel running while teammates test.
