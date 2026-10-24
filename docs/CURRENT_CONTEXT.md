@@ -14,10 +14,12 @@ defaults approved by Max and now implemented. See the additive
 
 **Planned follow-up, not implemented:** Max wants Claude to construct and revise
 itineraries, with Python validating hard constraints and factual consistency
-instead of enumerating complete candidate plans. Eric Wu is currently building
-Bright Data → SpacetimeDB ingestion. Review his schema/read path, agree a versioned
-venue snapshot contract and prove newly scraped records reach the planner before
-the deferred agent rewrite. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+instead of enumerating complete candidate plans. Eric Wu has built Bright Data →
+SpacetimeDB ingestion: a versioned venue snapshot (`POST /catalog`, `venue` and
+`catalog_state` tables) that the module sends to FastAPI with each coordinator
+request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). It is not
+yet published to Maincloud ([go live](BRIGHTDATA.md#go-live)). Review the schema
+and read path before the deferred agent rewrite. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 
 **Preference UX proposal, planning only:** omitted options on first submission
 mean flexible. Optional budget/whole-outing-duration sliders and an optional
@@ -200,10 +202,14 @@ Vercel frontend continues to create legacy groups until its frontend release.
 Eric Chen's `scripts/host-api.ps1` is hosting tooling, not a replacement planner.
 Max's Mac is the designated API/tunnel host for this connected implementation test.
 
-There are 45 real Berkeley venues. Review aspects are placeholders and scout
-facts are cached. Max reaffirmed Bright Data scraping as active next work for
-discovering and refreshing alternatives. The scraper and shared catalog/evidence
-integration are not implemented yet. Keep a validated cached snapshot for scrape
+Maincloud currently plans over the 45 bundled Berkeley venues. Review aspects
+are placeholders and scout facts are cached. The Bright Data scraper
+(`data/reviews/`, [BRIGHTDATA.md](BRIGHTDATA.md)) has collected 936 Berkeley
+places from Google Maps and built a 130-venue catalog with source URLs and
+fetch times. It goes live after the module is republished, the API restarted and
+the catalog published ([go live](BRIGHTDATA.md#go-live)). Menus, takeout,
+seating, photos and dietary evidence (`data/brightdata/details.json`) are
+collected but not yet read by the coordinator. Keep a validated cached snapshot for scrape
 outages; scraping cannot guarantee a choice that satisfies every hard constraint.
 Neither Claude nor scraped reviews replace verified allergy evidence. See
 [NEXT_TASKS.md](NEXT_TASKS.md) for the open workstreams and suggested ownership.
@@ -226,8 +232,9 @@ Preserve the exact 13-feature order wherever the legacy contract is still used.
 | Eric Wu | Current `api/` implementation owner; coordinate the agent-planner migration and designated local API/tunnel operation with Max |
 | Eric Chen | UI, readable prompt/agent/plan flow and SpacetimeDB context/progress integration with Max |
 
-Coordinate file ownership before overlapping edits. Haydn's attendance and
-Bright Data access/integration are open tasks for refreshed venue alternatives.
+Coordinate file ownership before overlapping edits. Haydn's attendance is an
+open question. Publishing the live catalog and using the venue details are the
+remaining Bright Data tasks.
 
 - [x] Confirm Max's Mac as designated local API/tunnel operator and verify the
   Maincloud API URL before shared testing; retain this setup for agent work.

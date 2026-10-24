@@ -32,8 +32,14 @@ define the next implementation phase.
   preserve existing secrets and point its API URL at Max's current tunnel.
 - [x] Release the updated frontend to Vercel: main `57e1656` was pushed and
   Vercel reported deployment completed. Use a new huddle for coordinator mode.
-- [ ] Review Eric Wu's Bright Data → SpacetimeDB ingestion handoff and connect
-  its versioned venue snapshot to FastAPI and module validation.
+- [x] Bright Data → SpacetimeDB ingestion (Eric Wu): versioned venue snapshot via
+  `POST /catalog`, sent to FastAPI with each coordinator request and validated
+  by both. 130-venue catalog committed ([BRIGHTDATA.md](BRIGHTDATA.md)).
+- [ ] Go live with the catalog: republish the module, restart the shared API,
+  run `collect.py publish` ([steps](BRIGHTDATA.md#go-live)). Max to review the
+  schema/read path.
+- [ ] Feed venue details (menus, takeout, seating, dietary evidence in
+  `data/brightdata/details.json`) to the coordinator's public facts.
 - [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
   constraints and factual consistency. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 - [ ] Review [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md):
@@ -55,8 +61,8 @@ booking is simulated and review/price/travel limitations remain explicit.
 Suggested split: Max leads context/contracts and verification; Eric Wu owns the
 API migration/local operation with Max; Eric Chen leads UI and coordinates
 SpacetimeDB context/progress changes with Max. Coordinate overlapping file edits.
-Bright Data scraping and shared catalog/evidence integration are active next
-work, per Max's latest direction. See [NEXT_TASKS.md](NEXT_TASKS.md) for concrete
+Bright Data scraping and the shared catalog integration are built; publishing
+the catalog and using the venue details are next. See [NEXT_TASKS.md](NEXT_TASKS.md) for concrete
 UI/Claude/data tasks, suggested owners and solo testing. Advanced routing, real
 calls, vendor/MCP additions, accounts and personal history remain later work.
 The coordinator task is in progress until these demo-polish checks are complete.
@@ -83,7 +89,7 @@ requirements; use the priorities above when choosing work.
 | L3 (H24) + freeze | **Sat 6 PM** | Offers, scout badge, council streaming, polished screens, voice S1-S3 (or fallback), re-plan loop works once, demo path written | `[ ]` |
 | Submit | **Sun 7:30 AM** (hard 9 AM, checked in by 8 AM) | Devpost complete (T7 checklist) | `[ ]` |
 
-**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed privately only. API and module now use `STUB_MODE=false` with 45 Berkeley places; voice remains a scripted `confirm` stub. Backend fixes are deployed without a data reset. Current URLs are in [HANDOFF.md](HANDOFF.md).
+**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed privately only. API and module now use `STUB_MODE=false` with 45 Berkeley places (the 130-venue scraped catalog is committed but not yet published); voice remains a scripted `confirm` stub. Backend fixes are deployed without a data reset. Current URLs are in [HANDOFF.md](HANDOFF.md).
 
 **Sleep/away times need re-checking against the 6 PM start.** If Eric Chen's away window is fixed in clock time (Sat 6 AM to noon), it is now H12 to H18, not H9 to H15.
 
@@ -92,7 +98,7 @@ requirements; use the priorities above when choosing work.
 - Eric Chen is working on UI; Max covers backend code and integration in this Codex session. Eric Wu is working in `api/`; coordinate before touching that folder. Primary ownership and shared contracts remain unchanged.
 - Max Li and Eric Wu are confirmed Admin collaborators on `huddle-calhacks`. Max deployed source `7612d0b` with CLI 2.13.0 using his own account and `--delete-data=never`. Both public service URLs and real API mode were verified; the existing shared secret was preserved.
 - Eric Wu's voice stub is connected. Six unit tests passed locally; live confirm and voice-originated full-to-re-plan checks passed, with no duplicate replay or automatic replacement call. Service restored to confirm; no real phone calls.
-- No Bright Data account/key is available. Haydn owns the account/review pipeline and Mapbox token/routing. Eric Chen's booth visit/key acquisition was temporary coverage; confirm a human owner for the booth task before he leaves. Max's private root `.env` has a blank `BRIGHTDATA_API_KEY` entry only.
+- Bright Data: Eric Wu has the account/key and ran the scrape (October 24); see [BRIGHTDATA.md](BRIGHTDATA.md). Haydn still owns the Mapbox token/routing.
 - Max's first phase is complete. Eric Wu implemented the real parser/learning/solver/offers/council; Max connected it to Maincloud and ran real-mode HTTP and connected smoke checks. Review aspects are still placeholders, travel is estimated and scout is cached.
 - Current work split: Eric Wu owns current `api/` work; Max covers backend integration/evaluation, leaving API files untouched. The next solver comparison can use the verified real API; it still needs to be run and reviewed.
 
@@ -110,10 +116,10 @@ requirements; use the priorities above when choosing work.
 > **Haydn is out until Saturday. Eric Chen covered smoke testing and re-plan.** With Eric leaving, Bright Data and geo remain pending for Haydn; they have not been silently reassigned to Max. Haydn: read this section and HANDOFF.md when you arrive.
 
 
-- [ ] Bright Data account/key (confirmed unavailable); Mapbox token still unconfirmed
+- [~] Bright Data account/key done (Eric Wu); Mapbox token still unconfirmed
 - [x] `scripts/smoke.mjs`: Maincloud checks now support real council output and terminal booking guards; current results in [MAINCLOUD_VERIFICATION.md](MAINCLOUD_VERIFICATION.md)
 - [~] Bare-bones UI: drafted by Eric Wu in `web/` (Vite + React, all screens routed, live on the SpacetimeDB views). Haydn: review and take over or confirm ownership
-- [ ] Bright Data review pull + `docs/BRIGHTDATA.md` (Eric Chen needs this for the live scout)
+- [x] Bright Data pull + `docs/BRIGHTDATA.md` (Eric Wu): 936 Google Maps places, top reviews, rating snapshots, 130-venue catalog and venue details
 - [ ] Aspect extraction, aggregation, `places.json` v2 (input: `data/places.base.json`; each place has `googlePlaceId`)
 - [ ] `server/src/geo.ts`: route geometry, leg times (geo_cache table exists)
 - [x] `server/src/replan.ts`: inline re-plan from /call-event; excludes the full place, new run, banner, vote reopens (Eric Chen)
@@ -135,7 +141,7 @@ requirements; use the priorities above when choosing work.
 - [x] Wired Max's api stubs on Maincloud (`FASTAPI_BASE_URL`, `STUB_MODE=true`); smoke test + frontend flow pass through it
 - [x] Max covering integration: set/verify Eric Wu's `VOICE_BASE_URL`, pass confirm and voice-originated "full" re-plan with him; restore confirm
 - [x] Demo-mode safety net (`server/src/lib/demo.ts`): host toggle uses fakes; any failed api/voice call switches the group to labeled demo mode instead of freezing. Tested locally with both services dead. `cached_run.json` still a placeholder (fakes are used instead)
-- [ ] Live scout via Bright Data (needs `docs/BRIGHTDATA.md`)
+- [ ] Live scout via Bright Data (`docs/BRIGHTDATA.md` now exists; the scout itself is not built)
 - [x] Council panel `web/src/components/council/` (functional pass; replays synthetic messages, not a live LLM council; restyle at H19)
 - [x] Privacy fix: names hidden in plan text and offers unless showWhoCompromised
 - [x] Raw service errors removed from public fallback warnings; cumulative budget rechecks, queued booking/terminal callback guards and host-only settings deployed. Server typecheck and 30 native tests pass (one opt-in HTTP test skipped).

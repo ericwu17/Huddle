@@ -63,6 +63,18 @@ the operator should retain its public tunnel URL in its own logs. Agent mode
 forces simulated booking independently of `VOICE_BASE_URL`. Do not launch a
 second host script that silently replaces the shared URL.
 
+## Live venue catalog (Bright Data)
+
+The scraped Berkeley catalog has 130 venues: the bundled 45 plus 85 new ones. It's committed in
+`data/brightdata/catalog.json` but isn't live yet. To turn it on, the designated
+operator republishes the module (as above, `--delete-data=never --no-config`),
+restarts the shared API from the same commit, and then runs
+`python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30`.
+That last step needs `SPACETIMEDB_URI`, `SPACETIMEDB_DB` and `HUDDLE_SHARED_SECRET`
+and no scraper keys. The exact commands, checks and rollback are in
+[BRIGHTDATA.md, Go live](BRIGHTDATA.md#go-live). Until the catalog is published,
+every huddle plans over the bundled 45 places in `data/places.json`.
+
 ## Verification commands
 
 ```sh

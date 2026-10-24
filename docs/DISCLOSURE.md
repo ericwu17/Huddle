@@ -12,9 +12,9 @@ Every library, API, and AI tool used. Cal Hacks requires this.
 | Service | Used for | Part |
 | --- | --- | --- |
 | SpacetimeDB (local server; Maincloud for the demo) | realtime state, reducers, procedures, HTTP routes | B |
-| Anthropic Claude API | preference parsing, review extraction, council, voice dialogue | A, C, D |
-| Google Places API (New) | place basics (location, price, hours, phone) | B |
-| Bright Data | Google Maps reviews, live scout check | A, B |
+| Anthropic Claude API | preference parsing, coordinator, menu extraction from venue websites, council, voice dialogue | A, C, D |
+| Google Places API (New) | place basics (location, price, hours, phone); price level, takeout, dine-in, outdoor seating and attributed photos for the scraped catalog | B |
+| Bright Data | Web Scraper API: Google Maps discovery of Berkeley places (ratings, review counts, hours); Web Unlocker: fetching venue menu pages | A, B |
 | Mapbox | maps, walking routes, leg times | A |
 | Twilio Programmable Voice | phone call | D |
 | Cartesia | text-to-speech (and possibly speech-to-text) | D |

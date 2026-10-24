@@ -34,7 +34,7 @@ contacts, history, voice input and personal AI keys are staged enhancements.
 | API and planner | Separate Python FastAPI service on Max's Mac/tunnel | One coordinator, with legacy routes retained |
 | Models | Claude API for private needs and coordinator choices | Code validates facts and hard limits; no installed local LLM required |
 | Booking | Maincloud's scripted booking path; separate voice service disconnected in the recorded setup | Keep the simulation labeled until real calls are implemented |
-| Venue data | 45 Berkeley places; review aspects are placeholders, scout cached | Bright Data scraping and validated catalog/evidence refresh are active next work |
+| Venue data | 45 bundled Berkeley places on Maincloud today; review aspects are placeholders, scout cached. A Bright Data scrape (936 places) and a 130-venue live catalog are built and committed but not yet published ([go live](docs/BRIGHTDATA.md#go-live)) | Publish the live catalog; feed menus/takeout/seating details to the coordinator |
 
 Keep frontend and API as separate processes during local development. The earlier
 fully local database proposal is **blocked as written**: SpacetimeDB 2.13.0

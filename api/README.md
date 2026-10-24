@@ -26,7 +26,9 @@ the retained legacy endpoints where stated.
 ## No stub mode
 
 The service always runs for real over the 45 Berkeley places in
-`data/places.json`: Claude parsing, Bayesian swipe learning, Monte Carlo solver,
+`data/places.json`, or, for coordinator requests, over the live venue catalog
+the module sends once one is published (`catalog` in `docs/AGENT_CONTRACT.md`,
+`docs/BRIGHTDATA.md`): Claude parsing, Bayesian swipe learning, Monte Carlo solver,
 offers and live council. The phase-zero stub mode has been removed. `STUB_MODE`
 is no longer read, `/health` always reports `"stub": false`, and startup refuses
 a catalog containing `synthetic_stub` places (such as
@@ -174,7 +176,7 @@ determinism comes from the schema and the validators instead.
 ## Checks
 
 ```sh
-api/.venv/bin/python -m unittest discover -s api/eval -v   # 27 tests, no network
+api/.venv/bin/python -m unittest discover -s api/eval -v   # 42 tests, no network
 api/.venv/bin/python api/eval/check_integration.py         # module procedures + local API, no Claude key
 FASTAPI_BASE_URL=http://127.0.0.1:8000 HUDDLE_SHARED_SECRET=... \
   api/.venv/bin/python api/eval/smoke_http.py              # any running instance

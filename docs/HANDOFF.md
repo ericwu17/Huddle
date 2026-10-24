@@ -13,7 +13,8 @@ a tunnel, accepting that host laptop's availability dependency temporarily.
 One designated operator owns the shared API/tunnel URL. Hosted API migration is
 deferred; the earlier Render configuration has not been deployed. Local
 development keeps Vite and FastAPI separate. The previous all-local database
-proposal is blocked as written on 2.13.0. Bright Data scraping is active next work;
+proposal is blocked as written on 2.13.0. The Bright Data scraper and a 130-venue
+live catalog are built but not yet published ([go live](BRIGHTDATA.md#go-live));
 real calls remain deferred. [NEXT_TASKS.md](NEXT_TASKS.md) records the open task
 breakdown, suggested owners and solo-test commands.
 
@@ -40,13 +41,13 @@ operator. Do not run another helper that replaces Max's shared API URL.
 - **Smoke test:** real parsing, swipe updates, plans, council (without chair fallback), a private offer, votes and roulette pass through Maincloud. Plans' cumulative costs fit every private cap. Synthetic confirmation and injected full-to-re-plan pass, including stale-choice rejection. The voice-originated full scenario passed earlier with the old API stubs; it has not been rerun against this new deployment. See [current verification](MAINCLOUD_VERIFICATION.md).
 - **Frontend:** Eric Chen reported the Maincloud flow passes. The Plans-to-Vote jump is fixed in `0d224a5`: phones on Plans stay there when voting opens, and Vote links back to the debate. It still needs a browser check ([DEMO_CHECKLIST.md](DEMO_CHECKLIST.md)). The landing page is served at `/landing` (`web/public/landing/`).
 - **Backend fixes deployed:** source `7612d0b` was published with CLI 2.13.0, `--delete-data=never`, and the new public service URLs. Existing shared secret and unspecified environment values were preserved; no data reset. Privacy, stale choices/current budgets, queued booking/late callback guards and host-only settings are live.
-- **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
+- **Bright Data:** Eric Wu has an account and key (kept in his ignored `.env`) and ran the full Google Maps scrape on October 24: 936 Berkeley places, plus a 130-venue catalog and venue details. See [BRIGHTDATA.md](BRIGHTDATA.md). Going live needs a module republish, an API restart and `collect.py publish` ([go live](BRIGHTDATA.md#go-live)). That publish step needs only the shared secret, not the Bright Data key.
 - **Real API implemented and switched on:** [api/README.md](../api/README.md) describes the implementation and limitations. Real-mode HTTP smoke passed through Eric Wu's tunnel. The API's stub mode has since been removed: `api/` always serves the real service, and the module integration check runs against it. Review aspects are still placeholders and travel times are estimates; scout and phone calls remain cached/scripted.
 - **Current work split:** Eric Wu owns current `api/` work; Max covers backend integration/evaluation. This deployment did not edit API files or restart Eric's services.
 
 | Piece | Real or fake right now |
 | --- | --- |
-| Places | Real 45 Berkeley places; review aspects remain placeholder scores |
+| Places | Real 45 Berkeley places; review aspects remain placeholder scores. A 130-venue scraped catalog is committed, not yet published |
 | Parse, swipes, plans, council | Real implementation on Maincloud, `STUB_MODE=false`; keyword/Safe fallbacks remain available |
 | Offers | Real private offers; the connected test delivered one only to its recipient |
 | Scout badge | cached file, labeled "Checked earlier" |
@@ -60,7 +61,7 @@ operator. Do not run another helper that replaces Max's shared API URL.
 - [x] Smoke test, hand-off and voice stub are on main (pulled through `7cb6613`).
 - [x] Add Max Li and Eric Wu as Admin collaborators (confirmed in the dashboard).
 - [x] Max and Eric Wu confirmed the voice URL/configuration and tested synthetic confirm/full callbacks through Maincloud.
-- [ ] Assign or finish the Bright Data booth task: prize/credits, Google Maps reviews product, rate limits, usage requirements and key acquisition. Haydn remains the review-pipeline owner; no account exists yet.
+- [~] Bright Data booth task: Eric Wu has the account and key, and the scrape has run. Prize/credits and usage requirements are still unconfirmed.
 - [ ] Optional: free Mapbox token into `.env` as `MAPBOX_TOKEN` (for walking routes).
 - [ ] DM the shared secret to Eric Wu if not done. Never post it in a channel.
 - [ ] Re-check your Saturday away window against the 6 PM start (6 AM-noon is H12-H18).
@@ -94,12 +95,15 @@ operator. Do not run another helper that replaces Max's shared API URL.
 
 - [ ] Read ROADMAP Part A first: Eric Chen covered `scripts/smoke.mjs` and `server/src/replan.ts`.
 - [ ] Agree with Eric Wu who owns `web/` from here.
-- [ ] Bright Data review pull + `docs/BRIGHTDATA.md`, unless Eric Chen has started it (check the roadmap).
-- [ ] Create the Bright Data account/get the key and obtain the Mapbox token. Coordinate the booth task with Eric Chen; Max is not taking over the review pipeline by default.
+- [x] Bright Data pull + `docs/BRIGHTDATA.md` (Eric Wu): Google Maps places, ratings and venue details. Review text is not mined into aspects yet.
+- [~] Bright Data account/key done (Eric Wu); the Mapbox token is still open.
 
 ## Remaining work (not dependent on Eric Chen's Claude quota)
 
-1. **Bright Data:** review pull for `data/places.base.json` (each place has `googlePlaceId`), `docs/BRIGHTDATA.md`, then the live scout check in `server/src/council.ts` (`runScoutJob`). Needs `BRIGHTDATA_API_KEY`.
+1. **Bright Data:** the scrape and live catalog are built ([BRIGHTDATA.md](BRIGHTDATA.md)). Still to do:
+   - publish the catalog ([go live](BRIGHTDATA.md#go-live));
+   - feed `details.json` (menus, takeout, seating) to the coordinator;
+   - the live scout check in `server/src/council.ts` (`runScoutJob`).
 2. **Keep both Python services and tunnels awake:** coordinate the current API/voice processes with Eric Wu, who supplied the new endpoints. Report new URLs after a tunnel restart and update the matching module setting. Real voice remains a later phase.
 3. **Demo-mode fallbacks:** deployed in `server/src/lib/demo.ts` (Eric Chen). A dead tunnel flips that group to labeled demo mode instead of freezing parse/swipes; the host can also toggle it. Native tests cover this path; the connected real-API run stayed out of fallback mode. `data/cached_run.json` is still a placeholder; labeled fakes serve that role.
 4. **`server/src/geo.ts`:** Mapbox route geometry + leg times with `geo_cache`. Needs `MAPBOX_TOKEN`. Fallback is straight lines.

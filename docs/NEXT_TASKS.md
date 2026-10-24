@@ -4,8 +4,9 @@ Updated October 24, 2026 after Max requested release to main. This task remains
 open: the connected coordinator works, but UI, Claude behavior and scraped-data
 integration still need polishing. This note supersedes earlier statements that
 Bright Data scraping is deferred. Owners below are a suggested split for Max,
-Eric Chen and Eric Wu to coordinate before editing overlapping files. Max has
-confirmed that Eric Wu is currently implementing Bright Data → SpacetimeDB.
+Eric Chen and Eric Wu to coordinate before editing overlapping files. Eric Wu has
+implemented Bright Data → SpacetimeDB; the catalog is committed but not yet
+published ([go live](BRIGHTDATA.md#go-live)).
 The [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) records the deferred
 propose → validate → revise design and the handoff after ingestion is ready.
 
@@ -31,7 +32,7 @@ accounts/memberships and prove invite/accept before expanding memory features.
 | Preference acceptance plan (draft) | Max + Eric Chen | Review optional budget/time sliders with Flexible defaults, optional prompt/restriction chips and one Save & ready action. Distinguish input ambiguity from missing venue evidence; use scenarios P01–P30 before implementation. | Approved semantics and reusable fixtures cover omissions, negation, cumulative caps, duration, allergies, categories, clarifications and stale/private state; no runtime changes claimed. |
 | Claude proposes and revises (deferred follow-up) | Max | After the database catalog contract is agreed, let Claude construct itineraries and repair them from structured validation feedback. Remove Python itinerary enumeration/preference ranking from this new path; Python validates hard constraints and factual consistency. See the dedicated follow-up plan. | Claude uses the database snapshot to propose and revise; only validated current plans become selectable, with bounded calls and private, explicit compromise approval when needed. |
 | Compromise flow (deferred follow-up) | Max + Eric Chen | Max requested replacing a dead-end “no plan” outcome with specific compromise proposals and a clear next action. Identify what prevents a plan, propose negotiable changes, and obtain explicit approval from affected users before applying them. Improve evidence-blocked messages so users are not told to rewrite a correct allergy. | No dead-end null result in the user journey; suggestions remain clearly conditional until approved and validated. Existing cap increases still require owner acceptance of a private trade offer; unknown allergy evidence never becomes a safety claim. |
-| Scrape and refresh venue data (in progress) | Eric Wu | Build Bright Data ingestion into SpacetimeDB; collect source URLs and fetched-at times for venue/menu/review/hours/price evidence; deduplicate and validate categories and dietary tags. Hand off the actual schema, read path, version/refresh behavior and sample records. | Validated Berkeley records exist in SpacetimeDB with stable IDs, source/freshness and explicit unknowns; planner integration is a separate next step. |
+| Scrape and refresh venue data (built; publish pending) | Eric Wu | Build Bright Data ingestion into SpacetimeDB; collect source URLs and fetched-at times for venue/menu/review/hours/price evidence; deduplicate and validate categories and dietary tags. Hand off the actual schema, read path, version/refresh behavior and sample records. | Validated Berkeley records exist in SpacetimeDB with stable IDs, source/freshness and explicit unknowns; planner integration is a separate next step. |
 | Integrate refreshed candidates | Max + scraping owner | Agree a versioned catalog/evidence shape before changing shared models. Feed the same snapshot to FastAPI and the module's venue validation; republish/restart both together. Extend the public fact whitelist only with supported evidence. | New venue IDs are accepted consistently by API, module and UI; source/freshness is visible and a full venue is excluded on replacement. |
 | Backend reliability | Max + Eric Wu | Rehearse API/tunnel stop-and-restart, provider errors and reconnect; preserve saved context and expose explicit retries. Keep one operator for the shared URL. Test budget edits during planning/booking, repeated clicks and late callbacks after replan. | Recovery needs no data reset, and stale results or actions never become current. |
 | Frontend release and rehearsal | Eric Chen + Max | Verify the main commit's Vercel status and public Maincloud variables, refresh into a new agent huddle, run physical-phone and solo tests, and fix remaining console/loading/navigation issues. | The deployed UI uses coordinator mode and completes the same flow as local Vite. |
@@ -81,7 +82,9 @@ but does not replace, the physical-phone rehearsal.
   constraints and factual consistency instead of assembling/ranking itineraries.
 - [ ] Deferred compromise flow and targeted conflict/evidence explanations; the
   current release retains blocked states while this follow-up is designed.
-- [ ] Bright Data scraping, normalization and shared catalog/evidence integration.
+- [x] Bright Data scraping, normalization and shared catalog integration ([BRIGHTDATA.md](BRIGHTDATA.md)).
+- [ ] Publish the live catalog: module republish, API restart, `collect.py publish` ([go live](BRIGHTDATA.md#go-live)).
+- [ ] Use the venue details (menus, takeout, seating, dietary evidence) in coordinator facts.
 - [ ] Physical-phone rehearsal, public Vercel flow and restart recovery.
 - [ ] Keep documentation and honesty labels aligned with what is actually live.
 - [ ] Review the staged profiles/contacts/invitation proposal; account and

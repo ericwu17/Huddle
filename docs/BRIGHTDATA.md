@@ -2,7 +2,11 @@
 
 Code: [`data/reviews/`](../data/reviews/). Source note for the Google Maps route: [`brightdata_googlemaps.md`](../brightdata_googlemaps.md) (measured 2026-10-24 for another project).
 
-**Status (2026-10-24):** Google Maps discovery has run once for real: 1 point × `restaurants` returned 20 places (0 errors) in 137 s, 0.01–1.20 mi from downtown, and 5 of them were already in the catalog. Yelp discovery returned nothing on two input types (see the Yelp row below), so the full run is Google Maps only. Nothing has been published to SpacetimeDB.
+**Status (2026-10-24):**
+- **Full Google Maps discovery has run:** 360 inputs (12 grid points × 30 keywords) returned 1,023 records, 3 of them errors, covering 1,009 distinct places. 936 of those classify as a stop: 524 restaurants, 380 hangouts and 32 boba shops. Stores, markets and other non-stops are dropped. 41 of the 45 bundled places were found again.
+- **Yelp discovery returned nothing** on two input types (see the Yelp row below), so all of the data is from Google Maps.
+- **A 130-venue catalog snapshot is built but not live.** `data/brightdata/catalog.json` has 60 meals, 45 activities and 25 desserts: the 45 bundled places plus 85 new ones, built with `publish --add meal=40,dessert=15,activity=30 --dry-run`. It goes live only after the steps in [Go live](#go-live). Until then Maincloud has no `venue` table and the app uses the bundled 45 places.
+- **Venue details exist for all 130 venues** (`details.json`; see [Venue details](#venue-details-menus-takeout-seating-photos-dietary-evidence)). They are a data file only: neither the module nor the API reads them yet.
 
 ## What it collects
 
@@ -39,13 +43,14 @@ python3 data/reviews/collect.py discover --one-point --keywords restaurants   # 
 python3 data/reviews/collect.py discover --yes                              # full: both sources, all groups
 python3 data/reviews/collect.py refresh                                     # fresh numbers, one batch per source
 python3 data/reviews/collect.py build                                       # rebuild outputs from data/raw/, no API calls
-python3 data/reviews/collect.py publish --add meal=10,dessert=5,activity=5 --dry-run  # writes catalog.json only
-python3 data/reviews/collect.py publish --add meal=10,dessert=5,activity=5            # live in SpacetimeDB
-python3 data/reviews/collect.py merge --add meal=10,dessert=5,activity=5 --dry-run    # bundled fallback file
-python3 -m unittest data/reviews/test_collect.py                            # offline tests
+python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30 --dry-run  # writes catalog.json only
+python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30            # live in SpacetimeDB
+python3 data/reviews/collect.py merge --add meal=40,dessert=15,activity=30 --dry-run    # bundled fallback file
+python3 -m unittest data/reviews/test_collect.py data/reviews/test_details.py         # offline tests
 ```
 
-- `discover` stops without `--yes` when it could return more than 2,000 records. The full run is about 360 Google inputs × 20 plus 30 Yelp inputs × 100, so up to about 10K records before dedup. Narrow it with `--groups`, `--keywords` or `--one-point`.
+- `discover` stops without `--yes` when it could return more than 2,000 records. It searches Google Maps only unless you pass `--source yelp` or `--source all`. The full Google run is 360 inputs × up to 20 results, so up to 7,200 records before dedup; the real run returned 1,023. Narrow it with `--groups`, `--keywords` or `--one-point`.
+- `publish` and `merge` look up new restaurants on Google Places for their price, and skip a restaurant that has none. The results are cached in `google_places.json`, so the committed `--add meal=40,dessert=15,activity=30` makes no new lookups and needs no `GOOGLE_PLACES_API_KEY`. Larger `--add` values need the key.
 - Discovery takes minutes (about 4.3 min for 20 places in the measured run), so it runs as a job and never on a click.
 
 ## How it reaches the app
@@ -68,6 +73,33 @@ collect.py publish ──POST /catalog──▶ SpacetimeDB venue + catalog_stat
 - **The bundled file:** `data/places.json` remains the fallback until the first push, and it's what the legacy swipe/solver flow uses. Update it with `merge` when a commit should carry the data.
 
 Contract details: `docs/CONTRACT.md` S5.5 "Live venue catalog", and the `catalog` field in `docs/AGENT_CONTRACT.md`.
+
+The coordinator flow shows each stop from the plan result, so new `bd_…` venues display correctly. The legacy swipe screen looks venues up in the bundled `data/places.json`, which still has only the 45 places. The legacy flow never offers `bd_…` venues, so this doesn't break anything.
+
+### Go live
+
+Run these in order. Steps 1 and 3 change the shared `huddle-calhacks` database, so only the designated operator should run them.
+
+1. **Republish the module** to Maincloud from an up-to-date `main`, without resetting data:
+
+   ```sh
+   npm run typecheck --prefix server && npm test --prefix server
+   spacetime publish huddle-calhacks -s maincloud -p server --delete-data=never --no-config
+   ```
+
+   The change only adds the `venue` and `catalog_state` tables. Publishing over the previous schema on a local database kept all existing rows. Don't pass new environment values, so the shared secret and service URLs stay as they are. Never approve a data reset to make the publish succeed.
+2. **Restart the shared API** from the same commit, so it accepts the `catalog` field the module now sends with each plan request (`api/agent_models.py`). If the tunnel URL changes on restart, update the module's `FASTAPI_BASE_URL` as usual ([AGENT_RUNBOOK.md](AGENT_RUNBOOK.md)).
+3. **Publish the catalog:**
+
+   ```sh
+   python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30
+   ```
+
+   This needs `SPACETIMEDB_URI=https://maincloud.spacetimedb.com`, `SPACETIMEDB_DB=huddle-calhacks` and the shared `HUDDLE_SHARED_SECRET`, from the shell, repo-root `.env` or `api/.env`. It needs no Bright Data or Google key. It prints `Published to huddle-calhacks: 130 active venues`. It also rewrites `data/brightdata/catalog.json` with a new version id; commit that file if you want the repo to match what is live.
+
+**Check:** `GET https://maincloud.spacetimedb.com/v1/database/huddle-calhacks/route/health` reports the catalog version and venue count, and a new coordinator huddle can plan with `bd_…` venues.
+
+**Rollback:** publishing a smaller snapshot (for example `--add meal=0,dessert=0,activity=0`) deactivates the new venues. Rows are never deleted, so earlier plans still resolve.
 
 ## Venue details: menus, takeout, seating, photos, dietary evidence
 
@@ -98,10 +130,16 @@ Contract details: `docs/CONTRACT.md` S5.5 "Live venue catalog", and the `catalog
   Image-only PDFs are listed per page as "not read".
 - **Highlights:** `menu.highlights` picks out vegan items, steak, fries and desserts from the verified items.
 
-Sample run (2026-10-24, `--fetch direct --no-places`, 5 venues):
-- 4 menus extracted: The Butcher's Son, Nation's, Super Duper, Wood Tavern (lunch PDF; its dinner and dessert PDFs are image-only).
-- Little Gem's menu is only on DoorDash.
-- Takeout and dine-in are unknown until a Places key is set.
+Full run (2026-10-24, all 130 catalog venues, Places lookups and Web Unlocker):
+- **Menus** are fetched for the 85 meal and dessert venues; activities are skipped.
+  - 51 menus extracted: 950 items, 554 of them with a price.
+  - 8 menus are only in ordering apps, 20 venues had no menu we could find, and 6 have no website on their listing.
+  - Highlights: vegan items at 14 venues, steak at 8, fries at 9, desserts at 19.
+- **Takeout:** 94 yes, 5 no, 31 unknown.
+- **Dine-in:** 89 yes, 1 no, 40 unknown.
+- **Outdoor seating:** 62 yes, 26 no, 42 unknown.
+- **Photos:** every venue has at least one photo with author attribution.
+- **Dietary coverage:** 19 venues have explicit menu evidence, 48 have only inferred tags, and 63 are unknown.
 
 ```bash
 api/.venv/bin/python -m pip install -r data/reviews/requirements.txt   # anthropic, pypdf
@@ -120,13 +158,17 @@ api/.venv/bin/python data/reviews/collect.py details --only p_006 --fetch direct
 - `data/brightdata/snapshots.json`: append-only `{source, key, fetched_at, source_url, rating, reviews_count, review_distribution, closed flags, is_claimed, hours}`. Momentum (reviews gained per week) and closures come from comparing rows.
 - `data/brightdata/catalog.json`: the last snapshot `publish` built (the exact body sent to `POST /catalog`).
 - `data/places.json`: changed **only by `merge`**, which first backs up the original to `data/places.v1.json`.
-  - Existing places keep their ids, aspects, cost, rating and review count. They gain an empty `priceLevel` from Yelp, `dietary` tags that Google services or Yelp categories state, and `"brightdata"` in `sources`.
-  - `--add` appends the most-reviewed new places inside Berkeley that have readable hours and a rating, with stable ids `bd_` + 10 hex characters derived from their Google Maps or Yelp key.
+  - Existing places keep their ids, aspects, cost, rating and review count. They gain an empty `priceLevel` from Yelp when Yelp has one, `dietary` tags that Google services or Yelp categories state, and `"brightdata"` in `sources`.
+  - `--add` appends the most-reviewed new places inside Berkeley that have readable hours and a rating, with stable ids `bd_` + 10 hex characters derived from their Google Maps or Yelp key. A new restaurant also needs a Google Places price level, which sets its cost; one without a price is skipped. New places get the default aspects, like the bundled ones.
+  - Neither `merge` nor `publish` has been run without `--dry-run`, so `data/places.json` still has the original 45 places.
+- `data/brightdata/google_places.json`: the Google Places lookups (price level, takeout, dine-in, delivery, outdoor seating, `servesVegetarianFood`, `servesDessert`, photos), keyed by place id, with `fetchedAt`.
+- `data/brightdata/menus.json`: fetched menu pages and verified items per venue.
+- `data/brightdata/details.json`: one venue-details record per catalog venue (see above).
   - Every row stays within the `Place` contract (`extra="forbid"`).
 
 ## Traps handled
 
-- **Price:** Google Maps has no price level. Yelp's `$$` fills `priceLevel` and meal cost. With no price, a meal costs the catalog default, 25.
+- **Price:** Google Maps has no price level (0 of 1,009 records), and Yelp returned nothing. New restaurants take their price level and meal cost from Google Places, and a new restaurant without one isn't added. In the full run, 94 candidates had a price and 38 didn't. A Yelp `$$` would fill an existing place's empty `priceLevel`.
 - **Locale links:** links carry random foreign locales (`hl=en-LK`). Every URL is cut at `?`, and rows are keyed on `place_id` / Yelp biz id, never on a URL.
 - **Categories:** Google's `category` is often just "Restaurant", so grouping uses `all_categories`.
 - **Hours:** taken from `open_hours`, never from `business_details`, which is relative to scrape time. Past-midnight closes end at 23:59, as in `fetch_places.py`. Split shifts arrive as two lines in one day (`"11 AM–2:30 PM\n5–9 PM"`) and become two ranges.
@@ -135,8 +177,12 @@ api/.venv/bin/python data/reviews/collect.py details --only p_006 --fetch direct
 
 ## Not measured yet
 
-The cost of our run (check the account's billing page). Whether Google Maps accepts `place_id` input. Whether Yelp's `url` discovery works, and the value formats inside its fields: `probe` confirmed the field names (`yelp_biz_id`, `full_address`, `latitude`, `longitude`, `price_range`, `opening_hours`, `overall_rating`, `reviews_count`, `categories`, `is_closed`, …) but not their shapes. How many places the full grid returns. Pricing at pay-as-you-go is $1.5 / 1K records for Yelp per brightdata.com, with a 5K/month free tier. Check the account plan.
+The cost of our run (check the account's billing page). Whether Google Maps accepts `place_id` input. Whether Yelp's `url` discovery works, and the value formats inside its fields: `probe` confirmed the field names (`yelp_biz_id`, `full_address`, `latitude`, `longitude`, `price_range`, `opening_hours`, `overall_rating`, `reviews_count`, `categories`, `is_closed`, …) but not their shapes. Pricing at pay-as-you-go is $1.5 / 1K records for Yelp per brightdata.com, with a 5K/month free tier. Check the account plan.
 
 ## Disclosure
 
 Public, logged-out listing data only, used for a hackathon prototype. Reviewer names, profile links and photos are removed before anything leaves `data/raw/`. Every stored number keeps its `source_url` and `fetched_at`. The API key stays server-side and out of the repo.
+
+Venue details add two more sources:
+- **Google Places API (New):** listing attributes and photos. Google's terms limit how long Places content other than place ids may be cached, and require showing each photo's author attribution with the photo. The committed `google_places.json` and `details.json` keep `fetchedAt` so stale entries can be refreshed (`details --refresh`). Photo URLs from Google may stop working after a while.
+- **Claude:** reads the text of venue websites to list menu items. Code keeps an item only if its quote appears verbatim on the page.
