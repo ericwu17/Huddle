@@ -1,0 +1,16 @@
+{
+  "name": "huddle-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "//": "SpacetimeDB module (Eric Chen). Haydn owns src/geo.ts and src/replan.ts.",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "spacetimedb": "2.13.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

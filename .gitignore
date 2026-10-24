@@ -71,3 +71,7 @@ coverage/
 tmp/
 temp/
 *.tmp
+
+# Huddle-specific
+data/raw/
+.convex/

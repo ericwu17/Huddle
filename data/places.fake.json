@@ -1,0 +1,1184 @@
+[
+  {
+    "id": "pf_01",
+    "name": "Fake Noodle Bar",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "100 Fake St, Berkeley, CA",
+    "lat": 37.8698,
+    "lng": -122.2679,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15105550100",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "22:30"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "22:30"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.65,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.25,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.05,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.35,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 412,
+    "rating": 4.4,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_02",
+    "name": "Fake Garden Taqueria",
+    "category": "meal",
+    "cuisine": "latin",
+    "address": "107 Fake St, Berkeley, CA",
+    "lat": 37.8679,
+    "lng": -122.2588,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15105550101",
+    "dietary": [
+      "vegetarian",
+      "vegan"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.35,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.9,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.2,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.3,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 268,
+    "rating": 4.5,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_03",
+    "name": "Fake Olive Courtyard",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "114 Fake St, Berkeley, CA",
+    "lat": 37.879,
+    "lng": -122.269,
+    "priceLevel": 3,
+    "costPerPerson": 45,
+    "dwellMinutes": 75,
+    "phone": "+15105550102",
+    "dietary": [
+      "vegetarian",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "17:00",
+          "23:00"
+        ]
+      ],
+      "sat": [
+        [
+          "17:00",
+          "23:00"
+        ]
+      ],
+      "sun": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.25,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.35,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.4,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.85,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.8,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.55,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 190,
+    "rating": 4.6,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_04",
+    "name": "Fake Smokehouse Diner",
+    "category": "meal",
+    "cuisine": "american",
+    "address": "121 Fake St, Berkeley, CA",
+    "lat": 37.8655,
+    "lng": -122.2672,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15105550103",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "23:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.75,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.65,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.15,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.1,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.2,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 520,
+    "rating": 4.1,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_05",
+    "name": "Fake Ceramics Studio",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "128 Fake St, Berkeley, CA",
+    "lat": 37.871,
+    "lng": -122.273,
+    "priceLevel": null,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15105550104",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.2,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.25,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.15,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.75,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.05,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.85,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 88,
+    "rating": 4.8,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_06",
+    "name": "Fake Rose Garden Walk",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "135 Fake St, Berkeley, CA",
+    "lat": 37.8853,
+    "lng": -122.2645,
+    "priceLevel": null,
+    "costPerPerson": 0,
+    "dwellMinutes": 75,
+    "phone": "+15105550105",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.1,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.3,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.05,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 1,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.8,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.4,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 1,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.4,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 1300,
+    "rating": 4.7,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_07",
+    "name": "Fake Retro Arcade",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "142 Fake St, Berkeley, CA",
+    "lat": 37.8702,
+    "lng": -122.2681,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15105550106",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.85,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.4,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.65,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.3,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.45,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.6,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 340,
+    "rating": 4.3,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_08",
+    "name": "Fake Jazz Basement",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "149 Fake St, Berkeley, CA",
+    "lat": 37.8668,
+    "lng": -122.2698,
+    "priceLevel": null,
+    "costPerPerson": 10,
+    "dwellMinutes": 75,
+    "phone": "+15105550107",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.3,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.75,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.7,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 150,
+    "rating": 4.5,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_09",
+    "name": "Fake Gelato Corner",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "156 Fake St, Berkeley, CA",
+    "lat": 37.8695,
+    "lng": -122.269,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15105550108",
+    "dietary": [
+      "vegetarian",
+      "gluten_free"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "23:30"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "22:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.45,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.75,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.45,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.65,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.3,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.35,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 610,
+    "rating": 4.6,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_10",
+    "name": "Fake Mochi House",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "163 Fake St, Berkeley, CA",
+    "lat": 37.8673,
+    "lng": -122.258,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15105550109",
+    "dietary": [
+      "vegetarian",
+      "vegan"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ],
+      "tue": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ],
+      "wed": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ],
+      "thu": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ],
+      "fri": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ],
+      "sat": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ],
+      "sun": [
+        [
+          "13:00",
+          "21:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.35,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.4,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.45,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.4,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.6,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.1,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.75,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 230,
+    "rating": 4.4,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_11",
+    "name": "Fake Pie Parlor",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "170 Fake St, Berkeley, CA",
+    "lat": 37.8781,
+    "lng": -122.2694,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15105550110",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.4,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.45,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.35,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.65,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.7,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.2,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.3,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 305,
+    "rating": 4.5,
+    "sources": [
+      "fake"
+    ]
+  },
+  {
+    "id": "pf_12",
+    "name": "Fake Night Churro Cart",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "177 Fake St, Berkeley, CA",
+    "lat": 37.8701,
+    "lng": -122.2595,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15105550111",
+    "dietary": [
+      "vegan"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "18:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.55,
+        "sd": 0.12
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.12
+      },
+      "wait": {
+        "mean": 0.25,
+        "sd": 0.12
+      },
+      "value": {
+        "mean": 0.85,
+        "sd": 0.12
+      },
+      "romance": {
+        "mean": 0.35,
+        "sd": 0.12
+      },
+      "service": {
+        "mean": 0.45,
+        "sd": 0.12
+      },
+      "outdoor": {
+        "mean": 0.95,
+        "sd": 0.12
+      },
+      "novelty": {
+        "mean": 0.65,
+        "sd": 0.12
+      }
+    },
+    "reviewCount": 97,
+    "rating": 4.3,
+    "sources": [
+      "fake"
+    ]
+  }
+]
