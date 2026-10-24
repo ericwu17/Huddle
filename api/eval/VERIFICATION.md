@@ -38,12 +38,12 @@ No SpacetimeDB host was published, no live backend was modified, and browser
 subscriptions, network deployment configuration, and persistence across host
 restarts are not covered by the in-memory procedure checks.
 
-The live `huddle-calhacks` call-event route on Maincloud was reachable and
-returned 401 to a no-secret request for an impossible booking ID. The user's
-exported credential is in a separate terminal and was not available to the
-agent's process, so its match against the deployed secret is not claimed here.
-`check_shared_secret.py` can verify that match from the user's terminal without
-printing credentials or creating an event.
+The live `huddle-calhacks` call-event route on Maincloud rejected a no-secret
+request with 401 and accepted the shared secret saved in the ignored local
+`api/.env`. The authenticated probe returned the expected unknown-booking
+error. `check_shared_secret.py` printed no credential and created no booking or
+event. This verifies the shared secret, not a deployed Python service or a
+Claude API call.
 
 Reproduce with the exact setup/run/check commands in `api/README.md`. The tests
 generate fresh credentials at runtime and do not store or print them.
