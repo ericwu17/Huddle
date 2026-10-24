@@ -60,7 +60,7 @@ def enrich_catalog(snapshot, details):
             if not url or not source:
                 continue
             attribution = ", ".join(str(author.get("name", "")) for author in (photo.get("attribution") or []) if isinstance(author, dict))
-            photos.append({"url": url, "sourceUrl": source, "attribution": (attribution or str(photo.get("attributionNote") or photo.get("source") or ""))[:1000]})
+            photos.append({"url": url, "sourceUrl": source, "attribution": (attribution or str(photo.get("attributionNote") or photo.get("source") or ""))[:500]})
             if len(photos) == 3:
                 break
         evidence["photos"] = photos

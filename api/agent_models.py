@@ -1,6 +1,9 @@
 """Versioned coordinator contracts, independent of the legacy score/posterior API."""
 
+from datetime import datetime
+from decimal import Decimal
 from typing import Annotated, Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field, field_validator, model_validator
 
@@ -70,6 +73,27 @@ class MenuItem(Model):
     sourceUrl: Annotated[str, Field(max_length=1000, pattern=r"^https?://[^\s]+$")]
     fetchedAt: Annotated[str, Field(max_length=40)]
 
+    @field_validator("price")
+    @classmethod
+    def cents(cls, value):
+        if value is not None and Decimal(str(value)) * 100 != (Decimal(str(value)) * 100).to_integral_value():
+            raise ValueError("menu prices use whole cents")
+        return value
+
+    @field_validator("sourceUrl")
+    @classmethod
+    def source_url(cls, value):
+        url = urlsplit(value)
+        if not url.hostname or url.username or url.password:
+            raise ValueError("menu source requires a public HTTP(S) URL")
+        return value
+
+    @field_validator("fetchedAt")
+    @classmethod
+    def observed_at(cls, value):
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return value
+
 
 class MenuEvidence(Model):
     status: Annotated[str, Field(max_length=80)]
@@ -85,7 +109,12 @@ class MenuEvidence(Model):
 class VenuePhoto(Model):
     url: Annotated[str, Field(max_length=2000, pattern=r"^https?://[^\s]+$")]
     sourceUrl: Annotated[str, Field(max_length=2000, pattern=r"^https?://[^\s]+$")]
-    attribution: Annotated[str, Field(max_length=1000)] = ""
+    attribution: Annotated[str, Field(max_length=500)] = ""
+
+    @field_validator("url", "sourceUrl")
+    @classmethod
+    def public_url(cls, value):
+        return MenuItem.source_url(value)
 
 
 class Evidence(Model):

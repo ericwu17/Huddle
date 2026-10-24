@@ -12,6 +12,11 @@ defaults approved by Max and now implemented. See the additive
 [coordinator contract](AGENT_CONTRACT.md), [runbook](AGENT_RUNBOOK.md) and
 [verification record](AGENT_VERIFICATION.md) for the shipped behavior and checks.
 
+**Menu update:** see [MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md) for sourced
+orders, owner-private personal totals, provisional suggestions, fallback behavior,
+publish commands and the Google redirect check. This supersedes the old blanket
+allergy block and shared-cost notes.
+
 **Planned follow-up, not implemented:** Max wants Claude to construct and revise
 itineraries, with Python validating hard constraints and factual consistency
 instead of enumerating complete candidate plans. Eric Wu has built Bright Data →
@@ -20,8 +25,8 @@ SpacetimeDB ingestion: a versioned venue snapshot (`POST /catalog`, `venue` and
 request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). The merged
 implementation is active on shared Maincloud `huddle-calhacks` and Vercel,
 with the committed 130-venue snapshot. The separate `huddle-account-max-check`
-preview remains available. See [operations](ACCOUNTS_RUNBOOK.md). Menus/photos/seating in
-`details.json` still need a coordinated read contract. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+preview remains available. See [operations](ACCOUNTS_RUNBOOK.md). Menus, prices and attributed
+photos now have a coordinated runtime contract; takeout/seating remain follow-ups. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 
 **Account and preference expansion: shared release active October 24.**
 Max approved username/password accounts, private saved context, reciprocal friends,
@@ -37,7 +42,8 @@ exact numeric inputs and optional sliders. An optional prompt adds context.
 ambiguity still requires a private correction. A blank initial submission is
 valid. A later blank/Flexible edit cannot erase an established outing cap.
 Known allergy input and missing venue evidence are separate states: the person
-can finish their input, while an unsupported food plan remains unavailable.
+can finish their input and receive provisional food suggestions. Unverified options
+remain unavailable for voting/booking; impossible timed outings get untimed venue ideas.
 
 Max authorized and completed the shared activation from `a029fb6` after its main
 push. Vercel `https://huddle-two-neon.vercel.app` now uses the updated shared
@@ -255,7 +261,7 @@ Eric Wu collected 936 Berkeley stops and built a 130-venue snapshot (60 meals,
 This snapshot is activated and tested in the isolated preview. Raw scraping and
 ingestion files were not edited during the integration. Review aspects and
 scout facts remain placeholders/cached. Details for 130 venues exist separately
-but menus/photos/takeout/seating are not yet read by the planner. Keep a validated cached snapshot for scrape
+with menus/prices/photos joined by the menu publisher; takeout/seating are not yet read by the planner. Keep a validated cached snapshot for scrape
 outages; scraping cannot guarantee a choice that satisfies every hard constraint.
 Neither Claude nor scraped reviews replace verified allergy evidence. See
 [NEXT_TASKS.md](NEXT_TASKS.md) for the open workstreams and suggested ownership.
@@ -264,7 +270,7 @@ The additive contract uses separate requests/results and private agent tables;
 it does not populate obsolete math fields. Public explanations are rendered from
 catalog facts selected by Claude, so private model prose cannot expose prompts or
 caps. The bounded candidate set is not a guarantee of a globally optimal plan.
-Unknown allergy evidence blocks validated food plans; qualitative review aspects, ingredients,
+Unknown allergy evidence keeps suggestions provisional and unbookable; qualitative review aspects, ingredients,
 live availability and actual prices are still unverified. Private trade-offer
 generation, inferred memory and actual-visit history are deferred. An
 established cap cannot be raised through prompt editing or model interpretation.

@@ -1,5 +1,10 @@
 # Huddle Python API
 
+Current menu extension: [MENU_RECOMMENDATIONS.md](../docs/MENU_RECOMMENDATIONS.md). Sourced menu orders, private personal totals, photos,
+provisional suggestions and untimed alternatives are implemented. The full
+Claude propose/revise loop and takeout/seating remain follow-ups. This update
+supersedes older blanket allergy-block and personal-cost deferral notes below.
+
 The stateless FastAPI service for the new single-Claude coordinator and the
 legacy S5.3 planner. The SpacetimeDB module calls its protected endpoints; browsers connect
 to Maincloud, with one public state-validated Google OAuth callback. The tested environment uses Python 3.13.
@@ -23,9 +28,10 @@ and public fact IDs. Public explanations are rendered from those catalog facts,
 never arbitrary private model prose. No feature ranking, swipes or confidence
 scores are used in this path. No database access occurs in these functions.
 
-Claude is required: missing credentials or invalid output produce explicit
-retryable errors, not fabricated agent plans. Allergies block planning because
-the catalog has no verified allergen evidence. Established private caps can be
+Claude selects menu-grounded choices. If its planning call fails, the response
+contains clearly labeled real-catalog venue ideas, never fabricated agent plans.
+Allergies permit provisional suggestions; unavailable venue evidence prevents
+voting/booking rather than hiding all options. Established private caps can be
 lowered, but prompt edits and Claude cannot raise them.
 
 See [contract](../docs/AGENT_CONTRACT.md), [setup/run commands](../docs/AGENT_RUNBOOK.md)

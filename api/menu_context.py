@@ -39,7 +39,9 @@ def allergy_conflict(item, allergies):
     text = " ".join([item.name, item.description])
     for allergy in allergies:
         key = normalized(allergy).removesuffix("s")
-        terms = ALLERGEN_TERMS.get(key, (key,))
+        matched = [term for label, aliases in ALLERGEN_TERMS.items()
+                   if has_term(key, label) or any(has_term(key, alias) for alias in aliases) for term in aliases]
+        terms = tuple(matched) or (key,)
         # Remove explicit absence phrases before matching ingredient tokens.
         clean = text
         for term in terms:

@@ -1,5 +1,10 @@
 # Huddle roadmap
 
+Current menu extension: [MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md). Sourced menu orders, private personal totals, photos,
+provisional suggestions and untimed alternatives are implemented. The full
+Claude propose/revise loop and takeout/seating remain follow-ups. This update
+supersedes older blanket allergy-block and personal-cost deferral notes below.
+
 ## Current priorities October 24
 
 [CURRENT_CONTEXT.md](CURRENT_CONTEXT.md) is the current source of product and
@@ -51,8 +56,9 @@ are still open. See [operations](ACCOUNTS_RUNBOOK.md).
   New scraped IDs pass API validation; frontend ratings use the database views.
 - [x] Activate the shared module/API and exact committed catalog without a data
   reset. Vercel plans now include new scraped IDs; 130 real venues are active.
-- [ ] Feed venue details (menus, takeout, seating, dietary evidence in
-  `data/brightdata/details.json`) to the coordinator's public facts.
+- [x] Feed bounded sourced menus/prices and attributed photos through Maincloud,
+  Claude and private order cards.
+- [ ] Feed evidenced takeout and suitable shared seating into the coordinator.
 - [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
   constraints and factual consistency. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 - [x] Implement optional budget/time sliders, optional prompt, flexible defaults,
@@ -84,14 +90,13 @@ are still open. See [operations](ACCOUNTS_RUNBOOK.md).
   explicit recipient opt-out remains authoritative. Real lookup succeeded.
 - [ ] Confirm actual Messages receipt after an explicit reviewed invitation.
 - [x] Review Eric Wu's actual catalog fields, snapshot boundary and sample records.
-- [ ] Wire the separately collected menu/takeout/seating/photo evidence through
-  a bounded extension of the snapshot contract. Inferred
+- [x] Wire collected menu items/prices/photos through a bounded snapshot extension.
+- [ ] Add takeout and seating evidence to that extension. Inferred
   dietary tags and a default $25 meal estimate do not prove vegan/allergen safety
   or actual affordability. Reviews/star distributions are not reported in `/catalog`.
-- [ ] Implement the approved individual-payment rule after reviewing assignments
-  and item-price shapes: each person pays for their own meal plus later stops,
-  not another participant's meal. Keep the current shared-stop runtime unchanged
-  until that coordinated API/module/UI follow-up is agreed and tested.
+- [x] Implement and validate individual menu totals: each person pays for their
+  own meal plus later stops. Store selections privately; preserve the legacy
+  public venue baseline. Unknown prices are estimates and remain provisional.
 - [ ] Complete Max's guided review with a separate test-bot browser.
 - [ ] Rehearse with physical phones; browser mobile emulation is not that test.
 - [ ] Consider removing legacy endpoints only after teammate review; they remain

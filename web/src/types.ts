@@ -41,7 +41,7 @@ export type Place = {
   name: string;
   category: Category;
   cuisine: string;
-  label?: string;
+  label?: string | null;
   address: string;
   lat: number;
   lng: number;
@@ -55,7 +55,6 @@ export type Place = {
   foodStyle?: string;
   menu?: { status: string; items: MenuItem[] };
   photos?: VenuePhoto[];
-  label?: string | null;
 };
 
 export type Hard = {

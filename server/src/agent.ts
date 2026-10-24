@@ -77,7 +77,7 @@ function structuredInput(json: string, previous: any) {
 function directNeeds(hard: any, preserved: boolean) {
   return { hard, preferences: [], questions: [], warnings: [
     ...(preserved ? ["Your existing outing cap was kept. An increase requires accepting a private trade offer."] : []),
-    ...(hard.allergies.length ? ["Your allergy is saved. Food recommendations still need verified venue allergy evidence; you can finish saving preferences now."] : []),
+    ...(hard.allergies.length ? ["Your allergy is saved. Menu clues can inform provisional suggestions; venue allergy handling remains unverified."] : []),
   ] };
 }
 

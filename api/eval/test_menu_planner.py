@@ -129,6 +129,16 @@ class MenuPlannerTests(unittest.IsolatedAsyncioTestCase):
 
 
 class RealMenuSidecarTests(unittest.TestCase):
+    def test_menu_contract_rejects_bad_sources_dates_and_fractional_cent_prices(self):
+        snapshot, _ = scenario()
+        for change in ({"sourceUrl": "javascript:alert(1)"}, {"sourceUrl": "https://user:secret@example.test/menu"},
+                       {"fetchedAt": "today"}, {"price": 9.999}):
+            with self.subTest(change=change):
+                raw = snapshot.model_dump()
+                raw["evidence"]["meal"]["menu"]["items"][0].update(change)
+                with self.assertRaises(ValueError):
+                    AgentCatalog.model_validate(raw)
+
     def test_every_scraped_item_survives_with_source_and_stable_id(self):
         snapshot = json.loads(Path("data/brightdata/catalog.json").read_text())
         details = json.loads(Path("data/brightdata/details.json").read_text())

@@ -158,6 +158,12 @@ def eligible(catalog: Catalog, body: AgentPlanRequest) -> set[int]:
 def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]:
     allowed = eligible(catalog, body)
     plans = {}
+    menu_places = {p.id for p in catalog.places if menu_items(catalog, p.id)}
+    # Resolve menu/ingredient lower bounds once per person/venue. Repeating
+    # that work for every meal x activity x dessert combination is expensive.
+    minimum_prices = {(m.memberId, p.id): min(
+        [item_cost(p, item) for item in allowed_items(catalog, p.id, m)] + [Decimal(str(p.costPerPerson))])
+        for m in body.members for p in catalog.places}
     # A meal can be the entire outing; dessert does not require an activity.
     # The legacy solver retains its documented templates unchanged.
     for itinerary in catalog.itineraries(body.date, body.window.start, body.window.end,
@@ -175,13 +181,11 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
                       costPerPerson=catalog.places[i].costPerPerson)
                  for i, start in zip(itinerary.stops, itinerary.starts)]
         total = sum_cost(stops)
-        has_menu = any(menu_items(catalog, stop.placeId) for stop in stops)
+        has_menu = any(stop.placeId in menu_places for stop in stops)
         # Menu-aware lower bounds keep an affordable personal order in the
         # candidate pool even when a venue's generic meal estimate is higher.
         def minimum(member):
-            return sum((min([item_cost(catalog.places[catalog.index[s.placeId]], item)
-                             for item in allowed_items(catalog, s.placeId, member)] +
-                            [Decimal(str(s.costPerPerson))]) for s in stops), Decimal(0))
+            return sum((minimum_prices[member.memberId, s.placeId] for s in stops), Decimal(0))
         if any(m.needs.hard.budgetMaxPerPerson is not None and
                (minimum(m) if has_menu else total) > Decimal(str(m.needs.hard.budgetMaxPerPerson))
                for m in body.members):

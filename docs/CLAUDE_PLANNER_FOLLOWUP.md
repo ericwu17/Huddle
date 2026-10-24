@@ -1,5 +1,10 @@
 # Follow-up: Claude proposes and revises outings
 
+Current menu extension: [MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md). Sourced menu orders, private personal totals, photos,
+provisional suggestions and untimed alternatives are implemented. The full
+Claude propose/revise loop and takeout/seating remain follow-ups. This update
+supersedes older blanket allergy-block and personal-cost deferral notes below.
+
 Planned October 24, 2026 at Max's request. **Deferred; not implemented in this
 change.** Eric Wu is currently building Bright Data → SpacetimeDB ingestion.
 This plan changes the next planner design, not the live endpoint shapes or

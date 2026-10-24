@@ -10,6 +10,13 @@ were preserved; preview accounts were not migrated. Shared checks passed:
 The separate review database/ports remain available. Eric Wu's scraping/data and
 voice code is unchanged. Operations: [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md).
 
+## Menu release update
+
+[MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md) is the current menu, personal-cost,
+provisional/alternative and Calendar setup contract. Menu items/prices and photos
+are now wired through Maincloud to Claude and the UI; takeout/seating and the
+full proposal/revision loop remain follow-ups. See its owner checklist.
+
 ## Implemented and released to the shared app
 
 - [x] Username/password registration and sign-in, eight-character minimum,
@@ -23,7 +30,7 @@ voice code is unchanged. Operations: [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md).
 - [x] Optional cumulative-budget/whole-outing-time sliders, Flexible defaults,
   optional prompt, dietary/allergy controls and one Save & ready action.
   Known allergies can finish input without redundant confirmation; missing
-  venue allergy evidence still prevents unsupported food recommendations.
+  venue allergy evidence now permits provisional suggestions while preventing unsupported booking.
 - [x] Cached rating/review-count/source context for Claude and cached ratings on
   place cards. These are evidence labels, not verified menu or allergy claims.
 - [x] 99 Python checks passed; 129 server checks passed with one opt-in test
@@ -85,7 +92,7 @@ messages were created by the automated acceptance checks.
 | Rich venue evidence | Max + Eric Wu | The basic catalog handoff is reviewed. Wire the separately collected menu items/prices, takeout, seating and attributed photos through a bounded contract; keep Eric's scraping pipeline separate. | Evidence distinguishes menu labels, inferred tags, estimates and unknowns; source URLs/fetch times survive the runtime path. |
 | Shared release rehearsal | Max + Eric Wu | Shared account/catalog activation is complete. Test real participants on phones and rehearse API/tunnel recovery while preserving shared settings. | Participants can re-enter their own shared accounts and recover cleanly after an operator restart. |
 | Claude proposes and revises (follow-up) | Max | Implement the reviewed propose → validate → revise design after the catalog contract is agreed. Claude constructs alternatives; Python validates facts and hard constraints rather than enumerating complete choices. | Bounded calls and structured repair feedback produce grounded current plans; errors/evidence gaps have useful next actions. |
-| Personalized meal costs (approved rule, follow-up implementation) | Max + Eric Chen | Review participant assignments and item-price shapes across API/module/UI. Each person pays for their own meal plus later stops, such as their dessert; they do not pay for somebody else's meal. Keep the existing shared-stop runtime unchanged until that contract is agreed. | Each person's full outing total is correct and fits their own cap. Missing/default prices never prove actual affordability, and caps cannot be pooled. |
+| Personalized meal costs (implemented) | Max + Eric Chen | Owner-private menu selections/totals now count each person's own meal plus later stops; the public legacy cost remains a venue baseline. Review order editing next. | Each person's full outing total is correct and fits their own cap. Missing/default prices never prove actual affordability, and caps cannot be pooled. |
 | Meal-quality and preference scenarios | Max + Eric Chen | Review vegan meal versus steak/fries, optional dessert, split takeout with evidenced seating, duration, categories and soft wishes. Distinguish input ambiguity from unavailable venue evidence. | Useful alternatives are independently supported; no fabricated vegan/allergen/menu facts or extra activity forced by a template. |
 | Conditional compromise | Max + Eric Chen | Explain the actual blocking evidence or requirement and offer a specific next action. Obtain the affected owner's explicit approval for permitted changes; cap increases still require acceptance of a current private offer. | No unexplained dead end, silently relaxed limit or selectable unvalidated compromise. |
 | Restart and release rehearsal | Max + Eric Chen | Rehearse API/tunnel recovery and provider failures, then test physical phones. After approval, sync main, resolve conflicts, coordinate additive module/UI release without a reset and verify Vercel. | Saved context survives recovery, stale votes/bookings stay blocked and the released UI matches the reviewed branch. |

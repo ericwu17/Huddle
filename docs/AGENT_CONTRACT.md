@@ -10,6 +10,13 @@ not part of this implemented wire contract. Venue snapshots, catalog versions,
 structured validation feedback and compromise states require a coordinated API,
 module and UI contract update after reviewing Eric Wu's ingestion schema.
 
+## Menu and provisional extension (October 24)
+
+The implemented [menu extension](MENU_RECOMMENDATIONS.md) supersedes earlier
+blanket evidence blocks and uniform per-person cost checks for `own_orders`.
+It adds sourced menu/photo evidence, provisional status, untimed suggestions
+and owner-private menu selections/totals. Legacy shapes remain compatible.
+
 ## FastAPI
 
 Both endpoints require the existing `X-Huddle-Secret` and use the configured
@@ -31,7 +38,7 @@ aspects receive limitations rather than invented scores.
 | --- | --- |
 | `budgetMaxPerPerson` | Nonnegative number or null; whole-outing per-person cap |
 | `dietary` | Array of supported dietary tags |
-| `allergies` | Array of stated allergies; currently blocks planning because catalog evidence is absent |
+| `allergies` | Array of stated allergies; missing venue evidence makes food suggestions provisional |
 | `vetoCuisines` | Array of refused cuisine families |
 | `vetoCategories` | Array of refused stop categories |
 | `rejectedTerms` | Array checked against catalog names/category/cuisine labels; not ingredient verification |
@@ -78,7 +85,8 @@ start/end, coordinates and catalog cost. A coordinator plan has one to three
 stops. A single-stop plan must be a meal venue: a dinner can fit a short outing
 without forcing an activity or dessert. Both API and module validate this
 additive count change; retained legacy templates/shapes are unchanged.
-The total equals the sum of every stop.
+The legacy public baseline equals the sum of every stop. For `own_orders`,
+private menu totals govern individual caps; see the extension above.
 Prices and travel are explicitly estimates. There is no score or posterior.
 
 Code enumerates feasible catalog itineraries and validates whole-outing caps,
@@ -92,8 +100,8 @@ Claude returns candidate IDs and public fact IDs only. Code renders those facts
 into public explanations. Arbitrary model prose is never published. Schema or
 selection errors allow one repair attempt within a 15-second model-call budget;
 missing credentials, timeout or invalid output yield explicit 503/502 errors,
-not synthetic recommendations. Missing feasibility/evidence returns empty plans
-with a conflict. Each module HTTP call has a 20-second timeout and no extra
+not synthetic recommendations. Missing evidence permits provisional suggestions. Missing timed feasibility permits
+untimed venue alternatives; provider failure has explicitly labeled catalog ideas. Each module HTTP call has a 20-second timeout and no extra
 agent-route HTTP retry.
 
 ## SpacetimeDB
@@ -108,7 +116,7 @@ legacy result shapes remain unchanged for legacy groups.
 | --- | --- |
 | `create_agent_group(name?)` | Create a group with coordinator state; the caller still joins as a participant |
 | `submit_agent_prefs(text)` | Owner-only prompt submission; invalidate old results immediately and schedule interpretation |
-| `confirm_agent_needs(revision)` | Owner confirms the exact current summary; reject stale revision, questions or unknown allergy evidence |
+| `confirm_agent_needs(revision)` | Owner confirms the exact current summary; reject stale revision or unresolved input questions |
 | `find_agent_plans()` | Host-only; require all current needs confirmed, then snapshot and schedule planning |
 | `post_agent_discussion(text)` | A deliberately shared participant message on the current ready run; considered on the next explicit generation |
 | `my_agent_session` | Current group's public status and confirmed member IDs only |

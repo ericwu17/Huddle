@@ -120,7 +120,10 @@ function shortSummary(summary: string) {
 export function AgentPlanCard({ plan, order, recommended = false }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean }) {
   const listings = useCatalogListings();
   const ready = isReadyAgentPlan(plan);
-  const cost = plan.costRange ? `Est. ${dollars(plan.costRange.min)}–${dollars(plan.costRange.max)}/person` : `Est. ${dollars(plan.costPerPerson)}/person total`;
+  const cost = plan.costRange ? plan.costRange.min === plan.costRange.max
+    ? `Est. ${dollars(plan.costRange.min)}/person total`
+    : `Est. ${dollars(plan.costRange.min)}–${dollars(plan.costRange.max)}/person`
+    : `Est. ${dollars(plan.costPerPerson)}/person total`;
   return <section className="card space-y-3">
     <div className="flex flex-wrap gap-2">{recommended && ready ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
       {!ready ? <span className="sticker sticker-pink">Suggested · confirm details</span> : null}</div>
