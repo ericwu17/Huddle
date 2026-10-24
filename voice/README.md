@@ -30,10 +30,15 @@ caffeinate -dis voice/.venv/bin/python -m uvicorn voice.main:app --host 127.0.0.
 cloudflared tunnel --no-autoupdate --url http://localhost:8001   # prints https://<random>.trycloudflare.com
 ```
 
-`caffeinate` keeps the laptop awake. If the tunnel dies, the module quietly falls
-back to its own fake call.
+`caffeinate` keeps the laptop awake. If a configured voice tunnel dies, the
+module records the booking as failed with reason `error`. Its built-in fake
+sequence is used only when `VOICE_BASE_URL` is unset.
 
-Send the tunnel URL to Eric Chen by DM. He runs:
+Send the tunnel URL to Max (covering backend integration while Eric Chen is
+away), or Eric Chen. Max and Eric Wu are now Admin collaborators on
+`huddle-calhacks`; use your own CLI login. Max's CLI installation/login is still
+pending, so Admin access in the browser is not yet a verified CLI publish.
+An administrator with a ready CLI runs:
 
 ```sh
 VOICE_BASE_URL=https://<random>.trycloudflare.com spacetime publish huddle-calhacks -s maincloud --env-only
@@ -54,3 +59,12 @@ SPACETIMEDB_URI=https://maincloud.spacetimedb.com SPACETIMEDB_DB=huddle-calhacks
 The uvicorn log prints one line per event with the module's status code. A `400
 unknown booking` means the booking ID doesn't exist on the module (for example a
 hand-made curl). That call stops; this is expected.
+
+## Current status
+
+The stub was pulled from main at `7cb6613`; all six voice unit tests pass in
+Max's Python environment. Live URL wiring and service-backed confirm/full
+re-plan verification remain pending. Until those pass, a working app booking
+may still be the module's built-in fallback. No Twilio, Pipecat or real call has
+been exercised by these stub tests. Keep the voice server and tunnel running
+while teammates test, and restore `STUB_SCENARIO=confirm` after the full case.

@@ -2,7 +2,24 @@
 
 React 19 + React Router v7 (data mode, `createBrowserRouter`) + Vite + Tailwind. It talks to the SpacetimeDB module in [../server/](../server/) through `spacetimedb/react`. Bare-bones UI for testing the backend; not the final design.
 
-## Run
+## Run against the shared Maincloud backend
+
+Create the ignored `web/.env.local` with these public connection values:
+
+```env
+NEXT_PUBLIC_SPACETIMEDB_URI=https://maincloud.spacetimedb.com
+NEXT_PUBLIC_SPACETIMEDB_DB=huddle-calhacks
+```
+
+From `web/`, run `npm ci` then `npm run dev`. Restart Vite after changing the
+file. Never put `HUDDLE_SHARED_SECRET`, Claude or Bright Data keys here. The
+optional `NEXT_PUBLIC_MAPBOX_TOKEN` is a public map token only.
+
+Max's FastAPI and Eric Wu's voice service are reached through SpacetimeDB; the
+browser does not call their private endpoints directly. See
+[the current hand-off](../docs/HANDOFF.md) for service URLs and test status.
+
+## Run against a local backend
 
 Publish the module locally first (see [../README.md](../README.md)), then:
 
@@ -19,6 +36,14 @@ npm run generate   # rewrites src/module_bindings/ from ../server (needs the spa
 ```
 
 Don't edit `src/module_bindings/` by hand.
+
+## Current coverage
+
+Haydn owns core frontend/routing; Eric Wu wrote the initial app and owns the call
+screen, and Eric Chen owns the council panel. Max is covering backend/council
+integration while Eric Chen is away. The reported rapid redirect after council
+and bounce when reopening Plans still need verification and an owner-confirmed
+fix. The voice stub landing does not establish that this browser bug is fixed.
 
 ## Layout
 

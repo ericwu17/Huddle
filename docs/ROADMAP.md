@@ -1,6 +1,6 @@
 # Huddle roadmap
 
-> Maintained by Eric Chen. Last updated Fri 8:20 PM (H2.3). Current state and async task list: [HANDOFF.md](HANDOFF.md). Check things off in your own section as you push them.
+> Primary owner: Eric Chen; Max is updating this hand-off and covering backend work while Eric is away. Updated Friday Oct 23 after pulling Eric Wu's voice stub (`7cb6613`). Current operating state: [HANDOFF.md](HANDOFF.md). Check things off only when the stated check has passed.
 >
 > **H0 = Fri 6:00 PM** (the brief assumed 9 PM, so every gate is 3 hours earlier than `huddle.md` says).
 > Legend: `[x]` done and in the repo · `[~]` in progress or rough draft · `[ ]` not started · `?` unknown (owner: please update)
@@ -20,6 +20,14 @@
 
 **Sleep/away times need re-checking against the 6 PM start.** If Eric Chen's away window is fixed in clock time (Sat 6 AM to noon), it is now H12 to H18, not H9 to H15.
 
+## Current coverage and access
+
+- Eric Chen has exhausted his Claude session usage and is leaving soon. Max can cover backend code and integration in this Codex session; primary ownership and shared contracts remain unchanged.
+- Max Li and Eric Wu are confirmed Admin collaborators on `huddle-calhacks`. Each uses their own account. Max's browser access is verified; his Mac's CLI launcher is installed, but the runtime download and CLI login are still pending. No publish from Max's CLI has been verified.
+- Eric Wu's voice stub has landed. Six voice unit tests pass locally; setting `VOICE_BASE_URL` and verifying confirm/full callbacks against Maincloud remain separate steps.
+- No Bright Data account/key is available. Haydn owns the account/review pipeline and Mapbox token/routing. Eric Chen's booth visit/key acquisition was temporary coverage; confirm a human owner for the booth task before he leaves. Max's private root `.env` has a blank `BRIGHTDATA_API_KEY` entry only.
+- Max's first phase is complete: eight authenticated API routes, deterministic disclosed fixtures, cumulative budget guards, a live tunnel, and local integration checks. The real solver/learning/LLM/council phases have not started here.
+
 ## Shared
 
 - [x] Plan docs (`build-brief.md`, `huddle.md`) updated for SpacetimeDB
@@ -30,10 +38,10 @@
 
 ## A. Haydn: data, routing, glue
 
-> **Haydn is out until Saturday. Eric Chen is covering Part A until he is back** (smoke test and re-plan done; Bright Data pull and geo next). Haydn: read this section first when you arrive.
+> **Haydn is out until Saturday. Eric Chen covered smoke testing and re-plan.** With Eric leaving, Bright Data and geo remain pending for Haydn; they have not been silently reassigned to Max. Haydn: read this section and HANDOFF.md when you arrive.
 
 
-- ? Mapbox token, Bright Data account
+- [ ] Bright Data account/key (confirmed unavailable); Mapbox token still unconfirmed
 - [x] `scripts/smoke.mjs`: 27 checks incl. re-plan; passes on Maincloud and local (Eric Chen)
 - [~] Bare-bones UI: drafted by Eric Wu in `web/` (Vite + React, all screens routed, live on the SpacetimeDB views). Haydn: review and take over or confirm ownership
 - [ ] Bright Data review pull + `docs/BRIGHTDATA.md` (Eric Chen needs this for the live scout)
@@ -52,13 +60,14 @@
 - [x] Re-plan trigger: failed/full or closed queues `replan_job`
 - [x] `data/fetch_places.py` and `places.json` v1 (45 real Berkeley places)
 - [x] Published to Maincloud; four-phone test 23/23 there
+- [x] Collaborator access: Max Li and Eric Wu are database Admins (browser role check)
 - [x] `docs/HONESTY.md`, `docs/DISCLOSURE.md` (seeded; keep updating)
 - [~] Hand-off note `docs/HANDOFF.md` (drafted; final update before sleep, due Sat 2 AM)
 - [x] Wired Max's api stubs on Maincloud (`FASTAPI_BASE_URL`, `STUB_MODE=true`); smoke test + frontend flow pass through it
-- [ ] Wire Eric Wu's voice service (`VOICE_BASE_URL`); test the "full" re-plan with him
+- [ ] Max covering integration: verify/set Eric Wu's `VOICE_BASE_URL`, then test confirm and "full" re-plan with him after CLI login is ready
 - [ ] Demo-mode fallbacks: `data/cached_run.json` from a real run; auto demo mode when /health fails
 - [ ] Live scout via Bright Data (needs `docs/BRIGHTDATA.md`)
-- [x] Council panel `web/src/components/council/` (functional pass; streams live; restyle at H19)
+- [x] Council panel `web/src/components/council/` (functional pass; replays synthetic messages, not a live LLM council; restyle at H19)
 - [x] Privacy fix: names hidden in plan text and offers unless showWhoCompromised
 - [~] Experiment harness `docs/experiments/` (5 baselines run; "ours" waits for Max's real /plan; numbers not pitch-ready until places.json v2)
 - [ ] README, Devpost writeup, secret scan, submission checklist
@@ -68,6 +77,9 @@
 - [x] FastAPI stubs for every endpoint, tunnel live and connected (keep it running; send the new URL if it changes)
 - [x] Dietary rule applies to meals/desserts only (tagless activities stay eligible)
 - [x] Budget guards in the module (`server/src/lib/budgets.ts`)
+- [x] Ignored `api/.env` loading and safe live shared-secret check; the saved secret matches Maincloud
+- [x] All eight API routes passed HTTP checks through the development tunnel, including auth, deterministic responses and cumulative budgets
+- [~] Cover Eric Chen's backend work; complete CLI 2.13.0 installation/login and verify management access using Max's account
 - [ ] /parse-prefs with keyword fallback
 - [ ] L1 solver: filter, normalization, enumeration, maximin + Nash tie-break, three plans (note: only ~7 activities are open after 7:30 PM Sat; `places.json` has an extra `googlePlaceId` field)
 - [ ] Posterior update, active selection, Monte Carlo robustness, Pareto, posteriorSummary
@@ -77,9 +89,10 @@
 
 ## D. Eric Wu: voice
 
-- ? Claude API key (moved from Max; share it with Max by DM for /parse-prefs and the council)
+- [x] Claude API key shared with Max and saved privately; unused by the current stubs
 - ? Twilio upgraded + number, Cartesia account, tunnel tool, demo phone verified
-- [~] `POST /book` stub posting fake events to `/route/call-event` (`voice/`, confirm + full scenarios, unit tests pass); next: Eric Chen sets `VOICE_BASE_URL`, smoke test, "full" re-plan test
+- [x] `POST /book` stub in `voice/`, confirm + full scenarios, six local unit tests pass; no real calls
+- [ ] Supply/confirm the voice tunnel URL with Max or Eric Chen; verify deployed `VOICE_BASE_URL`, smoke test and service-backed "full" re-plan
 - [ ] Bug: app jumps to Vote ~400 ms after the council finishes and Plans bounces back to Vote, so the debate is never seen
 - [ ] `web/.env.local` pointing at Maincloud (see HANDOFF.md)
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO

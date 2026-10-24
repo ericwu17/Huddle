@@ -6,6 +6,28 @@ started before implementation. This is a separate Python 3.11+ FastAPI service;
 it has no database dependency, external API calls, LLM calls, Bayesian update,
 Monte Carlo, real solver, or live council. All venue data and scores are fake.
 
+## Current hand-off
+
+Max's first-phase stubs are connected to `huddle-calhacks` on Maincloud through
+`https://conferencing-navigate-deleted-feedback.trycloudflare.com`. All eight
+routes passed authenticated HTTP checks through that tunnel, including missing
+auth rejection, deterministic fixtures and cumulative budget consistency. The
+saved Huddle secret also passed the non-mutating live backend check. Keep the
+API and tunnel running and the Mac awake while the team uses this URL.
+
+Eric Wu's voice stub has landed separately in `voice/`; its live connection is
+not established by these API checks. Eric Chen is leaving and has exhausted his
+Claude session usage, so Max is covering backend integration in this Codex
+session. Max Li and Eric Wu have confirmed database Admin roles. Max's CLI
+launcher is installed, but runtime installation/login and CLI management access
+remain pending. Current responsibilities and operating commands are in
+[`docs/HANDOFF.md`](../docs/HANDOFF.md).
+
+The real solver, Bayesian learning, Monte Carlo, Claude calls and live council
+remain later phases. No Bright Data account/key is available; that account and
+review pipeline belong to Haydn, with Eric Chen covering the booth task. A key
+is not needed for these stubs.
+
 ## Run locally
 
 From the repository root, in zsh/bash:
