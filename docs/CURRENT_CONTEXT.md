@@ -18,12 +18,12 @@ instead of enumerating complete candidate plans. Eric Wu has built Bright Data â
 SpacetimeDB ingestion: a versioned venue snapshot (`POST /catalog`, `venue` and
 `catalog_state` tables) that the module sends to FastAPI with each coordinator
 request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). The merged
-implementation is verified on isolated Maincloud `huddle-account-max-check`
-with the committed 130-venue snapshot. Shared `huddle-calhacks` activation
-remains separate ([go live](BRIGHTDATA.md#go-live)). Menus/photos/seating in
+implementation is active on shared Maincloud `huddle-calhacks` and Vercel,
+with the committed 130-venue snapshot. The separate `huddle-account-max-check`
+preview remains available. See [operations](ACCOUNTS_RUNBOOK.md). Menus/photos/seating in
 `details.json` still need a coordinated read contract. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 
-**Account and preference expansion: branch implementation verified for review.**
+**Account and preference expansion: shared release active October 24.**
 Max approved username/password accounts, private saved context, reciprocal friends,
 a friend picker and durable in-app invitations with an opening link. New
 account-owned huddles use addressed invitations; legacy anonymous groups retain
@@ -39,10 +39,11 @@ valid. A later blank/Flexible edit cannot erase an established outing cap.
 Known allergy input and missing venue evidence are separate states: the person
 can finish their input, while an unsupported food plan remains unavailable.
 
-Max authorized syncing main, resolving conflicts and pushing the combined
-account/connector work for both Erics to test on October 24. The connected
-review environment remains isolated Maincloud `huddle-account-max-check` and
-local Vite port 5174. A Git push does not deploy the matching shared backend. See
+Max authorized and completed the shared activation from `a029fb6` after its main
+push. Vercel `https://huddle-two-neon.vercel.app` now uses the updated shared
+module/API and 130 real venues. All original groups/members/plan identifiers
+survived; the shared rollout passed 41 connected, 14 OAuth and 30 browser checks.
+Preview accounts remain separate in `huddle-account-max-check`/local port 5174. See
 [ACCOUNTS_CONTRACT.md](ACCOUNTS_CONTRACT.md),
 [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md) and
 [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md).
@@ -78,8 +79,11 @@ shared availability and real meetup-event creation remain separate checks.
 
 The preview planner now receives the active 130-venue database snapshot. Claude
 gets its source/fetch evidence; plan cards resolve new `bd_` IDs through public
-catalog views and show ratings with observation dates. The shared backend keeps
-its prior catalog until the coordinated module/API/catalog release.
+catalog views and show ratings with observation dates. Shared Vercel now uses
+the same 130-venue catalog after coordinated module/API/catalog activation.
+Google callback wiring is verified on shared; each user still connects their own
+account. Shared Mac Messages/Contacts adapters are disabled while native sending
+is unresolved. In-app invitation delivery remains active.
 
 ## Goal
 

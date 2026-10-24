@@ -6,15 +6,16 @@
 architecture direction. The historical math-based milestones below do not
 define the next implementation phase.
 
-**Branch review status:** accounts, friends, addressed invitations, private saved
-context, optional sliders/Save & ready, cached ratings and password visibility
-are implemented in the isolated preview. Max authorized the main push after
-sync/conflict resolution; shared backend publication remains a separate step.
-The 130-venue catalog is active in that preview. Verification currently
-shows 99 Python passes, 129 server passes/one opt-in skip and 41 connected passes
-with real Claude and simulated booking. The final desktop/mobile browser rerun passed 30 assertions, including rapid
-map navigation and resizing, without page/console errors. Max's review and
-review continues for the remaining planner/UI follow-ups.
+**Shared release status:** accounts, friends, addressed invitations, private
+saved context, optional sliders/Save & ready, password visibility and the real
+130-venue catalog are active on shared `huddle-calhacks` and Vercel from
+`a029fb6`. The rollout preserved original data and existing secrets/settings.
+The shared deployment passed 41 connected, 14 OAuth-wiring and 30 desktop/mobile
+browser checks with no browser errors/overflow. Source verification passed 99
+Python tests, 129 server tests/one opt-in skip, build and lint before rollout.
+The isolated review environment is still separate and available. The remaining
+Claude proposal/revision, rich-menu/photo/seating and provider-write follow-ups
+are still open. See [operations](ACCOUNTS_RUNBOOK.md).
 
 - [x] Review Eric Chen's Windows API launcher on main; it hosts the existing API
   through a tunnel and does not introduce a new planner.
@@ -48,9 +49,8 @@ review continues for the remaining planner/UI follow-ups.
 - [x] Sync main, combine catalog integration with account/connector hard checks,
   regenerate bindings and activate all 130 venues in `huddle-account-max-check`.
   New scraped IDs pass API validation; frontend ratings use the database views.
-- [ ] Go live with the catalog: republish the module, restart the shared API,
-  run `collect.py publish` ([steps](BRIGHTDATA.md#go-live)). Max to review the
-  schema/read path.
+- [x] Activate the shared module/API and exact committed catalog without a data
+  reset. Vercel plans now include new scraped IDs; 130 real venues are active.
 - [ ] Feed venue details (menus, takeout, seating, dietary evidence in
   `data/brightdata/details.json`) to the coordinator's public facts.
 - [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
@@ -134,7 +134,7 @@ requirements; use the priorities above when choosing work.
 | L3 (H24) + freeze | **Sat 6 PM** | Offers, scout badge, council streaming, polished screens, voice S1-S3 (or fallback), re-plan loop works once, demo path written | `[ ]` |
 | Submit | **Sun 7:30 AM** (hard 9 AM, checked in by 8 AM) | Devpost complete (T7 checklist) | `[ ]` |
 
-**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed privately only. API and module now use `STUB_MODE=false` with 45 Berkeley places (the 130-venue scraped catalog is committed but not yet published); voice remains a scripted `confirm` stub. Backend fixes are deployed without a data reset. Current URLs are in [HANDOFF.md](HANDOFF.md).
+**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed privately only. API and module now use `STUB_MODE=false` with 130 real catalog venues for the coordinator (the legacy solver retains the bundled 45); voice remains a scripted `confirm` stub. Backend fixes are deployed without a data reset. Current URLs are in [HANDOFF.md](HANDOFF.md).
 
 **Sleep/away times need re-checking against the 6 PM start.** If Eric Chen's away window is fixed in clock time (Sat 6 AM to noon), it is now H12 to H18, not H9 to H15.
 

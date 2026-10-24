@@ -1,13 +1,16 @@
 # Current task: accounts, preferences and coordinator polish (in progress)
 
-Updated October 24, 2026. The expanded account/preference work is implemented on
-the review branch, using isolated Maincloud `huddle-account-max-check` and local
-Vite on port 5174. Max now authorized sync, conflict resolution and a main push
-for both Erics to test. The merged review module has the 130-venue catalog;
-shared backend activation remains separate from Git/Vercel frontend deployment.
-Eric Wu's scraping/ingestion files remain unchanged by this integration.
+Updated October 24, 2026 after the authorized shared rollout. Accounts,
+invitations, private context, preference sliders and the 130-venue catalog are
+active on [Vercel](https://huddle-two-neon.vercel.app/login) with shared Maincloud
+`huddle-calhacks`, source `a029fb6`. The shared API remains on Max's Mac, port
+8000, through the existing public tunnel. Original rows and secret/settings
+were preserved; preview accounts were not migrated. Shared checks passed:
+41 connected flow, 14 OAuth wiring and 30 desktop/mobile browser assertions.
+The separate review database/ports remain available. Eric Wu's scraping/data and
+voice code is unchanged. Operations: [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md).
 
-## Implemented in the isolated preview
+## Implemented and released to the shared app
 
 - [x] Username/password registration and sign-in, eight-character minimum,
   show/hide password, logout, stable account ownership and saved memberships.
@@ -80,7 +83,7 @@ messages were created by the automated acceptance checks.
 | --- | --- | --- | --- |
 | Branch review and UI finish | Max + Eric Chen | Review the verified account, friend-picker, inbox, private-input, plan and mobile flow with Max; the map-fix browser rerun passed. Keep accessible controls and the illustrated theme from Design.md. | Max can complete the two-account flow without guidance; refresh/re-entry and maps work without console errors. |
 | Rich venue evidence | Max + Eric Wu | The basic catalog handoff is reviewed. Wire the separately collected menu items/prices, takeout, seating and attributed photos through a bounded contract; keep Eric's scraping pipeline separate. | Evidence distinguishes menu labels, inferred tags, estimates and unknowns; source URLs/fetch times survive the runtime path. |
-| Shared catalog release | Max + Eric Wu | Basic integration passes on the 130-venue preview. Coordinate matching shared module/API activation and catalog publish, then verify the released UI. | Newly scraped IDs work on the shared app with consistent hours/prices/categories and source dates; no data reset or secret exposure. |
+| Shared release rehearsal | Max + Eric Wu | Shared account/catalog activation is complete. Test real participants on phones and rehearse API/tunnel recovery while preserving shared settings. | Participants can re-enter their own shared accounts and recover cleanly after an operator restart. |
 | Claude proposes and revises (follow-up) | Max | Implement the reviewed propose → validate → revise design after the catalog contract is agreed. Claude constructs alternatives; Python validates facts and hard constraints rather than enumerating complete choices. | Bounded calls and structured repair feedback produce grounded current plans; errors/evidence gaps have useful next actions. |
 | Personalized meal costs (approved rule, follow-up implementation) | Max + Eric Chen | Review participant assignments and item-price shapes across API/module/UI. Each person pays for their own meal plus later stops, such as their dessert; they do not pay for somebody else's meal. Keep the existing shared-stop runtime unchanged until that contract is agreed. | Each person's full outing total is correct and fits their own cap. Missing/default prices never prove actual affordability, and caps cannot be pooled. |
 | Meal-quality and preference scenarios | Max + Eric Chen | Review vegan meal versus steak/fries, optional dessert, split takeout with evidenced seating, duration, categories and soft wishes. Distinguish input ambiguity from unavailable venue evidence. | Useful alternatives are independently supported; no fabricated vegan/allergen/menu facts or extra activity forced by a template. |
@@ -143,8 +146,8 @@ mobile emulation supplements, rather than replaces, a physical-phone check.
 - [x] Review the actual Bright Data catalog export and use its existing snapshot contract.
 - [ ] Implement the deferred Claude proposal/repair and personalized-cost work.
 - [x] Max authorized the Git release; main is synced and content conflicts resolved.
-- [ ] Coordinate matching shared module/API/catalog activation before claiming
-  the account frontend works on shared Vercel. Preserve secrets and existing data.
+- [x] Activate matching shared module/API/catalog and verify the actual Vercel
+  account flow. Original data and secrets/settings were preserved.
 
 General SMS/email/push providers, voice prompt input,
 inferred memory/actual-visit history, personal keys, vendor/MCP settings, real

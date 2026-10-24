@@ -1,17 +1,81 @@
-# Accounts, invitations, preferences and connectors: branch review
+# Accounts, invitations, preferences and connectors: operations
 
-October 24, 2026. Implemented on Max's local `codex/fastapi-contract-stubs`
-checkout after syncing main `156697c`. **Max authorized pushing the combined
-changes to main for teammate testing. Shared backend activation is separate.**
-Only isolated Maincloud `huddle-account-max-check` receives the additive backend;
-shared `huddle-calhacks` has not received this account/catalog release. A Vercel
-frontend build alone cannot update that backend. Eric Wu's data, scraping and
-ingestion files were not edited. Invitation-intent, calendar scheduling and
-connector additions are also published only to that isolated module. See
-[account contract](ACCOUNTS_CONTRACT.md) and
-[connector contract/setup](CONNECTORS_CONTRACT.md).
+## Shared Vercel release — October 24, 2026
 
-## Try the preview
+The tested account/catalog release `a029fb6` is active on shared Maincloud
+**`huddle-calhacks`**, with [Vercel login](https://huddle-two-neon.vercel.app/login).
+The public frontend was already deployed from that commit. The shared API was
+restarted from it on Max's Mac, port **8000**, behind the existing tunnel
+`https://roughly-metabolism-representing-harmony.trycloudflare.com`.
+
+The module was published with `--delete-data=never`, preserving the existing
+secret, voice settings and all unspecified environment settings. Before/after
+identifier checks retained every original **26 groups, 57 members and 17 plan
+runs**. No preview accounts, passwords, private context or Google credentials
+were copied into the shared database. Create a shared account on Vercel; preview
+accounts belong to a separate database.
+
+The exact committed snapshot `2026-10-24T20:17:52Z-a182c74b` is active: **130 real
+venues**, comprising 60 meals, 45 activities and 25 desserts. A protected atomic
+`POST /catalog` activated it; unauthorized requests returned 401. Module health's
+`catalog.venues` is the active count; `placesLoaded` still describes the legacy
+bundled list of 45. FastAPI receives the live snapshot per coordinator request.
+
+Verification on the shared deployment:
+
+- **41** account/friend/invitation/private-input/real-Claude/voting/simulated-booking checks passed.
+- **14** Google OAuth start, PKCE, denied callback, replay and disconnect checks passed.
+- **30** actual Vercel desktop/mobile browser assertions passed: 1280×900 and
+  390×844, no page/console errors, warnings or mobile overflow.
+- The browser's three plans included two new scraped IDs, Aangan Restaurant &
+  Bar and Jot Mahal Palace of Indian Cuisine, absent from the bundled 45 places.
+- Provider-write tests did not send messages, authorize Google or create events.
+  Booking remains explicitly simulated. Menus/photos/takeout/seating in the
+  separate `details.json` still await runtime integration.
+
+Google settings/encryption remain private in ignored `api/.env`. Max confirmed
+adding the shared callback below to the existing OAuth web client, retaining
+the preview callback. Each person must connect their own Google account; real
+shared availability/event creation remains a participant check. Mac texting and
+Mac Contacts lookup are disabled on the shared API while Mac message delivery
+is unresolved; in-app invitations work. The isolated preview remains available.
+
+Restart **only the shared API** from the repo root, preserving the current
+secret and stable connector encryption key in `api/.env`:
+
+```sh
+HUDDLE_FRONTEND_BASE_URL=https://huddle-two-neon.vercel.app \
+HUDDLE_MESSAGES_ENABLED=false \
+HUDDLE_MAC_CONTACTS_ENABLED=false \
+GOOGLE_REDIRECT_URI=https://roughly-metabolism-representing-harmony.trycloudflare.com/connectors/google/callback \
+SPACETIMEDB_URI=https://maincloud.spacetimedb.com \
+SPACETIMEDB_DB=huddle-calhacks \
+.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
+```
+
+Keep the existing API tunnel and Mac awake. Restarting the tunnel creates a new
+URL: update only shared `FASTAPI_BASE_URL`, the API's `GOOGLE_REDIRECT_URI` and
+the OAuth client's registered URI together. Keep invitation frontend origin
+`https://huddle-two-neon.vercel.app`. Never point this shared API at the preview
+database or copy preview credential/session state into production.
+
+Shared checks (synthetic accounts, no external writes):
+
+```sh
+.venv/bin/python api/eval/check_live.py --accounts-flow \
+  --server https://maincloud.spacetimedb.com --database huddle-calhacks
+SPACETIMEDB_URI=https://maincloud.spacetimedb.com \
+SPACETIMEDB_DB=huddle-calhacks \
+FASTAPI_BASE_URL=https://roughly-metabolism-representing-harmony.trycloudflare.com \
+PUBLIC_FRONTEND_BASE_URL=https://huddle-two-neon.vercel.app \
+node scripts/connectors-smoke.mjs
+```
+
+The sections below retain the independent preview setup and earlier verification
+history. Its API is port 8002 and its database is `huddle-account-max-check`.
+Eric Wu's data/scraping/ingestion and voice files were not edited during rollout.
+
+## Try the isolated preview
 
 - Public review frontend: [open Huddle](https://assessed-healthcare-equipment-sox.trycloudflare.com).
   This frontend connects to the isolated review module.
@@ -87,7 +151,7 @@ previously signed in only at localhost, sign in once on the public origin using
 the same Huddle account. Membership and private settings remain in the same
 isolated database; browser device sessions are specific to each origin.
 
-The API callback for this run is exactly:
+The isolated preview API callback is exactly:
 
 ```text
 https://eat-days-means-magnetic.trycloudflare.com/connectors/google/callback
@@ -337,11 +401,10 @@ npm run lint --prefix web
   --database huddle-account-max-check
 ```
 
-Git release is now authorized. Shared backend rollout remains separate: publish
-the coordinated module without resetting data, restart its API from the same
-commit, activate the catalog and verify the matching frontend. A Vercel build
-alone does not update Maincloud or the local API. Both Erics can use the public
-review frontend above now while that shared rollout is coordinated.
+The earlier shared-release gate is now satisfied by the activation recorded at
+the top of this runbook: matching module/API, no reset, catalog activation and
+actual Vercel verification. A Vercel build alone does not update Maincloud or the
+local API. Both the shared app and the independent review frontend are available.
 
 For catalog-only activation in an already updated review module, send the exact
 committed snapshot to its authenticated `POST /catalog`; the API needs no Bright

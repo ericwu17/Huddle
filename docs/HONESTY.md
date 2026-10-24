@@ -14,7 +14,7 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | Persistent hosted API replacing the laptop/tunnel | `render.yaml`, `docs/HOSTED_API.md` | deferred alternative; configuration and Linux dependency checks passed, but no Render service or Maincloud cutover occurred |
 | Earlier tunnel-free single-laptop design | `docs/SINGLE_LAPTOP_PLAN.md` | blocked as written: isolated SpacetimeDB 2.13.0 procedure-to-loopback HTTP test was rejected; not a working local full-stack demo |
 | Place dataset is a cached snapshot (45 Berkeley places from Google Places, pulled once) | `data/places.json` | in use on Maincloud with `STUB_MODE=false` until the live catalog is published |
-| Live catalog of 130 venues (the 45 plus 85 new) from a one-time Bright Data Google Maps scrape of 936 Berkeley places on 2026-10-24. Ratings carry source and fetch date; new restaurants' prices come from Google Places price levels mapped to estimates; aspects are defaults | `data/brightdata/catalog.json`, `docs/BRIGHTDATA.md` | activated in isolated Maincloud `huddle-account-max-check`; shared `huddle-calhacks` activation pending. A snapshot, not live availability |
+| Live catalog of 130 venues (the 45 plus 85 new) from a one-time Bright Data Google Maps scrape of 936 Berkeley places on 2026-10-24. Ratings carry source and fetch date; new restaurants' prices come from Google Places price levels mapped to estimates; aspects are defaults | `data/brightdata/catalog.json`, `docs/BRIGHTDATA.md` | activated in both shared `huddle-calhacks` and isolated `huddle-account-max-check`, verified through actual Vercel planning. A snapshot, not live availability |
 | Venue details: menus from venue websites read by Claude (each item verified verbatim against the page), takeout/seating/photos from Google Places, dietary tags marked `explicit_menu` or `inferred`; unknowns stay null | `data/brightdata/details.json` | collected for 130 venues; not yet read by the module, API or UI. No tag establishes allergen or cross-contact safety |
 | Nine fictional venues for the module's fakes; the API refuses them. Legacy and real catalogs remain lookup-compatible | `api/fixtures/places.fake.json` | in use by the module with its `STUB_MODE=true` (default) or in demo mode |
 | Integration checks use real module procedures and the native in-memory test datastore calling a localhost FastAPI without a Claude key (keyword parsing, Safe-fallback council), not a deployed database or browser subscriptions | `api/eval/check_integration.py`, `server/test/` | verified locally |
@@ -94,3 +94,13 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
   after resolving a rating/count/source-date mismatch. No page/console errors,
   console warnings or mobile overflow. Synthetic users completed invitations,
   source-dated cards, voting, simulated booking and refresh; no provider writes.
+
+- Authorized shared activation on October 24: `a029fb6` module/API plus the exact
+  130-venue catalog are live for Vercel. Original 26 groups, 57 members and 17
+  plan identifiers survived. Shared checks passed 41 account-flow checks, 14
+  OAuth wiring checks and 30 actual Vercel desktop/mobile assertions, without
+  browser errors/warnings/overflow. Two of the three browser-plan stops used
+  newly scraped IDs absent from the old catalog. Texting/native Contacts are
+  disabled on shared; real Google grants/availability/event writes remain
+  participant checks. No restaurant calls, external messages or calendar events
+  were created by the automated rollout tests.

@@ -14,7 +14,7 @@ One designated operator owns the shared API/tunnel URL. Hosted API migration is
 deferred; the earlier Render configuration has not been deployed. Local
 development keeps Vite and FastAPI separate. The previous all-local database
 proposal is blocked as written on 2.13.0. The Bright Data scraper and a 130-venue
-live catalog are built but not yet published ([go live](BRIGHTDATA.md#go-live));
+live catalog are active on shared Maincloud/Vercel ([operations](ACCOUNTS_RUNBOOK.md));
 real calls remain deferred. [NEXT_TASKS.md](NEXT_TASKS.md) records the open task
 breakdown, suggested owners and solo-test commands.
 
@@ -22,9 +22,13 @@ breakdown, suggested owners and solo-test commands.
 its current public URL is `https://roughly-metabolism-representing-harmony.trycloudflare.com`.
 The additive module is published to `huddle-calhacks` with `STUB_MODE=false`, no
 data reset, and existing shared secret/unrelated settings preserved. The updated
-Vite UI at `http://10.0.20.127:5173/start` connects to that shared module. Keep the
-API, tunnel and Vite processes running and the laptop awake for this LAN test.
-Vercel still needs the frontend release; old clients create legacy groups.
+Vercel UI is `https://huddle-two-neon.vercel.app/login`; account/catalog source
+`a029fb6` is activated. Keep the shared API, tunnel and Mac awake; Vite is not
+required for Vercel. The 130-venue rollout preserved 26 existing groups, 57
+members and 17 plan runs. Shared verification passed 41 connected, 14 OAuth and
+30 desktop/mobile browser checks. New users create shared accounts; preview
+accounts are separate. Mac texting is disabled; booking remains simulated.
+See [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md) for exact restart commands.
 
 The sections below are historical legacy operating notes. In particular, the
 Windows-host ownership and past tunnel URLs below no longer describe the current
@@ -47,7 +51,7 @@ operator. Do not run another helper that replaces Max's shared API URL.
 
 | Piece | Real or fake right now |
 | --- | --- |
-| Places | Real 45 Berkeley places; review aspects remain placeholder scores. A 130-venue scraped catalog is committed, not yet published |
+| Places | 130 real venues active in the coordinator catalog; legacy solver retains the bundled 45. Review aspects remain placeholders |
 | Parse, swipes, plans, council | Real implementation on Maincloud, `STUB_MODE=false`; keyword/Safe fallbacks remain available |
 | Offers | Real private offers; the connected test delivered one only to its recipient |
 | Scout badge | cached file, labeled "Checked earlier" |

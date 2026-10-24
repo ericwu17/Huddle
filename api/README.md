@@ -6,7 +6,7 @@ to Maincloud, with one public state-validated Google OAuth callback. The tested 
 
 ## Coordinator flow
 
-The branch-only account foundation also adds service-protected
+The shared account foundation also adds service-protected
 `POST /accounts/credentials`, using FastAPI Users on request-local credential
 snapshots. Maincloud owns accounts, revocable sessions, memberships, friends, invitations
 and private saved defaults; the API

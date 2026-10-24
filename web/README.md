@@ -4,6 +4,14 @@ React 19 + React Router v7 (data mode, `createBrowserRouter`) + Vite + Tailwind.
 
 ## Current direction October 24
 
+**Shared activation complete:** `https://huddle-two-neon.vercel.app/login` now
+uses the updated `huddle-calhacks` module and 130 real venues, with shared API
+source `a029fb6`. The actual desktop/mobile Vercel account flow passed 30 checks.
+Create shared accounts there; isolated-preview accounts are separate. Texting
+is disabled while Mac delivery is unresolved; in-app invitations work. The
+review setup below remains an independent environment. See
+[operations](../docs/ACCOUNTS_RUNBOOK.md) for current targets/restart commands.
+
 Branch-only account review: [ACCOUNTS_RUNBOOK.md](../docs/ACCOUNTS_RUNBOOK.md)
 uses isolated Maincloud `huddle-account-max-check` and local port 5174. `/login`
 supports registration/sign-in; `/start` lists only the signed-in account's saved
