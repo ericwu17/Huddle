@@ -1,6 +1,6 @@
 # Hand-off (Eric Chen to Max; Haydn retains Part A)
 
-> Updated after live voice checks and corrected experiment baselines; latest main pulled: `059292a` (Eric Chen's demo-mode safety net, not published by Max). H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md) and [CONTRACT.md](CONTRACT.md). Eric Chen is leaving and has exhausted his Claude session usage; Max is covering backend coding and integration in Codex.
+> Updated through live voice checks, corrected experiments, and backend privacy/stale-choice guards. The latest module changes still need a coordinated publish. H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md) and [CONTRACT.md](CONTRACT.md). Current split: Eric Chen works on UI, Eric Wu works in `api/`, and Max covers backend/evaluation in Codex.
 
 ## Where things stand
 
@@ -82,6 +82,14 @@
 - Experiment follow-up: 22 regression checks passed; corrected baselines cover 1,000 feasible groups with zero selected-plan budget violations. An independent Decimal audit checked all 5,000 selected outing totals/caps, and a separate rerun produced byte-identical CSVs/chart. No live API was called or API file changed. Old experimental numbers are withdrawn; the real solver comparison remains pending.
 - After merging `059292a`: server typecheck passed; `npm test --prefix server` passed 11 tests with the opt-in HTTP test skipped. No API server was started for that check. The new demo-mode module was not published by Max.
 - Backend privacy follow-up: a failing regression reproduced raw service error details leaking into group-visible fallback warnings. Those warnings now contain only endpoint/status or generic unavailability. Server typecheck and 14 native integration tests pass (one opt-in API HTTP test skipped), including tight cumulative caps, a cap lowered during a failed request, and no repeated outbound requests once fallback mode is active. `api/` was untouched; the module update still needs a coordinated publish.
+- Stale-choice follow-up: votes, roulette and booking requests now require the latest completed run and current cumulative budgets. Roulette rechecks after HTTP before returning/storing a choice. Public views hide stale/unaffordable votes and roulette choices while retaining stored history. Queued bookings recheck before dispatch; invalid ones fail with a generic error and never call voice or another place. Dispatch is claimed once per booking; late callbacks cannot revive failed bookings or advance/re-plan a newer run. `npm test --prefix server`: 28 passed, one opt-in HTTP test skipped; typecheck passed. Native tests cover normal synthetic confirm/full flows too. No API files, process, schema or shared JSON shapes changed; module publish remains pending.
+
+Budget changes cannot undo an already-dispatched external call or reservation.
+Its confirmation stays in booking/event history, but it does not advance an
+unaffordable or superseded group plan to booked. An interrupted worker after
+claiming dispatch does not automatically redial; any retry requires an explicit
+new booking action. UI labels after budget/run changes still need a browser check
+with Eric Chen; these checks exercise module actions and view outputs locally.
 
 ## Operating
 

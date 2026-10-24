@@ -7,10 +7,9 @@ import { replan } from "./replan";
 import { voiceFor } from "./lib/demo";
 import { fakeCallEvents } from "./lib/fakes";
 import { placeById } from "./lib/places";
-import { planFitsBudgets } from "./lib/budgets";
-import { planMembers } from "./plans";
+import { availablePlans } from "./lib/availability";
 import type { Tx } from "./lib/types";
-import { at, membersOf, newId, nowMs, parse } from "./lib/util";
+import { at, membersOf, newId, nowMs } from "./lib/util";
 
 const FAKE_CALL_STEP_MS = 1200;
 const REPLAN_REASONS = new Set(["full", "closed"]);
@@ -25,15 +24,21 @@ export function recordCallEvent(tx: Tx, e: any) {
     textEn: e.textEn ?? undefined, lang: e.lang ?? undefined, slot: e.slot ?? undefined,
     reason: e.reason ?? undefined, ts: e.ts ?? nowMs(tx),
   });
+  // Keep late/replayed event history, but never revive a terminal booking.
+  if (b.status === "failed" || b.status === "confirmed") return;
   if (e.type === "dialing" || e.type === "connected") tx.db.booking.id.update({ ...b, status: "calling" });
   if (e.type === "confirmed") {
     tx.db.booking.id.update({ ...b, status: "confirmed", slot: e.slot ?? b.slot });
     const g = tx.db.group.id.find(b.groupId);
-    if (g) tx.db.group.id.update({ ...g, status: "booked" });
+    // A confirmation is still an external fact for this booking. It must not
+    // commit a newer group run or an outing that no longer fits current caps.
+    if (g && availablePlans(tx.db, b.groupId, b.runId).some((p) => p.id === b.planId))
+      tx.db.group.id.update({ ...g, status: "booked" });
   }
   if (e.type === "failed") {
     tx.db.booking.id.update({ ...b, status: "failed", failReason: e.reason });
-    if (REPLAN_REASONS.has(e.reason)) replan(tx, b.groupId, b.id);
+    if (REPLAN_REASONS.has(e.reason) && tx.db.group.id.find(b.groupId)?.latestRunId === b.runId)
+      replan(tx, b.groupId, b.id);
   }
 }
 
@@ -43,11 +48,10 @@ export const startBooking = spacetimedb.reducer(
     const me = requireMember(tx);
     const run = tx.db.plan_run.runId.find(runId);
     if (!run || run.groupId !== me.groupId) throw new SenderError("no such run");
-    const plan = (parse(run.resultJson)?.plans ?? []).find((p: any) => p.id === planId);
+    const plan = availablePlans(tx.db, me.groupId, runId).find((p) => p.id === planId);
+    if (!plan) throw new SenderError("plan is no longer available; choose a current plan");
     const stop = plan?.stops?.[stopIndex];
     if (!stop) throw new SenderError("no such stop");
-    if (!planFitsBudgets(plan, planMembers(tx, me.groupId)))
-      throw new SenderError("plan is unavailable under current budgets");
     const g = tx.db.group.id.find(me.groupId)!;
     const bookingId = newId(tx, "b", (id) => !!tx.db.booking.id.find(id));
     tx.db.booking.insert({
@@ -65,7 +69,16 @@ export const runCallJob = spacetimedb.procedure(
   (ctx, { job }) => {
     const body = ctx.withTx((tx) => {
       const b = tx.db.booking.id.find(job.bookingId);
-      if (!b) return null;
+      if (!b || b.status !== "pending") return null;
+      const plan = availablePlans(tx.db, b.groupId, b.runId).find((p) => p.id === b.planId);
+      if (!plan || plan.stops?.[b.stopIndex]?.placeId !== b.placeId) {
+        recordCallEvent(tx, { bookingId: b.id, type: "failed", reason: "error",
+          text: "This booking is no longer available. Choose a current plan and book again." });
+        return null;
+      }
+      // Claim dispatch before leaving the transaction. A repeated scheduled
+      // job must not start a second call while voice is still responding.
+      tx.db.booking.id.update({ ...b, status: "calling" });
       const members = membersOf(tx.db, b.groupId).sort((x, y) => x.joinedAt - y.joinedAt);
       const [, hh, mm] = b.time.match(/T(\d\d):(\d\d)/) ?? [];
       const mins = Number(hh) * 60 + Number(mm);

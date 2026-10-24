@@ -1,6 +1,6 @@
 # Huddle roadmap
 
-> Primary owner: Eric Chen; Max is updating this hand-off and covering backend work while Eric is away. Updated after live voice confirm/full checks (latest main pulled: `881aa82`). Current operating state: [HANDOFF.md](HANDOFF.md). Check things off only when the stated check has passed.
+> Primary owner: Eric Chen; Max covers backend/evaluation while Eric Chen works on UI and Eric Wu works in `api/`. Updated through live voice checks, corrected experiments and backend stale-choice guards. Current operating state: [HANDOFF.md](HANDOFF.md). Check things off only when the stated check has passed.
 >
 > **H0 = Fri 6:00 PM** (the brief assumed 9 PM, so every gate is 3 hours earlier than `huddle.md` says).
 > Legend: `[x]` done and in the repo · `[~]` in progress or rough draft · `[ ]` not started · `?` unknown (owner: please update)
@@ -22,7 +22,7 @@
 
 ## Current coverage and access
 
-- Eric Chen has exhausted his Claude session usage and is leaving soon. Max can cover backend code and integration in this Codex session; primary ownership and shared contracts remain unchanged.
+- Eric Chen is working on UI; Max covers backend code and integration in this Codex session. Eric Wu is working in `api/`; coordinate before touching that folder. Primary ownership and shared contracts remain unchanged.
 - Max Li and Eric Wu are confirmed Admin collaborators on `huddle-calhacks`. Max's CLI 2.13.0 is logged into his own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified API URL/stub mode stayed unchanged. No module/schema was deployed; Eric Wu's CLI setup has not been checked here.
 - Eric Wu's voice stub is connected. Six unit tests passed locally; live confirm and voice-originated full-to-re-plan checks passed, with no duplicate replay or automatic replacement call. Service restored to confirm; no real phone calls.
 - No Bright Data account/key is available. Haydn owns the account/review pipeline and Mapbox token/routing. Eric Chen's booth visit/key acquisition was temporary coverage; confirm a human owner for the booth task before he leaves. Max's private root `.env` has a blank `BRIGHTDATA_API_KEY` entry only.
@@ -71,6 +71,7 @@
 - [x] Council panel `web/src/components/council/` (functional pass; replays synthetic messages, not a live LLM council; restyle at H19)
 - [x] Privacy fix: names hidden in plan text and offers unless showWhoCompromised
 - [x] Raw HTTP error bodies/exception details removed from public fallback warnings; tested alongside cumulative budgets during service failures. Module publish still pending.
+- [x] Stale votes/roulette/bookings blocked after budget or run changes; queued-call and late-callback checks added, historical rows retained. 28 native tests pass; live deployment and UI verification still pending. `api/` untouched.
 - [~] Experiment harness `docs/experiments/`: cumulative budgets and returned-plan validation fixed; corrected five-baseline run/chart regenerated with zero selected-plan budget violations. Earlier numbers withdrawn. "Ours" and swipe learning wait for Eric Wu's real API; placeholder features still limit pitch claims.
 - [x] Draft demo script and submission checklist in `docs/DEMO_CHECKLIST.md`; final rehearsal/submission still pending
 - [ ] README, Devpost writeup, secret scan, submission checklist
