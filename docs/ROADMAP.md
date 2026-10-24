@@ -101,7 +101,7 @@
 - ? Twilio upgraded + number, Cartesia account, tunnel tool, demo phone verified
 - [x] `POST /book` stub in `voice/`, confirm + full scenarios, six local unit tests pass; no real calls
 - [x] Voice tunnel URL supplied/configured; live confirm and service-backed "full" re-plan passed with Max, then restored confirm
-- [ ] Bug: app jumps to Vote ~400 ms after the council finishes and Plans bounces back to Vote, so the debate is never seen
+- [~] Bug: app jumped to Vote ~400 ms after the council finished and Plans bounced back to Vote. Fixed in code (`0d224a5`); browser check pending
 - [ ] `web/.env.local` pointing at Maincloud (see HANDOFF.md)
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO
 - [ ] State machine, tools, event posting; scenarios S1, S2

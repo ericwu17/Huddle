@@ -41,9 +41,11 @@ Don't edit `src/module_bindings/` by hand.
 
 Haydn owns core frontend/routing; Eric Wu wrote the initial app and owns the call
 screen, and Eric Chen owns the council panel. Max is covering backend/council
-integration while Eric Chen is away. The reported rapid redirect after council
-and bounce when reopening Plans still need verification and an owner-confirmed
-fix. The voice stub landing does not establish that this browser bug is fixed.
+integration while Eric Chen is away. The rapid redirect to Vote after council
+and the bounce when reopening Plans are fixed in `0d224a5` (`GroupLayout.tsx`
+follows each run's status once and leaves phones on Plans). It still needs a
+browser check. The static landing page lives in `public/landing/` and is served
+at `/landing`.
 
 ## Layout
 

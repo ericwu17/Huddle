@@ -55,9 +55,10 @@ rerun the confirm smoke check.
 
 ```sh
 voice/.venv/bin/python -m unittest discover -s voice/eval -v
+# VOICE_URL: the voice tunnel URL that scripts/tunnels.sh prints
 api/.venv/bin/python api/eval/check_live.py \
   --server https://maincloud.spacetimedb.com --database huddle-calhacks \
-  --voice-base-url https://restaurants-availability-barbie-lil.trycloudflare.com \
+  --voice-base-url "$VOICE_URL" \
   --voice-scenario confirm
 ```
 
@@ -74,9 +75,9 @@ hand-made curl). That call stops; this is expected.
 
 ## Current status
 
-The stub is connected at
-`https://restaurants-availability-barbie-lil.trycloudflare.com`. All six unit
-tests passed in Max's Python environment. Live Maincloud checks passed both
+The stub has no fixed address: `scripts/tunnels.sh` gives it a new quick-tunnel
+URL and publishes it as `VOICE_BASE_URL` (see [docs/HANDOFF.md](../docs/HANDOFF.md)
+for whether it's up). All six unit tests passed in Max's Python environment. Live Maincloud checks passed both
 confirm and voice-originated full-to-re-plan, each with exactly one event
 sequence. The full case excluded the restaurant, reopened voting and did not
 start another booking automatically. The final check verified the service was

@@ -20,6 +20,9 @@ values, including `HUDDLE_SHARED_SECRET`, were preserved.
 | `VOICE_BASE_URL` | `https://albert-petition-spouse-itself.trycloudflare.com` |
 | `STUB_MODE` | `false` |
 
+These URLs are a record of this run. Both tunnels stopped at 11:56 PM Oct 23
+(Pacific); see [HANDOFF.md](HANDOFF.md) for the current state.
+
 Eric Wu supplied the new public URLs; the previously configured tunnels failed
 DNS resolution. Management reads confirmed all three settings after publishing.
 Authenticated API and module health both report `ok=true`, `stub=false`,
@@ -69,12 +72,13 @@ From the repository root, with the matching shared secret already saved privatel
 in ignored `api/.env`:
 
 ```sh
+# API_URL / VOICE_URL: the tunnel URLs that scripts/tunnels.sh prints
 npm run typecheck --prefix server
 npm test --prefix server
 node --check scripts/smoke.mjs
 api/.venv/bin/python api/eval/check_live.py \
   --server https://maincloud.spacetimedb.com --database huddle-calhacks \
-  --voice-base-url https://albert-petition-spouse-itself.trycloudflare.com \
+  --voice-base-url "$VOICE_URL" \
   --voice-scenario confirm
 ```
 
@@ -90,7 +94,7 @@ api/.venv/bin/python - <<'PY'
 import os, runpy
 from dotenv import dotenv_values
 os.environ['HUDDLE_SHARED_SECRET'] = dotenv_values('api/.env')['HUDDLE_SHARED_SECRET']
-os.environ['FASTAPI_BASE_URL'] = 'https://thru-test-meets-radios.trycloudflare.com'
+os.environ['FASTAPI_BASE_URL'] = os.environ['API_URL']
 runpy.run_path('api/eval/smoke_http.py', run_name='__main__')
 PY
 ```

@@ -5,10 +5,10 @@
 ## Where things stand
 
 - **Backend is live:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks` (dashboard: https://spacetimedb.com/@kwunnchen/huddle-calhacks). Eric Chen is owner; Max Li and Eric Wu are confirmed Admin collaborators.
-- **Real API connected:** `FASTAPI_BASE_URL=https://thru-test-meets-radios.trycloudflare.com`, with API and module both `STUB_MODE=false`. Authenticated health reports 45 places. Eric Wu supplied this replacement tunnel; the previous configured URLs had stopped resolving.
-- **Voice stub connected:** `VOICE_BASE_URL=https://albert-petition-spouse-itself.trycloudflare.com`, authenticated `stub=true`, `scenario=confirm`. It posts scripted callbacks; it does not place phone calls.
+- **Real API switched on, services currently down:** the module runs with `STUB_MODE=false` and 45 places. The API and voice tunnels used for the [verification](MAINCLOUD_VERIFICATION.md) stopped at 11:56 PM Oct 23 (Pacific), but the module still points at them, so new groups drop into labeled demo mode. To bring them back, run `scripts/tunnels.sh` on the laptop that hosts them. It publishes the new `FASTAPI_BASE_URL` and `VOICE_BASE_URL` ([LOCAL_TUNNELS.md](LOCAL_TUNNELS.md)). Quick-tunnel URLs change on every restart, so they aren't recorded here.
+- **Voice stub:** scripted `confirm`/`full` callbacks only; it does not place phone calls.
 - **Smoke test:** real parsing, swipe updates, plans, council (without chair fallback), a private offer, votes and roulette pass through Maincloud. Plans' cumulative costs fit every private cap. Synthetic confirmation and injected full-to-re-plan pass, including stale-choice rejection. The voice-originated full scenario passed earlier with the old API stubs; it has not been rerun against this new deployment. See [current verification](MAINCLOUD_VERIFICATION.md).
-- **Frontend:** Eric Chen reported the Maincloud flow passes. The rapid Plans-to-Vote transition and reopening Plans still need a browser regression check; do not infer those are fixed from the voice stub landing.
+- **Frontend:** Eric Chen reported the Maincloud flow passes. The Plans-to-Vote jump is fixed in `0d224a5`: phones on Plans stay there when voting opens, and Vote links back to the debate. It still needs a browser check ([DEMO_CHECKLIST.md](DEMO_CHECKLIST.md)). The landing page is served at `/landing` (`web/public/landing/`).
 - **Backend fixes deployed:** source `7612d0b` was published with CLI 2.13.0, `--delete-data=never`, and the new public service URLs. Existing shared secret and unspecified environment values were preserved; no data reset. Privacy, stale choices/current budgets, queued booking/late callback guards and host-only settings are live.
 - **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
 - **Real API implemented and switched on:** [api/README.md](../api/README.md) describes the implementation and limitations. Real-mode HTTP smoke passed through Eric Wu's tunnel. The API's stub mode has since been removed: `api/` always serves the real service, and the module integration check runs against it. Review aspects are still placeholders and travel times are estimates; scout and phone calls remain cached/scripted.
@@ -52,7 +52,7 @@
 
 - [x] **`/book` voice stub** merged: confirm/full scenarios and six passing local unit tests. No phone call is placed.
 - [x] Tunnel URL configured and authenticated callbacks to `https://maincloud.spacetimedb.com/v1/database/huddle-calhacks/route/call-event` tested with Max for confirm and full; restored confirm.
-- [ ] **Bug:** the app jumps to Vote ~400 ms after the council finishes, and Plans cannot be reopened (bounces to Vote), so nobody sees the debate. Show the council panel on Vote, or delay the jump and allow going back.
+- [x] **Bug fixed in `0d224a5`:** the app no longer jumps to Vote when the council finishes, and Plans can be reopened. Browser check still pending.
 - [ ] Add `web/.env.local`: `NEXT_PUBLIC_SPACETIMEDB_URI=https://maincloud.spacetimedb.com`, `NEXT_PUBLIC_SPACETIMEDB_DB=huddle-calhacks`.
 - [x] Claude API key shared privately with Max; current stubs do not use it.
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO.
@@ -123,9 +123,10 @@ spacetime publish huddle-calhacks -p server -s https://maincloud.spacetimedb.com
 FASTAPI_BASE_URL=https://NEW-URL.trycloudflare.com spacetime publish huddle-calhacks -s https://maincloud.spacetimedb.com --env-only --no-config
 
 # Smoke test against Maincloud (loads api/.env; creates a throwaway group)
+# $VOICE_URL is the voice tunnel URL that scripts/tunnels.sh prints
 api/.venv/bin/python api/eval/check_live.py \
   --server https://maincloud.spacetimedb.com --database huddle-calhacks \
-  --voice-base-url https://albert-petition-spouse-itself.trycloudflare.com \
+  --voice-base-url "$VOICE_URL" \
   --voice-scenario confirm
 
 # Frontend against Maincloud (PowerShell, from web/)
