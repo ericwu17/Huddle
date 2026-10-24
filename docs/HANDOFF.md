@@ -6,10 +6,10 @@
 
 - **Backend is live:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks` (dashboard: https://spacetimedb.com/@kwunnchen/huddle-calhacks). Eric Chen is owner; Max Li and Eric Wu are confirmed Admin collaborators.
 - **Connected to Max's FastAPI stubs** via `FASTAPI_BASE_URL=https://conferencing-navigate-deleted-feedback.trycloudflare.com`, `STUB_MODE=true`. Every plan, parse and council message comes from his service and is labeled SYNTHETIC STUB.
-- **Voice stub is merged** (`voice/`, see its README). Six unit tests passed again in Max's checkout. The last deployment report has `VOICE_BASE_URL` unset; confirm the current URL and verify live callbacks before claiming the voice service is connected.
+- **Voice stub is merged** (`voice/`, see its README). Six unit tests passed again in Max's checkout. Max's authenticated CLI check confirms `VOICE_BASE_URL` is unset; obtain its tunnel URL, configure it and verify live callbacks before claiming the voice service is connected.
 - **Smoke test:** Eric Chen reported 27 passing Maincloud checks; offers skip because the stubs return none on purpose. This was not rerun against Maincloud during this documentation update.
 - **Frontend:** Eric Chen reported the Maincloud flow passes. The rapid Plans-to-Vote transition and reopening Plans still need a browser regression check; do not infer those are fixed from the voice stub landing.
-- **Max's CLI:** launcher installed at `/Users/maxli/.local/bin/spacetime`; runtime download stalled and was stopped. Finish installing/selecting 2.13.0, log in with Max's own account, then verify management access. No publish has been attempted from Max's CLI.
+- **Max's CLI is ready:** version 2.13.0 installed at `/Users/maxli/.local/bin/spacetime` and logged in with Max's own account. Authenticated management reads returned the correct `FASTAPI_BASE_URL`, `STUB_MODE=true`, and absent `VOICE_BASE_URL`. No live settings were changed and no publish was attempted.
 - **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
 
 | Piece | Real or fake right now |
@@ -37,7 +37,7 @@
 
 ### Max (solver owner; temporary backend coverage)
 
-- [ ] Finish CLI 2.13.0 runtime installation and login; verify management access without changing live data. Browser Admin role alone is not a completed CLI setup.
+- [x] CLI 2.13.0 runtime installed and selected; login and authenticated management reads verified using Max's account, without changing live data.
 - [ ] Cover backend integration while Eric is away: wire/verify the voice URL with Eric Wu, then confirm successful booking and full-to-re-plan through Maincloud.
 - [ ] Keep the FastAPI server + Cloudflare tunnel running. If the URL changes, send the new one (see "Operating" below).
 - [x] First-phase API stubs, auth, deterministic fixtures, budget/dietary fixes, automatic private env loading, shared-secret verification and tunnel smoke checks.
@@ -77,6 +77,7 @@
 - `api/.venv/bin/python api/eval/check_integration.py`: all 12 API/module tests passed, including real HTTP to a temporary local API and an in-memory SpacetimeDB datastore.
 - `node --check scripts/smoke.mjs`: syntax passed; the live smoke test was not rerun in this update.
 - Earlier tunnel checks passed all eight API routes; both API tunnel health and Maincloud health returned 200 with nine synthetic places. These do not prove the voice service is wired.
+- CLI archive matched the official 2.13.0 SHA-256; `spacetime --version`, `spacetime login show`, and management reads of the API URL/stub mode passed. The CLI read of `VOICE_BASE_URL` reported the key is absent. Secret values were not read or printed by these checks.
 
 ## Operating
 
@@ -108,10 +109,12 @@ $env:NEXT_PUBLIC_SPACETIMEDB_URI='https://maincloud.spacetimedb.com'; $env:NEXT_
 ```
 
 `spacetime` is at `%LOCALAPPDATA%\SpacetimeDB\spacetime.exe` on Eric Chen's
-laptop. Max's launcher is `/Users/maxli/.local/bin/spacetime`; use the full path
-until the CLI is ready and that directory is on PATH. Max and Eric Wu have Admin
-roles and should use their own logins; their CLI management access still needs
-verification. Do not share Eric Chen's login/token.
+laptop. Max's ready CLI is `/Users/maxli/.local/bin/spacetime` (2.13.0); his
+existing interactive zsh setup adds `~/.local/bin` to PATH, so open a fresh
+terminal or use the full path. Max's own-account CLI management reads are
+verified; no publish was performed. Max and Eric Wu have Admin roles and should
+use their own logins. Eric Wu's CLI setup has not been checked here. Do not share
+Eric Chen's login/token.
 
 ## Gotchas (each cost a failed publish or a production-only bug)
 

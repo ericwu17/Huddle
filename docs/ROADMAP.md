@@ -23,8 +23,8 @@
 ## Current coverage and access
 
 - Eric Chen has exhausted his Claude session usage and is leaving soon. Max can cover backend code and integration in this Codex session; primary ownership and shared contracts remain unchanged.
-- Max Li and Eric Wu are confirmed Admin collaborators on `huddle-calhacks`. Each uses their own account. Max's browser access is verified; his Mac's CLI launcher is installed, but the runtime download and CLI login are still pending. No publish from Max's CLI has been verified.
-- Eric Wu's voice stub has landed. Six voice unit tests pass locally; setting `VOICE_BASE_URL` and verifying confirm/full callbacks against Maincloud remain separate steps.
+- Max Li and Eric Wu are confirmed Admin collaborators on `huddle-calhacks`. Max's CLI 2.13.0 is installed and logged into his own account, with authenticated management reads verified. No publish from Max's CLI was performed; Eric Wu's CLI setup has not been checked here.
+- Eric Wu's voice stub has landed. Six voice unit tests pass locally; Max's CLI confirms `VOICE_BASE_URL` is absent. Setting it and verifying confirm/full callbacks against Maincloud remain separate steps.
 - No Bright Data account/key is available. Haydn owns the account/review pipeline and Mapbox token/routing. Eric Chen's booth visit/key acquisition was temporary coverage; confirm a human owner for the booth task before he leaves. Max's private root `.env` has a blank `BRIGHTDATA_API_KEY` entry only.
 - Max's first phase is complete: eight authenticated API routes, deterministic disclosed fixtures, cumulative budget guards, a live tunnel, and local integration checks. The real solver/learning/LLM/council phases have not started here.
 
@@ -64,7 +64,7 @@
 - [x] `docs/HONESTY.md`, `docs/DISCLOSURE.md` (seeded; keep updating)
 - [~] Hand-off note `docs/HANDOFF.md` (drafted; final update before sleep, due Sat 2 AM)
 - [x] Wired Max's api stubs on Maincloud (`FASTAPI_BASE_URL`, `STUB_MODE=true`); smoke test + frontend flow pass through it
-- [ ] Max covering integration: verify/set Eric Wu's `VOICE_BASE_URL`, then test confirm and "full" re-plan with him after CLI login is ready
+- [ ] Max covering integration: obtain/set Eric Wu's `VOICE_BASE_URL` (confirmed absent), then test confirm and "full" re-plan with him
 - [ ] Demo-mode fallbacks: `data/cached_run.json` from a real run; auto demo mode when /health fails
 - [ ] Live scout via Bright Data (needs `docs/BRIGHTDATA.md`)
 - [x] Council panel `web/src/components/council/` (functional pass; replays synthetic messages, not a live LLM council; restyle at H19)
@@ -79,7 +79,8 @@
 - [x] Budget guards in the module (`server/src/lib/budgets.ts`)
 - [x] Ignored `api/.env` loading and safe live shared-secret check; the saved secret matches Maincloud
 - [x] All eight API routes passed HTTP checks through the development tunnel, including auth, deterministic responses and cumulative budgets
-- [~] Cover Eric Chen's backend work; complete CLI 2.13.0 installation/login and verify management access using Max's account
+- [x] CLI 2.13.0 installed and logged in; own-account management reads verified (no publish or live settings changes)
+- [~] Cover Eric Chen's backend work and remaining service integration
 - [ ] /parse-prefs with keyword fallback
 - [ ] L1 solver: filter, normalization, enumeration, maximin + Nash tie-break, three plans (note: only ~7 activities are open after 7:30 PM Sat; `places.json` has an extra `googlePlaceId` field)
 - [ ] Posterior update, active selection, Monte Carlo robustness, Pareto, posteriorSummary

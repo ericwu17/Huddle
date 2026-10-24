@@ -23,8 +23,8 @@ The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
 ## Status
 
 - **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Connected to Max's separate FastAPI service with `STUB_MODE=true`; parse, learning, plans, scores and council remain synthetic.
-- **Voice:** Eric Wu's `/book` stub is merged, with confirm/full event sequences and six passing local tests. Live `VOICE_BASE_URL` wiring and the service-backed booking/re-plan checks still need verification; no real phone call is implemented.
-- **Access and coverage:** Max Li and Eric Wu are confirmed database Admins. Eric Chen is leaving and has exhausted his Claude session usage; Max can cover backend coding here. Max's Mac has the CLI launcher installed, but runtime installation and CLI login are not yet complete. Browser Admin access has been verified; CLI publishing has not.
+- **Voice:** Eric Wu's `/book` stub is merged, with confirm/full event sequences and six passing local tests. Max's authenticated CLI check confirms `VOICE_BASE_URL` is unset; wiring and service-backed booking/re-plan checks remain pending. No real phone call is implemented.
+- **Access and coverage:** Max Li and Eric Wu are confirmed database Admins. Eric Chen is leaving and has exhausted his Claude session usage; Max can cover backend coding here. Max's Mac has CLI 2.13.0 installed and logged into his own account. Management reads verified the API tunnel URL and `STUB_MODE=true`; no CLI publish has been performed.
 - **Data:** no Bright Data account/key is available yet. Haydn owns the account, reviews and Mapbox routing; Eric Chen's booth/key task was temporary coverage. Review scores and live scout work remain blocked on that hand-off, not the stub demo.
 - **What's done and what's next:** [docs/ROADMAP.md](docs/ROADMAP.md). **Current state, async tasks, operating commands:** [docs/HANDOFF.md](docs/HANDOFF.md).
 - **Smoke test:** `node scripts/smoke.mjs` (set `SPACETIMEDB_URI`, `SPACETIMEDB_DB`; secret from `.env`).

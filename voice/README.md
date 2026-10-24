@@ -36,9 +36,9 @@ sequence is used only when `VOICE_BASE_URL` is unset.
 
 Send the tunnel URL to Max (covering backend integration while Eric Chen is
 away), or Eric Chen. Max and Eric Wu are now Admin collaborators on
-`huddle-calhacks`; use your own CLI login. Max's CLI installation/login is still
-pending, so Admin access in the browser is not yet a verified CLI publish.
-An administrator with a ready CLI runs:
+`huddle-calhacks`; use your own CLI login. Max's CLI 2.13.0 and login are ready,
+and management reads are verified. `VOICE_BASE_URL` is confirmed absent; no
+publish has been performed from Max's CLI. An administrator with a ready CLI runs:
 
 ```sh
 VOICE_BASE_URL=https://<random>.trycloudflare.com spacetime publish huddle-calhacks -s maincloud --env-only

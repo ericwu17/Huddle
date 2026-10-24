@@ -19,8 +19,8 @@ Eric Wu's voice stub has landed separately in `voice/`; its live connection is
 not established by these API checks. Eric Chen is leaving and has exhausted his
 Claude session usage, so Max is covering backend integration in this Codex
 session. Max Li and Eric Wu have confirmed database Admin roles. Max's CLI
-launcher is installed, but runtime installation/login and CLI management access
-remain pending. Current responsibilities and operating commands are in
+2.13.0 is installed and logged in; authenticated management reads verified the
+API URL and stub mode, with no publish performed. Current responsibilities and operating commands are in
 [`docs/HANDOFF.md`](../docs/HANDOFF.md).
 
 The real solver, Bayesian learning, Monte Carlo, Claude calls and live council
