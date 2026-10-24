@@ -27,6 +27,7 @@
 - Eric Wu's voice stub is connected. Six unit tests passed locally; live confirm and voice-originated full-to-re-plan checks passed, with no duplicate replay or automatic replacement call. Service restored to confirm; no real phone calls.
 - No Bright Data account/key is available. Haydn owns the account/review pipeline and Mapbox token/routing. Eric Chen's booth visit/key acquisition was temporary coverage; confirm a human owner for the booth task before he leaves. Max's private root `.env` has a blank `BRIGHTDATA_API_KEY` entry only.
 - Max's first phase is complete: eight authenticated API routes, deterministic disclosed fixtures, cumulative budget guards, a live tunnel, and local integration checks. The real solver/learning/LLM/council phases have not started here.
+- Current work split: Eric Wu is working in `api/`; Max is fixing evaluation and preparing the demo/submission checklist. The next solver comparison waits for Eric to confirm readiness.
 
 ## Shared
 
@@ -69,7 +70,8 @@
 - [ ] Live scout via Bright Data (needs `docs/BRIGHTDATA.md`)
 - [x] Council panel `web/src/components/council/` (functional pass; replays synthetic messages, not a live LLM council; restyle at H19)
 - [x] Privacy fix: names hidden in plan text and offers unless showWhoCompromised
-- [~] Experiment harness `docs/experiments/` (5 baselines run; "ours" waits for Max's real /plan; numbers not pitch-ready until places.json v2)
+- [~] Experiment harness `docs/experiments/`: cumulative budgets and returned-plan validation fixed; corrected five-baseline run/chart regenerated with zero selected-plan budget violations. Earlier numbers withdrawn. "Ours" and swipe learning wait for Eric Wu's real API; placeholder features still limit pitch claims.
+- [x] Draft demo script and submission checklist in `docs/DEMO_CHECKLIST.md`; final rehearsal/submission still pending
 - [ ] README, Devpost writeup, secret scan, submission checklist
 
 ## C. Max: solver and council

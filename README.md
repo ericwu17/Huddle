@@ -29,6 +29,7 @@ The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
 - **What's done and what's next:** [docs/ROADMAP.md](docs/ROADMAP.md). **Current state, async tasks, operating commands:** [docs/HANDOFF.md](docs/HANDOFF.md).
 - **Smoke test:** [Live check commands](api/README.md#check-the-live-connected-stubs) load the saved secret from `api/.env` and test both service scenarios. Each run creates a disposable synthetic group in the selected database.
 - **Honesty and disclosure:** [docs/HONESTY.md](docs/HONESTY.md), [docs/DISCLOSURE.md](docs/DISCLOSURE.md).
+- **Demo and submission:** [docs/DEMO_CHECKLIST.md](docs/DEMO_CHECKLIST.md). Corrected simulated comparisons and reproducible commands: [docs/experiments/README.md](docs/experiments/README.md); earlier per-stop-budget results are withdrawn.
 
 ## Run the connected stubs
 
