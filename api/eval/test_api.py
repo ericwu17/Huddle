@@ -176,6 +176,23 @@ class APIBoundaryTests(unittest.TestCase):
         self.assertEqual(self.post("/offers", request), {"offers": []})
         self.assertEqual(before, self.plan())
 
+    def test_dietary_requirements_apply_only_to_meals_and_desserts(self):
+        places = self.client.app.state.places
+        for place in places:
+            if place.category == "activity":
+                place.dietary = []
+        self.assertEqual(len(self.plan()["plans"]), 3)
+        for place in places:
+            if place.category == "meal":
+                place.dietary = []
+        self.assertEqual(self.plan()["plans"], [])
+        for place in places:
+            if place.category == "meal":
+                place.dietary = ["vegetarian"]
+            elif place.category == "dessert":
+                place.dietary = []
+        self.assertEqual(self.plan()["plans"], [])
+
     def test_determinism_including_council_and_roulette(self):
         self.assertEqual(self.plan(), self.plan())
         body = deepcopy(self.body)

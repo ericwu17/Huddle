@@ -140,7 +140,7 @@ function plan(body: { runId: string; members: Member[]; excludePlaceIds?: string
         const hard = member.hard ?? {};
         return !(hard.vetoCuisines ?? []).includes(place.cuisine) &&
           !(hard.vetoCategories ?? []).includes(place.category) &&
-          (hard.dietary ?? []).every((diet: string) => place.dietary.includes(diet));
+          (place.category === "activity" || (hard.dietary ?? []).every((diet: string) => place.dietary.includes(diet)));
       })));
   if (plans.length && !plans.some((p) => p.kind === "safe"))
     plans.reduce((best, p) => p.robustness > best.robustness ? p : best).kind = "safe";

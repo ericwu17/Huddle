@@ -166,7 +166,8 @@ def fixture_eligible(plan: Plan, request: PlanRequest, by_id: dict[str, Place]) 
             hard = member.hard
             if place.cuisine in (hard.vetoCuisines or []) or place.category in (hard.vetoCategories or []):
                 return False
-            if not set(hard.dietary or []).issubset(place.dietary):
+            # Activities do not serve food and commonly have no dietary tags.
+            if place.category != "activity" and not set(hard.dietary or []).issubset(place.dietary):
                 return False
     for member in request.members:
         if member.origin is not None and member.hard.maxTravelMinutes is not None:

@@ -104,6 +104,23 @@ describe("cumulative budget rules", () => {
     expect(preserveBudget({ budgetMaxPerPerson: null }, { budgetMaxPerPerson: 20 }).hard.budgetMaxPerPerson).toBe(20);
   });
 
+  it("keeps tagless activities for vegetarians while requiring suitable meals and desserts", () => {
+    const saved = PLACES.map((place) => ({ place, dietary: place.dietary }));
+    try {
+      for (const place of PLACES) if (place.category === "activity") place.dietary = [];
+      expect((fakeApi("/plan", requestFixture) as any).plans).toHaveLength(3);
+      for (const place of PLACES) if (place.category === "meal") place.dietary = [];
+      expect((fakeApi("/plan", requestFixture) as any).plans).toEqual([]);
+      for (const place of PLACES) {
+        if (place.category === "meal") place.dietary = ["vegetarian"];
+        if (place.category === "dessert") place.dietary = [];
+      }
+      expect((fakeApi("/plan", requestFixture) as any).plans).toEqual([]);
+    } finally {
+      for (const { place, dietary } of saved) place.dietary = dietary;
+    }
+  });
+
   it("filters standalone fallback plans and never fabricates offers", () => {
     for (const cap of [0, 13, 17, 20, 30, null]) {
       const request = structuredClone(requestFixture);

@@ -3,7 +3,7 @@
 Verified locally after Max explicitly confirmed the hacking period had started.
 
 - Python 3.12.5; FastAPI 0.116.1; Pydantic 2.11.7; uvicorn 0.35.0; httpx 0.28.1.
-- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **19 tests passed**, including previews and the safe authentication checker.
+- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **20 tests passed**, including dietary filtering, previews, and the safe authentication checker.
 - Started uvicorn on `127.0.0.1:8000` with an ephemeral in-memory shared secret,
   ran `api/.venv/bin/python api/eval/smoke_http.py`: **all eight routes passed**.
   The HTTP runner checked successful auth, missing-auth rejection, synthetic
@@ -26,8 +26,8 @@ Verified locally after Max explicitly confirmed the hacking period had started.
 
 The integration follow-up resolves the five caller/API gaps documented in
 `api/README.md`. `npm run typecheck --prefix server` passes. Server tests use
-the official SpacetimeDB 2.13.0 native in-memory datastore via Vitest (11 tests
-with local HTTP enabled; 10 plus one skipped without it). The local
+the official SpacetimeDB 2.13.0 native in-memory datastore via Vitest (12 tests
+with local HTTP enabled; 11 plus one skipped without it). The local
 HTTP runner checks four members, four swipes each, preview confidence, automatic
 planning, empty offers, roulette, and nine council messages through real module
 procedures calling a temporary FastAPI server. It also verifies current caps

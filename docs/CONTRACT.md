@@ -27,6 +27,8 @@ Features 0-7 are "aspects" scored in [0,1]. Features 8-12 are 0/1 one-hot (activ
 - **Categories:** meal, activity, dessert.
 - **Default dwell times:** meal 75 min, activity 75 min, dessert 30 min.
 - **Dietary tags:** vegetarian, vegan, gluten_free, halal, kosher.
+  Apply dietary requirements to meals and desserts only. Activities do not need
+  dietary tags and must not be excluded merely because those tags are empty.
 - **Cuisine families:** asian, latin, mediterranean, american, cafe_dessert, none.
 - **Time:** local time HH:MM 24h strings; dates ISO YYYY-MM-DD; timestamps in ms since epoch.
 - **Default plan window for the demo:** Saturday 17:00-23:00 local.

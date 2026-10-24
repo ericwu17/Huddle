@@ -129,8 +129,9 @@ stop is at most $13. A $17 cap keeps only the $14 template. No function raises a
 cap, mutates a request, accepts an offer, or writes state.
 
 Fixture filtering also checks excluded IDs, cuisine/category vetoes, dietary
-tags, opening intervals, the requested time window, and the initial travel cap
-when origin is supplied. First-leg travel is a simple synthetic straight-line
+tags on meals and desserts only, opening intervals, the requested time window, and the initial travel cap
+when origin is supplied. Tagless activities remain eligible for vegetarian or
+other dietary-constrained members. First-leg travel is a simple synthetic straight-line
 sanity check, not a live ETA. Stop gaps are fixed at 15 minutes. There is no search
 for alternative venues, routes, timings, or real utility. The veto cap keeps the
 first two entries (cuisines first), drops extras, and reports a plan warning.
