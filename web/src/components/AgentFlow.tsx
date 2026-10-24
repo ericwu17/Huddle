@@ -134,12 +134,13 @@ export function AgentPlanCard({ plan, order, recommended = false, optionNumber =
 function AgentSuggestionCard({ suggestion, order, optionNumber }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber: number }) {
   const listings = useCatalogListings();
   const place = listings.get(suggestion.placeId);
+  if (!place) return <article className="card space-y-3" role="status"><h2 className="card-title">Option {optionNumber}</h2><p>Loading venue…</p></article>;
   return <article className="card space-y-3">
     <h2 className="card-title">Option {optionNumber}</h2>
-    <p className="font-bold">{place?.name ?? "Another venue"}</p>
+    <p className="font-bold">{place.name}</p>
     <p className="muted">Time not set</p>
     <PrivateOrderSummary order={order} listings={listings} alternative />
-    <AgentVenueDetails place={place} name={place?.name ?? "Berkeley venue"} />
+    <AgentVenueDetails place={place} name={place.name} />
   </article>;
 }
 
@@ -201,6 +202,7 @@ export function AgentVote() {
   const runId = group.latestRunId;
   const planRun = useAgentRun(runId);
   const orders = useAgentOrders(runId, session.memberId);
+  const listings = useCatalogListings();
   const votes = useVotes(runId, session.memberId);
   const vote = useReducer(reducers.vote);
   const spin = useProcedure(procedures.doRoulette);
@@ -227,7 +229,7 @@ export function AgentVote() {
       {"stops" in choice ? <AgentPlanCard plan={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} />
         : <AgentSuggestionCard suggestion={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} />}
       <VoteChoice planId={choice.id} title={`Option ${index + 1}`} votes={votes} members={group.members} myMemberId={session.memberId}
-        busy={busy} onVote={() => run(() => vote({ runId, planId: choice.id }))} />
+        busy={busy || !("stops" in choice) && !listings.has(choice.placeId)} onVote={() => run(() => vote({ runId, planId: choice.id }))} />
     </div>)}
     {choices.length ? <p className="on-sky muted">You can change your vote until the host starts booking.</p> : null}
     {bookingPlan ? <MeetupCalendarAction runId={runId} planId={bookingPlan.id} isHost={isHost} /> : null}

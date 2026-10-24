@@ -15,6 +15,7 @@ export default function PrivateOrderSummary({ order, listings, stops = [], alter
   });
   const allPricesKnown = choices.length > 0 && (!stops.length || choices.length === stops.length) && choices.every(({ item }) => item?.price != null);
   const total = allPricesKnown ? choices.reduce((sum, { item }) => sum + item!.price!, 0) : null;
+  if (choices.some(({ place, stop }) => !place && !stop)) return <section className="card-note rounded-xl p-4" role="status">Loading your menu suggestions…</section>;
   return <section className="card-note rounded-xl p-4 space-y-3" aria-label="Your private order suggestion">
     <h3 className="font-bold">What you could order <span className="muted font-normal">· private to you</span></h3>
     <ul className="space-y-3">{choices.map(({ choice, place, stop, item }, index) => <li key={`${choice.placeId}:${index}`} className="space-y-1">
