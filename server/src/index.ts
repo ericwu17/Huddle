@@ -17,7 +17,7 @@ export {
   saveAgentPreferences, my_agent_preferences,
   my_agent_orders,
 } from "./agent";
-export { registerAccount, loginAccount, logoutAccount, selectHuddle, runAccountExpiryJob,
+export { registerAccount, loginAccount, logoutAccount, selectHuddle, removeHuddle, runAccountExpiryJob,
   my_account, my_account_memberships } from "./accounts";
 export { saveAccountContext, clearAccountContext, my_account_context,
   requestFriend, respondFriendRequest, removeFriend, my_friends, my_friend_requests,

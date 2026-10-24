@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { joinUrl } from "../joinUrl";
 import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
 import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
 import type { Session } from "../session";
@@ -11,6 +12,7 @@ import OffersInbox from "../components/OffersInbox";
 import { Buddy } from "../doodle/Doodle";
 import { useAgentNeeds, useAgentState } from "../agentData";
 import AgentPhaseNav from "../components/AgentPhaseNav";
+import PlanningHuddle from "../components/PlanningHuddle";
 import AccountStatus from "../components/AccountStatus";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
@@ -111,7 +113,7 @@ export default function GroupLayout() {
     agentNeeds,
   };
 
-  // Web layout: a vertical sidebar (who, steps, people) beside the step's
+  // Web layout: a vertical sidebar (who, steps, code, people) beside the step's
   // screen. On a phone the sidebar collapses to the header and the step list.
   return (
     <main className="group-page">
@@ -120,6 +122,9 @@ export default function GroupLayout() {
           <a className="logo" href="/">
             huddle
           </a>
+          <span className="code-tag" aria-label={`Huddle code ${group.code}`}>
+            {group.code}
+          </span>
         </header>
         <span className="me-tag on-sky">
           <Buddy who={session.name} size={40} />
@@ -138,6 +143,7 @@ export default function GroupLayout() {
       {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}
       {!agent ? <OffersInbox ctx={ctx} /> : null}
       <Outlet key={group.id} context={ctx} />
+      {agent?.status === "planning" ? <PlanningHuddle members={group.members} start={group.window.start} /> : null}
       {!agent ? <PhaseFooter ctx={ctx} booking={booking} /> : null}
       <p className="text-center">
         <Link className="on-sky muted underline" to={`/g/${session.groupId}/judge`}>
@@ -149,12 +155,20 @@ export default function GroupLayout() {
   );
 }
 
-// Desktop only: joined people and their public readiness.
+// Desktop only: the join code with a copy button, and who's in and ready.
 function SidebarPeople({ ctx }: { ctx: GroupContext }) {
   const { group, agent, session } = ctx;
+  const [copied, setCopied] = useState(false);
+  const link = joinUrl(group.code);
   return (
     <section className="sidebar-people card" aria-label="Who's in">
-      <h2 className="card-title">Your people</h2>
+      <div className="flex items-center justify-between gap-2">
+        <span className="muted text-sm">Join code</span>
+        <b className="display text-2xl tracking-[0.15em] text-[var(--cobalt)]">{group.code}</b>
+      </div>
+      <button className="btn w-full text-sm" onClick={() => navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }, () => {})}>
+        {copied ? "Link copied" : "Copy invite link"}
+      </button>
       <ul className="sidebar-members">
         {group.members.map((m) => {
           const ready = agent ? agent.confirmedMemberIds.includes(m.id) : m.ready;

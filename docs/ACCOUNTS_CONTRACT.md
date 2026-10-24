@@ -51,9 +51,11 @@ Sign out before switching accounts. Same-account login on another device creates
 another revocable device session, not another account or membership.
 
 Account group creation/join uses the account principal and persisted display name.
-New account-hosted huddles are invitation-only: a legacy join code cannot add an
-uninvited account or guest. Hosts and existing members can recover their own
-membership. Anonymous legacy huddles retain code compatibility. Accepting an
+Any huddle can be joined with its four-letter code (typed, scanned from the
+lobby QR or opened from a shared link) while it is still gathering people; the
+code is the invitation. Signed-in joiners get a durable membership; guests join
+by first name. Inbox invitations remain the option for Huddle friends.
+`removeHuddle` removes a huddle from the caller's own list only. Accepting an
 addressed invitation creates/reuses a durable membership and selects that group
 for this device. Selecting an old huddle changes no readiness, needs, votes or
 booking. Joining never implies readiness or acceptance of anyone else's limits.

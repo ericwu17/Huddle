@@ -406,6 +406,13 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .phase-buttons .btn-primary { flex: 1; max-width: 70%; }
 .phase-hint { color: #fff; font-size: 13px; font-weight: 700; text-align: center; }
 
+/* Lobby: scan-or-type join card */
+.join-card { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.join-qr { border: 3px solid var(--ink); border-radius: 18px; background: #fff; padding: 8px; line-height: 0; }
+.join-info { flex: 1 1 200px; min-width: 0; display: grid; gap: 6px; }
+.join-code { font-family: var(--display); font-size: 64px; line-height: 1; letter-spacing: 0.18em; color: var(--cobalt); }
+@media (max-width: 420px) { .join-card { justify-content: center; text-align: center; } .join-info .flex { justify-content: center; } }
+
 /* Vote: status strip, your pick, tally and voters */
 .vote-status {
   position: sticky; top: 8px; z-index: 5;
@@ -433,7 +440,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .plan-stop-name { font-weight: 800; font-size: 17px; line-height: 1.25; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .plan-more > summary { cursor: pointer; font-weight: 700; font-size: 14px; }
 
-/* Huddle screens as a web app: a vertical sidebar (you, steps, people)
+/* Huddle screens as a web app: a vertical sidebar (you, steps, code, people)
    beside the current step. Below 860px it stacks: header, step list, screen. */
 .group-page { display: grid; grid-template-columns: 250px minmax(0, 720px); gap: 40px; max-width: 1060px; margin: 0 auto; padding: 28px 24px 160px; align-items: start; }
 .group-sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 18px; max-height: calc(100vh - 48px); overflow-y: auto; padding: 4px 6px 8px 2px; }
@@ -459,3 +466,27 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
   .step-rail li > * { padding: 7px 10px; font-size: 14px; }
   .step-rail .step-mark { width: 22px; height: 22px; font-size: 12px; }
 }
+
+/* Quiet and destructive buttons (remove a huddle, sign out) */
+.btn-quiet { background: transparent; box-shadow: none; border-color: rgb(22 21 43 / 0.45); }
+.btn-quiet:hover { background: var(--note); }
+.btn-danger { background: var(--red); color: #fff; }
+.sidebar-account { display: grid; gap: 8px; justify-items: start; }
+.sidebar-account .btn-quiet { color: #fff; border-color: rgb(255 255 255 / 0.7); }
+.sidebar-account .btn-quiet:hover { color: var(--ink); }
+
+/* Planning: the group's advocates huddle in the middle of the screen */
+.planning-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgb(22 21 43 / 0.45); }
+.planning-card { width: min(640px, 100%); display: grid; gap: 10px; justify-items: center; text-align: center; animation: popIn 420ms var(--pop) both; }
+.planning-stage { width: 100%; display: grid; gap: 18px; justify-items: center; padding: 8px 0; }
+.planning-chair { display: grid; justify-items: center; gap: 2px; }
+.planning-ring { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 18px; }
+.planning-ring li { display: grid; justify-items: center; gap: 4px; width: 128px; }
+.planning-name { font-size: 12px; font-weight: 800; color: var(--ink-soft); }
+.planning-bubble { position: relative; min-height: 44px; display: grid; place-items: center; padding: 6px 10px; border: 2.5px solid var(--ink); border-radius: 14px; background: #fff; font-size: 13px; font-weight: 700; line-height: 1.25; animation: popIn 320ms var(--pop) both; }
+.planning-bubble::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 12px; height: 12px; margin-left: -6px; background: #fff; border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); transform: rotate(45deg); }
+.planning-bubble.is-quiet { min-width: 54px; color: var(--ink-soft); animation: none; }
+.planning-ring li.is-speaking .planning-bubble { background: var(--note); }
+.planning-ring li.is-speaking .planning-bubble::after { background: var(--note); }
+.planning-pill { position: fixed; right: 16px; bottom: 16px; z-index: 2000; }
+@media (max-width: 480px) { .planning-ring li { width: 104px; } .planning-bubble { font-size: 12px; } }

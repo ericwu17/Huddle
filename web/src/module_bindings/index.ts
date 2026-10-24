@@ -48,6 +48,7 @@ import InviteFriendsReducer from "./invite_friends_reducer";
 import LogoutAccountReducer from "./logout_account_reducer";
 import PostAgentDiscussionReducer from "./post_agent_discussion_reducer";
 import RemoveFriendReducer from "./remove_friend_reducer";
+import RemoveHuddleReducer from "./remove_huddle_reducer";
 import RequestFriendReducer from "./request_friend_reducer";
 import RespondFriendRequestReducer from "./respond_friend_request_reducer";
 import RespondHuddleInvitationReducer from "./respond_huddle_invitation_reducer";
@@ -322,6 +323,7 @@ const reducersSchema = __reducers(
   __reducerSchema("logout_account", LogoutAccountReducer),
   __reducerSchema("post_agent_discussion", PostAgentDiscussionReducer),
   __reducerSchema("remove_friend", RemoveFriendReducer),
+  __reducerSchema("remove_huddle", RemoveHuddleReducer),
   __reducerSchema("request_friend", RequestFriendReducer),
   __reducerSchema("respond_friend_request", RespondFriendRequestReducer),
   __reducerSchema("respond_huddle_invitation", RespondHuddleInvitationReducer),

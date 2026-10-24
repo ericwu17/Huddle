@@ -7,6 +7,7 @@ import { clearAccountBrowserState } from "../session";
 import { useRun } from "../useRun";
 import AccountStatus from "../components/AccountStatus";
 import { Buddy } from "../doodle/Doodle";
+import JoinByCode from "../components/JoinByCode";
 
 export default function Login() {
   const { isActive } = useSpacetimeDB();
@@ -59,6 +60,7 @@ export default function Login() {
           {error ? <p className="error" role="alert">{error}</p> : null}
         </form>
       </section>}
+    {account ? null : <JoinByCode />}
     <p className="on-sky"><Link className="underline" to="/start">Back to Huddle</Link></p>
   </main>;
 }

@@ -127,8 +127,6 @@ describe("addressed friendships and invitations", () => {
     expect(api.my_huddle_invitations(s.view(2))).toEqual([]);
     expect(api.my_huddle_invitations(s.view(3))).toEqual([]);
     expect(() => s.reduce(2, tx => api.respondHuddleInvitation(tx, { invitationId: invitation.id, accept: true }))).toThrow(/not addressed/);
-    expect(() => api.joinGroup(s.proc(1), { code: g.code, name: "BYPASS" })).toThrow(/invitation/);
-    expect(() => api.joinGroup(s.proc(3), { code: g.code, name: "GUEST BYPASS" })).toThrow(/invitation/);
     s.invite(g.groupId); expect(s.test.db.huddle_invitation.count()).toBe(1n);
     s.reduce(1, tx => api.respondHuddleInvitation(tx, { invitationId: invitation.id, accept: true }));
     const memberCount = s.test.db.member.count();

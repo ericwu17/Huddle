@@ -107,6 +107,16 @@ export const selectHuddle = spacetimedb.reducer({ groupId: t.string() }, (tx, { 
   tx.db.account_session.identity.update({ ...session, activeGroupId: groupId });
 });
 
+// Remove a huddle from this account's list. Other members keep it; the
+// huddle's own data is untouched, so nothing shared is deleted.
+export const removeHuddle = spacetimedb.reducer({ groupId: t.string() }, (tx, { groupId }) => {
+  const { account, session } = requireAccount(tx);
+  const id = membershipKey(account.id, groupId);
+  if (!tx.db.account_membership.id.find(id)) throw new SenderError("That huddle is not in your list.");
+  tx.db.account_membership.id.delete(id);
+  if (session.activeGroupId === groupId) tx.db.account_session.identity.update({ ...session, activeGroupId: undefined });
+});
+
 export const my_account = spacetimedb.view({ name: "my_account", public: true }, t.option(t.row("MyAccountRow", {
   accountId: t.string().primaryKey(), username: t.string(), displayName: t.string(),
   activeGroupId: t.option(t.string()), expiresAt: t.f64(),

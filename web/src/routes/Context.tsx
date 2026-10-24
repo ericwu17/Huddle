@@ -15,7 +15,7 @@ function ContextForm({ initial }: { initial: AccountContext }) {
   return <section className="card space-y-5">
     <p>These defaults are private to your account in SpacetimeDB. You can edit them for each outing. Saving here does not change an existing Huddle’s limits.</p>
     <PreferenceFields value={draft} onChange={setDraft} prefix="usual" />
-    <label className="block font-bold" htmlFor="usual-preferences">Your usual vibe (optional)</label>
+    <label className="block font-bold" htmlFor="usual-preferences">Anything else you usually like (optional)</label>
     <textarea id="usual-preferences" className="input min-h-28" maxLength={4000} placeholder="Favorite cuisines, activities, quieter places…" value={draft.preferences}
       onChange={e => setDraft({ ...draft, preferences: e.target.value })} />
     <div className="flex flex-wrap gap-3"><button className="btn btn-sun" disabled={busy} onClick={() => run(async () => { await save({ contextJson: JSON.stringify(draft) }); setNotice("Your private defaults are saved."); })}>Save my defaults</button>
@@ -29,7 +29,7 @@ export default function Context() {
   const account = useAccount();
   const saved = useAccountContext();
   return <AccountShell>{account === undefined || saved === undefined ? <p role="status">Loading your private defaults…</p> : !account ? <AccountRequired /> : <>
-    <div><h1 className="shout text-[56px]">Your usual vibe</h1><p className="on-sky mt-3">A head start for your next hangout. Always yours to edit.</p></div>
+    <div><h1 className="shout text-[56px]">Preferences</h1><p className="on-sky mt-3">A head start for your next hangout. Always yours to edit.</p></div>
     <ContextForm key={account.accountId} initial={saved?.context ?? EMPTY_CONTEXT} />
   </>}</AccountShell>;
 }

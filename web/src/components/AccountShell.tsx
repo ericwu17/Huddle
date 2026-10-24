@@ -1,11 +1,16 @@
 import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router";
+import { useReducer } from "spacetimedb/react";
+import { reducers } from "../module_bindings";
 import { useAccount, useFriendRequests, useHuddleInvitations } from "../accountData";
-import AccountStatus from "./AccountStatus";
+import { clearAccountBrowserState } from "../session";
+import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 
 export default function AccountShell({ children }: { children: ReactNode }) {
   const account = useAccount();
+  const logout = useReducer(reducers.logoutAccount);
+  const { run, busy } = useRun();
   const requests = useFriendRequests();
   const invitations = useHuddleInvitations();
   const count = (requests?.filter(r => r.direction === "incoming" && r.status === "pending").length ?? 0)
@@ -15,15 +20,24 @@ export default function AccountShell({ children }: { children: ReactNode }) {
       <Link className="logo" to="/start">huddle</Link>
       <div className="sidebar-buddy" aria-hidden="true"><Buddy who={account?.displayName ?? "Huddle"} pose="wave" size={128} /></div>
       <nav className="account-nav" aria-label="Your Huddle">
-        <NavLink to="/start">Start a huddle</NavLink>
-        <NavLink to="/friends">Friends</NavLink>
-        <NavLink to="/inbox">Inbox {count ? <span className="sticker sticker-sun">{count}</span> : null}</NavLink>
-        <NavLink to="/context">Your usual vibe</NavLink>
-        <NavLink to="/connectors">Connectors</NavLink>
+        <NavLink to="/start">Home</NavLink>
+        {account ? <>
+          <NavLink to="/friends">Friends</NavLink>
+          <NavLink to="/inbox">Inbox {count ? <span className="sticker sticker-sun">{count}</span> : null}</NavLink>
+          <NavLink to="/context">Preferences</NavLink>
+          <NavLink to="/connectors">Connectors</NavLink>
+        </> : <NavLink to="/login">Sign in</NavLink>}
       </nav>
-      <p className="on-sky muted">Your people. One great plan.</p>
+      {account ? <div className="sidebar-account">
+        <p className="on-sky text-sm">Signed in as <strong>{account.displayName}</strong></p>
+        <button className="btn btn-quiet" disabled={busy} onClick={() => run(async () => {
+          await logout();
+          clearAccountBrowserState(true);
+          window.location.replace("/login");
+        })}>Sign out</button>
+      </div> : null}
     </aside>
-    <div className="account-main space-y-6"><AccountStatus />{children}</div>
+    <div className="account-main space-y-6">{children}</div>
   </main>;
 }
 

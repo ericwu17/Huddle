@@ -81,7 +81,6 @@ describe("accounts and explicit memberships", () => {
     expect(api.my_agent_needs(s.test.viewContext(s.users[1]))?.text).toContain("BOB_PRIVATE");
     expect(() => s.reduce(s.users[1], tx => api.selectHuddle(tx, { groupId: a.groupId }))).toThrow();
     expect(() => s.reduce(s.users[1], tx => api.setShowWhoCompromised(tx, { on: true }))).not.toThrow();
-    expect(() => api.joinGroup(s.proc(s.users[1]), { code: a.code, name: "ignored" })).toThrow(/invitation/);
     s.reduce(s.users[0], tx => api.requestFriend(tx, { username: "bob" }));
     const request = api.my_friend_requests(s.test.viewContext(s.users[1]))[0];
     s.reduce(s.users[1], tx => api.respondFriendRequest(tx, { requestId: request.id, accept: true }));
@@ -92,6 +91,29 @@ describe("accounts and explicit memberships", () => {
     expect(api.my_group(s.test.viewContext(s.users[1]))?.isHost).toBe(false);
     expect(api.my_agent_needs(s.test.viewContext(s.users[1]))).toBeUndefined();
     expect(() => s.reduce(s.users[1], tx => api.setShowWhoCompromised(tx, { on: true }))).toThrow();
+  });
+
+  it("joins an account-hosted huddle with its code, as a guest or a signed-in account", () => {
+    const s = setup(); s.register(0, "alice"); s.register(1, "bob");
+    const a = s.group(0);
+    const bob = api.joinGroup(s.proc(s.users[1]), { code: a.code.toLowerCase(), name: "ignored" });
+    expect(bob.groupId).toBe(a.groupId);
+    expect(s.memberships(1).map(m => [m.groupId, m.role, m.name])).toEqual([[a.groupId, "member", "BOB"]]);
+    const guest = api.joinGroup(s.proc(s.users[2]), { code: a.code, name: " Riley " });
+    expect(guest.groupId).toBe(a.groupId);
+    expect(api.my_members(s.test.viewContext(s.users[2])).map(m => m.name).sort()).toEqual(["ALICE", "BOB", "Riley"]);
+  });
+
+  it("removes a huddle from only this account's list and leaves the huddle intact", () => {
+    const s = setup(); s.register(0, "alice"); s.register(1, "bob");
+    const a = s.group(0);
+    api.joinGroup(s.proc(s.users[1]), { code: a.code, name: "ignored" });
+    s.reduce(s.users[1], tx => api.removeHuddle(tx, { groupId: a.groupId }));
+    expect(s.memberships(1)).toEqual([]);
+    expect(s.memberships(0).map(m => m.groupId)).toEqual([a.groupId]);
+    expect(s.test.db.member.count()).toBe(2n);
+    expect(() => s.reduce(s.users[1], tx => api.removeHuddle(tx, { groupId: a.groupId }))).toThrow(/not in your list/);
+    expect(() => s.reduce(s.users[2], tx => api.removeHuddle(tx, { groupId: a.groupId }))).toThrow();
   });
 
   it("selects old memberships explicitly without changing readiness or another device selection", () => {

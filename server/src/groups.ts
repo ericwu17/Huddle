@@ -81,11 +81,9 @@ export const joinGroup = spacetimedb.procedure(
       };
       const existing = membersOf(tx.db, g.id).find(m => m.identity.isEqual(principal));
       if (existing) { select(existing.id); return { memberId: existing.id, groupId: g.id }; }
-      // Account huddles are invitation-only. A legacy code or a copied URL is
-      // not consent from the addressed account and must not bypass the inbox.
-      const accountHost = tx.db.account.principal.find(g.hostIdentity);
-      if (accountHost && !g.hostIdentity.isEqual(principal))
-        throw new SenderError("Open the invitation in your Huddle inbox to join this huddle.");
+      // The code (typed, scanned or in a shared link) is the invitation: anyone the
+      // host gave it to can join while the huddle is still gathering people.
+      // Inbox invitations remain an alternative for Huddle friends.
       if (g.status !== "lobby" && g.status !== "eliciting") throw new SenderError("this huddle has already planned");
       const memberId = newId(tx, "m", (id) => !!tx.db.member.id.find(id));
       tx.db.member.insert({
