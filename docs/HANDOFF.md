@@ -67,7 +67,7 @@
 
 1. **Bright Data:** review pull for `data/places.base.json` (each place has `googlePlaceId`), `docs/BRIGHTDATA.md`, then the live scout check in `server/src/council.ts` (`runScoutJob`). Needs `BRIGHTDATA_API_KEY`.
 2. **Keep both Python services and tunnels awake:** Max owns the API process/tunnel; Eric Wu owns voice. Report new URLs after a tunnel restart and update the matching module setting. Real voice remains a later phase.
-3. **Demo-mode fallbacks:** fill `data/cached_run.json` from a real run; auto demo mode when `/health` fails.
+3. **Demo-mode fallbacks:** done in `server/src/lib/demo.ts` (Eric Chen). A dead tunnel now flips that group to labeled demo mode instead of freezing parse/swipes; the host can also toggle it. **Needs a Maincloud publish after it is merged** (only then is it live). `data/cached_run.json` is still a placeholder; the labeled fakes serve that role.
 4. **`server/src/geo.ts`:** Mapbox route geometry + leg times with `geo_cache`. Needs `MAPBOX_TOKEN`. Fallback is straight lines.
 5. **Rerun experiments** after places.json v2 and Eric Wu's real API are ready. Baselines run without API calls by default; opt-in commands and failure reporting are in [experiments/README.md](experiments/README.md#reproduce). Demo rehearsal and submission checklist: [DEMO_CHECKLIST.md](DEMO_CHECKLIST.md).
 

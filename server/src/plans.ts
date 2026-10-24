@@ -5,11 +5,10 @@
 import { SenderError, t } from "spacetimedb/server";
 import spacetimedb, { offers_job, plan_job, voting_cap_job } from "./schema";
 import { requireMember } from "./groups";
-import { callApi } from "./lib/api";
+import { apiFor } from "./lib/demo";
 import { COUNCIL_CAP_MS } from "./lib/constants";
-import { fakeApi } from "./lib/fakes";
 import { guardPlanResult, planFitsBudgets } from "./lib/budgets";
-import type { Tx } from "./lib/types";
+import type { Proc, Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs, parse } from "./lib/util";
 
 export function planMembers(tx: Tx, groupId: string) {
@@ -23,6 +22,10 @@ export function planMembers(tx: Tx, groupId: string) {
       origin: m.originLat != null && m.originLng != null ? { lat: m.originLat, lng: m.originLng } : null,
     };
   });
+}
+
+export function groupIdOf(ctx: Proc, runId: string): string {
+  return ctx.withTx((tx) => tx.db.plan_run.runId.find(runId)?.groupId ?? "");
 }
 
 // Starts a new run for the group and returns its runId. Exported for Haydn's replan.ts.
@@ -68,14 +71,13 @@ export const runPlanJob = spacetimedb.procedure(
       return run?.status === "running" ? planRequest(tx, job.runId) : null; // idempotent by runId
     });
     if (!body) return {};
-    let res = callApi(ctx, "/plan", body);
-    if (!res.ok) {
-      // FastAPI unreachable: fall back so the demo keeps going (S6). TODO(H24): data/cached_run.json.
-      const fallback = fakeApi("/plan", body) as any;
-      fallback.warnings = [...(fallback.warnings ?? []), `fallback: api error ${res.error.message}`];
-      res = { ok: true, data: fallback, stub: true };
-    }
-    const { data, stub } = res;
+    const res = apiFor<any>(ctx, groupIdOf(ctx, job.runId), "/plan", body);
+    if (!res.ok) throw new Error(`plan failed: ${JSON.stringify(res.error)}`);
+    const { stub } = res;
+    // A plan that did not come from the api says so (the smoke test checks for "fallback:").
+    const data = res.demo
+      ? { ...res.data, warnings: [...(res.data.warnings ?? []), `fallback: ${res.demo}`] }
+      : res.data;
     ctx.withTx((tx) => {
       const run = tx.db.plan_run.runId.find(job.runId);
       if (!run) return;
@@ -111,7 +113,7 @@ export const runOffersJob = spacetimedb.procedure(
       return safe && body ? { ...body, baselinePlanId: safe.id } : null;
     });
     if (!input) return {};
-    const res = callApi(ctx, "/offers", input);
+    const res = apiFor(ctx, groupIdOf(ctx, job.runId), "/offers", input);
     if (!res.ok) throw new Error(`offers failed: ${JSON.stringify(res.error)}`);
     ctx.withTx((tx) => {
       for (const o of res.data.offers ?? []) {
@@ -186,7 +188,7 @@ export const doRoulette = spacetimedb.procedure(
     });
     if (!plans.length) throw new SenderError("no plans fit current budgets");
     const seed = Number(ctx.timestamp.toMillis() % 100000n);
-    const res = callApi(ctx, "/roulette", { plans, seed });
+    const res = apiFor(ctx, groupIdOf(ctx, runId), "/roulette", { plans, seed });
     if (!res.ok) throw new SenderError(`roulette failed: ${res.error.message}`);
     ctx.withTx((tx) => {
       const run = tx.db.plan_run.runId.find(runId);
