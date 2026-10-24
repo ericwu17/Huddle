@@ -6,7 +6,8 @@ import { t } from "spacetimedb/server";
 import spacetimedb, { booking, call_event, scout_check, vote } from "./schema";
 import type { ReadDb, View } from "./lib/types";
 import { FEATURES } from "./lib/constants";
-import { availablePlans } from "./lib/availability";
+import { availableVotingChoices } from "./lib/availability";
+import { agentBallot, isAgent } from "./lib/agent-state";
 import { currentGroup, currentMember, membersOf, parse } from "./lib/util";
 import { principalFor } from "./lib/account-state";
 
@@ -157,7 +158,8 @@ export const my_plan_runs = spacetimedb.view(
     return runsOf(ctx.db, g.id).map((r) => ({
       runId: r.runId, status: r.status, resultJson: stripResult(r.resultJson, g.showWhoCompromised, names),
       councilJson: r.councilJson,
-      rouletteJson: availablePlans(ctx.db, g.id, r.runId).some((p) => p.id === parse(r.rouletteJson)?.planId)
+      rouletteJson: availableVotingChoices(ctx.db, g.id, r.runId).some((p) => p.id === parse(r.rouletteJson)?.planId) &&
+        (!isAgent(ctx.db, g.id) || agentBallot(ctx.db, g.id, r.runId).winner === parse(r.rouletteJson)?.planId)
         ? r.rouletteJson : undefined,
       error: r.error, stub: r.stub, createdAt: r.createdAt,
     }));
@@ -190,7 +192,7 @@ export const my_scout = spacetimedb.view(pub("my_scout"), t.array(scout_check.ro
 export const my_votes = spacetimedb.view(pub("my_votes"), t.array(vote.rowType), (ctx) => {
   const g = myGroup(ctx);
   if (!g?.latestRunId) return [];
-  const ids = new Set(availablePlans(ctx.db, g.id, g.latestRunId).map((p) => p.id));
+  const ids = new Set(availableVotingChoices(ctx.db, g.id, g.latestRunId).map((p) => p.id));
   // Keep historical rows in storage; only currently usable votes count live.
   return Array.from(ctx.db.vote.runId.filter(g.latestRunId)).filter((v) => ids.has(v.planId));
 });

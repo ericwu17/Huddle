@@ -1,6 +1,7 @@
 import type { Plan, ScoutCheck } from "../types";
 import { KIND_LABEL, pct } from "../plans";
 import ScoutBadge from "./ScoutBadge";
+import { displayTime } from "../venueFormatting";
 
 type Props = {
   plan: Plan;
@@ -31,7 +32,7 @@ export default function PlanCard({ plan, scout, selected, recommended, onSelect 
             <span>
               <b>{s.name}</b>
               <span className="muted block">
-                {s.start}–{s.end} · {s.category} · ${s.costPerPerson}
+                {displayTime(s.start)}–{displayTime(s.end)} · {s.category} · ${s.costPerPerson}
               </span>
             </span>
           </li>

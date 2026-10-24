@@ -16,6 +16,10 @@ The implemented [menu extension](MENU_RECOMMENDATIONS.md) supersedes earlier
 blanket evidence blocks and uniform per-person cost checks for `own_orders`.
 It adds sourced menu/photo evidence, provisional status, untimed suggestions
 and owner-private menu selections/totals. Legacy shapes remain compatible.
+All current plan/suggestion IDs are valid voting choices, including provisional
+and untimed options. Votes/Spin use `availableVotingChoices`; booking and calendar
+writes retain strict `availablePlans`/`agentPlans` checks. A vote never converts an
+unverified or untimed suggestion into a bookable itinerary or raises a cap.
 
 ## FastAPI
 

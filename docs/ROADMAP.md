@@ -5,6 +5,12 @@ provisional suggestions and untimed alternatives are implemented. The full
 Claude propose/revise loop and takeout/seating remain follow-ups. This update
 supersedes older blanket allergy-block and personal-cost deferral notes below.
 
+Voting correction: all current timed/provisional and untimed venue suggestions
+can receive votes and tie Spin. Booking/calendar actions remain limited to ready
+timed winners. The demo UI uses route names, AM/PM times and known menu prices,
+without source/confirmation boilerplate. Current budgets and stale-run checks
+still apply; exploratory voting never changes saved limits.
+
 ## Current priorities October 24
 
 [CURRENT_CONTEXT.md](CURRENT_CONTEXT.md) is the current source of product and

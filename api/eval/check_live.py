@@ -43,7 +43,7 @@ def main():
     try:
         runner = "accounts-flow-smoke.mjs" if args.accounts_flow else "accounts-smoke.mjs" if args.accounts else "agent-smoke.mjs" if args.agent else "smoke.mjs"
         result = subprocess.run(["node", str(root / "scripts" / runner)],
-                                cwd=root, env=env, timeout=240)
+                                cwd=root, env=env, timeout=600 if args.accounts_flow else 240)
     except (OSError, subprocess.TimeoutExpired) as err:
         parser.exit(1, f"Smoke runner failed: {type(err).__name__}\n")
     return result.returncode

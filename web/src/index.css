@@ -406,13 +406,6 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .phase-buttons .btn-primary { flex: 1; max-width: 70%; }
 .phase-hint { color: #fff; font-size: 13px; font-weight: 700; text-align: center; }
 
-/* Lobby: scan-or-type join card */
-.join-card { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
-.join-qr { border: 3px solid var(--ink); border-radius: 18px; background: #fff; padding: 8px; line-height: 0; }
-.join-info { flex: 1 1 200px; min-width: 0; display: grid; gap: 6px; }
-.join-code { font-family: var(--display); font-size: 64px; line-height: 1; letter-spacing: 0.18em; color: var(--cobalt); }
-@media (max-width: 420px) { .join-card { justify-content: center; text-align: center; } .join-info .flex { justify-content: center; } }
-
 /* Vote: status strip, your pick, tally and voters */
 .vote-status {
   position: sticky; top: 8px; z-index: 5;
@@ -440,7 +433,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .plan-stop-name { font-weight: 800; font-size: 17px; line-height: 1.25; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 .plan-more > summary { cursor: pointer; font-weight: 700; font-size: 14px; }
 
-/* Huddle screens as a web app: a vertical sidebar (you, steps, code, people)
+/* Huddle screens as a web app: a vertical sidebar (you, steps, people)
    beside the current step. Below 860px it stacks: header, step list, screen. */
 .group-page { display: grid; grid-template-columns: 250px minmax(0, 720px); gap: 40px; max-width: 1060px; margin: 0 auto; padding: 28px 24px 160px; align-items: start; }
 .group-sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 18px; max-height: calc(100vh - 48px); overflow-y: auto; padding: 4px 6px 8px 2px; }

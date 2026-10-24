@@ -4,7 +4,13 @@
 import { planFitsBudgets } from "./budgets";
 import type { ReadDb } from "./types";
 import { membersOf, parse } from "./util";
-import { agentPlans, isAgent } from "./agent-state";
+import { agentPlans, agentVotingChoices, isAgent } from "./agent-state";
+
+// Voting can express interest in provisional/untimed agent choices. It never
+// confers booking or calendar permission; those continue using availablePlans.
+export function availableVotingChoices(db: ReadDb, groupId: string, runId: string): any[] {
+  return isAgent(db, groupId) ? agentVotingChoices(db, groupId, runId) : availablePlans(db, groupId, runId);
+}
 
 export function availablePlans(db: ReadDb, groupId: string, runId: string): any[] {
   if (isAgent(db, groupId)) return agentPlans(db, groupId, runId);

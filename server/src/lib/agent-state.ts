@@ -45,31 +45,63 @@ export function startAgentRun(tx: Tx, groupId: string): string {
   return runId;
 }
 
-export function agentPlans(db: ReadDb, groupId: string, runId: string): any[] {
+function currentAgentChoices(db: ReadDb, groupId: string, runId: string, mode: "proposal" | "selectable") {
   const group = db.group.id.find(groupId);
   const session = db.agent_session.groupId.find(groupId);
   const run = db.plan_run.runId.find(runId);
   const result = parse(run?.resultJson);
   if (!group || group.latestRunId !== runId || run?.groupId !== groupId || run.status !== "done" ||
-      session?.status !== "ready" || session.activeRunId !== runId || result?.mode !== "agent" ||
-      result.inputRevision !== session.revision || !allAgentNeedsConfirmed(db, groupId)) return [];
+      !session || !(mode === "proposal" ? ["ready", "blocked"].includes(session.status) : session.status === "ready") ||
+      session.activeRunId !== runId || result?.mode !== "agent" || result.inputRevision !== session.revision ||
+      !allAgentNeedsConfirmed(db, groupId)) return null;
   const members = membersOf(db, groupId).map(m => ({ memberId: m.id, hard: parse(db.private_prefs.memberId.find(m.id)?.hardJson) }));
   const catalog = catalogSnapshot(db);
-  return Array.isArray(result.plans) ? result.plans.filter((plan: any) => {
-    if (plan.status === "provisional") return false;
-    const rows = Array.from(db.agent_order.runId.filter(runId)).filter(row => row.planId === plan.id).map(row => ({
-      memberId: row.memberId, planId: row.planId, items: parse(row.itemsJson), total: row.total,
-    }));
+  const places = catalog?.places ?? LIVE_PLACES;
+  const evidence = catalog?.evidence ?? {};
+  const privateRows = Array.from(db.agent_order.runId.filter(runId)).map(row => ({
+    memberId: row.memberId, planId: row.planId, items: parse(row.itemsJson), total: row.total,
+  }));
+  const plans = Array.isArray(result.plans) ? result.plans.filter((plan: any) => {
+    if (mode === "selectable" && plan.status === "provisional") return false;
+    const rows = privateRows.filter(row => row.planId === plan.id);
     const verified = plan.costModel === "own_orders" ? validateOrders(plan, rows,
       members.map(member => ({ memberId: member.memberId, needs: { hard: member.hard } })),
-      catalog?.places ?? LIVE_PLACES, catalog?.evidence ?? {}, true) : null;
-    if (plan.costModel === "own_orders" && (!verified || verified.requiresProvisional)) return false;
-    return planFitsAgentRequirements(plan, members, { personalTotals: verified?.totals });
+      places, evidence, true) : null;
+    if (plan.costModel === "own_orders" && (!verified || verified.requiresProvisional && plan.status !== "provisional")) return false;
+    return planFitsAgentRequirements(plan, members, { mode, personalTotals: verified?.totals });
   }) : [];
+  return { group, result, members, places, evidence, privateRows, plans };
+}
+
+// Timed, hard-validated choices only. Booking and Calendar must continue using
+// this helper even when a provisional plan or untimed venue wins the ballot.
+export function agentPlans(db: ReadDb, groupId: string, runId: string): any[] {
+  return currentAgentChoices(db, groupId, runId, "selectable")?.plans ?? [];
+}
+
+// A vote expresses interest, not verification of an outing. Suggestions retain
+// their original untimed shape; no schedule, affordability or booking is implied.
+export function agentVotingChoices(db: ReadDb, groupId: string, runId: string): any[] {
+  const current = currentAgentChoices(db, groupId, runId, "proposal");
+  if (!current) return [];
+  const { group, result, members, places, evidence, privateRows, plans } = current;
+  const suggestions = Array.isArray(result.suggestions) ? result.suggestions.filter((suggestion: any) => {
+    const place = places.find(p => p.id === suggestion.placeId);
+    if (!place || group.excludedPlaceIds.includes(place.id) || members.some(({ hard }) => {
+      if (!hard) return true;
+      const label = `${place.name} ${place.cuisine} ${place.category}`.toLocaleLowerCase();
+      return hard.vetoCategories.includes(place.category) || hard.vetoCuisines.includes(place.cuisine) ||
+        hard.rejectedTerms.some((term: string) => label.includes(term.toLocaleLowerCase()));
+    })) return false;
+    const rows = privateRows.filter(row => row.planId === suggestion.id);
+    return !rows.length || !!validateOrders({ id: suggestion.id, stops: [{ placeId: place.id, category: place.category }] }, rows,
+      members.map(member => ({ memberId: member.memberId, needs: { hard: member.hard } })), places, evidence, false);
+  }) : [];
+  return [...plans, ...suggestions];
 }
 
 export function agentBallot(db: ReadDb, groupId: string, runId: string) {
-  const plans = agentPlans(db, groupId, runId);
+  const plans = agentVotingChoices(db, groupId, runId);
   const members = membersOf(db, groupId);
   const ids = new Set(plans.map(p => p.id));
   const votes = Array.from(db.vote.runId.filter(runId)).filter(v => members.some(m => m.id === v.memberId) && ids.has(v.planId));

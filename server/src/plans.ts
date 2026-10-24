@@ -8,7 +8,7 @@ import { requireMember } from "./groups";
 import { apiFor } from "./lib/demo";
 import { COUNCIL_CAP_MS } from "./lib/constants";
 import { guardPlanResult, planFitsBudgets } from "./lib/budgets";
-import { availablePlans } from "./lib/availability";
+import { availablePlans, availableVotingChoices } from "./lib/availability";
 import type { Proc, Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs, parse } from "./lib/util";
 import { agentBallot, isAgent, startAgentRun } from "./lib/agent-state";
@@ -168,8 +168,8 @@ export const castVote = spacetimedb.reducer({ name: "vote" }, { runId: t.string(
   const me = requireMember(tx);
   const run = tx.db.plan_run.runId.find(runId);
   if (!run || run.groupId !== me.groupId) throw new SenderError("no such run");
-  if (!availablePlans(tx.db, me.groupId, runId).some((p) => p.id === planId))
-    throw new SenderError("plan is no longer available; choose a current plan");
+  if (!availableVotingChoices(tx.db, me.groupId, runId).some((p) => p.id === planId))
+    throw new SenderError("choice is no longer available; choose a current option");
   const id = `${runId}:${me.id}`;
   const row = { id, runId, memberId: me.id, planId };
   if (tx.db.vote.id.find(id)) tx.db.vote.id.update(row);

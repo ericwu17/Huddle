@@ -27,8 +27,15 @@ async function call(user, name, args = []) {
 }
 const unopt = v => Array.isArray(v) && v.length === 2 && (v[0] === 0 || v[0] === 1) &&
   (v[0] === 1 ? Array.isArray(v[1]) && !v[1].length : true) ? v[0] === 0 ? v[1] : null : v;
+// Only reads are retried. A failed mutation may have committed remotely.
+async function readView(user, name) {
+  for (let attempt = 0; ; attempt++) {
+    try { return await fetch(`${base}/sql`, { method: "POST", headers: { Authorization: `Bearer ${user.token}` }, body: `SELECT * FROM ${name}` }); }
+    catch (error) { if (attempt >= 2) throw error; await sleep(500); }
+  }
+}
 async function view(user, name) {
-  const r = await fetch(`${base}/sql`, { method: "POST", headers: { Authorization: `Bearer ${user.token}` }, body: `SELECT * FROM ${name}` });
+  const r = await readView(user, name);
   if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
   const tables = await r.json();
   const names = tables[0].schema.elements.map(c => c.name.some);
@@ -74,7 +81,7 @@ check((await view(host, "my_friends")).some(f => f.account_id === friend.account
 check(!(await view(outsider, "my_friends")).length && !(await view(outsider, "my_friend_requests")).length, "Friend network is account-scoped");
 const [groupId, code] = await call(host, "create_agent_group", [null]);
 await call(host, "join_group", [code, "Untrusted display name"]);
-await rejects("Account huddle cannot be joined by guessed code", () => call(outsider, "join_group", [code, "Outsider"]));
+await rejects("Account cannot select a huddle without membership", () => call(outsider, "select_huddle", [groupId]));
 await call(host, "invite_friends", [groupId, [friend.account.account_id]]);
 await call(host, "invite_friends", [groupId, [friend.account.account_id]]);
 const invitations = (await view(friend, "my_huddle_invitations")).filter(i => i.group_id === groupId && i.status === "pending");
@@ -146,7 +153,37 @@ const evidence = await until("venue evidence state", async () => {
 check(evidence.plans.length > 0 || evidence.suggestions.length > 0, "Missing allergy evidence still produces useful provisional or untimed suggestions");
 check(evidence.plans.every(plan => plan.status === "provisional"), "Unverified food suggestions remain provisional");
 const allergyState = (await view(host, "my_agent_session"))[0];
-for (const provisional of evidence.plans) await rejects("Provisional option cannot be voted on", () => call(host, "vote", [allergyState.active_run_id, provisional.id]));
+const allergyChoices = [...evidence.plans, ...(evidence.suggestions ?? [])];
+for (const choice of allergyChoices) {
+  await call(host, "vote", [allergyState.active_run_id, choice.id]);
+  await call(friend, "vote", [allergyState.active_run_id, choice.id]);
+  check((await view(host, "my_votes")).length === 2, "Both participants can vote on a current suggestion");
+  await rejects("Unverified group choice cannot start booking", () => call(host, "start_booking", [allergyState.active_run_id, choice.id, 0]));
+  await rejects("Unverified group choice cannot create calendar events", () => call(host, "confirm_meetup", [allergyState.active_run_id, choice.id]));
+}
+if (allergyChoices.length >= 2) {
+  await call(host, "vote", [allergyState.active_run_id, allergyChoices[0].id]);
+  await call(friend, "vote", [allergyState.active_run_id, allergyChoices[1].id]);
+  const spun = await call(host, "do_roulette", [allergyState.active_run_id]);
+  check([allergyChoices[0].id, allergyChoices[1].id].includes(spun[0]), "Tie Spin resolves current suggestion votes");
+}
+check(JSON.parse((await view(friend, "my_private"))[0].hard_json).budgetMaxPerPerson === 12, "Suggestion voting never raises a private budget cap");
+await save(friend, structured(12, 1, { dietary: ["vegetarian"], allergies: ["peanut"] }));
+check(!(await view(host, "my_votes")).length, "Changed needs invalidate suggestion votes too");
+await call(host, "find_agent_plans");
+const untimed = await until("untimed alternatives", async () => {
+  const state = (await view(host, "my_agent_session"))[0];
+  if (state.error) throw new Error(state.error);
+  if (!["ready", "blocked"].includes(state.status)) return null;
+  const row = (await view(host, "my_plan_runs")).find(r => r.run_id === state.active_run_id);
+  return row?.result_json ? { runId: row.run_id, result: JSON.parse(row.result_json) } : null;
+});
+check(!untimed.result.plans.length && untimed.result.suggestions.length > 0, "Impossible duration keeps real untimed venue choices without fabricated schedules");
+const idea = untimed.result.suggestions[0];
+await call(host, "vote", [untimed.runId, idea.id]);
+await call(friend, "vote", [untimed.runId, idea.id]);
+check((await view(host, "my_votes")).length === 2, "Untimed venue choices remain open to a complete group vote");
+await rejects("Untimed winning venue cannot be booked", () => call(host, "start_booking", [untimed.runId, idea.id, 0]));
 await call(host, "clear_account_context");
 check(!(await view(host, "my_account_context")).length, "Owner can clear saved context");
 await call(host, "logout_account");

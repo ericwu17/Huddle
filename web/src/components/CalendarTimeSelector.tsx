@@ -6,6 +6,7 @@ import { useGroupConnectors } from "../accountData";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
 import { OUTING_TIME_ZONE, berkeleyMidnight, berkeleyToday, dateAfter } from "../calendarTime";
+import { displayTime, displayTimesInText } from "../venueFormatting";
 
 export default function CalendarTimeSelector() {
   const { group, isHost } = useGroup();
@@ -32,7 +33,7 @@ export default function CalendarTimeSelector() {
   }, [status]);
   return <section className="card space-y-4" aria-label="Find a time together">
     <h2 className="card-title">Find a time together</h2>
-    <p>Current outing: <strong>{group.date}, {group.window.start}–{group.window.end}</strong>.</p>
+    <p>Current outing: <strong>{group.date}, {displayTime(group.window.start)}–{displayTime(group.window.end)}</strong>.</p>
     <p className="muted">Dates and outing hours use Berkeley time (America/Los_Angeles).</p>
     {isHost ? <details className="space-y-4"><summary className="btn">Set date & time manually</summary>
       <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(async () => {
@@ -42,6 +43,7 @@ export default function CalendarTimeSelector() {
         <label className="block font-bold" htmlFor="manual-outing-date">Outing date</label><input id="manual-outing-date" className="input" type="date" required value={manualDate} onChange={e => setManualDate(e.target.value)} />
         <div className="grid grid-cols-2 gap-3"><div><label className="block font-bold" htmlFor="manual-outing-start">Outing starts</label><input id="manual-outing-start" className="input" type="time" required value={manualStart} onChange={e => setManualStart(e.target.value)} /></div>
           <div><label className="block font-bold" htmlFor="manual-outing-end">Outing ends</label><input id="manual-outing-end" className="input" type="time" required value={manualEnd} onChange={e => setManualEnd(e.target.value)} /></div></div>
+        <p className="muted">{displayTime(manualStart)}–{displayTime(manualEnd)}</p>
         <p className="muted">Changing the date or window makes previous plans, votes and booking choices stale.</p>
         <button className="btn btn-sun" disabled={busy}>Apply outing date & time</button>
       </form>
@@ -52,8 +54,8 @@ export default function CalendarTimeSelector() {
     {isHost ? <details className="space-y-4"><summary className="btn">Choose a search window</summary>
       <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(async () => {
         const result = await schedule({ searchStart: berkeleyMidnight(searchStart), searchEnd: berkeleyMidnight(dateAfter(searchEnd, 1)), dayStart, dayEnd, durationMinutes: duration, timeZone: OUTING_TIME_ZONE });
-        setNotice(result.message);
-        if (!result.ok) throw new Error(result.message);
+        setNotice(displayTimesInText(result.message));
+        if (!result.ok) throw new Error(displayTimesInText(result.message));
       }); }}>
         <p className="muted">Search dates and daily hours use Berkeley time, including daylight-saving changes.</p>
         <label className="block font-bold" htmlFor="schedule-start">Search from</label>
@@ -62,6 +64,7 @@ export default function CalendarTimeSelector() {
         <input id="schedule-end" className="input" type="date" required min={searchStart} value={searchEnd} onChange={e => setSearchEnd(e.target.value)} />
         <div className="grid grid-cols-2 gap-3"><div><label className="block font-bold" htmlFor="schedule-day-start">Earliest start</label><input id="schedule-day-start" className="input" type="time" required value={dayStart} onChange={e => setDayStart(e.target.value)} /></div>
           <div><label className="block font-bold" htmlFor="schedule-day-end">Latest finish</label><input id="schedule-day-end" className="input" type="time" required value={dayEnd} onChange={e => setDayEnd(e.target.value)} /></div></div>
+        <p className="muted">{displayTime(dayStart)}–{displayTime(dayEnd)}</p>
         <label className="block font-bold" htmlFor="schedule-duration">Meetup duration (minutes)</label><input id="schedule-duration" className="input" type="number" min="15" max="720" step="15" required value={duration} onChange={e => setDuration(Number(e.target.value))} />
         <button className="btn btn-sun" disabled={busy || !configured || !allConnected}>{busy ? "Checking shared availability…" : "Find a time everyone can make"}</button>
       </form>

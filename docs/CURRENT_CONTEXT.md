@@ -43,7 +43,11 @@ ambiguity still requires a private correction. A blank initial submission is
 valid. A later blank/Flexible edit cannot erase an established outing cap.
 Known allergy input and missing venue evidence are separate states: the person
 can finish their input and receive provisional food suggestions. Unverified options
-remain unavailable for voting/booking; impossible timed outings get untimed venue ideas.
+can receive votes and tie Spin; booking/calendar eligibility stays separate.
+Impossible timed outings get untimed venue ideas that can also receive exploratory
+votes without changing anyone's limits or inventing visit times. Cards show
+route names, AM/PM times, ratings/photos and private orders with known menu prices;
+source/confirmation boilerplate and unknown price estimates are hidden.
 
 Max authorized and completed the shared activation from `a029fb6` after its main
 push. Vercel `https://huddle-two-neon.vercel.app` now uses the updated shared

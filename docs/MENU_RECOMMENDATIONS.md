@@ -13,28 +13,34 @@ recommendations. Context clues can support a **provisional suggestion**; they
 do not establish verified allergen handling. Known ingredient conflicts are
 excluded from that person's offered item IDs. Unknown ingredients stay unknown.
 
-The UI shows a short venue/route summary, sourced ratings, available attributed
-photos and **your own** proposed order and price. Another person's order or
-private requirements do not appear in your private-order view. A missing item
-price uses an explicitly labeled venue estimate, never zero/free. Listed base
-prices can exclude taxes, tips and other fees.
+The UI shows venue names joined with arrows, ratings/review counts, available
+photos and **your own** proposed menu order. It uses AM/PM times and shows item
+prices only when the menu lists them. Unknown item prices and incomplete totals
+are omitted from cards; internal cost validation still uses the venue allowance,
+never zero/free. Source evidence remains in the catalog for the coordinator and
+validation, without source/date links or confirmation boilerplate in plan cards.
+Another person's orders or private requirements are never shown to you.
 
 Each person's total is their own selected meal plus their selected later food
 stops and shared activity costs. It is independently checked against their own
 current outing cap. Another person's steak is not charged to them. Existing caps
 cannot be raised/erased without the existing owner-only private offer acceptance.
 
-Provisional plans appear in Plans, with voting/Spin/booking/calendar actions
-unavailable. The module enforces this independently of the UI and service's
-claimed readiness. It rejects falsely ready results, unknown item IDs, incorrect
-totals, changed item prices and stale budgets. Missing allergy evidence always
-keeps a food plan provisional. Unknown/unpriced selections and unsupported
-dietary evidence also require provisional status.
+All current suggestions can be voted on, including provisional timed plans.
+Complete tied ballots can use equal-chance Spin. Voting is an expression of
+group preference, independent of booking/calendar eligibility. Only a current
+ready timed winner can enter booking simulation or calendar creation. The module
+enforces that distinction and still rejects falsely ready results, unknown item
+IDs, incorrect totals, changed item prices and stale budgets. Missing allergy
+evidence, unknown/unpriced selections and unsupported dietary evidence still
+require provisional status internally.
 
 If no timed itinerary fits the current budget, duration, hours or travel limits,
 the coordinator can suggest up to three **untimed venues to explore**. These
 have no fabricated visit times and are not claimed to fit those limits. They
-cannot enter voting or booking. If Claude fails, clearly labeled real-catalog
+can enter an exploratory group vote and Spin, but cannot be booked or added to
+calendars. Voting does not raise budgets or claim these venues fit the outing.
+If Claude fails, clearly labeled real-catalog
 ideas keep the screen useful; they are not represented as Claude decisions or
 synthetic venues. An empty/excluded catalog cannot produce invented places.
 
@@ -64,7 +70,8 @@ rejects an invalid complete snapshot without damaging the last good one.
 
 - Plan `status: ready|provisional`, `summary`, optional `costModel: own_orders`
   and `costRange: {min,max}` across independently validated participant totals.
-- `suggestions: [{id,placeId,summary,limitations}]`: display-only, untimed ideas.
+- `suggestions: [{id,placeId,summary,limitations}]`: untimed ideas that can receive
+  votes using their existing IDs, with no fabricated schedule.
 - `privateOrders: [{memberId,planId,items:[{placeId,itemId|null}],total}]`:
   **service-to-module only**. The module strips this before storing the public
   result and saves selections in private `agent_order`. Only the owner/current
@@ -73,7 +80,8 @@ rejects an invalid complete snapshot without damaging the last good one.
 For compatibility `costPerPerson` remains the sum of the stops' original catalog
 estimates. It is a **venue baseline**, not the authoritative personal charge for
 `own_orders`. Use the private total for each cap and the range/own total in the
-new UI. Legacy plans without this cost model retain their old budget checks.
+validation. The UI shows an owner total only when all selected prices are known.
+Legacy plans without this cost model retain their old budget checks.
 The module re-resolves item IDs and recomputes costs at ingest and action time.
 
 Python still enumerates schedule-compatible venue sequences; Claude chooses

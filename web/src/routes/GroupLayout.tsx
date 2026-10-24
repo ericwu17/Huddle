@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { joinUrl } from "../joinUrl";
+import { useEffect, useRef } from "react";
 import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
 import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
 import type { Session } from "../session";
@@ -14,6 +13,7 @@ import { useAgentNeeds, useAgentState } from "../agentData";
 import AgentPhaseNav from "../components/AgentPhaseNav";
 import PlanningHuddle from "../components/PlanningHuddle";
 import AccountStatus from "../components/AccountStatus";
+import { displayTime } from "../venueFormatting";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -44,7 +44,11 @@ export default function GroupLayout() {
     if (group && group.id === session.groupId && agent) {
       const key = `${group.latestRunId}:${agent.status}:${group.status}`;
       if (lastAgentState.current === key) return;
+      const firstLoad = lastAgentState.current === null;
       lastAgentState.current = key;
+      // An explicit Vote URL stays open on refresh, including its empty state.
+      // Later run/needs changes still take everyone back through the new plans.
+      if (firstLoad && pathname.endsWith("/vote")) return;
       const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "call"
         : agent.status === "needs" ? "prefs" : "plans";
       navigate(`/g/${session.groupId}/${step}`);
@@ -113,7 +117,7 @@ export default function GroupLayout() {
     agentNeeds,
   };
 
-  // Web layout: a vertical sidebar (who, steps, code, people) beside the step's
+  // Web layout: a vertical sidebar (who, steps, people) beside the step's
   // screen. On a phone the sidebar collapses to the header and the step list.
   return (
     <main className="group-page">
@@ -122,9 +126,6 @@ export default function GroupLayout() {
           <a className="logo" href="/">
             huddle
           </a>
-          <span className="code-tag" aria-label={`Huddle code ${group.code}`}>
-            {group.code}
-          </span>
         </header>
         <span className="me-tag on-sky">
           <Buddy who={session.name} size={40} />
@@ -138,7 +139,7 @@ export default function GroupLayout() {
       </aside>
       <div className="group-main space-y-4">
       <AccountStatus />
-      <p className="on-sky text-sm">Outing: {group.date} · {group.window.start}–{group.window.end} · Berkeley time</p>
+      <p className="on-sky text-sm">Outing: {group.date} · {displayTime(group.window.start)}–{displayTime(group.window.end)} · Berkeley time</p>
       <DemoBanner on={group.demoMode} />
       {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}
       {!agent ? <OffersInbox ctx={ctx} /> : null}
@@ -155,20 +156,12 @@ export default function GroupLayout() {
   );
 }
 
-// Desktop only: the join code with a copy button, and who's in and ready.
+// Desktop only: joined people and their public readiness.
 function SidebarPeople({ ctx }: { ctx: GroupContext }) {
   const { group, agent, session } = ctx;
-  const [copied, setCopied] = useState(false);
-  const link = joinUrl(group.code);
   return (
     <section className="sidebar-people card" aria-label="Who's in">
-      <div className="flex items-center justify-between gap-2">
-        <span className="muted text-sm">Join code</span>
-        <b className="display text-2xl tracking-[0.15em] text-[var(--cobalt)]">{group.code}</b>
-      </div>
-      <button className="btn w-full text-sm" onClick={() => navigator.clipboard?.writeText(link).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }, () => {})}>
-        {copied ? "Link copied" : "Copy invite link"}
-      </button>
+      <h2 className="card-title">Your people</h2>
       <ul className="sidebar-members">
         {group.members.map((m) => {
           const ready = agent ? agent.confirmedMemberIds.includes(m.id) : m.ready;

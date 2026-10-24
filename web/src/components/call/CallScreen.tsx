@@ -1,6 +1,7 @@
 import { useCallEvents } from "../../data";
 import type { Booking } from "../../types";
 import { Buddy } from "../../doodle/Doodle";
+import { displayTime } from "../../venueFormatting";
 
 const STEPS = [
   { type: "dialing", label: "Dialing" },
@@ -55,7 +56,7 @@ export default function CallScreen({ booking, onRetry }: Props) {
           ?.filter((e) => e.type === "slot_offered")
           .map((e) => (
             <p key={e.id} className="sticker sticker-sun mx-auto">
-              Offered {e.slot}
+              Offered {displayTime(e.slot)}
             </p>
           ))}
         </div>
@@ -66,7 +67,7 @@ export default function CallScreen({ booking, onRetry }: Props) {
           <p className="display text-5xl text-[var(--green)]">Booked!</p>
           <p className="font-bold">{booking.restaurantName}</p>
           <p>
-            {confirmed.slot ?? booking.slot} · party of {booking.partySize}
+            {displayTime(confirmed.slot ?? booking.slot)} · party of {booking.partySize}
           </p>
         </div>
       )}

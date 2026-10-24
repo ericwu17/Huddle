@@ -387,13 +387,16 @@ describe("menu proposals and private own orders", () => {
       items: [{ placeId: "p_002", itemId: i ? "large" : "beans" }], total: i ? 30 : 20 }));
     change(data);
   });
-  const deniesActions = (s: ReturnType<typeof setup>, runId: string, planId = "choice-1") => {
-    expect(() => s.vote(0, runId, planId)).toThrow();
-    expect(() => api.doRoulette(s.proc(s.users[0].auth), { runId })).toThrow();
+  const deniesBooking = (s: ReturnType<typeof setup>, runId: string, planId = "choice-1") => {
     expect(() => s.reduce(s.users[0].auth, tx => api.startBooking(tx, { runId, planId, stopIndex: 1 }))).toThrow();
     expect(() => s.reduce(s.users[0].auth, tx => api.confirmMeetup(tx, { runId, planId }))).toThrow();
     expect(s.test.db.booking.count()).toBe(0n);
     expect(s.test.db.meetup.count()).toBe(0n);
+  };
+  const deniesActions = (s: ReturnType<typeof setup>, runId: string, planId = "choice-1") => {
+    expect(() => s.vote(0, runId, planId)).toThrow();
+    expect(() => api.doRoulette(s.proc(s.users[0].auth), { runId })).toThrow();
+    deniesBooking(s, runId, planId);
   };
 
   it("charges each member only their own priced meal plus activity, and keeps order details private", () => {
@@ -438,7 +441,7 @@ describe("menu proposals and private own orders", () => {
   });
 
   it.each(["allergy", "unknown item", "unpriced item", "unsupported diet", "contradictory ingredients"])(
-    "accepts an explicit provisional %s proposal for display and rejects every action", reason => {
+    "allows voting on a provisional %s proposal while keeping booking and Calendar blocked", reason => {
       const s = setup();
       const menu = evidence(reason === "unpriced item" ? [item("beans", null), item("large", 20)] :
         reason === "contradictory ingredients" ? [item("beans", 10, { name: "Chicken plate" }), item("large", 20)] : undefined);
@@ -455,9 +458,11 @@ describe("menu proposals and private own orders", () => {
       });
       const runId = s.plan();
       expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
-      expect(s.test.db.group.id.find(s.group.groupId)?.status).toBe("planned");
+      expect(s.test.db.group.id.find(s.group.groupId)?.status).toBe("voting");
       expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toHaveLength(1);
-      deniesActions(s, runId);
+      s.vote(0, runId); s.vote(1, runId);
+      expect(api.my_votes(s.test.viewContext(s.users[0].auth))).toHaveLength(2);
+      deniesBooking(s, runId);
     });
 
   it.each(["allergy", "unknown item", "unpriced item", "unsupported diet", "contradictory ingredients"])(
@@ -527,7 +532,7 @@ describe("menu proposals and private own orders", () => {
     expect(api.my_agent_orders(s.test.viewContext(s.users[1].auth))).toEqual([]); deniesActions(s, runId);
   });
 
-  it("keeps untimed suggestions display-only, including private totals above a current cap", () => {
+  it("allows exploratory votes for untimed suggestions above a cap without booking permission", () => {
     const s = setup(); push(s); s.save(0, { budgetMaxPerPerson: 5 }); s.save(1, { budgetMaxPerPerson: 5 });
     s.transform(data => {
       data.plans = []; data.recommendedPlanId = null;
@@ -537,14 +542,25 @@ describe("menu proposals and private own orders", () => {
     const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
     expect(JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!).suggestions).toHaveLength(1);
     expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))[0].total).toBe(10);
-    deniesActions(s, runId, "untimed");
+    expect(s.test.db.agent_session.groupId.find(s.group.groupId)?.status).toBe("ready");
+    expect(s.test.db.group.id.find(s.group.groupId)?.status).toBe("voting");
+    s.vote(0, runId, "untimed"); s.vote(1, runId, "untimed");
+    expect(api.my_votes(s.test.viewContext(s.users[0].auth))).toHaveLength(2);
+    expect(() => s.reduce(s.users[0].auth, tx => api.postAgentDiscussion(tx, { text: "Let's discuss this venue." }))).not.toThrow();
+    deniesBooking(s, runId, "untimed");
   });
 
   it("accepts explicitly provisional legacy allergy results without inventing private orders", () => {
     const s = setup(); s.save(0, { allergies: ["peanut"] }); s.save(1);
     s.transform(data => { for (const plan of data.plans) plan.status = "provisional"; });
     const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
-    expect(s.test.db.agent_order.count()).toBe(0n); deniesActions(s, runId);
+    expect(s.test.db.agent_order.count()).toBe(0n);
+    s.vote(0, runId, "choice-1"); s.vote(1, runId, "choice-2");
+    const picked = api.doRoulette(s.proc(s.users[0].auth), { runId });
+    expect(["choice-1", "choice-2"]).toContain(picked.planId);
+    expect(api.doRoulette(s.proc(s.users[1].auth), { runId })).toEqual(picked);
+    expect(JSON.parse(api.my_plan_runs(s.test.viewContext(s.users[0].auth)).find(run => run.runId === runId)!.rouletteJson!).planId).toBe(picked.planId);
+    deniesBooking(s, runId, picked.planId);
   });
 
   it("accepts null optional cost fields from FastAPI's legacy response serialization", () => {
@@ -567,7 +583,83 @@ describe("menu proposals and private own orders", () => {
     });
     const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
     expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toEqual([]);
-    deniesActions(s, runId, "offline-idea");
+    s.vote(0, runId, "offline-idea"); s.vote(1, runId, "offline-idea");
+    deniesBooking(s, runId, "offline-idea");
+  });
+
+  it("supports suggestion-only ties and conversation on an older blocked run without granting booking", () => {
+    const s = setup(); s.ready();
+    s.transform(data => {
+      data.plans = []; data.recommendedPlanId = null;
+      data.suggestions = ["p_002", "p_003"].map((placeId, i) => ({ id: `idea-${i}`, placeId,
+        summary: "Explore this venue.", limitations: ["No timed plan is verified."] }));
+    });
+    const runId = s.plan();
+    // Previously saved suggestion-only runs were marked blocked. Their current
+    // revision and confirmations remain sufficient for an exploratory ballot.
+    s.reduce(internal, tx => {
+      const session = tx.db.agent_session.groupId.find(s.group.groupId)!;
+      tx.db.agent_session.groupId.update({ ...session, status: "blocked" });
+    });
+    s.vote(0, runId, "idea-0"); s.vote(1, runId, "idea-1");
+    expect(api.my_votes(s.test.viewContext(s.users[1].auth))).toHaveLength(2);
+    const pick = api.doRoulette(s.proc(s.users[0].auth), { runId });
+    expect(["idea-0", "idea-1"]).toContain(pick.planId);
+    expect(api.doRoulette(s.proc(s.users[1].auth), { runId })).toEqual(pick);
+    expect(api.my_plan_runs(s.test.viewContext(s.users[1].auth)).find(run => run.runId === runId)?.rouletteJson).toBeDefined();
+    expect(() => s.reduce(s.users[0].auth, tx => api.postAgentDiscussion(tx, { text: "I prefer the second venue." }))).not.toThrow();
+    deniesBooking(s, runId, pick.planId);
+  });
+
+  it.each(["revision", "confirmation", "new run", "budget"])("hides provisional votes and Spin after a stale %s", change => {
+    const s = setup(); s.ready();
+    s.transform(data => { for (const plan of data.plans) plan.status = "provisional"; });
+    const runId = s.plan(); s.vote(0, runId, "choice-1"); s.vote(1, runId, "choice-2");
+    api.doRoulette(s.proc(s.users[0].auth), { runId });
+    s.reduce(internal, tx => {
+      if (change === "revision") {
+        const session = tx.db.agent_session.groupId.find(s.group.groupId)!;
+        tx.db.agent_session.groupId.update({ ...session, revision: session.revision + 1 });
+      } else if (change === "confirmation") {
+        const need = tx.db.agent_need.memberId.find(s.users[0].id)!;
+        tx.db.agent_need.memberId.update({ ...need, confirmed: false });
+      } else if (change === "new run") {
+        const group = tx.db.group.id.find(s.group.groupId)!;
+        tx.db.group.id.update({ ...group, latestRunId: "newer-run" });
+      } else {
+        const prefs = tx.db.private_prefs.memberId.find(s.users[0].id)!;
+        tx.db.private_prefs.memberId.update({ ...prefs,
+          hardJson: JSON.stringify({ ...JSON.parse(prefs.hardJson!), budgetMaxPerPerson: 21 }) });
+      }
+    });
+    expect(api.my_votes(s.test.viewContext(s.users[0].auth))).toEqual([]);
+    expect(api.my_plan_runs(s.test.viewContext(s.users[0].auth)).find(run => run.runId === runId)?.rouletteJson).toBeUndefined();
+    deniesActions(s, runId);
+  });
+
+  it("invalidates exploratory suggestion votes after a normal saved budget edit", () => {
+    const s = setup(); s.ready();
+    s.transform(data => {
+      data.plans = []; data.recommendedPlanId = null;
+      data.suggestions = ["p_002", "p_003"].map((placeId, i) => ({ id: `idea-${i}`, placeId,
+        summary: "Explore this venue.", limitations: ["Affordability is unverified."] }));
+    });
+    const runId = s.plan(); s.vote(0, runId, "idea-0"); s.vote(1, runId, "idea-1");
+    api.doRoulette(s.proc(s.users[0].auth), { runId });
+    s.save(0, { budgetMaxPerPerson: 5 });
+    expect(api.my_votes(s.test.viewContext(s.users[0].auth))).toEqual([]);
+    expect(api.my_plan_runs(s.test.viewContext(s.users[0].auth)).find(run => run.runId === runId)?.rouletteJson).toBeUndefined();
+    deniesActions(s, runId, "idea-0");
+  });
+
+  it("keeps an empty current result blocked instead of creating an empty ballot", () => {
+    const s = setup(); s.ready();
+    s.transform(data => { data.plans = []; data.recommendedPlanId = null; data.suggestions = []; });
+    const runId = s.plan();
+    expect(s.test.db.agent_session.groupId.find(s.group.groupId)?.status).toBe("blocked");
+    expect(s.test.db.group.id.find(s.group.groupId)?.status).toBe("planned");
+    expect(() => s.reduce(s.users[0].auth, tx => api.postAgentDiscussion(tx, { text: "No choices." }))).toThrow();
+    deniesActions(s, runId);
   });
 
   it("rejects malformed menu evidence before replacing any catalog rows", () => {

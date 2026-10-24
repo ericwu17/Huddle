@@ -1,5 +1,10 @@
 # Current task: accounts, preferences and coordinator polish (in progress)
 
+Latest demo correction: current provisional and untimed suggestions remain
+votable, with separate strict eligibility for booking/calendar actions. Plan
+cards use route names and AM/PM times, omit source/confirmation boilerplate, and
+show only known menu prices. See MENU_RECOMMENDATIONS.md for the current contract.
+
 Updated October 24, 2026 after the authorized shared rollout. Accounts,
 invitations, private context, preference sliders and the 130-venue catalog are
 active on [Vercel](https://huddle-two-neon.vercel.app/login) with shared Maincloud
@@ -26,8 +31,9 @@ full proposal/revision loop remain follow-ups. See its owner checklist.
   show/hide password, logout, stable account ownership and saved memberships.
 - [x] Exact-username friend requests, reciprocal contacts, an Invite friends
   dropdown, durable in-app invitation messages and addressed opening links.
-  Accepting joins/selects without marking ready; copied links and legacy codes
-  cannot bypass invitation ownership for account huddles. QR UI is removed.
+  Accepting joins/selects without marking ready; copied addressed links cannot
+  bypass recipient ownership. The compatibility backend retains code joining
+  while gathering people, as merged from `c24c556`; QR/code sharing UI is removed.
 - [x] Private editable defaults in SpacetimeDB, editable outing autofill and an
   explicit Remember choice. Other accounts cannot see those defaults.
 - [x] Optional cumulative-budget/whole-outing-time sliders, Flexible defaults,

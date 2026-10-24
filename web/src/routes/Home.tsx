@@ -7,10 +7,8 @@ import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 import { useAccount, useAccountMemberships, useHuddleInvitations } from "../accountData";
 import AccountShell from "../components/AccountShell";
-import JoinByCode from "../components/JoinByCode";
 
-// Two things to do here: start a huddle, or join one with its code.
-// Friends are invited from the huddle's lobby, by code, QR or the inbox.
+// Start an outing here; invite friends from its lobby or open an addressed invite.
 export default function Home() {
   const { isActive } = useSpacetimeDB();
   const navigate = useNavigate();
@@ -71,7 +69,7 @@ export default function Home() {
 
   return <AccountShell>{account === undefined ? <p role="status" className="on-sky">Loading your Huddle…</p> : <>
     <div className="home-intro"><div><h1 className="shout text-[56px]">What are<br />we doing?</h1>
-      <p className="on-sky mt-4">{account ? `Hi ${account.displayName}. ` : ""}Start a huddle, or join one with its code.</p></div>
+      <p className="on-sky mt-4">{account ? `Hi ${account.displayName}. ` : ""}Start a huddle and invite your friends.</p></div>
       <div className="crowd" aria-hidden="true"><Buddy who={account?.displayName ?? "You"} pose="wave" size={116} /><Buddy who="Your people" pose="huddle" size={104} /></div></div>
 
     {pending.length ? <section className="card card-note space-y-3" aria-label="New Huddle invitations"><h2 className="card-title">You're invited</h2>
@@ -87,8 +85,6 @@ export default function Home() {
       {!isActive ? <p role="status" className="muted">Connecting to Huddle…</p> : null}
       {error ? <p className="error" role="alert">{error}</p> : null}
     </section>
-
-    <JoinByCode />
 
     {account ? <section className="card space-y-4" aria-label="Your huddles"><h2 className="card-title">Your huddles</h2>
       {memberships === undefined ? <p role="status">Loading your huddles…</p> : !memberships.length ? <p className="muted">Huddles you start or join show up here, on any device you sign in on.</p> :

@@ -73,6 +73,7 @@ class MenuPlannerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.plans[0].costRange, {"min": 25, "max": 45})
         self.assertEqual({row.memberId: row.total for row in result.privateOrders}, {"max": 25, "eric": 45})
         self.assertNotIn("PRIVATE_", result.rationale)
+        self.assertEqual(result.plans[0].summary, " → ".join(stop.name for stop in result.plans[0].stops))
         self.assertEqual(result.plans[0].costPerPerson, sum(s.costPerPerson for s in result.plans[0].stops))
 
     async def test_allergy_and_unknown_dietary_evidence_do_not_blank_the_screen(self):

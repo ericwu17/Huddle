@@ -3,7 +3,7 @@ import { SenderError, t } from "spacetimedb/server";
 import spacetimedb, { agent_needs_job, agent_plan_job } from "./schema";
 import { createGroup, requireMember, setReady } from "./groups";
 import { callApi } from "./lib/api";
-import { allAgentNeedsConfirmed, invalidateAgent, startAgentRun } from "./lib/agent-state";
+import { agentVotingChoices, allAgentNeedsConfirmed, invalidateAgent, startAgentRun } from "./lib/agent-state";
 import { preserveBudget } from "./lib/budgets";
 import { at, currentGroup, currentMember, membersOf, nowMs, parse } from "./lib/util";
 import { validateAgentResult } from "./lib/agent-result";
@@ -255,10 +255,11 @@ export const runAgentPlanJob = spacetimedb.procedure(
         tx.db.agent_order.insert({ id, runId: job.runId, memberId: order.memberId, planId: order.planId, itemsJson: JSON.stringify(order.items), total: order.total });
       }
       tx.db.plan_run.runId.update({ ...run, status: "done", resultJson: JSON.stringify(data), stub: false });
-      tx.db.agent_session.groupId.update({ ...state, status: data.plans.length ? "ready" : "blocked", error: undefined });
-      tx.db.group.id.update({ ...group, status: verified.selectablePlanIds.length ? "voting" : "planned" });
-      if (data.plans.length) tx.db.council_message.insert({ id: 0n, runId: job.runId, round: 1,
-        speaker: "coordinator", label: "Huddle coordinator", memberId: undefined, planId: data.recommendedPlanId,
+      const hasChoices = data.plans.length > 0 || !!data.suggestions?.length;
+      tx.db.agent_session.groupId.update({ ...state, status: hasChoices ? "ready" : "blocked", error: undefined });
+      tx.db.group.id.update({ ...group, status: hasChoices ? "voting" : "planned" });
+      if (hasChoices) tx.db.council_message.insert({ id: 0n, runId: job.runId, round: 1,
+        speaker: "coordinator", label: "Huddle coordinator", memberId: undefined, planId: data.recommendedPlanId ?? undefined,
         stanceJson: undefined, text: data.rationale, citedJson: undefined, ts: nowMs(tx) });
     });
     return {};
@@ -269,8 +270,8 @@ export const postAgentDiscussion = spacetimedb.reducer({ text: t.string() }, (tx
   const me = requireMember(tx);
   const state = tx.db.agent_session.groupId.find(me.groupId);
   const clean = text.trim();
-  if (!state?.activeRunId || state.status !== "ready" || !clean || clean.length > 2000)
-    throw new SenderError("Post 1–2000 characters while current plans are ready.");
+  if (!state?.activeRunId || !agentVotingChoices(tx.db, me.groupId, state.activeRunId).length || !clean || clean.length > 2000)
+    throw new SenderError("Post 1–2000 characters while current choices are available.");
   tx.db.council_message.insert({ id: 0n, runId: state.activeRunId, round: 1, speaker: "participant",
     label: me.name, memberId: undefined, planId: undefined, stanceJson: undefined, text: clean, citedJson: undefined, ts: nowMs(tx) });
 });

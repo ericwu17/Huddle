@@ -1,20 +1,17 @@
 import { Link, useLocation } from "react-router";
 import type { GroupContext } from "../groupContext";
 import type { Booking } from "../types";
-import { isReadyAgentPlan, useAgentRun } from "../agentData";
 import Tick from "./Tick";
 
 // The huddle's steps as a vertical rail: done steps are ticked, the open screen
 // is highlighted, steps the group hasn't reached yet are shown but locked.
 export default function AgentPhaseNav({ ctx, booking }: { ctx: GroupContext; booking: Booking | null | undefined }) {
   const { pathname } = useLocation();
-  const planRun = useAgentRun(ctx.group.latestRunId);
-  const canVote = ctx.agent?.status === "ready" && planRun?.result?.inputRevision === ctx.agent.revision && planRun.result.plans.some(isReadyAgentPlan);
   const steps = [
     { route: "lobby", label: "People & invites", open: true },
     { route: "prefs", label: "Private needs", open: true },
     { route: "plans", label: "Coordinator & plans", open: !!ctx.group.latestRunId },
-    { route: "vote", label: "Vote", open: canVote },
+    { route: "vote", label: "Vote", open: true },
     { route: "call", label: "Booking simulation", open: !!booking && booking.runId === ctx.group.latestRunId },
   ];
   const at = steps.findIndex(s => pathname.endsWith(`/${s.route}`));

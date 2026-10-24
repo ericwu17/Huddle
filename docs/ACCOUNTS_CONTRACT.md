@@ -51,10 +51,10 @@ Sign out before switching accounts. Same-account login on another device creates
 another revocable device session, not another account or membership.
 
 Account group creation/join uses the account principal and persisted display name.
-Any huddle can be joined with its four-letter code (typed, scanned from the
-lobby QR or opened from a shared link) while it is still gathering people; the
-code is the invitation. Signed-in joiners get a durable membership; guests join
-by first name. Inbox invitations remain the option for Huddle friends.
+The compatibility backend still accepts a huddle's four-letter code while it is
+gathering people (the behavior merged from `c24c556`). Signed-in code joiners get
+a durable membership; guests join by first name. The account UI uses the friend
+dropdown and addressed Inbox invitations, with QR/code sharing removed.
 `removeHuddle` removes a huddle from the caller's own list only. Accepting an
 addressed invitation creates/reuses a durable membership and selects that group
 for this device. Selecting an old huddle changes no readiness, needs, votes or

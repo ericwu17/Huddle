@@ -1,4 +1,4 @@
-"""Menu-grounded coordinator selection and display-only fallback suggestions."""
+"""Menu-grounded coordinator selection and untimed fallback suggestions."""
 import asyncio
 import hashlib
 import json
@@ -16,10 +16,8 @@ def food_style(catalog, place):
 
 
 def summary(catalog, places):
-    meal = next((p for p in places if p.category == "meal"), places[0])
-    later = [p.name for p in places if p.id != meal.id]
     # Preserve the actual route order, including activity-first itineraries.
-    return "Visit " + " → ".join(p.name for p in places) + f"; {meal.name} is listed for {food_style(catalog, meal)}."
+    return " → ".join(p.name for p in places)
 
 
 def fallback_venues(catalog, body, eligible):

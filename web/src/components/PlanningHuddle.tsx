@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Buddy } from "../doodle/Doodle";
+import { displayTime } from "../venueFormatting";
 
 type Member = { id: string; name: string };
 
@@ -33,7 +34,7 @@ export default function PlanningHuddle({ members, start }: { members: Member[]; 
     return <button className="planning-pill btn btn-sun" onClick={() => setHidden(false)}>Planning… show the huddle</button>;
   }
   const speaker = cast.length ? tick % cast.length : -1;
-  const line = LINES[(tick * 5) % LINES.length].replace("{start}", start);
+  const line = LINES[(tick * 5) % LINES.length].replace("{start}", displayTime(start));
   return (
     <div className="planning-overlay" role="status" aria-live="polite">
       <section className="planning-card card">
