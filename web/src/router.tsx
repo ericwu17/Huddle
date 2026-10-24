@@ -18,6 +18,7 @@ import Context from "./routes/Context";
 import Connectors from "./routes/Connectors";
 
 export const router = createBrowserRouter([
+  { path: "/", loader: () => redirect("/start") },
   { path: "/start", Component: Home },
   { path: "/login", Component: Login },
   { path: "/friends", Component: Friends },

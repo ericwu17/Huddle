@@ -7,7 +7,7 @@ export default function JoinByCode() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   return (
-    <section className="card card-note card-tilt-r space-y-3" aria-label="Join with a code">
+    <section className="card card-note space-y-3" aria-label="Join with a code">
       <h2 className="card-title">Got a code?</h2>
       <form
         className="space-y-3"

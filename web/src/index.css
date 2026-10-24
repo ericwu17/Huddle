@@ -123,8 +123,7 @@ body {
 .card-note { background: var(--note); }
 .card-pink { background: #ffe2f1; }
 .card-mint { background: #e3f9d0; }
-.card-tilt-l { transform: rotate(-1.2deg); }
-.card-tilt-r { transform: rotate(1.2deg); }
+.card-tilt-l, .card-tilt-r { transform: none; } /* kept as names; everything sits straight */
 
 /* Text that is neither shouting nor important. Inherits colour so it works on paper and sky. */
 .muted { opacity: 0.72; font-size: 0.875rem; }
@@ -225,7 +224,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 /* ---- Group shell ---- */
 .topbar { display: flex; align-items: center; gap: 12px; }
 .logo { font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; text-shadow: 0 2px 0 var(--cobalt), 0 4px 0 var(--deep); }
-.code-tag { padding: 2px 12px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-3deg); }
+.code-tag { padding: 2px 12px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; box-shadow: 3px 3px 0 var(--ink); }
 .me-tag { margin-left: auto; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
 
 .steps {
@@ -305,7 +304,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .plan-budget { background: #e3f9d0; }
 .plan-budget .display { color: #2f7a12; }
 .plan-card.is-selected { transform: translateY(-3px); box-shadow: 9px 11px 0 var(--ink); outline: 4px solid var(--sun); outline-offset: 3px; }
-.plan-pick { position: absolute; top: -14px; right: 14px; transform: rotate(4deg); font-size: 13px; }
+.plan-pick { position: absolute; top: -14px; right: 14px; font-size: 13px; }
 .plan-stops { display: grid; gap: 8px; }
 .plan-stops li { display: flex; gap: 10px; align-items: flex-start; }
 .plan-dot { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--sun); border: 2.5px solid var(--ink); font-family: var(--display); font-size: 14px; line-height: 1; }
@@ -323,11 +322,11 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
   border: 4px solid var(--ink);
   border-radius: 34px;
   box-shadow: 7px 9px 0 var(--ink);
-  transform: rotate(-2deg);
+  transform: none;
 }
 .call-phone::before { content: ""; position: absolute; left: 50%; top: 10px; width: 64px; height: 6px; margin-left: -32px; background: var(--ink); border-radius: 4px; }
 .call-phone.is-ringing { animation: ring 2.4s ease-in-out infinite; }
-@keyframes ring { 0%, 70%, 100% { transform: rotate(-2deg); } 74% { transform: rotate(-5deg); } 78% { transform: rotate(1deg); } 82% { transform: rotate(-4deg); } 86% { transform: rotate(-1deg); } }
+@keyframes ring { 0%, 70%, 100% { transform: none; } 74% { transform: rotate(-3deg); } 78% { transform: rotate(3deg); } 82% { transform: rotate(-2deg); } 86% { transform: rotate(1deg); } }
 .call-screen { display: flex; flex-direction: column; gap: 8px; min-height: 260px; max-height: 420px; overflow-y: auto; color: var(--ink); font-size: 14px; line-height: 1.3; }
 .call-line { max-width: 86%; padding: 7px 11px; border-radius: 14px; font-weight: 600; }
 .call-line.is-them { background: #e8edff; align-self: flex-start; border-bottom-left-radius: 4px; }
@@ -348,15 +347,13 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
   font-size: 20px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  transform: rotate(-2deg);
+  transform: none;
 }
 .council-row { display: flex; align-items: flex-end; gap: 6px; }
 .council-row.is-right { flex-direction: row-reverse; }
 .council-row .buddy { margin-bottom: -4px; }
 .council-bubble { flex: 1; min-width: 0; margin-bottom: 30px; }
 .council-row.is-right .council-bubble { border-radius: 22px 22px 6px 22px; }
-.council-row.is-left .council-bubble { transform: rotate(-0.6deg); }
-.council-row.is-right .council-bubble { transform: rotate(0.6deg); }
 .council-speaker { font-family: var(--display); font-weight: 400; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cobalt); }
 .bubble-chair .council-speaker { color: var(--sun); }
 .council-for { font-family: var(--text); font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--ink-soft); }
