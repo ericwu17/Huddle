@@ -66,10 +66,10 @@ to get new URLs.
 
 ## 0. Before you start
 
-**Tell Max first.** `FASTAPI_BASE_URL` currently points at Max's tunnel
-(`conferencing-navigate-deleted-feedback.trycloudflare.com`). Changing it moves
-the live backend onto your laptop for everyone on the team. Max should stop his
-tunnel only after you've switched over.
+**Coordinate with the team first.** Maincloud now points at Eric Wu's real API
+and scripted voice service; current URLs are in [HANDOFF.md](HANDOFF.md).
+Changing them moves service traffic onto your laptop for everyone. Keep the old
+services running until the new endpoints and configuration have been verified.
 
 What this laptop needs:
 
@@ -221,10 +221,13 @@ api/.venv/bin/python api/eval/check_live.py \
   --voice-base-url "$VOICE_URL" --voice-scenario confirm
 ```
 
-Look for the "plan came from the api" check: it proves Maincloud reached your
-API tunnel. The script was written against the old stubs. A live council can
-drop an advocate (fewer than 9 messages) or pick a plan other than Safe; either
-fails those two checks without anything being wrong.
+Look for the "plan came from the api" check and real-mode health: together they
+verify Maincloud reached the real API tunnel without module fallback. The smoke
+now accepts validated real council output with fewer than nine messages or a
+different supplied plan. It checks whole-outing budgets and rejects stale votes,
+roulette and booking requests after a re-plan. The confirm scenario injects a
+full callback into a separate active test booking; the full scenario requires
+restarting the voice service as described below.
 
 Expect this from the real API, too: confidence rarely reaches 0.9 while place
 aspects are placeholders, so groups usually move on at the 12-swipe cap.

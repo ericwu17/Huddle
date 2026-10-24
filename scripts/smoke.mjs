@@ -41,6 +41,15 @@ const check = (name, ok, extra = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}${extra ? "  " + extra : ""}`);
   if (!ok) fails++;
 };
+async function rejects(name, fn) {
+  try { await fn(); check(name, false); }
+  catch { check(name, true); }
+}
+const mealIndex = (plan) => {
+  const i = plan.stops.findIndex((s) => s.category === "meal");
+  if (i < 0) throw new Error("smoke booking requires a meal stop");
+  return i;
+};
 
 if (voiceBase) {
   const url = `${voiceBase.replace(/\/$/, "")}/health`;
@@ -102,6 +111,8 @@ for (const [name] of demo) {
   phones.push({ tok, name, memberId });
 }
 check("4 members visible", (await view(host, "my_members")).length === 4);
+await rejects("member cannot change demo mode", () => call(phones[0].tok, "set_demo_mode", [true]));
+await rejects("member cannot change compromise visibility", () => call(phones[0].tok, "set_show_who_compromised", [true]));
 for (const p of phones) await call(p.tok, "set_ready", []);
 check("status -> eliciting", (await view(host, "my_group"))[0].status === "eliciting");
 
@@ -136,6 +147,10 @@ check("status -> voting with a run", !!g.latest_run_id, g.latest_run_id);
 const run = (await view(host, "my_plan_runs")).find((r) => r.run_id === g.latest_run_id);
 const result = JSON.parse(run.result_json);
 check("3 plans safe/bold/budget", result.plans.map((p) => p.kind).join() === "safe,bold,budget");
+const caps = await Promise.all(phones.map(async (p) => JSON.parse((await view(p.tok, "my_private"))[0].hard_json).budgetMaxPerPerson));
+check("outing costs equal stop sums and fit every private cap", result.plans.every((p) =>
+  Math.abs(p.costPerPerson - p.stops.reduce((total, s) => total + s.costPerPerson, 0)) < 1e-8 &&
+  caps.every((cap) => cap == null || p.costPerPerson <= cap)), result.plans.map((p) => `${p.kind}: $${p.costPerPerson}`).join(", "));
 const fellBack = (result.warnings ?? []).filter((w) => w.startsWith("fallback:"));
 if (conf("SMOKE_EXPECT_DEMO") === "1") {
   // Run against a module whose api URL is unreachable: the flow must still finish, labeled.
@@ -148,12 +163,17 @@ if (conf("SMOKE_EXPECT_DEMO") === "1") {
 check("privacy: perMember/gaveUp/posteriorSummary stripped", result.plans.every((p) => !p.perMember && !p.gaveUp) && !result.posteriorSummary);
 const leaked = result.plans.filter((p) => demo.some(([n]) => new RegExp(`\\b${n}\\b`, "i").test(p.whyLine ?? "")));
 check("privacy: no member names in whyLine", leaked.length === 0, leaked.map((p) => p.whyLine).join(" | "));
-const msgs = await until("9 council messages", async () => {
-  const m = await view(host, "my_council_messages");
-  return m.length >= 9 ? m : null;
+const council = await until("stored council result", async () => {
+  const row = (await view(host, "my_plan_runs")).find((r) => r.run_id === g.latest_run_id);
+  return row.council_json ? JSON.parse(row.council_json) : null;
 });
-check("council: 9 messages, chair last, no memberId", msgs.length === 9 && msgs.at(-1).speaker === "chair" && msgs.every((m) => m.member_id == null));
-check("council result stored", JSON.parse(run.council_json ?? (await view(host, "my_plan_runs")).find((r) => r.run_id === g.latest_run_id).council_json).chosenPlanId === result.plans[0].id);
+const msgs = (await view(host, "my_council_messages")).filter((m) => m.run_id === g.latest_run_id);
+check("council result chooses a supplied plan", result.plans.some((p) => p.id === council.chosenPlanId), `fallbackUsed=${council.fallbackUsed}`);
+check("council: private transcript, chair last when present", msgs.every((m) => m.member_id == null) &&
+  msgs.length <= 9 && (msgs.length > 0 ? msgs.at(-1).speaker === "chair" : council.fallbackUsed), `${msgs.length} messages`);
+if (run.stub) {
+  check("stub council: exactly 9 messages and Safe chosen", msgs.length === 9 && council.chosenPlanId === result.plans[0].id);
+}
 check("scout rows (cached)", (await view(host, "my_scout")).length >= 1);
 const offersFor = await Promise.all(phones.map(async (p) => (await view(p.tok, "my_offers")).length));
 if (offersFor.every((n) => n === 0)) {
@@ -193,7 +213,7 @@ async function checkFullReplan(b) {
 }
 
 // 5. Booking through the configured service (or module fake when its URL is unset).
-await call(phones[0].tok, "start_booking", [g.latest_run_id, result.plans[0].id, 0]);
+await call(phones[0].tok, "start_booking", [g.latest_run_id, result.plans[0].id, mealIndex(result.plans[0])]);
 if (voiceScenario === "full") {
   const failed = await until("voice-originated full failure", async () => (await view(host, "my_bookings")).find((b) => b.status === "failed" && b.fail_reason === "full"), 25000);
   await until("voice full ended event", async () => (await view(host, "my_call_events")).some((e) => e.booking_id === failed.id && e.type === "ended"), 10000);
@@ -211,28 +231,39 @@ check("call events end confirmed/ended", evs.includes("confirmed") && evs.at(-1)
 check("one confirm sequence (no duplicate replay)", evs.join(">") === "dialing>connected>transcript>transcript>slot_offered>transcript>confirmed>ended");
 check("status -> booked", (await view(host, "my_group"))[0].status === "booked");
 
-// 6. Voice route: failed/full from the voice service
-await call(phones[0].tok, "start_booking", [g.latest_run_id, result.plans[1].id, 0]);
-const b2 = await until("second booking", async () => (await view(host, "my_bookings")).find((b) => b.plan_id === result.plans[1].id));
-await sleep(9000); // let its fake confirm sequence finish first
+// 6. A late failure cannot undo a confirmed booking. A separate active booking
+// receives a synthetic full callback to exercise the re-plan route.
 const post = (body, s = secret) =>
   fetch(`${D}/route/call-event`, { method: "POST", headers: { "X-Huddle-Secret": s, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-check("route rejects bad secret", (await post({ bookingId: b2.id, type: "failed", reason: "full" }, "wrong")).status === 401);
+check("route rejects bad secret", (await post({ bookingId: booking.id, type: "failed", reason: "full" }, "wrong")).status === 401);
+const late = await post({ bookingId: booking.id, type: "failed", reason: "full", ts: Date.now() });
+check("late failure preserves confirmed booking and current run", late.ok &&
+  (await view(host, "my_bookings")).find((b) => b.id === booking.id).status === "confirmed" &&
+  (await view(host, "my_group"))[0].latest_run_id === g.latest_run_id);
+await call(phones[0].tok, "start_booking", [g.latest_run_id, result.plans[1].id, mealIndex(result.plans[1])]);
+const b2 = await until("active second booking", async () => (await view(host, "my_bookings")).find((b) => b.id !== booking.id && b.plan_id === result.plans[1].id));
+if (!["pending", "calling"].includes(b2.status)) throw new Error("Second booking finished before the synthetic full callback; retry smoke");
 const failRes = await post({ bookingId: b2.id, type: "failed", reason: "full", ts: Date.now() });
 check("route accepts failed/full", failRes.ok, failRes.ok ? "" : `${failRes.status} ${await failRes.text()}`);
 const { replanned, newRun } = await checkFullReplan(b2);
-await call(phones[0].tok, "start_booking", [replanned.latest_run_id, JSON.parse(newRun.result_json).plans[0].id, 0]);
+check("re-plan never auto-calls another restaurant", (await view(host, "my_bookings")).length === 2);
+await rejects("stale vote rejected after re-plan", () => call(phones[0].tok, "vote", [g.latest_run_id, result.plans[0].id]));
+await rejects("stale roulette rejected after re-plan", () => call(phones[0].tok, "do_roulette", [g.latest_run_id]));
+await rejects("stale booking rejected after re-plan", () => call(phones[0].tok, "start_booking", [g.latest_run_id, result.plans[0].id, mealIndex(result.plans[0])]));
+check("stale votes hidden after re-plan", (await view(host, "my_votes")).length === 0);
+check("stale roulette choice hidden after re-plan", (await view(host, "my_plan_runs")).find((r) => r.run_id === g.latest_run_id).roulette_json == null);
+const replacement = JSON.parse(newRun.result_json).plans[0];
+await call(phones[0].tok, "start_booking", [replanned.latest_run_id, replacement.id, mealIndex(replacement)]);
 check("call again clears the banner", (await until("banner cleared", async () => (await view(host, "my_group"))[0].replan_for == null ? true : null, 10000)) === true);
 const postCouncil = (memberId, label) => fetch(`${D}/route/council-message`, {
   method: "POST", headers: { "X-Huddle-Secret": secret, "Content-Type": "application/json" },
   body: JSON.stringify({ runId: g.latest_run_id, round: 1, speaker: "advocate", label, memberId, planId: null, stance: {}, text: "route test", cited: [], ts: Date.now() }),
 });
-// A member who already spoke in round 1: the module ignores the duplicate.
-const dup = await postCouncil(phones[0].memberId, "Advocate Dup");
-check("council-message route ignores a duplicate speaker", dup.ok && !(await view(host, "my_council_messages")).some((m) => m.label === "Advocate Dup"));
 // A speaker with no round-1 message yet: stored, and memberId hidden from the group.
 const cm = await postCouncil("m_smoke_route", "Advocate Z");
 check("council-message route stores a new message", cm.ok && (await view(host, "my_council_messages")).some((m) => m.label === "Advocate Z" && m.member_id == null));
+const dup = await postCouncil("m_smoke_route", "Advocate Dup");
+check("council-message route ignores a duplicate speaker", dup.ok && !(await view(host, "my_council_messages")).some((m) => m.label === "Advocate Dup"));
 
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASS");
 process.exit(fails ? 1 : 0);

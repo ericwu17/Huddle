@@ -4,12 +4,12 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 
 | Item | Where | Status |
 | --- | --- | --- |
-| Place dataset is a cached snapshot (~45 Berkeley places from Google Places, pulled once) | `data/places.json` | planned |
+| Place dataset is a cached snapshot (45 Berkeley places from Google Places, pulled once) | `data/places.json` | in use on Maincloud with `STUB_MODE=false` |
 | Nine fictional venues shared by API/backend stubs; legacy and real catalogs remain lookup-compatible | `api/fixtures/places.fake.json` | in use with `STUB_MODE=true` (default) |
 | API parser recognizes four exact demo phrases; posterior updates are unchanged; scores, confidence, Pareto rows, and council text/timestamps are canned; offers are empty | `api/stubs.py`, `server/src/lib/fakes.ts` | in use with `STUB_MODE=true` only; synthetic labels included |
 | Stub integration checks use real module procedures and the native in-memory test datastore calling localhost FastAPI, not a deployed database or browser subscriptions | `api/eval/check_integration.py`, `server/test/` | verified locally |
 | Demo group (Alex, Sam, Jordan, Riley) is seeded | `data/demo_group.json` | in use |
-| The module returns fake plans / council / scout / call data until the real api and voice are wired | `server/src/lib/fakes.ts` | in use (H0-H13) |
+| Module fakes are used when a group enters labeled demo mode; normal Maincloud planning now uses the real API. Scout remains cached and voice scripted | `server/src/lib/fakes.ts`, `server/src/lib/demo.ts` | fallback available; connected real-mode smoke stayed out of demo mode |
 | Cached plan run used when the api is unreachable | `data/cached_run.json` | placeholder (fake until H24) |
 | Scout results may come from a pre-warmed cache ("Checked earlier") | `data/scout_cache.json` | placeholder (fake until H24) |
 | The restaurant on the call is a teammate | demo | planned |
@@ -24,3 +24,4 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | When Claude is unavailable or returns invalid output, preferences are parsed by keyword rules; the member sees a warning | `api/parse.py` | in use with `STUB_MODE=false` (fallback path) |
 | Auth is hackathon-grade: each phone is whoever holds its SpacetimeDB token (kept in local storage); services share one secret header | `server/src/http.ts` | in use |
 | Demo mode: if the api or voice service is unreachable (or the host turns demo mode on), the group switches to labeled synthetic data and a scripted call; plans carry a `fallback:` warning and the UI shows "Demo mode: cached data" | `server/src/lib/demo.ts` | in use |
+| Maincloud smoke uses four generated identities and synthetic preference text, not four people on physical phones. Confirmation callbacks are scripted; the new deployment's full callback was injected into an active test booking | `scripts/smoke.mjs`, `docs/MAINCLOUD_VERIFICATION.md` | verified; not a real restaurant call or browser rehearsal |

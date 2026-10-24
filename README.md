@@ -22,21 +22,21 @@ The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
 
 ## Status
 
-- **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Connected to the FastAPI service with `STUB_MODE=true`; parse, learning, plans, scores and council remain synthetic there. The real service (Claude parsing, swipe learning, Monte Carlo solver, offers, live council) is implemented behind `STUB_MODE=false` but Maincloud has not been switched; see [api/README.md](api/README.md) and [the switch-over steps](docs/LOCAL_TUNNELS.md#4-point-the-maincloud-module-at-the-tunnels).
-- **Voice:** Eric Wu's `/book` stub is connected at `https://restaurants-availability-barbie-lil.trycloudflare.com`. Live synthetic confirm and full-to-re-plan tests passed through Maincloud without duplicate event replay. The service is restored to `STUB_SCENARIO=confirm`. No real phone call is implemented.
-- **Access and coverage:** Max Li and Eric Wu are confirmed database Admins. Eric Chen is leaving and has exhausted his Claude session usage; Max can cover backend coding here. Max's CLI 2.13.0 is logged into his own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified the API URL and `STUB_MODE=true` stayed unchanged. No module/schema was deployed.
+- **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`, now connected to Eric Wu's real FastAPI service with matching `STUB_MODE=false` and 45 Berkeley places. Backend privacy, stale-choice, booking callback and host-setting fixes are deployed without a data reset. [Deployment and smoke results](docs/MAINCLOUD_VERIFICATION.md).
+- **Voice:** the separate `/book` service remains scripted, currently `STUB_SCENARIO=confirm`. Connected confirmation and an injected full-to-re-plan test pass without duplicate event replay. No real phone call is implemented. Current service URLs are in [HANDOFF.md](docs/HANDOFF.md).
+- **Access and coverage:** Max Li and Eric Wu are database Admins. Max covers backend integration; Eric Wu owns current API work and Eric Chen works on UI. Max deployed with CLI 2.13.0 using his own account; the existing shared secret and data were preserved.
 - **Data:** no Bright Data account/key is available yet. Haydn owns the account, reviews and Mapbox routing; Eric Chen's booth/key task was temporary coverage. Review scores and live scout work remain blocked on that hand-off, not the stub demo.
 - **What's done and what's next:** [docs/ROADMAP.md](docs/ROADMAP.md). **Current state, async tasks, operating commands:** [docs/HANDOFF.md](docs/HANDOFF.md).
-- **Smoke test:** [Live check commands](api/README.md#check-the-live-connected-stubs) load the saved secret from `api/.env` and test both service scenarios. Each run creates a disposable synthetic group in the selected database.
+- **Smoke test:** [Current live commands and results](docs/MAINCLOUD_VERIFICATION.md) cover the real API, four separate identities, budgets, privacy, voting, roulette, synthetic booking and re-plan. Each run creates a disposable test group. A browser/four-physical-phone check remains separate.
 - **Honesty and disclosure:** [docs/HONESTY.md](docs/HONESTY.md), [docs/DISCLOSURE.md](docs/DISCLOSURE.md).
 - **Demo and submission:** [docs/DEMO_CHECKLIST.md](docs/DEMO_CHECKLIST.md). Corrected simulated comparisons and reproducible commands: [docs/experiments/README.md](docs/experiments/README.md); earlier per-stop-budget results are withdrawn.
 
-## Run the connected stubs
+## Run the connected services
 
 Use Python 3.11+ for both Python services. From the repository root:
 
 ```sh
-api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
+STUB_MODE=false api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
 FastAPI loads the ignored `api/.env` automatically. It needs the matching
@@ -45,8 +45,7 @@ real service and uses `ANTHROPIC_API_KEY` (the module's `STUB_MODE` must match).
 checks: [api/README.md](api/README.md). Running both services from one laptop behind
 Cloudflare tunnels: [docs/LOCAL_TUNNELS.md](docs/LOCAL_TUNNELS.md).
 
-The current development tunnel is
-`https://conferencing-navigate-deleted-feedback.trycloudflare.com`. Keep the API,
+The current development tunnels are recorded in [HANDOFF.md](docs/HANDOFF.md). Keep the API,
 tunnel and Mac awake while others use it. A restarted tunnel needs its new URL
 published as `FASTAPI_BASE_URL`. This is temporary development access, not hosted
 production infrastructure.

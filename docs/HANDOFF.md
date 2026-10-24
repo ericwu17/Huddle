@@ -1,24 +1,24 @@
 # Hand-off (Eric Chen to Max; Haydn retains Part A)
 
-> Updated through live voice checks, corrected experiments, and backend privacy/stale-choice guards. The latest module changes still need a coordinated publish. H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md) and [CONTRACT.md](CONTRACT.md). Current split: Eric Chen works on UI, Eric Wu works in `api/`, and Max covers backend/evaluation in Codex.
+> Updated after the Maincloud backend deployment and real-API switch on Oct 23, 2026 (Pacific). H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md), [CONTRACT.md](CONTRACT.md) and [current verification](MAINCLOUD_VERIFICATION.md). Current split: Eric Chen works on UI, Eric Wu works in `api/`, and Max covers backend/evaluation in Codex.
 
 ## Where things stand
 
 - **Backend is live:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks` (dashboard: https://spacetimedb.com/@kwunnchen/huddle-calhacks). Eric Chen is owner; Max Li and Eric Wu are confirmed Admin collaborators.
-- **Connected to Max's FastAPI stubs** via `FASTAPI_BASE_URL=https://conferencing-navigate-deleted-feedback.trycloudflare.com`, `STUB_MODE=true`. Every plan, parse and council message comes from his service and is labeled SYNTHETIC STUB.
-- **Voice stub is connected** at `https://restaurants-availability-barbie-lil.trycloudflare.com`. Live synthetic confirm and voice-originated full-to-re-plan checks passed through Maincloud with one event sequence per booking. Eric Wu restored `STUB_SCENARIO=confirm`, verified by the final run. No real phone call was made.
-- **Smoke test:** both live voice scenarios passed. The full case produced replacement plans excluding the restaurant, reopened voting and did not auto-call another place. Offers skip because the stubs return none on purpose. See [verification](../api/eval/VERIFICATION.md#live-voice-integration-follow-up).
+- **Real API connected:** `FASTAPI_BASE_URL=https://thru-test-meets-radios.trycloudflare.com`, with API and module both `STUB_MODE=false`. Authenticated health reports 45 places. Eric Wu supplied this replacement tunnel; the previous configured URLs had stopped resolving.
+- **Voice stub connected:** `VOICE_BASE_URL=https://albert-petition-spouse-itself.trycloudflare.com`, authenticated `stub=true`, `scenario=confirm`. It posts scripted callbacks; it does not place phone calls.
+- **Smoke test:** real parsing, swipe updates, plans, council (without chair fallback), a private offer, votes and roulette pass through Maincloud. Plans' cumulative costs fit every private cap. Synthetic confirmation and injected full-to-re-plan pass, including stale-choice rejection. The voice-originated full scenario passed earlier with the old API stubs; it has not been rerun against this new deployment. See [current verification](MAINCLOUD_VERIFICATION.md).
 - **Frontend:** Eric Chen reported the Maincloud flow passes. The rapid Plans-to-Vote transition and reopening Plans still need a browser regression check; do not infer those are fixed from the voice stub landing.
-- **Max's CLI is ready:** version 2.13.0 at `/Users/maxli/.local/bin/spacetime`, logged into Max's own account. An environment-only publish set `VOICE_BASE_URL`; management reads verified `FASTAPI_BASE_URL` and `STUB_MODE=true` stayed unchanged. No module/schema deploy or data reset was performed.
+- **Backend fixes deployed:** source `7612d0b` was published with CLI 2.13.0, `--delete-data=never`, and the new public service URLs. Existing shared secret and unspecified environment values were preserved; no data reset. Privacy, stale choices/current budgets, queued booking/late callback guards and host-only settings are live.
 - **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
-- **Real API implemented, not switched on:** `api/` now serves the real parser, learning, solver, offers and council with `STUB_MODE=false` ([api/README.md](../api/README.md)). Unit tests, the module integration check and a real-mode run of the module procedures pass locally. Maincloud and the running API still use `STUB_MODE=true`; switching needs the module and API flipped together ([LOCAL_TUNNELS.md](LOCAL_TUNNELS.md#4-point-the-maincloud-module-at-the-tunnels)).
-- **Current work split:** Eric Wu is working in `api/`; Max's current changes are experiments and documentation. Coordinate before touching that folder or evaluating the changing service.
+- **Real API implemented and switched on:** [api/README.md](../api/README.md) describes the implementation and limitations. Real-mode HTTP smoke passed through Eric Wu's tunnel. Review aspects are still placeholders and travel times are estimates; scout and phone calls remain cached/scripted.
+- **Current work split:** Eric Wu owns current `api/` work; Max covers backend integration/evaluation. This deployment did not edit API files or restart Eric's services.
 
 | Piece | Real or fake right now |
 | --- | --- |
-| Places | Max's synthetic fixture while `STUB_MODE=true`; real 45 Berkeley places in `data/places.json` for later |
-| Parse, swipes, plans, council | Stubs (canned) on Maincloud; real implementation behind `STUB_MODE=false`, not switched on |
-| Offers | none from the stubs (never faked); real private offers behind `STUB_MODE=false` |
+| Places | Real 45 Berkeley places; review aspects remain placeholder scores |
+| Parse, swipes, plans, council | Real implementation on Maincloud, `STUB_MODE=false`; keyword/Safe fallbacks remain available |
+| Offers | Real private offers; the connected test delivered one only to its recipient |
 | Scout badge | cached file, labeled "Checked earlier" |
 | Phone call | separate voice service, scripted confirm scenario; no phone call |
 | Re-plan on "full" | real logic, tested |
@@ -57,7 +57,7 @@
 - [x] Claude API key shared privately with Max; current stubs do not use it.
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO.
 - [x] Real API in `api/` (`STUB_MODE=false`): 37 unit tests, module integration check, HTTP smoke in both modes, and a local real-mode run of the module procedures with live Claude.
-- [ ] Switch Maincloud to the real API with the team: API and module `STUB_MODE=false` together, then a new huddle.
+- [x] Switch Maincloud to the real API with the team: API and module `STUB_MODE=false` together; new four-identity huddle passes connected smoke.
 
 ### Haydn (out until Saturday)
 
@@ -69,12 +69,15 @@
 ## Remaining work (not dependent on Eric Chen's Claude quota)
 
 1. **Bright Data:** review pull for `data/places.base.json` (each place has `googlePlaceId`), `docs/BRIGHTDATA.md`, then the live scout check in `server/src/council.ts` (`runScoutJob`). Needs `BRIGHTDATA_API_KEY`.
-2. **Keep both Python services and tunnels awake:** Max owns the API process/tunnel; Eric Wu owns voice. Report new URLs after a tunnel restart and update the matching module setting. Real voice remains a later phase.
-3. **Demo-mode fallbacks:** done in `server/src/lib/demo.ts` (Eric Chen). A dead tunnel now flips that group to labeled demo mode instead of freezing parse/swipes; the host can also toggle it. **Needs a Maincloud publish after it is merged** (only then is it live). `data/cached_run.json` is still a placeholder; the labeled fakes serve that role.
+2. **Keep both Python services and tunnels awake:** coordinate the current API/voice processes with Eric Wu, who supplied the new endpoints. Report new URLs after a tunnel restart and update the matching module setting. Real voice remains a later phase.
+3. **Demo-mode fallbacks:** deployed in `server/src/lib/demo.ts` (Eric Chen). A dead tunnel flips that group to labeled demo mode instead of freezing parse/swipes; the host can also toggle it. Native tests cover this path; the connected real-API run stayed out of fallback mode. `data/cached_run.json` is still a placeholder; labeled fakes serve that role.
 4. **`server/src/geo.ts`:** Mapbox route geometry + leg times with `geo_cache`. Needs `MAPBOX_TOKEN`. Fallback is straight lines.
 5. **Rerun experiments** after places.json v2; Eric Wu's real API is ready for the opt-in comparison (run it with `STUB_MODE=false`). Baselines run without API calls by default; opt-in commands and failure reporting are in [experiments/README.md](experiments/README.md#reproduce). Demo rehearsal and submission checklist: [DEMO_CHECKLIST.md](DEMO_CHECKLIST.md).
 
-## Verification after pulling the voice stub
+## Earlier verification history
+
+The pending-publish statements below describe earlier checks; the module is now
+deployed. Current results and commands are in [MAINCLOUD_VERIFICATION.md](MAINCLOUD_VERIFICATION.md).
 
 - `api/.venv/bin/python -m unittest discover -s voice/eval -v`: six voice tests passed (local fake event poster; no Maincloud callbacks).
 - `npm run typecheck --prefix server`: passed.
@@ -121,7 +124,7 @@ FASTAPI_BASE_URL=https://NEW-URL.trycloudflare.com spacetime publish huddle-calh
 # Smoke test against Maincloud (loads api/.env; creates a throwaway group)
 api/.venv/bin/python api/eval/check_live.py \
   --server https://maincloud.spacetimedb.com --database huddle-calhacks \
-  --voice-base-url https://restaurants-availability-barbie-lil.trycloudflare.com \
+  --voice-base-url https://albert-petition-spouse-itself.trycloudflare.com \
   --voice-scenario confirm
 
 # Frontend against Maincloud (PowerShell, from web/)
@@ -136,7 +139,7 @@ verified, and the environment-only voice URL update succeeded. Max and Eric Wu h
 use their own logins. Eric Wu's CLI setup has not been checked here. Do not share
 Eric Chen's login/token.
 
-To verify the voice-originated full case, Eric Wu restarts only his API with
+To verify the voice-originated full case, Eric Wu restarts only his voice API with
 `STUB_SCENARIO=full`, keeping the tunnel running. Run the same helper with
 `--voice-scenario full`, then restore the service to `confirm` and rerun confirm.
 The test flag selects assertions, not the remote scenario. No real calls are made.
