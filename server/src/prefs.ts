@@ -9,11 +9,13 @@ import { placesForMode } from "./lib/places";
 import { guardPlanResult, preserveBudget } from "./lib/budgets";
 import type { Proc } from "./lib/types";
 import { at, membersOf, nowMs, parse } from "./lib/util";
+import { isAgent } from "./lib/agent-state";
 
 // ---- reducers (called by phones) ----
 
 export const submitPrefs = spacetimedb.reducer({ text: t.string() }, (tx, { text }) => {
   const me = requireMember(tx);
+  if (isAgent(tx.db, me.groupId)) throw new SenderError("Use the private agent needs form for this huddle.");
   const clean = text.trim().slice(0, 500);
   const existing = tx.db.private_prefs.memberId.find(me.id);
   if (existing) tx.db.private_prefs.memberId.update({ ...existing, text: clean, updatedAt: nowMs(tx) });
@@ -30,6 +32,7 @@ export const submitSwipe = spacetimedb.reducer(
   { winnerPlaceId: t.string(), loserPlaceId: t.string() },
   (tx, { winnerPlaceId, loserPlaceId }) => {
     const me = requireMember(tx);
+    if (isAgent(tx.db, me.groupId)) throw new SenderError("Agent huddles do not use swipes.");
     if (me.swipeCount >= MAX_SWIPES) throw new SenderError("swipe limit reached");
     const prefs = tx.db.private_prefs.memberId.find(me.id);
     if (!prefs?.posteriorJson) throw new SenderError("preferences not parsed yet");

@@ -1,6 +1,26 @@
 # Single laptop demo change plan
 
-Proposed implementation, October 24, 2026. The agreed direction is one laptop
+## Status October 24 superseded for the shared demo
+
+The all-local proposal below is retained for reference. It is not the current
+deployment plan. An isolated test on SpacetimeDB 2.13.0 reproduced a procedure
+HTTP failure when calling a reachable loopback endpoint: `refusing to connect to
+private or special-purpose addresses`. Phase 1 therefore fails as written.
+Moving all services onto one laptop would also retain that laptop as the shared
+demo's availability dependency.
+
+The current direction is [CURRENT_CONTEXT.md](CURRENT_CONTEXT.md): agent-led
+planning with code-enforced hard constraints, separate Vite/FastAPI processes
+for local development, and Vercel + Maincloud + local FastAPI behind a public
+tunnel for the shared app. The laptop availability dependency is accepted for
+this phase. Hosted API migration is deferred; no hosting cutover has happened.
+Review [AGENT_FLOW_PLAN.md](AGENT_FLOW_PLAN.md). Do not implement the historical
+all-local database launcher or preserve its mathematical requirements as new
+product requirements.
+
+## Original proposal
+
+Proposed implementation, October 24, 2026. The earlier direction was one laptop
 running three separate processes: Vite for the React frontend, FastAPI for the
 Python solver/council, and local SpacetimeDB for state and realtime. This plan
 covers the startup and connection changes needed to demonstrate Huddle with

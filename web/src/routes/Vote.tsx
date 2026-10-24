@@ -8,8 +8,14 @@ import { useRun } from "../useRun";
 import { KIND_LABEL } from "../plans";
 import PlanCard from "../components/PlanCard";
 import { Buddy } from "../doodle/Doodle";
+import { AgentVote } from "../components/AgentFlow";
 
 export default function Vote() {
+  const { agent } = useGroup();
+  return agent ? <AgentVote /> : <LegacyVote />;
+}
+
+function LegacyVote() {
   const { group, session } = useGroup();
   const navigate = useNavigate();
   const runId = group.latestRunId;

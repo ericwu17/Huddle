@@ -1,5 +1,11 @@
 # Huddle contract
 
+> Coordinator update, October 24: [AGENT_CONTRACT.md](AGENT_CONTRACT.md) defines
+> the approved additive agent endpoints, private context/confirmation views and
+> group actions. New frontend starts use that flow. The specification below
+> remains the legacy contract; its numerical fields are not used as fake values
+> for agent results. Existing tables and legacy groups remain compatible.
+
 > Section S5 of build-brief.md, with S5.5 written for SpacetimeDB. Maintained by Eric Chen. Read-only for everyone else: propose changes in the team channel.
 
 ## S5.1 Constants

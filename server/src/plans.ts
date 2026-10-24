@@ -11,6 +11,7 @@ import { guardPlanResult, planFitsBudgets } from "./lib/budgets";
 import { availablePlans } from "./lib/availability";
 import type { Proc, Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs, parse } from "./lib/util";
+import { agentBallot, isAgent, startAgentRun } from "./lib/agent-state";
 
 export function planMembers(tx: Tx, groupId: string) {
   return membersOf(tx.db, groupId).sort((a, b) => a.joinedAt - b.joinedAt).map((m) => {
@@ -31,6 +32,7 @@ export function groupIdOf(ctx: Proc, runId: string): string {
 
 // Starts a new run for the group and returns its runId. Exported for Haydn's replan.ts.
 export function startRun(tx: Tx, groupId: string): string {
+  if (isAgent(tx.db, groupId)) return startAgentRun(tx, groupId);
   const g = tx.db.group.id.find(groupId);
   if (!g) throw new Error(`group ${groupId} not found`);
   const runId = `run_${g.code}_${g.runCounter + 1}`;
@@ -172,12 +174,26 @@ export const castVote = spacetimedb.reducer({ name: "vote" }, { runId: t.string(
   const row = { id, runId, memberId: me.id, planId };
   if (tx.db.vote.id.find(id)) tx.db.vote.id.update(row);
   else tx.db.vote.insert(row);
+  if (isAgent(tx.db, me.groupId)) tx.db.plan_run.runId.update({ ...run, rouletteJson: undefined });
 });
 
 export const doRoulette = spacetimedb.procedure(
   { runId: t.string() },
   t.object("RouletteResult", { planId: t.string() }),
   (ctx, { runId }) => {
+    const agentPick = ctx.withTx(tx => {
+      const me = requireMember(tx);
+      if (!isAgent(tx.db, me.groupId)) return null;
+      const ballot = agentBallot(tx.db, me.groupId, runId);
+      if (ballot.leaders.length < 2) throw new SenderError("Spin is only available after everyone votes and the current choices are tied.");
+      if (ballot.winner) return { planId: ballot.winner };
+      const planId = ballot.leaders[tx.random.integerInRange(0, ballot.leaders.length - 1)];
+      const run = tx.db.plan_run.runId.find(runId)!;
+      tx.db.plan_run.runId.update({ ...run, rouletteJson: JSON.stringify({ planId, voteSignature: ballot.signature,
+        weights: ballot.leaders.map(id => ({ planId: id, weight: 1 / ballot.leaders.length })) }) });
+      return { planId };
+    });
+    if (agentPick) return agentPick;
     const input = ctx.withTx((tx) => {
       const me = requireMember(tx);
       const run = tx.db.plan_run.runId.find(runId);

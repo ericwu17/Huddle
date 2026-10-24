@@ -10,7 +10,7 @@ const token = import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
 
 // `lines` are [lng, lat] polylines: Mapbox route legs when routeGeometry
 // returned, otherwise straight lines between stops.
-type Props = { plan: Plan; lines: [number, number][][] };
+type Props = { plan: Pick<Plan, "stops">; lines: [number, number][][] };
 
 export default function PlanMap(props: Props) {
   return token ? <MapboxMap {...props} /> : <StreetMap {...props} />;

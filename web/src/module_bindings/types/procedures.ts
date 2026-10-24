@@ -6,10 +6,13 @@
 import { type Infer as __Infer } from "spacetimedb";
 
 // Import all procedure arg schemas
+import * as CreateAgentGroupProcedure from "../create_agent_group_procedure";
 import * as CreateGroupProcedure from "../create_group_procedure";
 import * as DoRouletteProcedure from "../do_roulette_procedure";
 import * as JoinGroupProcedure from "../join_group_procedure";
 
+export type CreateAgentGroupArgs = __Infer<typeof CreateAgentGroupProcedure.params>;
+export type CreateAgentGroupResult = __Infer<typeof CreateAgentGroupProcedure.returnType>;
 export type CreateGroupArgs = __Infer<typeof CreateGroupProcedure.params>;
 export type CreateGroupResult = __Infer<typeof CreateGroupProcedure.returnType>;
 export type DoRouletteArgs = __Infer<typeof DoRouletteProcedure.params>;

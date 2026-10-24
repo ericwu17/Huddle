@@ -36,21 +36,28 @@ import {
 // Import all reducer arg schemas
 import AcceptOfferReducer from "./accept_offer_reducer";
 import CastVoteReducer from "./cast_vote_reducer";
+import ConfirmAgentNeedsReducer from "./confirm_agent_needs_reducer";
 import DeclineOfferReducer from "./decline_offer_reducer";
+import FindAgentPlansReducer from "./find_agent_plans_reducer";
+import PostAgentDiscussionReducer from "./post_agent_discussion_reducer";
 import SetDemoModeReducer from "./set_demo_mode_reducer";
 import SetOriginReducer from "./set_origin_reducer";
 import SetReadyReducer from "./set_ready_reducer";
 import SetShowWhoCompromisedReducer from "./set_show_who_compromised_reducer";
 import StartBookingReducer from "./start_booking_reducer";
+import SubmitAgentPrefsReducer from "./submit_agent_prefs_reducer";
 import SubmitPrefsReducer from "./submit_prefs_reducer";
 import SubmitSwipeReducer from "./submit_swipe_reducer";
 
 // Import all procedure arg schemas
+import * as CreateAgentGroupProcedure from "./create_agent_group_procedure";
 import * as CreateGroupProcedure from "./create_group_procedure";
 import * as DoRouletteProcedure from "./do_roulette_procedure";
 import * as JoinGroupProcedure from "./join_group_procedure";
 
 // Import all table schema definitions
+import MyAgentNeedsRow from "./my_agent_needs_table";
+import MyAgentSessionRow from "./my_agent_session_table";
 import MyBookingsRow from "./my_bookings_table";
 import MyCallEventsRow from "./my_call_events_table";
 import MyCouncilMessagesRow from "./my_council_messages_table";
@@ -66,6 +73,20 @@ import MyVotesRow from "./my_votes_table";
 
 /** The schema information for all tables in this module. This is defined the same was as the tables would have been defined in the server. */
 const tablesSchema = __schema({
+  myAgentNeeds: __table({
+    name: 'my_agent_needs',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAgentNeedsRow),
+  myAgentSession: __table({
+    name: 'my_agent_session',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyAgentSessionRow),
   myBookings: __table({
     name: 'my_bookings',
     indexes: [
@@ -142,18 +163,23 @@ const tablesSchema = __schema({
 const reducersSchema = __reducers(
   __reducerSchema("accept_offer", AcceptOfferReducer),
   __reducerSchema("vote", CastVoteReducer),
+  __reducerSchema("confirm_agent_needs", ConfirmAgentNeedsReducer),
   __reducerSchema("decline_offer", DeclineOfferReducer),
+  __reducerSchema("find_agent_plans", FindAgentPlansReducer),
+  __reducerSchema("post_agent_discussion", PostAgentDiscussionReducer),
   __reducerSchema("set_demo_mode", SetDemoModeReducer),
   __reducerSchema("set_origin", SetOriginReducer),
   __reducerSchema("set_ready", SetReadyReducer),
   __reducerSchema("set_show_who_compromised", SetShowWhoCompromisedReducer),
   __reducerSchema("start_booking", StartBookingReducer),
+  __reducerSchema("submit_agent_prefs", SubmitAgentPrefsReducer),
   __reducerSchema("submit_prefs", SubmitPrefsReducer),
   __reducerSchema("submit_swipe", SubmitSwipeReducer),
 );
 
 /** The schema information for all procedures in this module. This is defined the same way as the procedures would have been defined in the server. */
 const proceduresSchema = __procedures(
+  __procedureSchema("create_agent_group", CreateAgentGroupProcedure.params, CreateAgentGroupProcedure.returnType),
   __procedureSchema("create_group", CreateGroupProcedure.params, CreateGroupProcedure.returnType),
   __procedureSchema("do_roulette", DoRouletteProcedure.params, DoRouletteProcedure.returnType),
   __procedureSchema("join_group", JoinGroupProcedure.params, JoinGroupProcedure.returnType),
@@ -161,6 +187,10 @@ const proceduresSchema = __procedures(
 
 type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "tables"> & {
   tables: typeof tablesSchema.schemaType.tables & {
+    /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
+    readonly "my_agent_needs": Omit<typeof tablesSchema.schemaType.tables["myAgentNeeds"], "accessorName"> & { readonly accessorName: "my_agent_needs" };
+    /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
+    readonly "my_agent_session": Omit<typeof tablesSchema.schemaType.tables["myAgentSession"], "accessorName"> & { readonly accessorName: "my_agent_session" };
     /** @deprecated Use `myBookings` instead. This alias will be removed in the next major version. */
     readonly "my_bookings": Omit<typeof tablesSchema.schemaType.tables["myBookings"], "accessorName"> & { readonly accessorName: "my_bookings" };
     /** @deprecated Use `myCallEvents` instead. This alias will be removed in the next major version. */
@@ -199,6 +229,8 @@ const REMOTE_MODULE = {
 >;
 
 const tableAccessorAliases = {
+  "my_agent_needs": "myAgentNeeds",
+  "my_agent_session": "myAgentSession",
   "my_bookings": "myBookings",
   "my_call_events": "myCallEvents",
   "my_council_messages": "myCouncilMessages",
@@ -229,6 +261,10 @@ function __withTableAccessorAliases<T extends object>(target: T, freeze = false)
 
 type __DbViewBase = __DbConnectionImpl<typeof REMOTE_MODULE>["db"];
 export type DbView = __DbViewBase & {
+  /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_needs": __DbViewBase["myAgentNeeds"];
+  /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_session": __DbViewBase["myAgentSession"];
   /** @deprecated Use `myBookings` instead. This alias will be removed in the next major version. */
   readonly "my_bookings": __DbViewBase["myBookings"];
   /** @deprecated Use `myCallEvents` instead. This alias will be removed in the next major version. */
@@ -253,6 +289,10 @@ export type DbView = __DbViewBase & {
 
 type __TablesBase = __QueryBuilder<typeof tablesSchema.schemaType>;
 export type Tables = __TablesBase & {
+  /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_needs": __TablesBase["myAgentNeeds"];
+  /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
+  readonly "my_agent_session": __TablesBase["myAgentSession"];
   /** @deprecated Use `myBookings` instead. This alias will be removed in the next major version. */
   readonly "my_bookings": __TablesBase["myBookings"];
   /** @deprecated Use `myCallEvents` instead. This alias will be removed in the next major version. */

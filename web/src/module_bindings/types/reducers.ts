@@ -8,23 +8,31 @@ import { type Infer as __Infer } from "spacetimedb";
 // Import all reducer arg schemas
 import AcceptOfferReducer from "../accept_offer_reducer";
 import CastVoteReducer from "../cast_vote_reducer";
+import ConfirmAgentNeedsReducer from "../confirm_agent_needs_reducer";
 import DeclineOfferReducer from "../decline_offer_reducer";
+import FindAgentPlansReducer from "../find_agent_plans_reducer";
+import PostAgentDiscussionReducer from "../post_agent_discussion_reducer";
 import SetDemoModeReducer from "../set_demo_mode_reducer";
 import SetOriginReducer from "../set_origin_reducer";
 import SetReadyReducer from "../set_ready_reducer";
 import SetShowWhoCompromisedReducer from "../set_show_who_compromised_reducer";
 import StartBookingReducer from "../start_booking_reducer";
+import SubmitAgentPrefsReducer from "../submit_agent_prefs_reducer";
 import SubmitPrefsReducer from "../submit_prefs_reducer";
 import SubmitSwipeReducer from "../submit_swipe_reducer";
 
 export type AcceptOfferParams = __Infer<typeof AcceptOfferReducer>;
 export type CastVoteParams = __Infer<typeof CastVoteReducer>;
+export type ConfirmAgentNeedsParams = __Infer<typeof ConfirmAgentNeedsReducer>;
 export type DeclineOfferParams = __Infer<typeof DeclineOfferReducer>;
+export type FindAgentPlansParams = __Infer<typeof FindAgentPlansReducer>;
+export type PostAgentDiscussionParams = __Infer<typeof PostAgentDiscussionReducer>;
 export type SetDemoModeParams = __Infer<typeof SetDemoModeReducer>;
 export type SetOriginParams = __Infer<typeof SetOriginReducer>;
 export type SetReadyParams = __Infer<typeof SetReadyReducer>;
 export type SetShowWhoCompromisedParams = __Infer<typeof SetShowWhoCompromisedReducer>;
 export type StartBookingParams = __Infer<typeof StartBookingReducer>;
+export type SubmitAgentPrefsParams = __Infer<typeof SubmitAgentPrefsReducer>;
 export type SubmitPrefsParams = __Infer<typeof SubmitPrefsReducer>;
 export type SubmitSwipeParams = __Infer<typeof SubmitSwipeReducer>;
 

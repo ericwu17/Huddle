@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
-import { useProcedure } from "spacetimedb/react";
+import { useProcedure, useSpacetimeDB } from "spacetimedb/react";
 import { procedures } from "../module_bindings";
 import { saveSession } from "../session";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 
 export default function Home() {
+  const { isActive } = useSpacetimeDB();
   const navigate = useNavigate();
-  const createGroup = useProcedure(procedures.createGroup);
+  const createGroup = useProcedure(procedures.createAgentGroup);
   const joinGroup = useProcedure(procedures.joinGroup);
   const { run, busy, error } = useRun();
   // The landing page's form sends ?name= here.
@@ -53,7 +54,8 @@ export default function Home() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <button className="btn btn-primary w-full" disabled={busy || !name.trim()} onClick={start}>
+        {!isActive ? <p role="status" className="muted">Connecting to Huddle…</p> : null}
+        <button className="btn btn-primary w-full" disabled={busy || !isActive || !name.trim()} onClick={start}>
           Start a huddle ↗
         </button>
         {error && <p className="error">{error}</p>}

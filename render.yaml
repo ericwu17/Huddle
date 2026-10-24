@@ -1,0 +1,24 @@
+# Creates a paid service only when this Blueprint is applied in Render.
+# Review the instance price before applying; no database or disk is needed.
+services:
+  - type: web
+    name: huddle-api
+    runtime: python
+    repo: https://github.com/ericwu17/Huddle
+    branch: main
+    region: oregon
+    plan: starter
+    autoDeployTrigger: "off"
+    # Keep the repository root: the API also loads data/places.json.
+    buildCommand: python -m pip install -r api/requirements.txt
+    startCommand: python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT --no-access-log
+    # Use Render's default TCP probe. /health requires X-Huddle-Secret.
+    envVars:
+      - key: HUDDLE_SHARED_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SPACETIMEDB_URI
+        value: https://maincloud.spacetimedb.com
+      - key: SPACETIMEDB_DB
+        value: huddle-calhacks

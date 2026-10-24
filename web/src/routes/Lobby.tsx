@@ -6,7 +6,7 @@ import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 
 export default function Lobby() {
-  const { group, session, isHost } = useGroup();
+  const { group, session, isHost, agent } = useGroup();
   const setReady = useReducer(reducers.setReady);
   const setOrigin = useReducer(reducers.setOrigin);
   const setDemoMode = useReducer(reducers.setDemoMode);
@@ -59,7 +59,7 @@ export default function Lobby() {
       </div>
       <p className="on-sky muted">Starts once there are 2+ members and everyone is ready.</p>
 
-      {isHost && (
+      {isHost && !agent && (
         <section className="card space-y-3 text-sm">
           <h2 className="card-title">Host settings</h2>
           <label className="check">

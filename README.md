@@ -1,69 +1,119 @@
 # Huddle
 
-Everyone in the group chat says what they want, and the AI finds a plan nobody hates, has agents argue it out, then books it by phone.
+Everyone describes what they want. A huddle agent uses the group's prompt context
+to suggest an outing, explain the trade-offs and help the group decide.
 
-Cal Hacks 13.0. Current operating instructions and hand-off are below; the final submission README is due at H26.
+Cal Hacks 13.0. **Start with [current product and architecture context](docs/CURRENT_CONTEXT.md).**
+It supersedes conflicting requirements in the original build brief and task split.
+
+## Current goal
+
+Move from mathematical ranking to Claude-led agents using every participant's
+submitted prompt and confirmed needs. Keep deterministic code checks for private
+cumulative budgets, confirmed dietary/allergy restrictions, venue facts and stale
+choices. The coordinator uses prompts internally; the shared UI does not expose
+other members' raw prompts, budget caps or offers.
+
+The implemented flow for new huddles is join -> individual prompts/clarification
+and private confirmation -> agent proposals
+-> validated itineraries and explanations -> group choice -> visibly scripted
+booking/re-plan. New huddles use one Claude coordinator. Legacy endpoints/groups
+retain the original mathematical planner for compatibility; new results have no
+feature vectors, Bayesian swipe gates or Monte Carlo confidence fields.
+
+The UI direction remains shadcn, Start a huddle as the primary screen, and a
+readable agent conversation with plans/voting always accessible. Accounts,
+contacts, history, voice input and personal AI keys are staged enhancements.
+
+## Architecture and status
+
+| Component | Current implementation | Shared app target |
+| --- | --- | --- |
+| Frontend | Vite/React, deployed on Vercel | Keep Vercel; improve the prompt/agent/plan flow |
+| State and realtime | SpacetimeDB Maincloud, `huddle-calhacks` | Keep Maincloud; store durable huddle context and current input revisions |
+| API and planner | Separate Python FastAPI service on Max's Mac/tunnel | One coordinator, with legacy routes retained |
+| Models | Claude API for private needs and coordinator choices | Code validates facts and hard limits; no installed local LLM required |
+| Booking | Maincloud's scripted booking path; separate voice service disconnected in the recorded setup | Keep the simulation labeled until real calls are implemented |
+| Venue data | 45 Berkeley places; review aspects are placeholders, scout cached | Bright Data scraping and validated catalog/evidence refresh are active next work |
+
+Keep frontend and API as separate processes during local development. The earlier
+fully local database proposal is **blocked as written**: SpacetimeDB 2.13.0
+procedure HTTP rejected a reachable loopback endpoint in an isolated test. The
+single-laptop proposal is retained as [historical context](docs/SINGLE_LAPTOP_PLAN.md).
+
+The current decision is to keep local FastAPI + a public tunnel + Maincloud and
+accept the host laptop's availability dependency temporarily. One operator owns
+the shared API URL; others can test from Vercel or their own local frontend.
+Hosted API migration is deferred. The earlier [Render preparation](docs/HOSTED_API.md)
+has not been deployed or connected to Maincloud.
 
 ## Layout
 
 | Path | Owner | What |
 | --- | --- | --- |
-| `web/` | Haydn | Vite + React app (see [web/README.md](web/README.md)) |
-| `server/` | Eric Chen; Max covering backend work while Eric is away | SpacetimeDB module (`src/geo.ts`, `src/replan.ts` remain Part A; Eric Chen implemented re-plan while Haydn was out) |
-| `web/src/components/council/` | Eric Chen; Max covering integration | Council panel |
+| `web/` | Eric Chen; coordinate overlapping work | Vite + React app (see [web/README.md](web/README.md)) |
+| `server/` | Eric Chen with Max on integration | SpacetimeDB state, private views, jobs and realtime |
+| `web/src/components/council/` | Eric Chen | Agent conversation / council panel |
 | `web/src/components/call/` | Eric Wu | Call screen |
-| `api/` | Max | FastAPI solver + council (see [api/README.md](api/README.md)) |
-| `voice/` | Eric Wu | Pipecat / Twilio voice service |
-| `data/` | Eric Chen, Haydn (`reviews/`) | Place data, fakes, caches |
-| `docs/` | Eric Chen; Max maintaining the current hand-off | Contract, roadmap, hand-off, honesty list, disclosure |
-| `scripts/` | Haydn (smoke test implemented by Eric Chen) | `smoke.mjs` end-to-end test |
+| `api/` | Eric Wu on implementation; Max on planner/context/contracts and verification | Separate FastAPI service; coordinate file ownership before edits |
+| `voice/` | Eric Wu | Scripted service; live phone calls deferred |
+| `data/` | Coordinate venue corrections; review pipeline deferred | Place catalog, fakes, caches |
+| `docs/` | Max maintaining current context with the team | Context, contracts, roadmap, hand-off and disclosure |
+| `scripts/` | Coordinate with Eric Chen and Max | Hosting helpers and connected smoke |
 
-The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
+The additive [agent contract](docs/AGENT_CONTRACT.md) describes the new flow.
+The [legacy wire contract](docs/CONTRACT.md) remains valid for existing groups.
 
-## Status
+## Current work
 
-- **Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`, now connected to Eric Wu's real FastAPI service with matching `STUB_MODE=false` and 45 Berkeley places. Backend privacy, stale-choice, booking callback and host-setting fixes are deployed without a data reset. [Deployment and smoke results](docs/MAINCLOUD_VERIFICATION.md).
-- **Voice:** the separate `/book` service remains scripted, currently `STUB_SCENARIO=confirm`. Connected confirmation and an injected full-to-re-plan test pass without duplicate event replay. No real phone call is implemented. Current service URLs are in [HANDOFF.md](docs/HANDOFF.md).
-- **Access and coverage:** Max Li and Eric Wu are database Admins. Max covers backend integration; Eric Wu owns current API work and Eric Chen works on UI. Max deployed with CLI 2.13.0 using his own account; the existing shared secret and data were preserved.
-- **Data:** no Bright Data account/key is available yet. Haydn owns the account, reviews and Mapbox routing; Eric Chen's booth/key task was temporary coverage. Review scores and live scout work remain blocked on that hand-off, not the stub demo.
-- **What's done and what's next:** [docs/ROADMAP.md](docs/ROADMAP.md). **Current state, async tasks, operating commands:** [docs/HANDOFF.md](docs/HANDOFF.md).
-- **Smoke test:** [Current live commands and results](docs/MAINCLOUD_VERIFICATION.md) cover the real API, four separate identities, budgets, privacy, voting, roulette, synthetic booking and re-plan. Each run creates a disposable test group. A browser/four-physical-phone check remains separate.
-- **Honesty and disclosure:** [docs/HONESTY.md](docs/HONESTY.md), [docs/DISCLOSURE.md](docs/DISCLOSURE.md).
-- **Demo and submission:** [docs/DEMO_CHECKLIST.md](docs/DEMO_CHECKLIST.md). Corrected simulated comparisons and reproducible commands: [docs/experiments/README.md](docs/experiments/README.md); earlier per-stop-budget results are withdrawn.
+- [Approved agent flow](docs/AGENT_FLOW_PLAN.md): the participant journey and scope.
+- [Run the stack](docs/AGENT_RUNBOOK.md) and [verification](docs/AGENT_VERIFICATION.md):
+  exact local commands, connected checks and remaining limitations.
+- [Roadmap](docs/ROADMAP.md): completed coordinator work and remaining release tasks.
+- [Open task breakdown and solo test](docs/NEXT_TASKS.md): UI, Claude behavior,
+  Bright Data scraping, shared data integration and rehearsal. Work remains in progress.
+- [Hand-off](docs/HANDOFF.md): recorded deployment state and operating notes.
+- [Interface proposal](docs/INTERFACE_PROPOSAL.md): staged UI/account changes.
+- [Existing verification](docs/MAINCLOUD_VERIFICATION.md): legacy API/module
+  budgets, privacy, voting, roulette and simulated booking/re-plan. These checks
+  do not establish that the proposed agent planner works.
+- [Honesty](docs/HONESTY.md) and [disclosure](docs/DISCLOSURE.md): cached data,
+  simulated booking, model limitations and incomplete features.
 
-## Run the connected services
+## Local development
 
-Use Python 3.11+ for both Python services. From the repository root:
+The API hosting configuration uses Python 3.13. After installing its dependencies,
+start FastAPI from the repository root:
 
 ```sh
-api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
+.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
-FastAPI loads the ignored `api/.env` automatically. It needs the matching
-`HUDDLE_SHARED_SECRET` and uses `ANTHROPIC_API_KEY`. It always serves the real service,
-so the module calling it must run with `STUB_MODE=false`. Setup and
-checks: [api/README.md](api/README.md). Running both services from one laptop behind
-Cloudflare tunnels: [docs/LOCAL_TUNNELS.md](docs/LOCAL_TUNNELS.md).
+FastAPI loads ignored `api/.env`. It needs the matching `HUDDLE_SHARED_SECRET`
+and uses `ANTHROPIC_API_KEY`; never place these in frontend configuration.
+It has no API stub mode. The calling module must use `STUB_MODE=false` with
+the real catalog. [API implementation and checks](api/README.md).
 
-The current development tunnels are recorded in [HANDOFF.md](docs/HANDOFF.md). Keep the API,
-tunnel and Mac awake while others use it. A restarted tunnel needs its new URL
-published as `FASTAPI_BASE_URL`. This is temporary development access, not hosted
-production infrastructure.
+Start the frontend separately, with the public SpacetimeDB variables described
+in [web/README.md](web/README.md):
 
-Voice setup: [voice/README.md](voice/README.md). Frontend Maincloud configuration:
-[web/README.md](web/README.md). The frontend, SpacetimeDB module, Python API and
-voice service are separate processes. The shared secret never goes in frontend
-configuration.
-
-## Run the SpacetimeDB module locally
-
-Needs the `spacetime` CLI 2.13.0 (https://spacetimedb.com/install).
-
-```bash
-spacetime start                                   # local server on :3000, leave running
-cd server && npm install && cd ..
-HUDDLE_SHARED_SECRET=<any local value> spacetime publish huddle-local -p server -s local -y
-curl http://127.0.0.1:3000/v1/database/huddle-local/route/health
+```sh
+npm ci --prefix web
+npm run dev --prefix web -- --host 127.0.0.1 --port 5173 --strictPort
 ```
 
-With `FASTAPI_BASE_URL` and `VOICE_BASE_URL` unset, the module uses fakes (see `server/src/lib/fakes.ts`). Set them in your shell and publish again to talk to the real api and voice services.
+Use `/start` for the app; `/` serves the landing page. Maincloud cannot call a
+loopback API directly. Existing [tunnel helpers](docs/LOCAL_TUNNELS.md) provide
+the current shared API connection. Only the designated host should publish its
+new URL; backend developers must not overwrite it with personal test instances.
+
+Module tests can run independently:
+
+```sh
+npm ci --prefix server
+npm test --prefix server
+```
+
+An isolated local database can exercise module/fake paths, but that does not
+prove its procedures can reach a local API. See the reproduced networking
+blocker and environment distinctions in [CURRENT_CONTEXT.md](docs/CURRENT_CONTEXT.md).

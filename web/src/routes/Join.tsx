@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useProcedure } from "spacetimedb/react";
+import { useProcedure, useSpacetimeDB } from "spacetimedb/react";
 import { procedures } from "../module_bindings";
 import { saveSession } from "../session";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 
 export default function Join() {
+  const { isActive } = useSpacetimeDB();
   const code = useParams().code!.toUpperCase();
   const navigate = useNavigate();
   const joinGroup = useProcedure(procedures.joinGroup);
@@ -46,7 +47,8 @@ export default function Join() {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <button className="btn btn-primary w-full" disabled={busy || !name.trim()} onClick={join}>
+        {!isActive ? <p role="status" className="muted">Connecting to Huddle…</p> : null}
+        <button className="btn btn-primary w-full" disabled={busy || !isActive || !name.trim()} onClick={join}>
           Join the huddle ↗
         </button>
         {error && <p className="error">{error}</p>}

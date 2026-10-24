@@ -9,6 +9,8 @@ import DemoBanner from "../components/DemoBanner";
 import ReplanBanner from "../components/ReplanBanner";
 import OffersInbox from "../components/OffersInbox";
 import { Buddy } from "../doodle/Doodle";
+import { useAgentNeeds, useAgentState } from "../agentData";
+import AgentPhaseNav from "../components/AgentPhaseNav";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -25,6 +27,9 @@ export default function GroupLayout() {
   const group = useGroupState();
   const mine = useMyPrivate();
   const booking = useLatestBooking();
+  const agent = useAgentState();
+  const agentNeeds = useAgentNeeds();
+  const lastAgentState = useRef<string | null>(null);
 
   // Follow the group to the next step whenever its status changes, but only the
   // first time each run reaches a status, so a repeated or flapping update never
@@ -32,6 +37,17 @@ export default function GroupLayout() {
   const lastStatus = useRef<GroupStatus | null>(null);
   const followed = useRef(new Set<string>());
   useEffect(() => {
+    if (agent && agent.groupId !== session.groupId) return;
+    if (group && group.id === session.groupId && agent) {
+      const key = `${group.latestRunId}:${agent.status}:${group.status}`;
+      if (lastAgentState.current === key) return;
+      lastAgentState.current = key;
+      const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "call"
+        : agent.status === "needs" ? "prefs" : "plans";
+      navigate(`/g/${session.groupId}/${step}`);
+      return;
+    }
+    if (agent === undefined) return;
     if (!group || group.id !== session.groupId || group.status === lastStatus.current) return;
     lastStatus.current = group.status;
     const key = `${group.latestRunId}:${group.status}`;
@@ -43,7 +59,7 @@ export default function GroupLayout() {
     let step = STEP_FOR_STATUS[group.status];
     if (group.status === "eliciting" && mine?.text) step = "swipe";
     navigate(`/g/${session.groupId}/${step}`);
-  }, [group, mine, navigate, pathname, session.groupId]);
+  }, [group, agent, mine, navigate, pathname, session.groupId]);
 
   // Status only becomes "booked" once the call is confirmed, so follow a new
   // booking too: every phone watches the call live.
@@ -57,7 +73,7 @@ export default function GroupLayout() {
     lastBooking.current = id;
   }, [booking, navigate, session.groupId]);
 
-  if (group === undefined) return <main className="page on-sky">Loading group…</main>;
+  if (group === undefined || agent === undefined) return <main className="page on-sky">Loading group…</main>;
   // Views only cover this phone's current group: the one it joined last.
   if (group === null || group.id !== session.groupId) {
     return (
@@ -81,11 +97,17 @@ export default function GroupLayout() {
     );
   }
 
+  if ((agent && agent.groupId !== group.id) || (agentNeeds && agentNeeds.memberId !== session.memberId)) {
+    return <main className="page on-sky">Loading this huddle’s context…</main>;
+  }
+
   const ctx: GroupContext = {
     session,
     group,
     mine,
     isHost: group.isHost,
+    agent,
+    agentNeeds,
   };
 
   return (
@@ -105,12 +127,12 @@ export default function GroupLayout() {
           </span>
         </span>
       </header>
-      <PhaseProgress ctx={ctx} booking={booking} />
+      {agent ? <AgentPhaseNav ctx={ctx} booking={booking} /> : <PhaseProgress ctx={ctx} booking={booking} />}
       <DemoBanner on={group.demoMode} />
-      <ReplanBanner ctx={ctx} />
-      <OffersInbox ctx={ctx} />
-      <Outlet context={ctx} />
-      <PhaseFooter ctx={ctx} booking={booking} />
+      {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}
+      {!agent ? <OffersInbox ctx={ctx} /> : null}
+      <Outlet key={group.id} context={ctx} />
+      {!agent ? <PhaseFooter ctx={ctx} booking={booking} /> : null}
       <p className="text-center">
         <Link className="on-sky muted underline" to={`/g/${session.groupId}/judge`}>
           Under the hood

@@ -10,6 +10,43 @@ import {
   type Infer as __Infer,
 } from "spacetimedb";
 
+export const AgentNeed = __t.object("AgentNeed", {
+  memberId: __t.string(),
+  groupId: __t.string(),
+  text: __t.string(),
+  revision: __t.u32(),
+  resultJson: __t.option(__t.string()),
+  confirmed: __t.bool(),
+  error: __t.option(__t.string()),
+});
+export type AgentNeed = __Infer<typeof AgentNeed>;
+
+export const AgentNeedsJob = __t.object("AgentNeedsJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  memberId: __t.string(),
+  revision: __t.u32(),
+});
+export type AgentNeedsJob = __Infer<typeof AgentNeedsJob>;
+
+export const AgentPlanJob = __t.object("AgentPlanJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  groupId: __t.string(),
+  runId: __t.string(),
+  revision: __t.u32(),
+});
+export type AgentPlanJob = __Infer<typeof AgentPlanJob>;
+
+export const AgentSession = __t.object("AgentSession", {
+  groupId: __t.string(),
+  revision: __t.u32(),
+  status: __t.string(),
+  activeRunId: __t.option(__t.string()),
+  error: __t.option(__t.string()),
+});
+export type AgentSession = __Infer<typeof AgentSession>;
+
 export const Booking = __t.object("Booking", {
   id: __t.string(),
   groupId: __t.string(),
@@ -69,6 +106,12 @@ export const CouncilMessage = __t.object("CouncilMessage", {
   ts: __t.f64(),
 });
 export type CouncilMessage = __Infer<typeof CouncilMessage>;
+
+export const CreateAgentGroupResult = __t.object("CreateAgentGroupResult", {
+  groupId: __t.string(),
+  code: __t.string(),
+});
+export type CreateAgentGroupResult = __Infer<typeof CreateAgentGroupResult>;
 
 export const CreateGroupResult = __t.object("CreateGroupResult", {
   groupId: __t.string(),
@@ -130,6 +173,32 @@ export const Member = __t.object("Member", {
   joinedAt: __t.f64(),
 });
 export type Member = __Infer<typeof Member>;
+
+export const MyAgentNeeds = __t.object("MyAgentNeeds", {});
+export type MyAgentNeeds = __Infer<typeof MyAgentNeeds>;
+
+export const MyAgentNeedsRow = __t.object("MyAgentNeedsRow", {
+  memberId: __t.string(),
+  text: __t.string(),
+  revision: __t.u32(),
+  resultJson: __t.option(__t.string()),
+  confirmed: __t.bool(),
+  error: __t.option(__t.string()),
+});
+export type MyAgentNeedsRow = __Infer<typeof MyAgentNeedsRow>;
+
+export const MyAgentSession = __t.object("MyAgentSession", {});
+export type MyAgentSession = __Infer<typeof MyAgentSession>;
+
+export const MyAgentSessionRow = __t.object("MyAgentSessionRow", {
+  groupId: __t.string(),
+  revision: __t.u32(),
+  status: __t.string(),
+  activeRunId: __t.option(__t.string()),
+  error: __t.option(__t.string()),
+  confirmedMemberIds: __t.array(__t.string()),
+});
+export type MyAgentSessionRow = __Infer<typeof MyAgentSessionRow>;
 
 export const MyBookings = __t.object("MyBookings", {});
 export type MyBookings = __Infer<typeof MyBookings>;

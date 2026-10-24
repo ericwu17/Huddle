@@ -17,7 +17,8 @@ from fastapi.responses import JSONResponse
 from pydantic import TypeAdapter
 from dotenv import load_dotenv
 
-from . import council, elicit, parse, solver
+from . import agent, council, elicit, parse, solver
+from .agent_models import AgentNeeds, AgentNeedsRequest, AgentPlanRequest, AgentPlanResponse
 from .catalog import Catalog
 from .delivery import CouncilDelivery, HttpCouncilDelivery, LocalCouncilDelivery
 from .llm import LLM
@@ -119,6 +120,14 @@ def create_app(settings: Settings | None = None,
     @app.post("/parse-prefs", response_model=ParseResponse)
     async def parse_prefs(body: ParseRequest, request: Request):
         return await parse.parse_prefs(request.app.state.llm, body)
+
+    @app.post("/agent/needs", response_model=AgentNeeds)
+    async def agent_needs(body: AgentNeedsRequest, request: Request):
+        return await agent.interpret(request.app.state.llm, body)
+
+    @app.post("/agent/plan", response_model=AgentPlanResponse)
+    async def agent_plan(body: AgentPlanRequest, request: Request):
+        return await agent.coordinate(request.app.state.llm, request.app.state.catalog, body)
 
     @app.post("/elicit/next", response_model=NextResponse)
     async def next_pair(body: NextRequest, request: Request):

@@ -1,5 +1,34 @@
 # Hand-off (Eric Chen to Max; Haydn retains Part A)
 
+## Current direction October 24
+
+Read [CURRENT_CONTEXT.md](CURRENT_CONTEXT.md) first. The approved one-Claude
+coordinator is implemented across API, private Maincloud context/jobs and the
+local frontend. Legacy groups/endpoints retain their math shapes. The additive
+[contract](AGENT_CONTRACT.md), [runbook](AGENT_RUNBOOK.md) and
+[verification](AGENT_VERIFICATION.md) describe the new behavior.
+
+The current decision is to retain Vercel and Maincloud with local FastAPI behind
+a tunnel, accepting that host laptop's availability dependency temporarily.
+One designated operator owns the shared API/tunnel URL. Hosted API migration is
+deferred; the earlier Render configuration has not been deployed. Local
+development keeps Vite and FastAPI separate. The previous all-local database
+proposal is blocked as written on 2.13.0. Bright Data scraping is active next work;
+real calls remain deferred. [NEXT_TASKS.md](NEXT_TASKS.md) records the open task
+breakdown, suggested owners and solo-test commands.
+
+**Current operator: Max's Mac, October 24.** FastAPI is on loopback port 8000;
+its current public URL is `https://roughly-metabolism-representing-harmony.trycloudflare.com`.
+The additive module is published to `huddle-calhacks` with `STUB_MODE=false`, no
+data reset, and existing shared secret/unrelated settings preserved. The updated
+Vite UI at `http://10.0.20.127:5173/start` connects to that shared module. Keep the
+API, tunnel and Vite processes running and the laptop awake for this LAN test.
+Vercel still needs the frontend release; old clients create legacy groups.
+
+The sections below are historical legacy operating notes. In particular, the
+Windows-host ownership and past tunnel URLs below no longer describe the current
+operator. Do not run another helper that replaces Max's shared API URL.
+
 > Updated after the Maincloud backend deployment and real-API switch on Oct 23, 2026 (Pacific). H0 = Fri 6 PM. Read with [ROADMAP.md](ROADMAP.md), [CONTRACT.md](CONTRACT.md) and [current verification](MAINCLOUD_VERIFICATION.md). Current split: Eric Chen works on UI, Eric Wu works in `api/`, and Max covers backend/evaluation in Codex.
 
 ## Where things stand

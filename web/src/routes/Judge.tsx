@@ -5,9 +5,13 @@ import ConsensusMap from "../components/ConsensusMap";
 // A6.7 judge panel. Shows only this member's own posterior (from my_private),
 // never anyone else's.
 export default function Judge() {
-  const { group, mine } = useGroup();
+  const { group, mine, agent } = useGroup();
   const runId = group.latestRunId;
   const planRun = usePlanRun(runId);
+  if (agent) return <section className="card space-y-3"><h1 className="card-title">One coordinator, validated choices</h1>
+    <p>Claude considers this huddle's confirmed private prompts and selects catalog itineraries. Code checks whole-outing budgets, hard restrictions, hours and venue facts.</p>
+    <p>Public explanations use verified catalog facts. No Bayesian taste vectors, Monte Carlo confidence or satisfaction percentages are computed for this flow.</p>
+    <p>Context revision: {agent.revision}. State: {agent.status}. Booking is simulated; no restaurant is called.</p></section>;
   const result = planRun?.result;
 
   const range = 3; // bars span theta in [-3, 3]

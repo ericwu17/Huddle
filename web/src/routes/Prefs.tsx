@@ -4,8 +4,14 @@ import { reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
+import { AgentPrefs } from "../components/AgentFlow";
 
 export default function Prefs() {
+  const { agent } = useGroup();
+  return agent ? <AgentPrefs /> : <LegacyPrefs />;
+}
+
+function LegacyPrefs() {
   const { session, mine } = useGroup();
   const submitPrefs = useReducer(reducers.submitPrefs);
   const { run, busy, error } = useRun();

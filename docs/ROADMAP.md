@@ -1,5 +1,60 @@
 # Huddle roadmap
 
+## Current priorities October 24
+
+[CURRENT_CONTEXT.md](CURRENT_CONTEXT.md) is the current source of product and
+architecture direction. The historical math-based milestones below do not
+define the next implementation phase.
+
+- [x] Review Eric Chen's Windows API launcher on main; it hosts the existing API
+  through a tunnel and does not introduce a new planner.
+- [x] Reproduce the local database-to-loopback HTTP restriction on SpacetimeDB
+  2.13.0 using an isolated probe; stop the probe without changing live settings.
+- [x] Prepare Render deployment settings and validate the Blueprint/schema plus
+  Python 3.13 Linux dependency resolution. No hosted API deployment yet.
+- [x] Choose local FastAPI + tunnel + Maincloud for this phase. Accept the
+  designated host laptop's availability dependency; defer hosted API migration.
+- [x] Approve [AGENT_FLOW_PLAN.md](AGENT_FLOW_PLAN.md): coordinator count, private
+  confirmation, plan generation trigger, voting/Spin and migration sequence.
+- [x] Confirm Max's Mac as designated operator and verify API/tunnel health before
+  shared testing; only that operator changes Maincloud's API URL.
+- [x] Implement additive context, confirmation, plan-response and input-revision contracts
+  for agent planning across API, database jobs and UI.
+- [x] Replace the feature/posterior/swipe/Monte Carlo decision pipeline for new huddles with a
+  coordinator using all members' current prompts and confirmed requirements.
+- [x] Preserve deterministic whole-outing budget checks, confirmed dietary and
+  allergy restrictions, venue validation, privacy and stale-result guards.
+- [x] Update the UI for per-member prompts, clarifications, readable agent
+  proposals and choice; remove unsupported numerical confidence in the new flow.
+- [x] Verify independent groups, prompt/budget changes, invalid model output,
+  current votes/roulette/bookings, and separate desktop/mobile browser identities.
+- [x] Publish the additive module to `huddle-calhacks` without a data reset;
+  preserve existing secrets and point its API URL at Max's current tunnel.
+- [ ] Release the updated frontend to Vercel. Local Vite already creates agent
+  groups; existing deployed clients retain the legacy flow until released.
+- [ ] Rehearse with physical phones; browser mobile emulation is not that test.
+- [ ] Consider removing legacy endpoints only after teammate review; they remain
+  compatible for existing groups and older frontend clients.
+
+See [AGENT_CONTRACT.md](AGENT_CONTRACT.md), [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md)
+and [AGENT_VERIFICATION.md](AGENT_VERIFICATION.md). Allergy evidence is absent,
+booking is simulated and review/price/travel limitations remain explicit.
+
+Suggested split: Max leads context/contracts and verification; Eric Wu owns the
+API migration/local operation with Max; Eric Chen leads UI and coordinates
+SpacetimeDB context/progress changes with Max. Coordinate overlapping file edits.
+Bright Data scraping and shared catalog/evidence integration are active next
+work, per Max's latest direction. See [NEXT_TASKS.md](NEXT_TASKS.md) for concrete
+UI/Claude/data tasks, suggested owners and solo testing. Advanced routing, real
+calls, vendor/MCP additions, accounts and personal history remain later work.
+The coordinator task is in progress until these demo-polish checks are complete.
+
+## Historical roadmap and completed legacy work
+
+This section records previous gates, ownership and verification of the existing
+mathematical implementation. Old unchecked tasks are backlog, not current
+requirements; use the priorities above when choosing work.
+
 > Primary owner: Eric Chen; Max covers backend/evaluation while Eric Chen works on UI and Eric Wu works in `api/`. Updated after the backend deployment and real-API switch. Current operating state: [HANDOFF.md](HANDOFF.md), checks: [MAINCLOUD_VERIFICATION.md](MAINCLOUD_VERIFICATION.md). Check things off only when the stated check has passed.
 >
 > **H0 = Fri 6:00 PM** (the brief assumed 9 PM, so every gate is 3 hours earlier than `huddle.md` says).

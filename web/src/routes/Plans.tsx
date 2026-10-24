@@ -8,8 +8,14 @@ import PlanMap from "../components/PlanMap";
 import ConsensusMap from "../components/ConsensusMap";
 import CouncilPanel from "../components/council/CouncilPanel";
 import { Buddy } from "../doodle/Doodle";
+import { AgentPlans } from "../components/AgentFlow";
 
 export default function Plans() {
+  const { agent } = useGroup();
+  return agent ? <AgentPlans /> : <LegacyPlans />;
+}
+
+function LegacyPlans() {
   const { group } = useGroup();
   const runId = group.latestRunId;
   const planRun = usePlanRun(runId);

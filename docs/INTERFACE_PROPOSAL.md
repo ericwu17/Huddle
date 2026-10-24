@@ -1,9 +1,19 @@
 # Huddle interface and account proposal
 
 Proposed enhancements, October 24, 2026. Extend the
-[single laptop change plan](SINGLE_LAPTOP_PLAN.md) with a consistent shadcn UI,
+[current product direction](CURRENT_CONTEXT.md) with a consistent shadcn UI,
 username/password accounts, personal context, contacts and a prompt-driven
 start screen. These are proposed changes, not currently implemented features.
+
+The core flow is now all members' prompts -> confirmed needs -> agent proposals
+-> code validation -> discussion/choice. Retire mandatory swipes and numerical
+confidence from the replacement UI after the shared contract migration. The
+coordinator uses current huddle prompt context privately; the conversation screen
+shows explanations and trade-offs without exposing participants' raw prompts or
+caps. Keep separate Vite/FastAPI processes locally; shared access uses Vercel,
+Maincloud and local FastAPI behind a public tunnel for now. Hosted API migration
+is deferred and the earlier all-local database plan is superseded. See
+[the agent flow for review](AGENT_FLOW_PLAN.md) before changing runtime contracts.
 
 The demo remains the priority: correct plans, clear interactions and a reliable
 group flow. Introduce the new interface in stages so unfinished account, voice
@@ -160,6 +170,13 @@ Only authorized context should reach the parser. Invitees' private profiles are
 not part of the initiator's prompt. Agent output cannot change another person's
 budget, mark them ready or authorize a booking.
 
+After members join and submit their own prompts, the huddle coordinator can use
+all of those submissions internally, as described in [CURRENT_CONTEXT.md](CURRENT_CONTEXT.md).
+Keep that group-planning context distinct from the initiator's start prompt and
+from the public conversation. Ask each participant to confirm their own inferred
+requirements; their input updates the current huddle context and invalidates
+superseded recommendations.
+
 **Acceptance:** Permission denial, unavailable transcription or Claude failure
 leave a usable typed form. Wrong/ambiguous contacts can be corrected before any
 invitation. No raw audio is retained by default. Confirm microphone behavior
@@ -168,19 +185,21 @@ on the actual demo phones and supported browser.
 ## Agent conversation and group navigation
 
 Make the current huddle's agent conversation a persistent, readable screen.
-Show participant advocates, the chair, visible progress and a clear explanation
-of the recommendation. Keep navigation between conversation, plans and voting
+Show the coordinator's visible progress and a clear explanation of the
+recommendation; show participant advocates only if that agent design is used.
+Keep navigation between conversation, plans and voting
 available after the vote opens. Separate recording/cached/fallback labels from
 live messages.
 
 **Rationale:** Users should be able to understand how their group reached the
 decision, rather than losing the debate when the next stage begins.
 
-Start by displaying the existing validated council transcript. A continuing
-logistics conversation, additional tools or autonomous actions require a later
-behavior contract; the current council is a bounded planning discussion. Show
+The existing validated council transcript can remain visible during migration.
+For the new flow, agree how coordinator messages, clarifications, input updates
+and plan revisions are stored and displayed before changing shared contracts.
+Additional tools or autonomous actions require their own behavior contract. Show
 user-facing messages and supported facts, not hidden prompts or private model
-reasoning. Preserve the existing privacy rules for advocates' derived data.
+reasoning. Preserve privacy when an advocate uses its member's context.
 
 **Acceptance:** Only members can view a huddle's discussion. Private caps,
 credentials and other accounts' context never appear in the shared transcript.

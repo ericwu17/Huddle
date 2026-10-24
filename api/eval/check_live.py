@@ -16,6 +16,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--server", required=True)
     parser.add_argument("--database", required=True)
+    parser.add_argument("--agent", action="store_true", help="Run the coordinator flow smoke instead of legacy swipes")
+    parser.add_argument("--api-base-url", help="Optional authenticated health checks for the coordinator API")
     parser.add_argument("--voice-base-url")
     parser.add_argument("--voice-scenario", choices=("confirm", "full"), default="confirm")
     args = parser.parse_args()
@@ -29,12 +31,15 @@ def main():
     env = os.environ.copy()
     env.update(SPACETIMEDB_URI=args.server, SPACETIMEDB_DB=args.database,
                SMOKE_VOICE_SCENARIO=args.voice_scenario)
+    if args.api_base_url:
+        env["FASTAPI_BASE_URL"] = args.api_base_url
     if args.voice_base_url:
         env["VOICE_BASE_URL"] = args.voice_base_url
     else:
         env.pop("VOICE_BASE_URL", None)
     try:
-        result = subprocess.run(["node", str(root / "scripts" / "smoke.mjs")],
+        runner = "agent-smoke.mjs" if args.agent else "smoke.mjs"
+        result = subprocess.run(["node", str(root / "scripts" / runner)],
                                 cwd=root, env=env, timeout=240)
     except (OSError, subprocess.TimeoutExpired) as err:
         parser.exit(1, f"Smoke runner failed: {type(err).__name__}\n")

@@ -1,6 +1,45 @@
-# Huddle: Task Split (v3)
+# Huddle current direction and task split
 
-> Local file only. Not published or committed anywhere.
+Updated October 24, 2026. Read [current product and architecture context](docs/CURRENT_CONTEXT.md)
+before the original task split below.
+
+The current goal is an agent coordinator that uses every participant's submitted
+prompt context to propose and explain an outing. Replace mathematical ranking,
+Bayesian swipes and Monte Carlo confidence in the new flow; keep code checks for
+whole-outing budgets, dietary/allergy restrictions, venue facts and stale choices.
+Everyone's input must matter without publishing their raw prompts or private caps.
+Only a user's explicit acceptance of a private trade offer may raise their cap.
+
+Keep Vite and FastAPI separate for local development. For now, keep the shared
+demo on Vercel + SpacetimeDB Maincloud + local FastAPI behind a tunnel. Accept
+the designated host laptop's availability dependency temporarily. The all-local
+proposal is blocked as written by the installed database's private-address HTTP
+restriction. Eric Chen's Windows script hosts the existing API behind a tunnel;
+it does not implement a replacement planner. Hosted API migration is deferred.
+The [approved agent flow](docs/AGENT_FLOW_PLAN.md) is implemented additively for
+new huddles. See [contract](docs/AGENT_CONTRACT.md),
+[runbook](docs/AGENT_RUNBOOK.md) and [verification](docs/AGENT_VERIFICATION.md).
+
+| Person | Current focus |
+| --- | --- |
+| Max | Agent/context requirements, shared contracts, hard-constraint and integration verification |
+| Eric Wu | API implementation, agent-planner migration and local API/tunnel operation with Max |
+| Eric Chen | UI and prompt/agent/plan flow; SpacetimeDB context/progress integration with Max |
+
+Bright Data scraping and shared catalog/evidence integration are active next
+work alongside UI and Claude polish; see [NEXT_TASKS.md](docs/NEXT_TASKS.md).
+Advanced routing, real calls and vendor/MCP additions wait. Use the existing
+45-place snapshot until refreshed facts pass validation. shadcn and the staged account/context proposal
+remain the UI direction, not completed features.
+
+## Historical v3 task split
+
+The schedules, roles, math milestones and cut rules below describe the original
+plan. They do not override the current context or authorize rebuilding the old
+mathematical pipeline. Existing code/contracts remain until their replacement is
+agreed and verified.
+
+> **Historical timing assumptions:**
 >
 > **Time labels:** H0 = Fri 9 PM (assumed; shift if kickoff differs).
 > **Gates:** L1 = H13 (Sat 10 AM), L2 = H19 (Sat 4 PM), L3 = H24 (Sat 9 PM, freeze).
@@ -33,6 +72,8 @@ Proposed from your LinkedIn PDFs, not confirmed by anyone yet:
 | D, voice | Eric Wu |
 
 ### Assumptions (tell me if wrong)
+
+- **Budget decision:** each user sets a private cumulative budget for the entire outing. The solver checks the sum of all stops' per-person costs against each user's cap. Only that user accepting a private trade offer can raise their cap.
 
 - Eric Chen is unavailable roughly H9 to H15 (Sat 6 AM to noon). Haydn is awake from H9 and covers that gap.
 - Max misses a short stretch tonight. If he isn't there at kickoff, Eric Wu writes the stub solver.

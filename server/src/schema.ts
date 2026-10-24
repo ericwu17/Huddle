@@ -190,6 +190,18 @@ export const geo_cache = table(
   },
 );
 
+// Additive coordinator storage. Existing rows/contracts remain intact for
+// legacy huddles. Private prompts are exposed only through the owner's view.
+export const agent_session = table({ name: "agent_session" }, {
+  groupId: t.string().primaryKey(), revision: t.u32(), status: t.string(),
+  activeRunId: t.option(t.string()), error: t.option(t.string()),
+});
+export const agent_need = table({ name: "agent_need" }, {
+  memberId: t.string().primaryKey(), groupId: t.string().index("btree"),
+  text: t.string(), revision: t.u32(), resultJson: t.option(t.string()),
+  confirmed: t.bool(), error: t.option(t.string()),
+});
+
 // ---- schedule tables: one per background job (jobs.ts). Functions scheduled this way
 // are private, so phones cannot call them directly. ----
 
@@ -209,6 +221,8 @@ export const fake_event_job = job("fake_event_job", { kind: t.string(), payloadJ
 // Unused: the re-plan runs inline (replan.ts). Kept because Maincloud cannot drop or
 // re-schedule an existing table without wiping the database.
 export const replan_job = job("replan_job", { groupId: t.string(), bookingId: t.string() });
+export const agent_needs_job = job("agent_needs_job", { memberId: t.string(), revision: t.u32() });
+export const agent_plan_job = job("agent_plan_job", { groupId: t.string(), runId: t.string(), revision: t.u32() });
 
 const spacetimedb = schema(
   {
@@ -216,6 +230,7 @@ const spacetimedb = schema(
     council_message, scout_check, geo_cache,
     parse_job, swipe_job, preview_job, plan_job, offers_job, scout_job,
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,
+    agent_session, agent_need, agent_needs_job, agent_plan_job,
   },
   {
     // Set at publish time. Unset service URLs mean "use fakes" (lib/fakes.ts).

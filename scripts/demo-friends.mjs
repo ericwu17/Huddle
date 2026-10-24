@@ -1,6 +1,7 @@
 // Three simulated friends for a one-phone demo. They join your huddle by code,
-// get ready, write their own private preferences, swipe with their own tastes,
-// answer private offers and vote, so one presenter can run the whole flow.
+// get ready and submit seeded private preferences. Agent groups confirm needs
+// and vote; legacy groups also swipe and answer offers. The human host starts
+// planning and the clearly labeled booking simulation.
 //
 //   node scripts/demo-friends.mjs ABCD                       # Sam, Jordan, Riley (you play Alex)
 //   node scripts/demo-friends.mjs ABCD --friends Alex,Sam,Riley
@@ -136,6 +137,41 @@ async function step(f) {
       say(f.name, "is ready");
     }
     f.ready = true;
+    return;
+  }
+  // These remain simulated participants, not Claude agents. In coordinator
+  // huddles they confirm their seeded needs and wait for the human host's
+  // explicit Find plans/booking actions; they never swipe or auto-book.
+  let coordinator = null;
+  try { coordinator = (await view(f.tok, "my_agent_session"))[0]; }
+  catch (e) { if (!/unknown|no such|not found|does not exist|unresolved/i.test(String(e.message))) throw e; }
+  if (coordinator) {
+    const own = (await view(f.tok, "my_agent_needs"))[0];
+    if (!own && !f.wrote) {
+      await pause(1000, 2500);
+      await call(f.tok, "submit_agent_prefs", [f.text]);
+      f.wrote = true;
+      say(f.name, "submitted simulated private needs");
+      return;
+    }
+    if (own?.result_json && !own.confirmed) {
+      const summary = JSON.parse(own.result_json);
+      if (!summary.questions.length && !summary.hard.allergies.length) {
+        await call(f.tok, "confirm_agent_needs", [own.revision]);
+        say(f.name, "confirmed simulated needs");
+      }
+      return;
+    }
+    if (g.status === "voting" && g.latest_run_id && !f.voted.has(g.latest_run_id)) {
+      const current = (await view(f.tok, "my_plan_runs")).find(r => r.run_id === g.latest_run_id);
+      if (!current?.result_json) return;
+      const result = JSON.parse(current.result_json);
+      if (!result.plans.length) return;
+      await pause(1500, 4000);
+      await call(f.tok, "vote", [g.latest_run_id, result.recommendedPlanId]);
+      f.voted.add(g.latest_run_id);
+      say(f.name, "cast simulated vote for the coordinator's recommendation");
+    }
     return;
   }
   const mine = (await view(f.tok, "my_private"))[0];

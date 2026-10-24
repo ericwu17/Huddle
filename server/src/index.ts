@@ -11,3 +11,7 @@ export {
   my_scout, my_votes, my_bookings, my_call_events,
 } from "./views";
 export { health, callEvent, councilMessage, router } from "./http";
+export {
+  createAgentGroup, submitAgentPrefs, confirmAgentNeeds, findAgentPlans,
+  runAgentNeedsJob, runAgentPlanJob, postAgentDiscussion, my_agent_session, my_agent_needs,
+} from "./agent";

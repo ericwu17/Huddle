@@ -10,6 +10,7 @@ import { placeById } from "./lib/places";
 import { availablePlans } from "./lib/availability";
 import type { Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs } from "./lib/util";
+import { agentBallot, isAgent } from "./lib/agent-state";
 
 const FAKE_CALL_STEP_MS = 1200;
 const REPLAN_REASONS = new Set(["full", "closed"]);
@@ -53,6 +54,13 @@ export const startBooking = spacetimedb.reducer(
     const stop = plan?.stops?.[stopIndex];
     if (!stop) throw new SenderError("no such stop");
     const g = tx.db.group.id.find(me.groupId)!;
+    if (isAgent(tx.db, g.id)) {
+      if (!g.hostIdentity.isEqual(tx.sender)) throw new SenderError("Only the host can start the booking simulation.");
+      if (agentBallot(tx.db, g.id, runId).winner !== planId) throw new SenderError("Everyone must vote and resolve the current choice first.");
+      if (stop.category !== "meal") throw new SenderError("Choose the meal stop for booking.");
+      if (Array.from(tx.db.booking.groupId.filter(g.id)).some(b => b.runId === runId && b.status !== "failed"))
+        throw new SenderError("A booking already exists for this run.");
+    }
     const bookingId = newId(tx, "b", (id) => !!tx.db.booking.id.find(id));
     tx.db.booking.insert({
       id: bookingId, groupId: g.id, runId, planId, stopIndex, placeId: stop.placeId, restaurantName: stop.name,
@@ -71,7 +79,8 @@ export const runCallJob = spacetimedb.procedure(
       const b = tx.db.booking.id.find(job.bookingId);
       if (!b || b.status !== "pending") return null;
       const plan = availablePlans(tx.db, b.groupId, b.runId).find((p) => p.id === b.planId);
-      if (!plan || plan.stops?.[b.stopIndex]?.placeId !== b.placeId) {
+      if (!plan || plan.stops?.[b.stopIndex]?.placeId !== b.placeId ||
+          isAgent(tx.db, b.groupId) && agentBallot(tx.db, b.groupId, b.runId).winner !== b.planId) {
         recordCallEvent(tx, { bookingId: b.id, type: "failed", reason: "error",
           text: "This booking is no longer available. Choose a current plan and book again." });
         return null;
@@ -94,7 +103,11 @@ export const runCallJob = spacetimedb.procedure(
     });
     if (!body) return {};
     const { groupId, ...book } = body;
-    const res = voiceFor(ctx, groupId, "/book", book);
+    // Agent-mode booking is always explicitly simulated; never call a live
+    // voice URL just because the shared module has one configured.
+    const simulate = ctx.withTx(tx => isAgent(tx.db, groupId));
+    const res = simulate ? { ok: true as const, stub: true, data: { accepted: true } }
+      : voiceFor(ctx, groupId, "/book", book);
     ctx.withTx((tx) => {
       if (!res.ok) {
         recordCallEvent(tx, { bookingId: job.bookingId, type: "failed", reason: "error", text: res.error.message });

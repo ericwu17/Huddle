@@ -1,5 +1,28 @@
 # HUDDLE: MASTER BUILD BRIEF v2 (Cal Hacks 13.0, Oct 23-25, 2026)
 
+## Current direction override October 24
+
+Read [docs/CURRENT_CONTEXT.md](docs/CURRENT_CONTEXT.md) first. It supersedes
+conflicting product, math, role and hosting requirements below. Hacking has
+started. The target is a huddle coordinator agent holding all current members'
+submitted prompt context, proposing and explaining outings, with deterministic
+budget, dietary/allergy, venue and stale-result validation in code. Retire the
+Bayesian/Monte Carlo/swipe-ranking path from the new core flow after a coordinated
+contract migration; it remains available for legacy groups. New huddles in the
+updated frontend use the approved single-coordinator flow. Do not fabricate numeric
+scores or silently change shared request/response shapes.
+
+Keep separate Vite and FastAPI processes for local development. For this phase,
+keep Vercel + SpacetimeDB Maincloud + local FastAPI behind a tunnel, accepting
+the designated host laptop's availability dependency temporarily. The previous
+all-local database-to-API design is blocked on SpacetimeDB 2.13.0 private-address
+HTTP restrictions. Hosted API migration is deferred; Render preparation is not
+deployed. See [the approved agent flow](docs/AGENT_FLOW_PLAN.md), additive
+[contract](docs/AGENT_CONTRACT.md) and [runbook](docs/AGENT_RUNBOOK.md).
+UI polish and Bright Data scraping/catalog integration are active next work;
+accounts remain staged. See [NEXT_TASKS.md](docs/NEXT_TASKS.md). The original
+phases and gates below are historical planning context.
+
 ## How to use this document (for the humans)
 
 Paste this whole document into one Google Doc, or keep the .md file. Claude Code reads either.
@@ -26,6 +49,12 @@ A brief cannot make four AI sessions run perfectly. You still steer, run the smo
 ---
 
 # PART S: SHARED (everyone pastes this)
+
+> Start with [CURRENT_CONTEXT.md](docs/CURRENT_CONTEXT.md). The shared sections
+> below preserve the legacy implementation specification. New work targets
+> group prompt context and agent-led planning with code-enforced hard constraints;
+> historical math phases and the single-laptop proposal are superseded. Existing
+> wire contracts remain active until the coordinated migration is agreed.
 
 ## S0. Rules for Claude Code (read first, obey always)
 
@@ -183,7 +212,7 @@ Features 0-7 are "aspects" scored in [0,1]. Features 8-12 are 0/1 one-hot (activ
 - **Time:** local time HH:MM 24h strings; dates ISO YYYY-MM-DD; timestamps in ms since epoch.
 - **Default plan window for the demo:** Saturday 17:00-23:00 local.
 - **IDs:** strings.
-- **Money:** US dollars, per person.
+- **Money:** US dollars, per person. Each user sets a private cumulative budget for the entire outing. `budgetMaxPerPerson` limits the sum of `costPerPerson` across all stops, not the cost of each stop separately. A null budget means no budget cap. Only that user's explicit acceptance of a private budget trade offer may raise their cap.
 
 ### S5.2 Data shapes
 
@@ -692,6 +721,11 @@ Four phones stay in sync; private data is never visible to others; the app works
 
 # PART C: SOLVER + COUNCIL (Max; paste S + this)
 
+> Legacy implementation specification. For new work, use the agent-led target in
+> [CURRENT_CONTEXT.md](docs/CURRENT_CONTEXT.md). The numerical machinery below
+> remains relevant only to the existing API until its shared contracts and flow
+> are migrated; it is no longer the new planner's required architecture.
+
 You own `api/`. You build the stateless FastAPI service in S5.3 (including /council) and the checks in `api/eval/`. The L1 solver is the product; everything else is an upgrade.
 
 ## C1. Service basics
@@ -718,7 +752,8 @@ You own `api/`. You build the stateless FastAPI service in S5.3 (including /coun
 
 ## C4. Hard filter, plan enumeration, travel
 
-- A place passes if: not in excludePlaceIds; not in anyone's vetoCuisines/vetoCategories; it covers every member's dietary needs (place dietary contains each tag; if place dietary is empty and someone has a need, exclude); its costPerPerson is at most every member's budgetMaxPerPerson; and it is open for the stop interval.
+- A place passes if: not in excludePlaceIds; not in anyone's vetoCuisines/vetoCategories; it covers every member's dietary needs (place dietary contains each tag; if place dietary is empty and someone has a need, exclude); and it is open for the stop interval.
+- A plan passes the cumulative budget check only if the sum of all stops' costPerPerson is at most every member's non-null budgetMaxPerPerson. Checking each stop separately is not sufficient. For example, a $20 meal plus a $15 activity exceeds a user's $30 outing budget. Apply this same total-cost rule to plan selection, budget slack, relaxation hints, and trade offers.
 - Templates: [meal, activity, dessert] and [activity, meal]. Start times on a 15-minute grid within the window. Dwell per S5.1.
 - Travel between stops (Tier 1): straight-line distance times 1.3 detour, at 4.5 km/h if the leg is at most 1.2 km, otherwise 18 km/h. A plan is feasible if every stop is open at its interval and everyone's maxTravelMinutes (if set and origin known) is respected for the first leg.
 - Enumerate all feasible plans; prune dominated ones (a plan is dominated if another is at least as good for every member's posterior-mean utility and strictly better for one) before Monte Carlo. Expect around 24,000 raw triples for 30 x 40 x 20 places; measure.

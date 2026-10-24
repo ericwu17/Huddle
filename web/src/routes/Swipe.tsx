@@ -5,6 +5,7 @@ import { PLACE_BY_ID } from "../places";
 import { useRun } from "../useRun";
 import type { Place } from "../types";
 import ConfidenceRing from "../components/ConfidenceRing";
+import { Navigate } from "react-router";
 
 const MAX_SWIPES = 12;
 
@@ -44,6 +45,11 @@ function PlaceCard({
 }
 
 export default function Swipe() {
+  const { agent, session } = useGroup();
+  return agent ? <Navigate replace to={`/g/${session.groupId}/prefs`} /> : <LegacySwipe />;
+}
+
+function LegacySwipe() {
   const { group, session, mine } = useGroup();
   const submitSwipe = useReducer(reducers.submitSwipe);
   const { run, busy, error } = useRun();

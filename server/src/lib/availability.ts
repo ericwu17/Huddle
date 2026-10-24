@@ -4,8 +4,10 @@
 import { planFitsBudgets } from "./budgets";
 import type { ReadDb } from "./types";
 import { membersOf, parse } from "./util";
+import { agentPlans, isAgent } from "./agent-state";
 
 export function availablePlans(db: ReadDb, groupId: string, runId: string): any[] {
+  if (isAgent(db, groupId)) return agentPlans(db, groupId, runId);
   const group = db.group.id.find(groupId);
   const run = db.plan_run.runId.find(runId);
   if (!group || group.latestRunId !== runId || run?.groupId !== groupId || run.status !== "done") return [];

@@ -2,6 +2,25 @@
 
 React 19 + React Router v7 (data mode, `createBrowserRouter`) + Vite + Tailwind. It talks to the SpacetimeDB module in [../server/](../server/) through `spacetimedb/react`. Bare-bones UI for testing the backend; not the final design.
 
+## Current direction October 24
+
+Read [current product context](../docs/CURRENT_CONTEXT.md) and the
+[interface proposal](../docs/INTERFACE_PROPOSAL.md). The target is a shadcn UI for
+each participant's prompt/clarification, coordinator progress, validated plans,
+explanations and group choice. New huddles now use private needs confirmation,
+one Claude coordinator, validated plans, current votes and simulated booking.
+They have no swipe or numerical confidence screens. Existing groups retain the
+legacy flow. See the additive [contract](../docs/AGENT_CONTRACT.md),
+[runbook](../docs/AGENT_RUNBOOK.md) and [verification](../docs/AGENT_VERIFICATION.md).
+
+Keep Vite and FastAPI separate locally. For this phase, shared access uses
+Vercel, Maincloud and a designated laptop's FastAPI through a public tunnel.
+Accept that laptop's availability dependency temporarily; hosted API migration
+is deferred. Follow [the approved agent flow](../docs/AGENT_FLOW_PLAN.md) when changing
+swipe/progress gates or shared contracts. Accounts, contacts, history, voice
+input and personal keys remain staged proposals. Keep raw participant prompts
+and private budget caps out of shared agent messages.
+
 ## Run against the shared Maincloud backend
 
 Create the ignored `web/.env.local` with these public connection values:
@@ -15,13 +34,19 @@ From `web/`, run `npm ci` then `npm run dev`. Restart Vite after changing the
 file. Never put `HUDDLE_SHARED_SECRET`, Claude or Bright Data keys here. The
 optional `NEXT_PUBLIC_MAPBOX_TOKEN` is a public map token only.
 
-Max's FastAPI and Eric Wu's voice service are reached through SpacetimeDB; the
-browser does not call their private endpoints directly. See
+FastAPI is reached through SpacetimeDB; the browser does not call its private
+endpoints directly. The recorded Maincloud setup uses scripted module booking
+with the separate voice service disconnected. See
 [the current hand-off](../docs/HANDOFF.md) for service URLs and test status.
 
 ## Run against a local backend
 
-Publish the module locally first (see [../README.md](../README.md)), then:
+An isolated local module can exercise its fake paths. It cannot currently call
+a loopback FastAPI from procedures on SpacetimeDB 2.13.0; the private-address
+restriction blocks the earlier all-local full stack. See
+[current context](../docs/CURRENT_CONTEXT.md) before treating this as a connected
+demo. For an already published isolated module, set the public variables to
+that explicit local target before starting Vite:
 
 ```sh
 npm install
@@ -39,13 +64,15 @@ Don't edit `src/module_bindings/` by hand.
 
 ## Current coverage
 
-Haydn owns core frontend/routing; Eric Wu wrote the initial app and owns the call
-screen, and Eric Chen owns the council panel. Max is covering backend/council
-integration while Eric Chen is away. The rapid redirect to Vote after council
+Eric Chen leads the current UI work; Eric Wu wrote the initial app and owns the
+call screen, and Max covers context/contracts and integration verification.
+Coordinate overlapping files. The rapid redirect to Vote after council
 and the bounce when reopening Plans are fixed in `0d224a5` (`GroupLayout.tsx`
 follows each run's status once and leaves phones on Plans). It still needs a
-browser check. The static landing page lives in `public/landing/` and is served
-at `/landing`.
+legacy browser check. The new coordinator flow passed two-user desktop/mobile
+browser testing, including readable plans, voting and booking after refresh.
+The landing page lives in `index.html` and `landing/` and is served
+at `/`; the application entry is `/start`.
 
 ## Layout
 

@@ -1,9 +1,27 @@
 # Huddle Python API
 
-The stateless FastAPI service behind contract S5.3: preference parsing, swipe
-learning, the group solver, private trade offers, roulette and the agent
-council. The SpacetimeDB module is its only caller; the browser never reaches it.
-Python 3.11+.
+The stateless FastAPI service for the new single-Claude coordinator and the
+legacy S5.3 planner. The SpacetimeDB module is its only caller; browsers connect
+to Maincloud. The tested environment uses Python 3.13.
+
+## Coordinator flow
+
+Authenticated `POST /agent/needs` interprets one private prompt for owner review;
+`POST /agent/plan` receives all confirmed member contexts and shared discussion.
+Code generates feasible catalog itineraries and checks whole-outing budgets,
+dietary requirements, vetoes, hours and travel. Claude selects up to three choices
+and public fact IDs. Public explanations are rendered from those catalog facts,
+never arbitrary private model prose. No feature ranking, swipes or confidence
+scores are used in this path. No database access occurs in these functions.
+
+Claude is required: missing credentials or invalid output produce explicit
+retryable errors, not fabricated agent plans. Allergies block planning because
+the catalog has no verified allergen evidence. Established private caps can be
+lowered, but prompt edits and Claude cannot raise them.
+
+See [contract](../docs/AGENT_CONTRACT.md), [setup/run commands](../docs/AGENT_RUNBOOK.md)
+and [verification](../docs/AGENT_VERIFICATION.md). The remaining sections describe
+the retained legacy endpoints where stated.
 
 ## No stub mode
 
@@ -28,10 +46,10 @@ Responses carry no `X-Huddle-Stub` header, so the module stores runs with
 From the repository root:
 
 ```sh
-python3 -m venv api/.venv                      # once; 3.11+
-api/.venv/bin/python -m pip install -r api/requirements-dev.txt
-cp api/.env.example api/.env                   # once; fill in privately
-api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
+uv venv --python 3.13 .venv                    # first setup only
+uv pip install --python .venv/bin/python -r api/requirements-dev.txt
+# Create api/.env from api/.env.example only if it does not exist; fill privately.
+.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
 The app loads `api/.env` itself; exported variables win, so
@@ -44,7 +62,7 @@ run. Restart uvicorn after editing `api/.env`.
 | --- | --- |
 | `HUDDLE_SHARED_SECRET` | Required, nonblank. Every route, `/health` included, needs it in `X-Huddle-Secret`. Never browser-visible. |
 | `PLACES_PATH` | Optional catalog override; defaults to `data/places.json`. `synthetic_stub` places refuse startup. |
-| `ANTHROPIC_API_KEY` | Without it parsing uses the keyword rules and the council falls back to Safe; nothing else needs it. |
+| `ANTHROPIC_API_KEY` | Required for the coordinator endpoints. Without it they return 503; legacy parsing/council retain their labeled fallback behavior. |
 | `CLAUDE_MODEL_FAST`, `CLAUDE_MODEL_SMART` | Default `claude-haiku-5-5` (parser, advocates) and `claude-sonnet-5-5` (chair). |
 | `SPACETIMEDB_URI`, `SPACETIMEDB_DB` | Optional. When both are set, each validated council message is also POSTed to `/route/council-message` as it is produced, so the panel fills live. The response transcript is the source of truth either way; the module deduplicates. |
 | `FASTAPI_BASE_URL` | Read by the smoke check and the module, not by this service. |
