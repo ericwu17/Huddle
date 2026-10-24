@@ -8,6 +8,8 @@
 #   powershell -ExecutionPolicy Bypass -File scripts/host-api.ps1 [-Yes] [-NoPublish] [-Port 8000]
 #     -Yes         publish the new URL without asking
 #     -NoPublish   start the API and tunnel only; leave the module settings alone
+#     -Cloudflared path to cloudflared.exe (default: PATH, then ..\tools next to the repo,
+#                  then %LOCALAPPDATA%\HuddleLocal\bin)
 #
 # A quick tunnel gets a new URL on every start, so every run republishes it.
 # Local SpacetimeDB can't replace the tunnel: procedures refuse private
@@ -22,7 +24,8 @@ param(
   [switch]$NoPublish,
   [int]$Port = 8000,
   [string]$Server = "maincloud",
-  [string]$Database = "huddle-calhacks"
+  [string]$Database = "huddle-calhacks",
+  [string]$Cloudflared = ""
 )
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
@@ -51,15 +54,25 @@ if (-not $secret) { throw "HUDDLE_SHARED_SECRET is empty in api/.env" }
 if (-not (EnvValue "api\.env" "ANTHROPIC_API_KEY")) {
   Write-Warning "No ANTHROPIC_API_KEY in api/.env: parsing falls back to keyword rules and the council to Safe"
 }
-$cf = Get-Command cloudflared -ErrorAction SilentlyContinue
-$Cloudflared = if ($cf) { $cf.Source } else { Join-Path $env:LOCALAPPDATA "HuddleLocal\bin\cloudflared.exe" }
-if (-not (Test-Path $Cloudflared)) { throw "cloudflared not found on PATH or in %LOCALAPPDATA%\HuddleLocal\bin" }
+if (-not $Cloudflared) {
+  $cf = Get-Command cloudflared -ErrorAction SilentlyContinue
+  $candidates = @()
+  if ($cf) { $candidates += $cf.Source }
+  # Next to the repo, outside git (where Eric Chen's laptop keeps it).
+  $candidates += Join-Path (Split-Path -Parent $Root) "tools\cloudflared.exe"
+  if ($env:LOCALAPPDATA) { $candidates += Join-Path $env:LOCALAPPDATA "HuddleLocal\bin\cloudflared.exe" }
+  $candidates += Join-Path $env:USERPROFILE "AppData\Local\HuddleLocal\bin\cloudflared.exe"
+  $Cloudflared = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+  if (-not $Cloudflared) { throw "cloudflared not found. Looked in: $($candidates -join '; '). Pass -Cloudflared <path to cloudflared.exe>" }
+}
+if (-not (Test-Path $Cloudflared)) { throw "cloudflared not found at $Cloudflared" }
 if (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue) {
   throw "port $Port is already in use (an API from an earlier run?)"
 }
 
 $api = $null
 $tunnel = $null
+$published = $false
 try {
   # ---------- API ----------
   Say "Starting the API on 127.0.0.1:$Port (logs in logs/host-api/)"
@@ -102,7 +115,12 @@ try {
     Start-Sleep 2
   }
   if (-not $ok) { throw "the tunnel never answered (see logs/host-api/tunnel.err.log)" }
-  $noSecret = StatusCode "$url/health" ""
+  # A fresh tunnel sometimes drops a request (000), so retry before giving up.
+  for ($i = 0; $i -lt 5; $i++) {
+    $noSecret = StatusCode "$url/health" ""
+    if ($noSecret -ne "000") { break }
+    Start-Sleep 2
+  }
   if ($noSecret -ne "401") { throw "the tunnel answered $noSecret without a secret; expected 401" }
   Write-Host "    api: $url"
   Set-Content -Path "$Logs\tunnel-url.txt" -Value $url
@@ -125,6 +143,7 @@ try {
       $code = $LASTEXITCODE
       Remove-Item Env:FASTAPI_BASE_URL, Env:STUB_MODE -ErrorAction SilentlyContinue
       if ($code -ne 0) { throw "spacetime publish failed; the module settings are unchanged" }
+      $published = $true
     } else {
       Write-Host "    Skipped. The API and tunnel keep running."
     }
@@ -139,7 +158,7 @@ finally {
   foreach ($p in $tunnel, $api) {
     if ($p -and -not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
   }
-  if (-not $NoPublish) {
+  if ($published) {
     Write-Host "Stopped. $Database still points at this tunnel, which is now gone:"
     Write-Host "new groups fall back to labeled demo mode until you rerun this script."
   }
