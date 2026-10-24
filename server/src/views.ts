@@ -102,19 +102,40 @@ export const my_offers = spacetimedb.view(
     const me = currentMember(ctx.db, ctx.sender);
     const g = me && ctx.db.group.id.find(me.groupId);
     if (!me || !g) return [];
+    const names = memberNames(ctx.db, g.id);
     return Array.from(ctx.db.offer.toMemberId.filter(me.id))
       .filter((o) => o.runId === g.latestRunId && o.status === "open")
       .map(({ id, runId, type, amount, unit, text, planJson, robustnessGain, minRatioGain }) => ({
-        id, runId, type, amount, unit, text, planJson, robustnessGain, minRatioGain,
+        id, runId, type, amount, unit, text, robustnessGain, minRatioGain,
+        // Always stripped, whatever showWhoCompromised says: an offer never reveals who benefits.
+        planJson: JSON.stringify(stripPlan(JSON.parse(planJson), names)),
       }));
   },
 );
 
-function stripResult(json: string | undefined, showWho: boolean) {
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// "Ana gave up novelty; Ben accepted a longer walk." -> "Someone gave up novelty; someone ..."
+function anonymize(text: string, names: string[]) {
+  let out = text;
+  for (const n of names.filter(Boolean)) out = out.replace(new RegExp(`\\b${escapeRe(n)}\\b`, "gi"), "someone");
+  return out.replace(/(^|[.!?]\s+)someone/g, (_m, pre) => `${pre}Someone`);
+}
+
+// Without showWhoCompromised, a plan must not say who compromised or how each person scores.
+function stripPlan({ perMember, gaveUp, ...p }: any, names: string[]) {
+  return { ...p, whyLine: p.whyLine ? anonymize(p.whyLine, names) : p.whyLine };
+}
+
+function memberNames(db: ReadDb, groupId: string) {
+  return membersOf(db, groupId).map((m) => m.name);
+}
+
+function stripResult(json: string | undefined, showWho: boolean, names: string[]) {
   const r = parse(json);
   if (!r || showWho) return json;
   const { posteriorSummary, ...rest } = r;
-  rest.plans = (rest.plans ?? []).map(({ perMember, gaveUp, ...p }: any) => p);
+  rest.plans = (rest.plans ?? []).map((p: any) => stripPlan(p, names));
   return JSON.stringify(rest);
 }
 
@@ -130,8 +151,9 @@ export const my_plan_runs = spacetimedb.view(
   (ctx) => {
     const g = myGroup(ctx);
     if (!g) return [];
+    const names = memberNames(ctx.db, g.id);
     return runsOf(ctx.db, g.id).map((r) => ({
-      runId: r.runId, status: r.status, resultJson: stripResult(r.resultJson, g.showWhoCompromised),
+      runId: r.runId, status: r.status, resultJson: stripResult(r.resultJson, g.showWhoCompromised, names),
       councilJson: r.councilJson, rouletteJson: r.rouletteJson, error: r.error, stub: r.stub, createdAt: r.createdAt,
     }));
   },

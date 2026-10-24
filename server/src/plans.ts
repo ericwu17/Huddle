@@ -112,7 +112,7 @@ export const runOffersJob = spacetimedb.procedure(
     ctx.withTx((tx) => {
       for (const o of res.data.offers ?? []) {
         tx.db.offer.insert({
-          id: newId(tx, "o"), runId: job.runId, toMemberId: o.toMemberId, type: o.type, amount: o.amount,
+          id: newId(tx, "o", (id) => !!tx.db.offer.id.find(id)), runId: job.runId, toMemberId: o.toMemberId, type: o.type, amount: o.amount,
           unit: o.unit, planId: o.plan.id, planJson: JSON.stringify(o.plan), robustnessGain: o.robustnessGain,
           minRatioGain: o.minRatioGain, text: offerText(o.type, o.amount), status: "open",
         });

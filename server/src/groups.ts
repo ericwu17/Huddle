@@ -41,7 +41,7 @@ export const createGroup = spacetimedb.procedure(
       let code = randomCode(tx);
       while (tx.db.group.code.find(code)) code = randomCode(tx);
       const now = nowMs(tx);
-      const groupId = newId(tx, "g");
+      const groupId = newId(tx, "g", (id) => !!tx.db.group.id.find(id));
       tx.db.group.insert({
         id: groupId,
         code,
@@ -73,7 +73,7 @@ export const joinGroup = spacetimedb.procedure(
       const g = tx.db.group.code.find(code.trim().toUpperCase());
       if (!g) throw new SenderError("no group with that code");
       if (g.status !== "lobby" && g.status !== "eliciting") throw new SenderError("this huddle has already planned");
-      const memberId = newId(tx, "m");
+      const memberId = newId(tx, "m", (id) => !!tx.db.member.id.find(id));
       tx.db.member.insert({
         id: memberId,
         groupId: g.id,

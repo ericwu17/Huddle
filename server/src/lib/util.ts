@@ -8,7 +8,16 @@ export function at(ctx: Tx, delayMs = 0) {
   return { scheduledId: 0n, scheduledAt: ScheduleAt.time(ctx.timestamp.microsSinceUnixEpoch + BigInt(delayMs) * 1000n) };
 }
 
-export const newId = (ctx: Tx, prefix: string) => `${prefix}_${ctx.newUuidV4().toString().replace(/-/g, "").slice(0, 12)}`;
+// SpacetimeDB seeds each transaction's RNG from its timestamp, so two transactions with the
+// same timestamp draw the same "random" values (seen on Maincloud). Ids therefore mix in the
+// timestamp, and `taken` rejects a clash so the next draw (the RNG advances) is used instead.
+export function newId(ctx: Tx, prefix: string, taken: (id: string) => boolean): string {
+  const ts = ctx.timestamp.microsSinceUnixEpoch.toString(36);
+  for (;;) {
+    const id = `${prefix}_${ts}${ctx.random.uint32().toString(36)}`;
+    if (!taken(id)) return id;
+  }
+}
 
 export const parse = <T = any>(json: string | undefined | null): T | null => (json ? (JSON.parse(json) as T) : null);
 

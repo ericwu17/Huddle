@@ -3,6 +3,7 @@ import { SenderError, t } from "spacetimedb/server";
 import spacetimedb, { call_job, fake_event_job } from "./schema";
 import { finishCouncil, insertCouncilMessage } from "./council";
 import { requireMember } from "./groups";
+import { replan } from "./replan";
 import { callVoice } from "./lib/api";
 import { fakeCallEvents } from "./lib/fakes";
 import { placeById } from "./lib/places";
@@ -13,7 +14,7 @@ const FAKE_CALL_STEP_MS = 1200;
 const REPLAN_REASONS = new Set(["full", "closed"]);
 
 // Stores one call event (from voice's POST /callEvent or the fake call) and moves the
-// booking along. failed + full|closed schedules Haydn's replan (replan_job).
+// booking along. failed + full|closed re-plans right away (replan.ts).
 export function recordCallEvent(tx: Tx, e: any) {
   const b = tx.db.booking.id.find(e.bookingId);
   if (!b) throw new Error(`unknown booking ${e.bookingId}`);
@@ -30,7 +31,7 @@ export function recordCallEvent(tx: Tx, e: any) {
   }
   if (e.type === "failed") {
     tx.db.booking.id.update({ ...b, status: "failed", failReason: e.reason });
-    if (REPLAN_REASONS.has(e.reason)) tx.db.replan_job.insert({ ...at(tx), groupId: b.groupId, bookingId: b.id });
+    if (REPLAN_REASONS.has(e.reason)) replan(tx, b.groupId, b.id);
   }
 }
 
@@ -44,7 +45,7 @@ export const startBooking = spacetimedb.reducer(
     const stop = plan?.stops?.[stopIndex];
     if (!stop) throw new SenderError("no such stop");
     const g = tx.db.group.id.find(me.groupId)!;
-    const bookingId = newId(tx, "b");
+    const bookingId = newId(tx, "b", (id) => !!tx.db.booking.id.find(id));
     tx.db.booking.insert({
       id: bookingId, groupId: g.id, runId, planId, stopIndex, placeId: stop.placeId, restaurantName: stop.name,
       time: `${g.date}T${stop.start}:00-07:00`, partySize: membersOf(tx.db, g.id).length, status: "pending",

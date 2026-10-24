@@ -1,0 +1,222 @@
+{
+  "label": "SIMULATED",
+  "places": "data/places.json",
+  "flat": [
+    "noise",
+    "crowd",
+    "wait",
+    "value",
+    "romance",
+    "service",
+    "outdoor",
+    "novelty"
+  ],
+  "A": {
+    "groups": 1000,
+    "redrawn": 4,
+    "vetoesDropped": 3,
+    "timeFeasiblePlans": {
+      "meal-activity-dessert": 1280,
+      "activity-meal": 169
+    },
+    "elapsedSec": 1.0
+  },
+  "seed": 7,
+  "summary": [
+    {
+      "method": "random",
+      "groups": 1000,
+      "minRatio": 0.6949006063808927,
+      "minRatio_lo": 0.6846859691054131,
+      "minRatio_hi": 0.705136602992029,
+      "gini": 0.05914019462939853,
+      "gini_lo": 0.05630802619349307,
+      "gini_hi": 0.06203802925343417,
+      "below50": 0.0,
+      "below50_lo": 0.0,
+      "below50_hi": 0.0,
+      "meanRatio": 0.8078764241509553,
+      "meanRatio_lo": 0.7987614847468093,
+      "meanRatio_hi": 0.8169393460472664
+    },
+    {
+      "method": "plurality",
+      "groups": 1000,
+      "minRatio": 0.7889083763699766,
+      "minRatio_lo": 0.7774651708743386,
+      "minRatio_hi": 0.8005952896811428,
+      "gini": 0.05273601607535336,
+      "gini_lo": 0.049558710483027596,
+      "gini_hi": 0.055741346176094456,
+      "below50": 0.0,
+      "below50_lo": 0.0,
+      "below50_hi": 0.0,
+      "meanRatio": 0.912993170245485,
+      "meanRatio_lo": 0.9070380910836939,
+      "meanRatio_hi": 0.9183103418240525
+    },
+    {
+      "method": "utilitarian",
+      "groups": 1000,
+      "minRatio": 0.8314279295597102,
+      "minRatio_lo": 0.8207845462716621,
+      "minRatio_hi": 0.841239158047741,
+      "gini": 0.03853178585104455,
+      "gini_lo": 0.036072825529985635,
+      "gini_hi": 0.04098739863146974,
+      "below50": 0.0,
+      "below50_lo": 0.0,
+      "below50_hi": 0.0,
+      "meanRatio": 0.9446976993876421,
+      "meanRatio_lo": 0.9412388617754348,
+      "meanRatio_hi": 0.9481861214392918
+    },
+    {
+      "method": "maximin",
+      "groups": 1000,
+      "minRatio": 0.8373185786205267,
+      "minRatio_lo": 0.8276880868095746,
+      "minRatio_hi": 0.8468588643376834,
+      "gini": 0.03730455759870087,
+      "gini_lo": 0.035013834871380455,
+      "gini_hi": 0.039586852690770565,
+      "below50": 0.0,
+      "below50_lo": 0.0,
+      "below50_hi": 0.0,
+      "meanRatio": 0.9409183157823561,
+      "meanRatio_lo": 0.9369267754004432,
+      "meanRatio_hi": 0.9445906275329142
+    },
+    {
+      "method": "nash",
+      "groups": 1000,
+      "minRatio": 0.8328262011084657,
+      "minRatio_lo": 0.8219971311101653,
+      "minRatio_hi": 0.8428987278920242,
+      "gini": 0.03811930312991253,
+      "gini_lo": 0.03563113387494835,
+      "gini_hi": 0.040432011310535095,
+      "below50": 0.0,
+      "below50_lo": 0.0,
+      "below50_hi": 0.0,
+      "meanRatio": 0.9445901369095417,
+      "meanRatio_lo": 0.9408519047563447,
+      "meanRatio_hi": 0.9480508954752371
+    }
+  ],
+  "paired": [
+    {
+      "method": "random",
+      "vs": "maximin",
+      "metric": "minRatio",
+      "groups": 1000,
+      "meanDiff": -0.1424179722396339,
+      "lo": -0.15238540303569081,
+      "hi": -0.13200488871352303
+    },
+    {
+      "method": "random",
+      "vs": "maximin",
+      "metric": "gini",
+      "groups": 1000,
+      "meanDiff": 0.021835637030697668,
+      "lo": 0.01967139458479656,
+      "hi": 0.023971765841710978
+    },
+    {
+      "method": "random",
+      "vs": "maximin",
+      "metric": "below50",
+      "groups": 1000,
+      "meanDiff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+    },
+    {
+      "method": "plurality",
+      "vs": "maximin",
+      "metric": "minRatio",
+      "groups": 1000,
+      "meanDiff": -0.04841020225054993,
+      "lo": -0.05414092383937604,
+      "hi": -0.04272061468895478
+    },
+    {
+      "method": "plurality",
+      "vs": "maximin",
+      "metric": "gini",
+      "groups": 1000,
+      "meanDiff": 0.015431458476652489,
+      "lo": 0.013612635760392587,
+      "hi": 0.017277020013193495
+    },
+    {
+      "method": "plurality",
+      "vs": "maximin",
+      "metric": "below50",
+      "groups": 1000,
+      "meanDiff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+    },
+    {
+      "method": "utilitarian",
+      "vs": "maximin",
+      "metric": "minRatio",
+      "groups": 1000,
+      "meanDiff": -0.005890649060816457,
+      "lo": -0.007559573617930498,
+      "hi": -0.004390532265127364
+    },
+    {
+      "method": "utilitarian",
+      "vs": "maximin",
+      "metric": "gini",
+      "groups": 1000,
+      "meanDiff": 0.0012272282523436786,
+      "lo": 0.0007544143978559858,
+      "hi": 0.0017827500792957048
+    },
+    {
+      "method": "utilitarian",
+      "vs": "maximin",
+      "metric": "below50",
+      "groups": 1000,
+      "meanDiff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+    },
+    {
+      "method": "nash",
+      "vs": "maximin",
+      "metric": "minRatio",
+      "groups": 1000,
+      "meanDiff": -0.004492377512060903,
+      "lo": -0.005840031132251395,
+      "hi": -0.0032130067859926395
+    },
+    {
+      "method": "nash",
+      "vs": "maximin",
+      "metric": "gini",
+      "groups": 1000,
+      "meanDiff": 0.000814745531211659,
+      "lo": 0.00041537388109934206,
+      "hi": 0.0012602721435913049
+    },
+    {
+      "method": "nash",
+      "vs": "maximin",
+      "metric": "below50",
+      "groups": 1000,
+      "meanDiff": 0.0,
+      "lo": 0.0,
+      "hi": 0.0
+    }
+  ],
+  "curveB": null,
+  "notes": [
+    "ours SKIPPED: FASTAPI_BASE_URL is not set (the solver is not ready). No ours numbers were produced.",
+    "Experiment B SKIPPED: FASTAPI_BASE_URL is not set (/elicit/* not available). Scaffolding only."
+  ]
+}

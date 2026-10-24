@@ -251,9 +251,9 @@ In demo mode the service dials `DEMO_RESTAURANT_PHONE` only and refuses any othe
 
 `type` is one of: `dialing`, `connected`, `transcript` (with `text`, `speaker` of agent or restaurant, and optional `textEn` English translation and `lang`), `slot_offered` (with `slot` like "19:45"), `confirmed` (with `slot`), `failed` (with `reason` one of full, closed, no_answer, refused, error, and optional `text`), `ended`.
 
-## S5.5 SpacetimeDB module (owner B; A owns `server/src/geo.ts` and `server/src/replan.ts`; consumed by A, B, C, D)
+## S5.5 SpacetimeDB module (owner B; A owns `server/src/geo.ts` and `server/src/replan.ts`, replan.ts written by B while A is out; consumed by A, B, C, D)
 
-Module: `server/` (TypeScript, `spacetimedb` 2.13.0). Database name `huddle-dev` locally. Clients see **snake_case** names (a function exported as `submitSwipe` is called as `submit_swipe`; columns too).
+Module: `server/` (TypeScript, `spacetimedb` 2.13.0). Database `huddle-calhacks` on Maincloud (`https://maincloud.spacetimedb.com`); `huddle-local` for local testing. Clients see **snake_case** names (a function exported as `submitSwipe` is called as `submit_swipe`; columns too).
 
 **Identity replaces memberId + secret.** Each phone connects with its own SpacetimeDB Identity; the SDK keeps the token in local storage. Every reducer acts on the caller's own membership, so no call takes a `memberId` or `secret`. A phone's "current group" is the group it most recently joined, else the one it most recently created.
 
@@ -297,10 +297,12 @@ Paths are lowercase (SpacetimeDB requires it). 401 on a bad secret, 400 on a bad
 
 **Re-plan loop:**
 
-1. The `/call-event` route stores every event. On `failed` with reason `full` or `closed`, it inserts a row into `replan_job {groupId, bookingId}`.
-2. A's `server/src/replan.ts` defines `spacetimedb.procedure({ onSchedule: replan_job }, ...)` (or a reducer). It adds the booking's placeId to `group.excludedPlaceIds`, calls `startRun(tx, groupId)` from `plans.ts` (which runs plan, offers, scout and council on its own), and sets `group.replanFor = bookingId`. A also exports it from `server/src/index.ts` (tell B).
+1. The `/call-event` route stores every event. On `failed` with reason `full` or `closed`, it calls `replan(tx, groupId, bookingId)` (`server/src/replan.ts`) in the same transaction.
+2. `replan` adds the booking's placeId to `group.excludedPlaceIds`, sets `group.replanFor = bookingId` and `status = 'planned'`, and calls `startRun(tx, groupId)` (plan, offers, scout and council follow on their own; the vote reopens after). A repeated failed event for the same booking is ignored. The `replan_job` table is unused (Maincloud cannot add a schedule to an existing table).
 3. The UI shows "That place is full. New plan ready" with a one-tap "Call again" (`start_booking`, which clears `replan_for`). Never auto-call. Other reasons (no_answer, refused, error) do not replan.
 
-**Env (set at publish; shell values for declared keys are picked up automatically):** `HUDDLE_SHARED_SECRET`, `FASTAPI_BASE_URL`, `VOICE_BASE_URL`, `COUNCIL_ENABLED`, `AGENT_LANGUAGE`, `STUB_SCENARIO` (fake call: `confirm` or `full`). Update without rebuilding: `spacetime publish huddle-dev --env-only`.
+**Schema changes on Maincloud are limited:** adding or removing a schedule on an existing table is refused, and other breaking changes may need the database wiped. Ask B before adding tables or scheduled jobs.
+
+**Env (set at publish; shell values for declared keys are picked up automatically):** `HUDDLE_SHARED_SECRET`, `FASTAPI_BASE_URL`, `VOICE_BASE_URL`, `COUNCIL_ENABLED`, `AGENT_LANGUAGE`, `STUB_SCENARIO` (fake call: `confirm` or `full`). Update without rebuilding: `spacetime publish huddle-calhacks -s maincloud --env-only`.
 
 **Auth model** (hackathon grade, state this honestly): each phone's SpacetimeDB identity token sits in the browser's local storage; whoever has the token is that member. Service-to-module calls use the shared `X-Huddle-Secret`. This is not production security.

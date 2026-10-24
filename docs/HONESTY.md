@@ -13,7 +13,7 @@ Everything cached, seeded, simulated, scripted, or hardcoded. Say these out loud
 | The restaurant on the call is a teammate | demo | planned |
 | The "we're full" reply in the re-plan demo is scripted | demo | planned |
 | Any recorded fallback call is a real earlier call, labeled | demo | planned |
-| Evaluation numbers come from synthetic groups | `docs/experiments/` | planned |
+| Evaluation numbers come from synthetic groups and tastes (baselines are oracles on the synthetic truth; "ours" is only reported from real /plan calls) | `docs/experiments/` | in use (baselines only; ours and swipe experiment wait on the api) |
 | Review data is scraped via Bright Data (terms checked) | `data/reviews/` | planned |
 | Council messages are AI-generated under a validator | `api/` | planned |
 | Auth is hackathon-grade: each phone is whoever holds its SpacetimeDB token (kept in local storage); services share one secret header | `server/src/http.ts` | in use |

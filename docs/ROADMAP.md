@@ -1,6 +1,6 @@
 # Huddle roadmap
 
-> Maintained by Eric Chen. Last updated Fri 7:30 PM (H1.5). Check things off in your own section as you push them.
+> Maintained by Eric Chen. Last updated Fri 8:15 PM (H2.25). Check things off in your own section as you push them.
 >
 > **H0 = Fri 6:00 PM** (the brief assumed 9 PM, so every gate is 3 hours earlier than `huddle.md` says).
 > Legend: `[x]` done and in the repo · `[~]` in progress or rough draft · `[ ]` not started · `?` unknown (owner: please update)
@@ -9,7 +9,7 @@
 
 | Gate | When | What must be true | Status |
 | --- | --- | --- | --- |
-| H2 stubs | **Fri 8 PM** | Every endpoint exists with contract-shaped fakes; smoke test passes on fakes | `[~]` backend + UI yes; api and voice stubs missing |
+| H2 stubs | **Fri 8 PM** | Every endpoint exists with contract-shaped fakes; smoke test passes on fakes | `[~]` backend, UI, smoke test yes; api and voice stubs missing |
 | H8 hand-off | **Sat 2 AM** | places.json v1; Eric Chen's hand-off note | `[~]` places.json done; note not yet |
 | L1 (H13) | **Sat 7 AM** | 4 phones join by QR, text parses, plan on a map with cost and timing, voting works; stubs-to-real flip done | `[ ]` |
 | L2 (H19) | **Sat 1 PM** | Swipes with confidence, 3 named plans with robustness, places.json v2, Mapbox leg times, one eval chart. Decide: council, Fetch.ai, live voice vs recording | `[ ]` |
@@ -25,18 +25,21 @@
 - [x] Plan docs (`build-brief.md`, `huddle.md`) updated for SpacetimeDB
 - [x] Repo layout, `.gitignore`, `.env.example`
 - [x] Contract `docs/CONTRACT.md` (S5.5 rewritten for SpacetimeDB)
-- [~] End-to-end check: Eric Chen's 23-check four-phone script passes on Maincloud (fakes). Haydn's `scripts/smoke.mjs` not yet; the script is available as a starting point
+- [x] End-to-end smoke test `scripts/smoke.mjs` passes on Maincloud (fakes), 27/27
 - [ ] Booth answers posted (Meta, Cartesia, Bright Data, Microsoft, Fetch.ai, SpacetimeDB)
 
 ## A. Haydn: data, routing, glue
 
+> **Haydn is out until Saturday. Eric Chen is covering Part A until he is back** (smoke test and re-plan done; Bright Data pull and geo next). Haydn: read this section first when you arrive.
+
+
 - ? Mapbox token, Bright Data account
-- [ ] `scripts/smoke.mjs` (H0-2)
+- [x] `scripts/smoke.mjs`: 27 checks incl. re-plan; passes on Maincloud and local (Eric Chen)
 - [~] Bare-bones UI: drafted by Eric Wu in `web/` (Vite + React, all screens routed, live on the SpacetimeDB views). Haydn: review and take over or confirm ownership
 - [ ] Bright Data review pull + `docs/BRIGHTDATA.md` (Eric Chen needs this for the live scout)
 - [ ] Aspect extraction, aggregation, `places.json` v2 (input: `data/places.base.json`; each place has `googlePlaceId`)
 - [ ] `server/src/geo.ts`: route geometry, leg times (geo_cache table exists)
-- [ ] `server/src/replan.ts`: scheduled procedure on `replan_job` calling `startRun(tx, groupId)`; tell Eric Chen to export it
+- [x] `server/src/replan.ts`: inline re-plan from /call-event; excludes the full place, new run, banner, vote reopens (Eric Chen)
 - [ ] Polished screens pass 1 (H19-24)
 - [ ] Demo video, pitch lead, rehearsal
 
@@ -61,7 +64,6 @@
 
 ## C. Max: solver and council
 
-- ? Claude API key
 - [ ] FastAPI stubs for every endpoint (due H2, 8 PM); tunnel URL to Eric Chen
 - [ ] /parse-prefs with keyword fallback
 - [ ] L1 solver: filter, normalization, enumeration, maximin + Nash tie-break, three plans (note: only ~7 activities are open after 7:30 PM Sat; `places.json` has an extra `googlePlaceId` field)
@@ -72,6 +74,7 @@
 
 ## D. Eric Wu: voice
 
+- ? Claude API key (moved from Max; share it with Max by DM for /parse-prefs and the council)
 - ? Twilio upgraded + number, Cartesia account, tunnel tool, demo phone verified
 - [ ] `POST /book` stub posting fake events to `/route/call-event` (due H2, 8 PM); URL to Eric Chen
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO

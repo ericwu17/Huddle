@@ -206,7 +206,8 @@ export const council_job = job("council_job", { runId: t.string() });
 export const voting_cap_job = job("voting_cap_job", { runId: t.string() });
 export const call_job = job("call_job", { bookingId: t.string() });
 export const fake_event_job = job("fake_event_job", { kind: t.string(), payloadJson: t.string() });
-// Haydn's replan.ts schedules a procedure on this table (S5.5 re-plan loop).
+// Unused: the re-plan runs inline (replan.ts). Kept because Maincloud cannot drop or
+// re-schedule an existing table without wiping the database.
 export const replan_job = job("replan_job", { groupId: t.string(), bookingId: t.string() });
 
 const spacetimedb = schema(
