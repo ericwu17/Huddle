@@ -9,14 +9,14 @@
 
 | Gate | When | What must be true | Status |
 | --- | --- | --- | --- |
-| H2 stubs | **Fri 8 PM** | Every endpoint exists with contract-shaped fakes; smoke test passes on fakes | `[~]` backend, UI, smoke test, Max's api stubs (connected on Maincloud) yes; voice `/book` stub missing |
+| H2 stubs | **Fri 8 PM** | Every endpoint exists with contract-shaped fakes; smoke test passes on fakes | `[~]` backend, UI, smoke test, Max's api stubs (connected on Maincloud) yes; voice `/book` stub built and tunneled, waiting on `VOICE_BASE_URL` publish |
 | H8 hand-off | **Sat 2 AM** | places.json v1; Eric Chen's hand-off note | `[~]` places.json done; hand-off note drafted (`docs/HANDOFF.md`), final update before Eric Chen sleeps |
 | L1 (H13) | **Sat 7 AM** | 4 phones join by QR, text parses, plan on a map with cost and timing, voting works; stubs-to-real flip done | `[ ]` |
 | L2 (H19) | **Sat 1 PM** | Swipes with confidence, 3 named plans with robustness, places.json v2, Mapbox leg times, one eval chart. Decide: council, Fetch.ai, live voice vs recording | `[ ]` |
 | L3 (H24) + freeze | **Sat 6 PM** | Offers, scout badge, council streaming, polished screens, voice S1-S3 (or fallback), re-plan loop works once, demo path written | `[ ]` |
 | Submit | **Sun 7:30 AM** (hard 9 AM, checked in by 8 AM) | Devpost complete (T7 checklist) | `[ ]` |
 
-**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed by DM only. Connected to Max's FastAPI stubs (`STUB_MODE=true`); voice not connected yet.
+**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed by DM only. Connected to Max's FastAPI stubs (`STUB_MODE=true`); voice stub (`voice/`) built, not yet wired (`VOICE_BASE_URL` unset).
 
 **Sleep/away times need re-checking against the 6 PM start.** If Eric Chen's away window is fixed in clock time (Sat 6 AM to noon), it is now H12 to H18, not H9 to H15.
 
@@ -79,7 +79,7 @@
 
 - ? Claude API key (moved from Max; share it with Max by DM for /parse-prefs and the council)
 - ? Twilio upgraded + number, Cartesia account, tunnel tool, demo phone verified
-- [ ] `POST /book` stub posting fake events to `/route/call-event` (**overdue, last H2 piece**); URL to Eric Chen
+- [~] `POST /book` stub posting fake events to `/route/call-event` (`voice/`, confirm + full scenarios, unit tests pass); next: Eric Chen sets `VOICE_BASE_URL`, smoke test, "full" re-plan test
 - [ ] Bug: app jumps to Vote ~400 ms after the council finishes and Plans bounces back to Vote, so the debate is never seen
 - [ ] `web/.env.local` pointing at Maincloud (see HANDOFF.md)
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO

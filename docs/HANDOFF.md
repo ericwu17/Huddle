@@ -6,7 +6,7 @@
 
 - **Backend is live:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks` (dashboard: https://spacetimedb.com/huddle-calhacks, Eric Chen's login).
 - **Connected to Max's FastAPI stubs** via `FASTAPI_BASE_URL=https://conferencing-navigate-deleted-feedback.trycloudflare.com`, `STUB_MODE=true`. Every plan, parse and council message comes from his service and is labeled SYNTHETIC STUB.
-- **Voice is not connected** (`VOICE_BASE_URL` unset): calls use the module's fake event sequence.
+- **Voice stub is built** (`voice/`, see its README) but not wired yet: until `VOICE_BASE_URL` is set, calls use the module's fake event sequence.
 - **Smoke test passes on Maincloud** (`node scripts/smoke.mjs`, 27 checks; offers skip because the stubs return none on purpose).
 - **Frontend works end to end** against Maincloud: lobby, private prefs, swipes, plans, council recommendation, vote.
 
