@@ -85,6 +85,46 @@ export const CallJob = __t.object("CallJob", {
 });
 export type CallJob = __Infer<typeof CallJob>;
 
+export const CatalogState = __t.object("CatalogState", {
+  id: __t.u32(),
+  version: __t.string(),
+  generatedAt: __t.string(),
+  venueCount: __t.u32(),
+  updatedAt: __t.f64(),
+});
+export type CatalogState = __Infer<typeof CatalogState>;
+
+export const CatalogStatus = __t.object("CatalogStatus", {});
+export type CatalogStatus = __Infer<typeof CatalogStatus>;
+
+export const CatalogStatusRow = __t.object("CatalogStatusRow", {
+  id: __t.u32(),
+  version: __t.string(),
+  generatedAt: __t.string(),
+  venueCount: __t.u32(),
+  updatedAt: __t.f64(),
+});
+export type CatalogStatusRow = __Infer<typeof CatalogStatusRow>;
+
+export const CatalogVenueRow = __t.object("CatalogVenueRow", {
+  id: __t.string(),
+  name: __t.string(),
+  category: __t.string(),
+  cuisine: __t.string(),
+  address: __t.string(),
+  lat: __t.f64(),
+  lng: __t.f64(),
+  costPerPerson: __t.f64(),
+  rating: __t.f64(),
+  reviewCount: __t.u32(),
+  evidenceJson: __t.string(),
+  version: __t.string(),
+});
+export type CatalogVenueRow = __Infer<typeof CatalogVenueRow>;
+
+export const CatalogVenues = __t.object("CatalogVenues", {});
+export type CatalogVenues = __Infer<typeof CatalogVenues>;
+
 export const CouncilJob = __t.object("CouncilJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),
@@ -430,6 +470,16 @@ export const SwipeJob = __t.object("SwipeJob", {
   loserPlaceId: __t.string(),
 });
 export type SwipeJob = __Infer<typeof SwipeJob>;
+
+export const Venue = __t.object("Venue", {
+  id: __t.string(),
+  placeJson: __t.string(),
+  evidenceJson: __t.string(),
+  active: __t.bool(),
+  version: __t.string(),
+  updatedAt: __t.f64(),
+});
+export type Venue = __Infer<typeof Venue>;
 
 export const Vote = __t.object("Vote", {
   id: __t.string(),

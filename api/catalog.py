@@ -1,11 +1,15 @@
 """Place catalog for the real solver: feature matrix, opening hours, travel (C3/C4).
 
-Built once at startup from data/places.json. Everything here is group-independent.
+Built once at startup from data/places.json, or per live snapshot the module sends with a
+coordinator request (CatalogCache). Everything here is group-independent.
 """
 
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import date
 from functools import lru_cache
+import hashlib
+import json
 from itertools import product
 from math import ceil
 
@@ -58,6 +62,7 @@ class Itinerary:
 @dataclass
 class Catalog:
     places: list[Place]
+    evidence: dict = field(default_factory=dict)  # place ID -> Evidence (live snapshots only)
     X: np.ndarray = field(init=False)
     index: dict[str, int] = field(init=False)
     category: np.ndarray = field(init=False)
@@ -124,3 +129,22 @@ class Catalog:
     def first_leg_minutes(self, origin, i: int) -> float:
         return float(travel_minutes(haversine_km(origin.lat, origin.lng, self.lat[i], self.lng[i])))
 
+
+
+class CatalogCache:
+    """Catalogs for live snapshots, keyed by content (not the version label), most recent kept."""
+
+    def __init__(self, size: int = 4):
+        self.size = size
+        self._items: OrderedDict[str, Catalog] = OrderedDict()
+
+    def get(self, snapshot) -> Catalog:
+        key = hashlib.sha256(json.dumps(snapshot.model_dump(mode="json", exclude={"version"}),
+                                        sort_keys=True).encode()).hexdigest()
+        if key in self._items:
+            self._items.move_to_end(key)
+        else:
+            self._items[key] = Catalog(list(snapshot.places), dict(snapshot.evidence))
+            while len(self._items) > self.size:
+                self._items.popitem(last=False)
+        return self._items[key]

@@ -56,6 +56,8 @@ import * as DoRouletteProcedure from "./do_roulette_procedure";
 import * as JoinGroupProcedure from "./join_group_procedure";
 
 // Import all table schema definitions
+import CatalogStatusRow from "./catalog_status_table";
+import CatalogVenuesRow from "./catalog_venues_table";
 import MyAgentNeedsRow from "./my_agent_needs_table";
 import MyAgentSessionRow from "./my_agent_session_table";
 import MyBookingsRow from "./my_bookings_table";
@@ -73,6 +75,20 @@ import MyVotesRow from "./my_votes_table";
 
 /** The schema information for all tables in this module. This is defined the same was as the tables would have been defined in the server. */
 const tablesSchema = __schema({
+  catalogStatus: __table({
+    name: 'catalog_status',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, CatalogStatusRow),
+  catalogVenues: __table({
+    name: 'catalog_venues',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, CatalogVenuesRow),
   myAgentNeeds: __table({
     name: 'my_agent_needs',
     indexes: [
@@ -187,6 +203,10 @@ const proceduresSchema = __procedures(
 
 type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "tables"> & {
   tables: typeof tablesSchema.schemaType.tables & {
+    /** @deprecated Use `catalogStatus` instead. This alias will be removed in the next major version. */
+    readonly "catalog_status": Omit<typeof tablesSchema.schemaType.tables["catalogStatus"], "accessorName"> & { readonly accessorName: "catalog_status" };
+    /** @deprecated Use `catalogVenues` instead. This alias will be removed in the next major version. */
+    readonly "catalog_venues": Omit<typeof tablesSchema.schemaType.tables["catalogVenues"], "accessorName"> & { readonly accessorName: "catalog_venues" };
     /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
     readonly "my_agent_needs": Omit<typeof tablesSchema.schemaType.tables["myAgentNeeds"], "accessorName"> & { readonly accessorName: "my_agent_needs" };
     /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
@@ -229,6 +249,8 @@ const REMOTE_MODULE = {
 >;
 
 const tableAccessorAliases = {
+  "catalog_status": "catalogStatus",
+  "catalog_venues": "catalogVenues",
   "my_agent_needs": "myAgentNeeds",
   "my_agent_session": "myAgentSession",
   "my_bookings": "myBookings",
@@ -261,6 +283,10 @@ function __withTableAccessorAliases<T extends object>(target: T, freeze = false)
 
 type __DbViewBase = __DbConnectionImpl<typeof REMOTE_MODULE>["db"];
 export type DbView = __DbViewBase & {
+  /** @deprecated Use `catalogStatus` instead. This alias will be removed in the next major version. */
+  readonly "catalog_status": __DbViewBase["catalogStatus"];
+  /** @deprecated Use `catalogVenues` instead. This alias will be removed in the next major version. */
+  readonly "catalog_venues": __DbViewBase["catalogVenues"];
   /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
   readonly "my_agent_needs": __DbViewBase["myAgentNeeds"];
   /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */
@@ -289,6 +315,10 @@ export type DbView = __DbViewBase & {
 
 type __TablesBase = __QueryBuilder<typeof tablesSchema.schemaType>;
 export type Tables = __TablesBase & {
+  /** @deprecated Use `catalogStatus` instead. This alias will be removed in the next major version. */
+  readonly "catalog_status": __TablesBase["catalogStatus"];
+  /** @deprecated Use `catalogVenues` instead. This alias will be removed in the next major version. */
+  readonly "catalog_venues": __TablesBase["catalogVenues"];
   /** @deprecated Use `myAgentNeeds` instead. This alias will be removed in the next major version. */
   readonly "my_agent_needs": __TablesBase["myAgentNeeds"];
   /** @deprecated Use `myAgentSession` instead. This alias will be removed in the next major version. */

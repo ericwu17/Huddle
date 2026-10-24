@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 from . import agent, council, elicit, parse, solver
 from .agent_models import AgentNeeds, AgentNeedsRequest, AgentPlanRequest, AgentPlanResponse
-from .catalog import Catalog
+from .catalog import Catalog, CatalogCache
 from .delivery import CouncilDelivery, HttpCouncilDelivery, LocalCouncilDelivery
 from .llm import LLM
 from .models import (
@@ -67,6 +67,7 @@ def create_app(settings: Settings | None = None,
         app.state.settings = config
         app.state.places = places
         app.state.catalog = Catalog(places)
+        app.state.live_catalogs = CatalogCache()
         app.state.llm = llm or LLM()
         if delivery_factory is not None:
             app.state.delivery = delivery_factory
@@ -127,7 +128,10 @@ def create_app(settings: Settings | None = None,
 
     @app.post("/agent/plan", response_model=AgentPlanResponse)
     async def agent_plan(body: AgentPlanRequest, request: Request):
-        return await agent.coordinate(request.app.state.llm, request.app.state.catalog, body)
+        # The module's live venue snapshot when it sends one, so both sides check the same venues.
+        catalog = (request.app.state.catalog if body.catalog is None
+                   else request.app.state.live_catalogs.get(body.catalog))
+        return await agent.coordinate(request.app.state.llm, catalog, body)
 
     @app.post("/elicit/next", response_model=NextResponse)
     async def next_pair(body: NextRequest, request: Request):

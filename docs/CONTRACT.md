@@ -280,7 +280,7 @@ Module: `server/` (TypeScript, `spacetimedb` 2.13.0). Database `huddle-calhacks`
 
 **Identity replaces memberId + secret.** Each phone connects with its own SpacetimeDB Identity; the SDK keeps the token in local storage. Every reducer acts on the caller's own membership, so no call takes a `memberId` or `secret`. A phone's "current group" is the group it most recently joined, else the one it most recently created.
 
-**Tables** (all private): group, member, private_prefs, swipe, plan_run, offer, vote, booking, call_event, council_message, scout_check, geo_cache, plus one schedule table per background job (`*_job`). Contract objects owned by the api (hard, posterior, plan results, council result) are stored as JSON strings in `*Json` columns; parse them on the client.
+**Tables** (all private): group, member, private_prefs, swipe, plan_run, offer, vote, booking, call_event, council_message, scout_check, geo_cache, venue, catalog_state, plus one schedule table per background job (`*_job`). Contract objects owned by the api (hard, posterior, plan results, council result) are stored as JSON strings in `*Json` columns; parse them on the client.
 
 **Views** (public, subscribable, each scoped to the caller's own group). Privacy rules are enforced here:
 
@@ -291,6 +291,7 @@ Module: `server/` (TypeScript, `spacetimedb` 2.13.0). Database `huddle-calhacks`
 - `my_plan_runs` -> `[{run_id, status, result_json?, council_json?, roulette_json?, error?, stub, created_at}]`. `result_json` has `perMember`, `gaveUp` and `posteriorSummary` removed unless `show_who_compromised`.
 - `my_council_messages` -> CouncilMessage rows (S5.3) in insert order; `member_id` removed unless `show_who_compromised`.
 - `my_scout`, `my_votes`, `my_bookings`, `my_call_events`.
+- `catalog_status` -> `{id, version, generated_at, venue_count, updated_at}` or empty while the bundled catalog applies; `catalog_venues` -> active venues `[{id, name, category, cuisine, address, lat, lng, cost_per_person, rating, review_count, evidence_json, version}]`. Public listing data, the same for every caller.
 
 **Procedures callable by phones** (they return values):
 
@@ -306,11 +307,19 @@ Status flow: `lobby` -> `eliciting` (2+ members, all ready) -> `planned` (stoppi
 
 **HTTP routes** (header `X-Huddle-Secret` required; SpacetimeDB does not authenticate routes, so the module does). Base `{SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route`:
 
-- `GET /health -> {"ok": true, "stub": bool, "placesLoaded": n}`
+- `GET /health -> {"ok": true, "stub": bool, "placesLoaded": n, "catalog": {"version", "generatedAt", "venues"}}` (`version: "bundled"`, `venues: 0` until a snapshot is pushed)
 - `POST /call-event` (from voice), body = call event (S5.4)
 - `POST /council-message` (from api), body = CouncilMessage (S5.3)
+- `POST /catalog` (from `data/reviews/collect.py publish`), body = `{version, generatedAt, venues: [{place, evidence}]}` -> `{ok, version, active, deactivated, counts}`
 
 Paths are lowercase (SpacetimeDB requires it). 401 on a bad secret, 400 on a bad body.
+
+**Live venue catalog** (`server/src/lib/catalog.ts`; the scraper side is in `docs/BRIGHTDATA.md`):
+
+1. `POST /catalog` carries the whole active set. Every `place` must be a contract Place (S5.2, no extra fields). `evidence` holds per-source `{source: gmaps|yelp|google_places, url, fetchedAt, rating, reviewCount}`, and unknown evidence fields are dropped. Each category needs at least one venue and at most 80 meals, 50 activities and 30 desserts, which keeps the API's itinerary enumeration under a second.
+2. The whole push is validated before anything is written. A rejected push changes nothing, so the last good snapshot stays live. An accepted one upserts its venues and deactivates the rest. Rows are never deleted, so earlier runs and bookings still resolve their place IDs.
+3. Coordinator runs (`agent_plan_job`) send the active snapshot as `catalog` in `/agent/plan` (AGENT_CONTRACT.md) and validate the reply's stops against that same snapshot. Booking phone lookups read the venue table first. With no snapshot pushed, both services use the bundled `data/places.json` as before. Legacy swipe/solver flows always use the bundled file.
+4. New scraped venues have stable IDs, `bd_` plus 10 hex characters from their source key, so a re-push never reassigns an ID. Existing catalog places keep their `p_###` IDs.
 
 **Pipeline after enough swipes** (B owns the wiring):
 

@@ -1,0 +1,2113 @@
+[
+  {
+    "bdId": "g:ChIJO60MVcF-hYARx7apz-2Rr3Y",
+    "group": "hangout",
+    "category": "dessert",
+    "name": "Cafe Leila",
+    "address": "1724 San Pablo Ave, Berkeley, CA 94702, United States",
+    "lat": 37.8725562,
+    "lng": -122.2935758,
+    "phone": "+15105257544",
+    "distance_mi": 1.14,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJO60MVcF-hYARx7apz-2Rr3Y",
+      "cid": "8552214667977144007",
+      "name": "Cafe Leila",
+      "address": "1724 San Pablo Ave, Berkeley, CA 94702, United States",
+      "lat": 37.8725562,
+      "lng": -122.2935758,
+      "phone": "+15105257544",
+      "url": "https://www.google.com/maps/place/Cafe%20Leila/data=!4m7!3m6!1s0x80857ec1550cad3b:0x76af91edcfa9b6c7!8m2!3d37.8725562!4d-122.2935758!16s%2Fg%2F1tfwq5sr!19sChIJO60MVcF-hYARx7apz-2Rr3Y",
+      "categories": [
+        "Cafe",
+        "Breakfast restaurant",
+        "Brunch restaurant",
+        "Dinner theater",
+        "Garden",
+        "Live music venue",
+        "Lunch restaurant",
+        "Tea house"
+      ],
+      "gcids": [
+        "gcid:cafe"
+      ],
+      "rating": 4.4,
+      "reviews_count": 1197,
+      "review_distribution": {
+        "1_star_reviews": 37,
+        "2_star_reviews": 36,
+        "3_star_reviews": 62,
+        "4_star_reviews": 284,
+        "5_star_reviews": 778
+      },
+      "open_hours": {
+        "Sunday": "8 AM–3 PM",
+        "Saturday": "8 AM–3 PM",
+        "Friday": "8 AM–3 PM",
+        "Thursday": "8 AM–3 PM",
+        "Wednesday": "8 AM–3 PM",
+        "Tuesday": "8 AM–3 PM",
+        "Monday": "8 AM–3 PM"
+      },
+      "services": [
+        "Wheelchair-accessible car park",
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/searchviewer/42",
+      "website": null,
+      "description": "With a spacious patio & occasional live jazz, this local cafe offers more than just healthy dishes.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-08-25T20:07:44.186Z",
+          "rating": 5,
+          "content": "Cafe Leila is such a great spot. The staff was super friendly, especially the dude working the register with braids — I didn’t catch his name, but he was seriously cool and made the whole experience even better.\n\nThe food was great, and the outdoor patio is really rad. Awesome atmosphere, good food, and genuinely nice people. I totally forgot to get food photos because we were too busy eating it. Definitely a place I’ll be coming back to!"
+        },
+        {
+          "review_date": "2026-03-06T06:51:43.661Z",
+          "rating": 5,
+          "content": "It's a low key vibe, with indoor tables and a lovely patio, with plants and fountains, nooks and umbrellas. I haven't tried the food, but the coffee was delicious, and the staff was sweet - smiling and friendly. It's a bit out of my way, but I like to suggest it to friends to meet there. It's just nice, a little oasis. Also, there's music some evenings indoors. Gotta check their website."
+        },
+        {
+          "review_date": "2026-06-15T15:55:07.357Z",
+          "rating": 5,
+          "content": "I came here with a few friends and we had an amazing experience. The food was fresh, flavorful, and clearly made with quality ingredients. We ordered the Shelby Steak, salmon salad, salmon omelette with avocado, a pancake, and two basil lemonades, and everything was delicious. The basil lemonade was especially refreshing and unique.\n\nThe staff were incredibly friendly and welcoming. Everyone was attentive, helpful, and made us feel right at home. The service was excellent from start to finish.\n\nWhat stood out most was how fresh everything tasted. You can tell they care about both the food and the customer experience. We left happy, full, and already talking about coming back. Definitely a well-deserved 5 stars!"
+        },
+        {
+          "review_date": "2026-05-09T21:08:26.705Z",
+          "rating": 5,
+          "content": "Atmosphere is great inside and especially outside. I got the eggs Benedict in different variations and it was perfect. I went to this place three times and it and every time it was spot on. And the price was average for the area."
+        },
+        {
+          "review_date": "2026-09-06T19:55:13.850Z",
+          "rating": 5,
+          "content": "Good food and great atmosphere. We sat on the patio for brunch - pancake plate and the Leila omelette. Kid friendly: my toddler enjoyed sharing both plates with us."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Great breakfast food, friendly staff and owners and amazing chai lattes\""
+        },
+        {
+          "content": "\"Great place to meet with people, good service and good coffee!!\""
+        },
+        {
+          "content": "\"Enjoyed superb buttermilk pancakes , scrambled eggs and grilled tomatoes.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJNwUiuJ1-hYARlmMobInl1SI",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Jupiter",
+    "address": "2181 Shattuck Ave., Berkeley, CA 94704, United States",
+    "lat": 37.8697958,
+    "lng": -122.267582,
+    "phone": "",
+    "distance_mi": 0.31,
+    "huddleId": "p_005",
+    "google": {
+      "place_id": "ChIJNwUiuJ1-hYARlmMobInl1SI",
+      "cid": "2510164745716786070",
+      "name": "Jupiter",
+      "address": "2181 Shattuck Ave., Berkeley, CA 94704, United States",
+      "lat": 37.8697958,
+      "lng": -122.267582,
+      "phone": "",
+      "url": "https://www.google.com/maps/place/Jupiter/data=!4m7!3m6!1s0x80857e9db8220537:0x22d5e5896c286396!8m2!3d37.8697958!4d-122.2675820!16s%2Fm%2F01zbwvr!19sChIJNwUiuJ1-hYARlmMobInl1SI",
+      "categories": [
+        "Pizza restaurant",
+        "Beer garden",
+        "Brewpub",
+        "Live music venue"
+      ],
+      "gcids": [
+        "gcid:pizza_restaurant"
+      ],
+      "rating": 4.5,
+      "reviews_count": 4025,
+      "review_distribution": {
+        "1_star_reviews": 92,
+        "2_star_reviews": 69,
+        "3_star_reviews": 241,
+        "4_star_reviews": 1027,
+        "5_star_reviews": 2596
+      },
+      "open_hours": {
+        "Sunday": "11:30 AM–10 PM",
+        "Saturday": "11:30 AM–11 PM",
+        "Friday": "11:30 AM–11 PM",
+        "Thursday": "11:30 AM–10 PM",
+        "Wednesday": "11:30 AM–10 PM",
+        "Tuesday": "11:30 AM–10 PM",
+        "Monday": "11:30 AM–10 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/J-xeyA06mHQ",
+      "website": "http://jupiterbeer.com/",
+      "description": "A 2-story venue & beer garden that serves up wood-fired pizzas plus handcrafted beers & ales.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2025-11-21T13:03:44.771Z",
+          "rating": 5,
+          "content": "Great vibes all around. The place feels welcoming the moment you walk in, and the energy is just right lively but not loud. The pizza tasted clean and fresh, which made it super easy to enjoy without feeling heavy afterward. The beer selection was solid too and paired perfectly with the food. Overall, a really good spot. I’d definitely go again."
+        },
+        {
+          "review_date": "2026-08-14T22:27:35.498Z",
+          "rating": 5,
+          "content": "After recommendations from three locals to try this spot, I couldn't ignore it anymore.\n\nI got the eutropia and the wings. The naming of the pizzas as celestial bodies is quite cute. The eutropia was very good and dare I say it tastes better after reheating as leftovers.\n\nThe wings tossed with honey Sriracha were good but the ranch was something special. I asked one of the staff what it was and they told me regular ranch. I felt like I was being gas lit in real time, it didn't look like regular ranch and it for sure tasted better than regular ranch. My waitress came over and I asked her the same question and she let me know it was special house made ranch with dill and other ingredients! Thank you! I would have had crashed out if this flavor came from thousand island or some bottled ranch and re-evaluated my life. Needless to say I took that shit home and dipped my leftover pizza. A+ ranch!"
+        },
+        {
+          "review_date": "2025-11-11T14:36:27.051Z",
+          "rating": 5,
+          "content": "What a hidden gem in Berkeley!\nI was in the mood for good, authentic pizza — and as someone from New York, I’m definitely spoiled — but this place really impressed me. The pizza was amazing, and the manager, Sami, went above and beyond to get us a great table and make sure our food and drinks were perfect. I really appreciated his friendliness, and even our server mentioned what a great manager he is. I’ll definitely be coming back — not just for the food, but for the hospitality and the wonderful atmosphere. 🥰"
+        },
+        {
+          "review_date": "2025-12-15T02:21:47.479Z",
+          "rating": 5,
+          "content": "Came in for pizza and beer here because this used to be my husband's favorite place when he was in college at uc berkeley!\nWe were a large group and took some time to decide on the seating and the menu - and the server was so patient with us🙏\nWe got four pizzas and they were all so good! If I had to pick a favorite, it would probably be Circe. The outdoor space was heated and wonderful."
+        },
+        {
+          "review_date": "2026-06-05T21:49:55.475Z",
+          "rating": 4,
+          "content": "Decent pizza, lots of options and a nice restaurant and outdoor patio space. Extensive beer selection but unfortunately they were out of the first three I wanted so I settled for a fourth option. Note that they can't split checks which is not a big deal. Just plan accordingly."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Awsome place, greate pizza, beer and super friendly service!\""
+        },
+        {
+          "content": "\"Food -creative pizzas and good prices, Beer - tasty and many options.\""
+        },
+        {
+          "content": "\"And i absolutely love that they serve fresh bulbs of roasted garlic.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJh_wjBJ1-hYARK2XCkZUkbg0",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Angeline's Louisiana Kitchen",
+    "address": "2261 Shattuck Ave., Berkeley, CA 94704, United States",
+    "lat": 37.8682333,
+    "lng": -122.2675528,
+    "phone": "+15105486900",
+    "distance_mi": 0.36,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJh_wjBJ1-hYARK2XCkZUkbg0",
+      "cid": "967751194745398571",
+      "name": "Angeline's Louisiana Kitchen",
+      "address": "2261 Shattuck Ave., Berkeley, CA 94704, United States",
+      "lat": 37.8682333,
+      "lng": -122.2675528,
+      "phone": "+15105486900",
+      "url": "https://www.google.com/maps/place/Angeline's%20Louisiana%20Kitchen/data=!4m7!3m6!1s0x80857e9d0423fc87:0xd6e249591c2652b!8m2!3d37.8682333!4d-122.2675528!16s%2Fg%2F1tlw991f!19sChIJh_wjBJ1-hYARK2XCkZUkbg0",
+      "categories": [
+        "Cajun restaurant",
+        "Brunch restaurant",
+        "Creole restaurant",
+        "Restaurant",
+        "Sandwich shop",
+        "Seafood restaurant",
+        "Southern restaurant (US)"
+      ],
+      "gcids": [
+        "gcid:cajun_restaurant"
+      ],
+      "rating": 4.5,
+      "reviews_count": 3096,
+      "review_distribution": {
+        "1_star_reviews": 62,
+        "2_star_reviews": 70,
+        "3_star_reviews": 217,
+        "4_star_reviews": 663,
+        "5_star_reviews": 2084
+      },
+      "open_hours": {
+        "Sunday": "10 AM–9 PM",
+        "Saturday": "10 AM–9 PM",
+        "Friday": "11:30 AM–9 PM",
+        "Thursday": "11:30 AM–9 PM",
+        "Wednesday": "11:30 AM–9 PM",
+        "Tuesday": "11:30 AM–9 PM",
+        "Monday": "Closed"
+      },
+      "services": [
+        "Wheelchair-accessible car park",
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": null,
+      "website": "http://www.angelineskitchen.com/",
+      "description": "Serving gumbo, beignets & jambalaya, this casual eatery brings New Orleans flavors to Berkeley.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-06-15T01:42:11.705Z",
+          "rating": 5,
+          "content": "Everything was delicious,  just as our server warned.  I had the fried catfish,  which was served with potato salad on a bed of hush puppies.  The fish was delicate and flaky without being over cooked.  The breading was seasoned but not over-powering. Others in our group enjoyed the buttermilk fried chicken.  Impressed by our mains,  we decided dessert was in order,  so we had the chocolate cake,  which does have a satisfying amount of cayenne- just enough to feel the warmth,  not so much as to be spicy. The rum infused whipped cream was a decadent touch.  The bread pudding was also a hit. Only issue was our server was stretched a bit thin,(surprise post- lunch rush) but he was still friendly and helpful."
+        },
+        {
+          "review_date": "2026-08-24T02:57:57.850Z",
+          "rating": 5,
+          "content": "I just moved to California recently and I had my first dine in experience at Angeline’s Louisiana Kitchen. I had such a lovely time! Our server, Melody, was very kind and attentive! She checked on us from time to time and made sure we were okay. The food was just as amazing and I can’t wait to go back!! It was my first time trying southern food and I loved it!\n\nThank you Melody and Angeline’s Louisiana Kitchen! 🩷"
+        },
+        {
+          "review_date": "2026-05-10T01:39:47.766Z",
+          "rating": 3,
+          "content": "I've been here a couple of times now. The first time I had high expectations from having enjoyed great food while in Louisiana.  Angeline's didn't quiet feel the same. It's definitely a great spot in the Bay when craving Louisiana food, but it still doesn't come close to the bold flavors I've had during my visit.\n\nApart from that, they have very good service and ambiance is cozy as well.\n\nThese are just my two cents so take it for what you will. Go check them and see what you think.\n\n\"High on Food. High on Life.\" - thefoodhigh\n\nCheck out more honest reviews on social @thefoodhigh"
+        },
+        {
+          "review_date": "2026-05-13T04:10:07.904Z",
+          "rating": 1,
+          "content": "Total rip off they super skimped out on the catfish nuggets, I paid $18 for fish batter. It's friggin catfish not like it's a super pricey fish especially nugget form. Never coming back here no wonder it wasn't busy."
+        },
+        {
+          "review_date": "2026-04-09T19:16:42.008Z",
+          "rating": 5,
+          "content": "This was some of the best food I have ever had!!! I used to work at a New Orleans spot in ATL, and this was top tier! Best hush puppies I have ever had, great sweet tea (for not being in the south) and great service despite it being empty! Shoutout to our server Mel, she was great!!"
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Good ambience and service, but the food was a bit salty.\""
+        },
+        {
+          "content": "\"Ordered gumbo, red beans and rice, and catfish with hush puppies.\""
+        },
+        {
+          "content": "\"RIBS WERE BAKED NOT BBQ'D. Gumbo had bits and pieces of meat and watery.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJcYtcJaF-hYAR-VzrwZpQY0E",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Chez Panisse",
+    "address": "1517 Shattuck Ave., Berkeley, CA 94709, United States",
+    "lat": 37.8796069,
+    "lng": -122.2689248,
+    "phone": "+15105485525",
+    "distance_mi": 0.59,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJcYtcJaF-hYAR-VzrwZpQY0E",
+      "cid": "4711698260768283897",
+      "name": "Chez Panisse",
+      "address": "1517 Shattuck Ave., Berkeley, CA 94709, United States",
+      "lat": 37.8796069,
+      "lng": -122.2689248,
+      "phone": "+15105485525",
+      "url": "https://www.google.com/maps/place/Chez%20Panisse/data=!4m7!3m6!1s0x80857ea1255c8b71:0x4163509ac1eb5cf9!8m2!3d37.8796069!4d-122.2689248!16s%2Fm%2F03f7rg!19sChIJcYtcJaF-hYAR-VzrwZpQY0E",
+      "categories": [
+        "Californian restaurant",
+        "Cafe",
+        "Restaurant"
+      ],
+      "gcids": [
+        "gcid:californian_restaurant"
+      ],
+      "rating": 4.6,
+      "reviews_count": 2523,
+      "review_distribution": {
+        "1_star_reviews": 60,
+        "2_star_reviews": 46,
+        "3_star_reviews": 157,
+        "4_star_reviews": 339,
+        "5_star_reviews": 1921
+      },
+      "open_hours": {
+        "Sunday": "Closed",
+        "Saturday": "11:30 AM–3 PM\n5–10 PM",
+        "Friday": "11:30 AM–3 PM\n5–10 PM",
+        "Thursday": "11:30 AM–2:30 PM\n5–10 PM",
+        "Wednesday": "11:30 AM–2:30 PM\n5–10 PM",
+        "Tuesday": "11:30 AM–2:30 PM\n5–10 PM",
+        "Monday": "5–10 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet",
+        "No wheelchair-accessible car park"
+      ],
+      "reservation_link": null,
+      "website": "http://www.chezpanisse.com/",
+      "description": "Alice Waters' acclaimed flagship downstairs & cafe upstairs offer seasonal fare & a chic, cozy vibe.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-06-19T19:33:41.514Z",
+          "rating": 4,
+          "content": "the salads, entrees, and dessert were very well balanced. i love how their ingredients were.\n\ni did prefer the egg for the salad to be a little more runny.\n\nloved the sweet and savory balance of the fig toast and prosciutto\n\nthe pasta with veggies did not really do it for me. i felt it was an overabundance of corn and veggie accoutrements, which was distracting.\n\npork loin was nice and tender. the seasoning for the loin was nicely done.\n\nthe olive oil cake was something special. i could taste the olive oil from the cake. nice and fluffy as well\n\nalthough not in the pictures, the apricot galette was not my favorites. i think the apricot filling was too tart and sweet. it is a tricky dessert to get right, as cooking the apricot will make it even more sweet. I would suggest adding a tad bit of salt to balance the tartness, and sweetness.\n\nThe last five years I came here, they used to scrape the bread crumbs off the table for me. this time they did not do it even after we finished the bread and going into the entree round. they finally did it before the desserts.\n\noverall, i applaud the use of fresh ingredients."
+        },
+        {
+          "review_date": "2026-02-06T08:14:21.226Z",
+          "rating": 5,
+          "content": "Delicious food and great service.  Definitely price and a special occasion kind of place.  We were pleasantly surprised with the small appetizer, dessert tea, and small candies (orange peel and chocolate covered almonds) included with the prix fixe menu!"
+        },
+        {
+          "review_date": "2026-06-26T21:25:50.553Z",
+          "rating": 3,
+          "content": "Had lunch at the cafe -- 3.5 stars, rounded down. It was frustratingly almost great. But IMO for an $80 lunch it needs to be solidly fantastic.\n\nMy waiter took long to take my order for main and for dessert. Food wait times were very long as well. Took many minutes for my dessert to come, and it was a slice of galette with a scoop of ice cream.\n\nBaked salmon - Almost incredible. The cook on the salmon was gorgeous. But the flavours and seasoning were just far too subtle for my taste. My first bite was exciting and I was hoping for more, but I felt like the amount of flavours diminished with each subsequent bite. Sadly underwhelming for $47.\n\nApricot galette - Almost incredible. Overall it was just too tart, even with the ice cream trying to balance things out. The crust was great though."
+        },
+        {
+          "review_date": "2026-05-22T03:55:59.203Z",
+          "rating": 4,
+          "content": "Went there because of the recommendation and reviews. The food had good flavors. But not sure if the price justifies it. It’s a prix fixed menu in the dining area. They have no cocktails, only wines and (?)beers. The servers were nice and attentive. There is an upstairs dining area that’s not prix fixed"
+        },
+        {
+          "review_date": "2026-07-20T23:20:15.296Z",
+          "rating": 5,
+          "content": "Whenever I visit northern California, I always book a table at Chez Panisse. Over the past six visits, each experience has been nothing short of a culinary awakening. The menu is a testament to the freshest local produce, showcasing the restaurant’s commitment to using the freshest ingredients. Their cooking is a harmonious blend of simplicity and elegance, avoiding any over-the-top or flashy elements. Chez Panisse truly understands the intricacies of each ingredient and flavor, employing the most effective techniques to elevate them to their fullest potential."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Great staff, lovely rooms, and terrific food and wine Save room for dessert.\""
+        },
+        {
+          "content": "\"Ate upstairs in the grill but same high quality as downstairs at a lower price.\""
+        },
+        {
+          "content": "\"We ordered the baked goat cheese salad, mushroom pasta, and pizza with nettles.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJReiUOpx-hYAR_WgFK4xVwyM",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Eureka!",
+    "address": "2068 Center St, Berkeley, CA 94704, United States",
+    "lat": 37.8699785,
+    "lng": -122.2690064,
+    "phone": "+15108098282",
+    "distance_mi": 0.23,
+    "huddleId": "p_011",
+    "google": {
+      "place_id": "ChIJReiUOpx-hYAR_WgFK4xVwyM",
+      "cid": "2576997472291612925",
+      "name": "Eureka!",
+      "address": "2068 Center St, Berkeley, CA 94704, United States",
+      "lat": 37.8699785,
+      "lng": -122.2690064,
+      "phone": "+15108098282",
+      "url": "https://www.google.com/maps/place/Eureka!/data=!4m7!3m6!1s0x80857e9c3a94e845:0x23c3558c2b0568fd!8m2!3d37.8699785!4d-122.2690064!16s%2Fg%2F1pty16nzf!19sChIJReiUOpx-hYAR_WgFK4xVwyM",
+      "categories": [
+        "American restaurant",
+        "Restaurant"
+      ],
+      "gcids": [
+        "gcid:american_restaurant"
+      ],
+      "rating": 4.3,
+      "reviews_count": 2367,
+      "review_distribution": {
+        "1_star_reviews": 99,
+        "2_star_reviews": 65,
+        "3_star_reviews": 202,
+        "4_star_reviews": 687,
+        "5_star_reviews": 1314
+      },
+      "open_hours": {
+        "Sunday": "11 am–12 am",
+        "Saturday": "11 am–1 am",
+        "Friday": "11 am–1 am",
+        "Thursday": "11 am–12 am",
+        "Wednesday": "11 am–12 am",
+        "Tuesday": "11 am–12 am",
+        "Monday": "11 am–12 am"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet",
+        "Does not have assistive hearing loop",
+        "No wheelchair-accessible car park"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/FnWXc92URYs",
+      "website": "http://eurekarestaurantgroup.com/locations/berkeley/",
+      "description": "Hip dining spot serving elevated burgers, craft beer & whiskey in industrial-chic surrounds.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-08-17T22:51:17.013Z",
+          "rating": 5,
+          "content": "Straight up incredible. It was like an explosion of flavors. Went to Eureka on a Monday and loved every bit of it. It was happy hour, so all their martinis were $10, a steal for the SF area. The espresso martini was delicious, but the lychee martini was the star of the show.\n\nThe fries with Korean beef... please, I'll take ten. So good. The jalapeño burger with an egg on top was cooked perfectly, and I swapped the fries for green beans. Not to be dramatic, but those might be the best green beans I've ever had.\n\nService was great too, zero complaints. I went with a local who loves this place, and I completely see why."
+        },
+        {
+          "review_date": "2026-08-28T21:53:14.372Z",
+          "rating": 5,
+          "content": "Celebrating my small wins here 🚘✨\nI love the food, especially the nachos! However, the drinks tasted like they were old or not fresh. Please check or change the drinks because it really affected the experience. Hopefully this can be improved."
+        },
+        {
+          "review_date": "2025-10-19T13:54:06.186Z",
+          "rating": 5,
+          "content": "Service was a 10/10. Jack did a great job. He was helpful and consistent\n\nAmbiance -  10/10 nice and versatile, you can come here for a nice date night or to watch a game with boys.\n\nFood - 8/0 the food is good specially the mash burgers and apps.\n\nAlso they have great cocktails selection."
+        },
+        {
+          "review_date": "2026-07-01T06:03:09.187Z",
+          "rating": 5,
+          "content": "One of the best dining experiences we’ve ever had in Berkeley. Everything was fantastic and happy hour / hoppy hour is a MUST. Especially the truffle cheese fries, great deal, and delicious.\n\nMost importantly, our service was exceptional. AJ SPECIFICALLY was beyond professional, and an above and beyond host for our table. Walked us through suggestions, gave honest recommendations, and kept us entertained. AJ IS THE BEST!\n\nAlso…. BURBON BARREL CAKE!!!"
+        },
+        {
+          "review_date": "2026-06-08T12:36:38.254Z",
+          "rating": 5,
+          "content": "Cellarmaker: Coffee and Cigarettes Porter. Best beer I have ever had! Food was pretty tasty. Server was great. No complaints"
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Good food, solid selection of beer and prices are reasonable for the area.\""
+        },
+        {
+          "content": "\"Manager took over service of the table, offered apologies but zero explanation.\""
+        },
+        {
+          "content": "\"Ambience was good, music a bit loud for talking in a group.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJB_-A0oJ-hYARwmbyJJR3sUo",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "La Note",
+    "address": "2377 Shattuck Ave., Berkeley, CA 94704, United States",
+    "lat": 37.866206,
+    "lng": -122.267249,
+    "phone": "+15108431525",
+    "distance_mi": 0.48,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJB_-A0oJ-hYARwmbyJJR3sUo",
+      "cid": "5382214507843184322",
+      "name": "La Note",
+      "address": "2377 Shattuck Ave., Berkeley, CA 94704, United States",
+      "lat": 37.866206,
+      "lng": -122.267249,
+      "phone": "+15108431525",
+      "url": "https://www.google.com/maps/place/La%20Note/data=!4m7!3m6!1s0x80857e82d280ff07:0x4ab1779424f266c2!8m2!3d37.8662060!4d-122.2672490!16s%2Fm%2F01zbx7x!19sChIJB_-A0oJ-hYARwmbyJJR3sUo",
+      "categories": [
+        "French restaurant",
+        "Bistro",
+        "Breakfast restaurant",
+        "Cafe",
+        "Restaurant"
+      ],
+      "gcids": [
+        "gcid:french_restaurant"
+      ],
+      "rating": 4.4,
+      "reviews_count": 2123,
+      "review_distribution": {
+        "1_star_reviews": 85,
+        "2_star_reviews": 59,
+        "3_star_reviews": 137,
+        "4_star_reviews": 471,
+        "5_star_reviews": 1371
+      },
+      "open_hours": {
+        "Sunday": "8 AM–3 PM",
+        "Saturday": "8 AM–3 PM",
+        "Friday": "8 AM–2 PM",
+        "Thursday": "8 AM–2 PM",
+        "Wednesday": "8 AM–2 PM",
+        "Tuesday": "8 AM–2 PM",
+        "Monday": "8 AM–2 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/nEL8IMlcUbE",
+      "website": "http://www.lanoterestaurant.com/",
+      "description": "Lively setting for French eats for breakfast, lunch or dinner, plus a garden open in good weather.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-07-04T21:05:31.689Z",
+          "rating": 2,
+          "content": "La Note is *the* brunch spot in Berkeley for a reason. The patio is lovely, the service was great, and I’ll absolutely be back to try other menu items.\n\nThat said, I ordered the Lemon Gingerbread Pancakes with Poached Pears, and my expectations and reality had a brief disagreement.\n\nWhen someone says “pancakes,” I imagine soft, tender, fluffy clouds that happily absorb maple syrup. These were more like:\n\n* Dense\n* Cakey\n* Crumbly\n* Heavy\n\nThe texture reminded me less of a pancake and more of a gingerbread muffin that accidentally got promoted to breakfast.\n\nThe flavors were nice, the poached pears were beautiful, but the interior texture wasn’t for me. If you love gingerbread cake, you may love these. If you’re expecting a classic fluffy pancake experience, you may be surprised.\n\nWould I come back to La Note? Absolutely.\n\nWould I order the Lemon Gingerbread Pancakes again?\n\nNot unless they come with a warning label that says:\n\n“Attention: This pancake identifies as cake.”"
+        },
+        {
+          "review_date": "2026-06-03T22:21:26.208Z",
+          "rating": 4,
+          "content": "Really adorable French cafe. Very busy Sunday morning for breakfast, but getting a table inside worked out well for us. Definitely faster than waiting for the patio.\n\nThe service was excellent: fun, friendly and attentive.\n\nThe food was solid but not incredible. The baguette with goat cheese and honey was delicious, but the breakfast sausages (apple and spicy - I forget the actual names) were underwhelming. The Bloody Mary was spicy and good.\n\nPricy but good. We’d go back."
+        },
+        {
+          "review_date": "2026-02-23T16:18:26.262Z",
+          "rating": 5,
+          "content": "Five stars all the way. The breakfast potatoes were crispy and perfectly seasoned, finished with fragrant herbs and mellow roasted garlic that added a rich depth. The scrambled eggs had a light, creamy texture that felt comforting and well prepared. The pear and gingerbread pancakes were not my favorite choice, so next time I would try a different flavor combination with a stronger fruit presence. The atmosphere felt warm and inviting, and the service was attentive and friendly. A lovely spot to relax and enjoy a satisfying brunch experience."
+        },
+        {
+          "review_date": "2026-06-19T03:46:49.637Z",
+          "rating": 5,
+          "content": "It’s my first time to try French food and I like the taste. The pancake is soft and not so sweet (they provided me with syrup). The oat meal is like a bowl of light sweet porridge, which is ok."
+        },
+        {
+          "review_date": "2026-04-20T06:14:26.372Z",
+          "rating": 5,
+          "content": "I had eggs benedict and honestly, the highlight for me was the herb and garlic potatoes on the side—so flavorful and perfectly cooked. It’s amazing how something so simple can taste that good. The menu being in French added a nice touch, and the cozy ambiance made it even better, especially with the rainy weather outside. A really warm and satisfying experience overall."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"The place was packed, the wait was fast and food and service was outstanding.\""
+        },
+        {
+          "content": "\"We ate breakfast and ordered a bakery basket and pancakes.\""
+        },
+        {
+          "content": "\"The space inside is a bit small so be prepared to be very close to other people.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJMfyhay98hYARs0L2SNx0vmY",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Gypsy's Trattoria Italiana",
+    "address": "2519 Durant Ave, Berkeley, CA 94704, United States",
+    "lat": 37.8680755,
+    "lng": -122.2581506,
+    "phone": "+15105484860",
+    "distance_mi": 0.83,
+    "huddleId": "p_010",
+    "google": {
+      "place_id": "ChIJMfyhay98hYARs0L2SNx0vmY",
+      "cid": "7403483326909399731",
+      "name": "Gypsy's Trattoria Italiana",
+      "address": "2519 Durant Ave, Berkeley, CA 94704, United States",
+      "lat": 37.8680755,
+      "lng": -122.2581506,
+      "phone": "+15105484860",
+      "url": "https://www.google.com/maps/place/Gypsy's%20Trattoria%20Italiana/data=!4m7!3m6!1s0x80857c2f6ba1fc31:0x66be74dc48f642b3!8m2!3d37.8680755!4d-122.2581506!16s%2Fm%2F01zbwcw!19sChIJMfyhay98hYARs0L2SNx0vmY",
+      "categories": [
+        "Italian restaurant"
+      ],
+      "gcids": [
+        "gcid:italian_restaurant"
+      ],
+      "rating": 4.4,
+      "reviews_count": 2056,
+      "review_distribution": {
+        "1_star_reviews": 101,
+        "2_star_reviews": 38,
+        "3_star_reviews": 148,
+        "4_star_reviews": 396,
+        "5_star_reviews": 1373
+      },
+      "open_hours": {
+        "Sunday": "10 AM–12 AM",
+        "Saturday": "10 AM–1 AM",
+        "Friday": "10 AM–1 AM",
+        "Thursday": "10 AM–12 AM",
+        "Wednesday": "10 AM–12 AM",
+        "Tuesday": "10 AM–12 AM",
+        "Monday": "10 AM–12 AM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance"
+      ],
+      "reservation_link": "https://www.google.com/searchviewer/42",
+      "website": "http://www.gypsysitaliana.com/",
+      "description": "Fast-food outfit with late hours provides Italian comfort dishes to a student-heavy clientele.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-05-10T05:10:25.698Z",
+          "rating": 5,
+          "content": "Classic student friendly pricing, this is the spot for Italian food. Lunch special is the way to go , the portion sizing is on point, easily sharable. Godfather’s favorite is what I ordered and it was bomb. The side salad is a nice touches. I would def return here and try more of the menu. The calzone’s and pizza looks great as well. Paying with cash is the pro move to avoid surcharge."
+        },
+        {
+          "review_date": "2026-07-15T06:53:05.153Z",
+          "rating": 5,
+          "content": "Located in the student Asian ghetto.\nWon’t go wrong with any of their late-night Italian cuisine. Fast processing queue with multiple cooks!\nGood price for a generous portion, and it looks great and tastes fantastic.\nThe meat is fresh as well."
+        },
+        {
+          "review_date": "2026-02-26T07:47:05.533Z",
+          "rating": 4,
+          "content": "Food was good and satisfying at an acceptable price point. Service was super friendly, kind, and deserving of a generous tip. The restaurant was clean; seating was very tight (not their fault that they are popular). Each pasta was cooked to perfection, not mushy. Sauces were flavorful, and meats were fairly tender. Portions were the perfect ratios of carbs, protein, veggies. Love the roasted garlic cloves on the bread! Everyone who was with me said they would come back again."
+        },
+        {
+          "review_date": "2026-04-21T09:41:15.019Z",
+          "rating": 3,
+          "content": "Food isn't very high quality but it's close to the bars so its price for quantity is good value. Discount for cash and extremely packed on a Friday night so food takes a while.\n\nI got their pesto calzone for $15. Huge, but not very good (I got sick of it after a few bites) and took over 20min for a takeout place.\n\nThe pesto was oily and a bit bland. Chicken and the thick dough tasted cold and very, very dry.  Ambiance is not nice to sit at, feels like an indoor taco truck.\n\nThis place probably isn't in my top 5 for the area because its not too good and it takes a long time, but if someone wanted to eat here I wouldn't argue against it."
+        },
+        {
+          "review_date": "2026-07-01T17:34:06.264Z",
+          "rating": 5,
+          "content": "Absolutely love this place! I can see why there are plenty of students here! The food here is very filling and comes with huge portions! I do have to say the salad needs a bit more dressing as there's not enough. Nonetheless it's still a 5/5."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"One guy with a ramen another group of people eating burritos and donuts.\""
+        },
+        {
+          "content": "\"Exceptional portion size and price range for such high quality of pasta.\""
+        },
+        {
+          "content": "\"When we received our food, there was only the main dish but no combo.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJxznM_r9-hYARgTkkLOY-fVU",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "La Mission",
+    "address": "1255 University Ave, Berkeley, CA 94702, United States",
+    "lat": 37.8698641,
+    "lng": -122.287927,
+    "phone": "+15108455898",
+    "distance_mi": 0.84,
+    "huddleId": "p_002",
+    "google": {
+      "place_id": "ChIJxznM_r9-hYARgTkkLOY-fVU",
+      "cid": "6160149023616678273",
+      "name": "La Mission",
+      "address": "1255 University Ave, Berkeley, CA 94702, United States",
+      "lat": 37.8698641,
+      "lng": -122.287927,
+      "phone": "+15108455898",
+      "url": "https://www.google.com/maps/place/La%20Mission/data=!4m7!3m6!1s0x80857ebffecc39c7:0x557d3ee62c243981!8m2!3d37.8698641!4d-122.2879270!16s%2Fg%2F1tgywyh7!19sChIJxznM_r9-hYARgTkkLOY-fVU",
+      "categories": [
+        "Mexican restaurant"
+      ],
+      "gcids": [
+        "gcid:mexican_restaurant"
+      ],
+      "rating": 4.5,
+      "reviews_count": 1989,
+      "review_distribution": {
+        "1_star_reviews": 61,
+        "2_star_reviews": 52,
+        "3_star_reviews": 125,
+        "4_star_reviews": 374,
+        "5_star_reviews": 1377
+      },
+      "open_hours": {
+        "Sunday": "10 AM–11 PM",
+        "Saturday": "10 AM–11:30 PM",
+        "Friday": "10 AM–11:30 PM",
+        "Thursday": "10 AM–11:30 PM",
+        "Wednesday": "10 AM–11:30 PM",
+        "Tuesday": "10 AM–11:30 PM",
+        "Monday": "10 AM–11:30 PM"
+      },
+      "services": [
+        "Wheelchair-accessible car park",
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": null,
+      "website": "https://la-mission.shop/",
+      "description": "Busy joint offering burritos & tacos in small, bright digs with painted walls plus outdoor seating.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-05-09T15:23:16.837Z",
+          "rating": 4,
+          "content": "We stopped by this restaurant late at night, around 10 PM, for dinner. I wasn’t extremely hungry, so I ordered three tacos — though I could only finish two and ended up taking one home. My friend also ordered a few tacos along with a Baja fish taco and another item.\n\nThe place has a very casual, chic, student-friendly vibe and offers a wide variety of Mexican dishes on the menu. The food felt fresh and made from scratch, which I really appreciated.\n\nAmong everything I tried, the chorizo taco was definitely the standout. It was flavorful, juicy, and perfectly seasoned. I also tried carnitas and al pastor. Usually al pastor is my all-time favorite, but this version didn’t quite match the ones I’ve had in Mexico City. Still, it wasn’t bad by any means.\n\nThey had a salsa station where you could pick your own sauces, though I noticed they didn’t offer the usual grilled onions or spring onions that many more traditional Mexican spots serve. Overall, the restaurant felt more like a California-style Mexican place with its own twist rather than a fully authentic Mexican taqueria.\n\nThat said, the freshness and quality of the food really stood out. I’d definitely go back, especially for the chorizo tacos. Overall, a really nice late-night food spot."
+        },
+        {
+          "review_date": "2026-02-06T18:40:32.841Z",
+          "rating": 5,
+          "content": "This is a MEXICAN restaurant. The very  kindest and nicest service. The food is just way off the high end of the charts. The atmosphere... Fantastic. 6/5. Across the board. They have a chocolate horchata that is the best I have ever had."
+        },
+        {
+          "review_date": "2026-03-31T19:17:48.738Z",
+          "rating": 5,
+          "content": "This place is conveniently located right on University Avenue. The staff is extremely friendly and they offer many homemade items including homemade corn bread, etc. I ordered the steak nachos and they were perfect. Wait times were non existent and the service was very quick and professional. Will be back!"
+        },
+        {
+          "review_date": "2026-10-14T18:23:24.472Z",
+          "rating": 4,
+          "content": "Quick service and sweet staff.\nHowever I felt the legumbres vegetarian burrito could have had more flavor.\nThe chocolate cake was good but the icing was maybe a touch too sweet.\nHusband liked his chicken burrito.\nLovely outdoor seating area."
+        },
+        {
+          "review_date": "2026-03-11T00:54:10.236Z",
+          "rating": 5,
+          "content": "Great burritos and other Mexican food. They’ve got beer and wine too.\nNice outdoor patio area. It’s screened off from University Ave with plants but you can hear some traffic.\nStaff here are super nice and friendly."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Amazing Mexican food work a great service and super friendly staff\""
+        },
+        {
+          "content": "\"Variety of fresh food from tacos, burritos, nachos, ceviche, pan ducle.\""
+        },
+        {
+          "content": "\"Large portions, legit homemade ingredients, and all offered at a great price.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJwW3-6p5-hYARgxQu2OLd16Q",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Berkeley Social Club",
+    "address": "2050 University Ave, Berkeley, CA 94704, United States",
+    "lat": 37.8718537,
+    "lng": -122.2694812,
+    "phone": "+15109005858",
+    "distance_mi": 0.18,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJwW3-6p5-hYARgxQu2OLd16Q",
+      "cid": "11878206508572218499",
+      "name": "Berkeley Social Club",
+      "address": "2050 University Ave, Berkeley, CA 94704, United States",
+      "lat": 37.8718537,
+      "lng": -122.2694812,
+      "phone": "+15109005858",
+      "url": "https://www.google.com/maps/place/Berkeley%20Social%20Club/data=!4m7!3m6!1s0x80857e9eeafe6dc1:0xa4d7dde2d82e1483!8m2!3d37.8718537!4d-122.2694812!16s%2Fg%2F11csq2p9cn!19sChIJwW3-6p5-hYARgxQu2OLd16Q",
+      "categories": [
+        "Restaurant",
+        "Breakfast restaurant"
+      ],
+      "gcids": [
+        "gcid:restaurant"
+      ],
+      "rating": 4.3,
+      "reviews_count": 1316,
+      "review_distribution": {
+        "1_star_reviews": 55,
+        "2_star_reviews": 49,
+        "3_star_reviews": 104,
+        "4_star_reviews": 328,
+        "5_star_reviews": 780
+      },
+      "open_hours": {
+        "Sunday": "9 am–3 pm\n5–9 pm",
+        "Saturday": "9 am–3 pm\n5–10 pm",
+        "Friday": "9 am–2:30 pm\n5–10 pm",
+        "Thursday": "9 am–2:30 pm\n5–9 pm",
+        "Wednesday": "9 am–2:30 pm\n5–9 pm",
+        "Tuesday": "9 am–2:30 pm\n5–9 pm",
+        "Monday": "9 am–2:30 pm\n5–9 pm"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet",
+        "No wheelchair-accessible car park"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/szoEB3U1qwc",
+      "website": "http://www.berkeley-socialclub.com/",
+      "description": "Lively spot serving eclectic Asian-American fare with beer & wine in expansive quarters.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-05-25T23:31:38.861Z",
+          "rating": 5,
+          "content": "We came for dinner after a Berkeley graduation and did not know what to expect.  The menu is more Korean fusion and food is delicious.  We had a large party and got a bit of everything.  All was delicious.  The service was a little slow, but that may have more with how busy it was due to graduation and little to do with what is the norm.  Definitely recommend"
+        },
+        {
+          "review_date": "2026-06-09T16:07:43.102Z",
+          "rating": 4,
+          "content": "We had breakfast delivered from here and it was pretty good! We ordered the BSC scramble, the Blackstone Benedict, and a side of fruit. Everything tasted delicious. I love how much variety of fruit was given. I would love to try this place in person!"
+        },
+        {
+          "review_date": "2026-08-03T20:52:26.002Z",
+          "rating": 5,
+          "content": "They didnt have a large sign on building, we drove around twice to find it and parking. Atmosphere is very clean and open. Friendly staff, food is remarkably delicious. They have full bar and decent beers on tap. Expresso  coffee is available too. Blown away with their millionaire eggs Benedict and Eggs Purgatory!"
+        },
+        {
+          "review_date": "2026-03-27T00:50:10.905Z",
+          "rating": 5,
+          "content": "It was a Thursday Ladies Luncheon.  5 friends nurturing their friendship.  Berkeley Social Club had very good reviews that was the deciding factor. Very unique menu selections with a Korean twist. Service was fast the food came out fast.\nTwo of us ordered the Bolgogi (sirloin steak) Bowl was excellent.  I eat red meat once a year and this was the best choice I ever made. The beef was so tender and flavorful.  Beef served on a bed of rice and vegetables. Other dishes, KFC burger, chicken curry. Everyone enjoyed their meals. I thought lunch prices were very reasonable."
+        },
+        {
+          "review_date": "2026-05-25T01:34:38.047Z",
+          "rating": 4,
+          "content": "Stopped here for lunch after walking around campus. The place was crowded, but we did not have to wait long to be seated. I had the Buttermilk Pancakes with Berry Compote, and my companions had the Bulgogi Bowl, and the Koren F.C. Avocado Salad. No complaints whatsoever about the food - all was delicious! The pancakes were perfectly cooked, but the berry compote took them to the next level! I could have eaten a bowl of it alone! Service was a bit slow, as it was very busy and seemed to be understaffed, but our waitress was very friendly and kept apologizing for the delay. We didn't feel ignored. I would eat here again."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Food came out quickly, our server and hosts made this such a good experience.\""
+        },
+        {
+          "content": "\"We ordered pretty simple meals I thought, french toast and regular pancakes.\""
+        },
+        {
+          "content": "\"Great vibes, presentable dishes, beautiful decor, and fast/attentive service.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJqUoig51-hYARUnXjcqs8-sg",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Gather in Berkeley",
+    "address": "2200 Oxford St, Berkeley, CA 94704, United States",
+    "lat": 37.8695038,
+    "lng": -122.2661179,
+    "phone": "+15108090400",
+    "distance_mi": 0.39,
+    "huddleId": "p_012",
+    "google": {
+      "place_id": "ChIJqUoig51-hYARUnXjcqs8-sg",
+      "cid": "14481954258827834706",
+      "name": "Gather in Berkeley",
+      "address": "2200 Oxford St, Berkeley, CA 94704, United States",
+      "lat": 37.8695038,
+      "lng": -122.2661179,
+      "phone": "+15108090400",
+      "url": "https://www.google.com/maps/place/Gather%20in%20Berkeley/data=!4m7!3m6!1s0x80857e9d83224aa9:0xc8fa3cab72e37552!8m2!3d37.8695038!4d-122.2661179!16s%2Fg%2F1tdn49ry!19sChIJqUoig51-hYARUnXjcqs8-sg",
+      "categories": [
+        "Californian restaurant",
+        "American restaurant"
+      ],
+      "gcids": [
+        "gcid:californian_restaurant"
+      ],
+      "rating": 4.4,
+      "reviews_count": 1271,
+      "review_distribution": {
+        "1_star_reviews": 24,
+        "2_star_reviews": 38,
+        "3_star_reviews": 126,
+        "4_star_reviews": 364,
+        "5_star_reviews": 719
+      },
+      "open_hours": {
+        "Sunday": "10 am–2 pm\n4–8:30 pm",
+        "Saturday": "10 am–2:30 pm\n4–8:45 pm",
+        "Friday": "11 am–2 pm\n4–8:30 pm",
+        "Thursday": "11 am–2 pm\n4–8:30 pm",
+        "Wednesday": "11 am–2 pm\n4–8:30 pm",
+        "Tuesday": "11 am–2 pm\n4–8:30 pm",
+        "Monday": "11 am–2 pm\n4–8:30 pm"
+      },
+      "services": [
+        "Wheelchair-accessible car park",
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/gRx5ZhHvO4Y",
+      "website": "http://gatherberkeley.com/",
+      "description": "Locavores come for creative Californian fare made with seasonal ingredients & West Coast wines.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-05-10T19:12:20.226Z",
+          "rating": 3,
+          "content": "Im not sure if it was just a fluke but the wait for our food was entirely too long. Usually when I go out to a restaurant, im in and out in about 45min give or take. We were in there for over an hour. The check came faster than the food.\nOur drinks were decent, though my grandmother prefers her water for tea to come from a fountain from hell. Im not too sure what that \"honey\" was, but it had a closer consistency to water. I ordered the French toast, is was okay with the exception of the enormous serving of whipped cream and the blackened edges of the bread."
+        },
+        {
+          "review_date": "2026-07-23T07:18:47.960Z",
+          "rating": 3,
+          "content": "I’ve been here twice and both times found the atmosphere to be a little tense, and not relaxed. Perhaps it was just the day I went as the manger was clearly angery and beet red.\n\nThe one standout dish I think is worth coming back for, is their dates wrapped in bacon on top of a tomato sauce. It was one of the best appetizers I’ve tried in Berkeley. Unforetunely my table and I devoured them before I could get a photo.\n\nI also enjoyed their salmon dish. It felt healthy and was the best selection flavor wise compared to other dishes my table got. Even so it didn’t standout to me. Get it you want something healthy and tasty! But don’t bank on it being so remarkable.\n\nUnfortuently, I developed high expectations for this place after the bacon and date appetizer."
+        },
+        {
+          "review_date": "2026-02-12T03:06:34.054Z",
+          "rating": 5,
+          "content": "What a wonderful restaurant l! We we walked in Just a few minutes before 2 pm and they graciously welcomed us.  The service was outstanding during our whole meal. There were accommodating to ourparty of four including a wheelchair.. I asked them for recommendations on dishes to eat and all of the dishes they recommended were spot on.  We enjoyed the hamburger,  Quinoa salad with chicken,  cauliflower soup ,hamburger with fries As well as the deviled eggs as an appetizer.  We were the last customers In the restaurant and they patiently waited for us as we finished our meal. We definitely will need to go visit this Restaurant on our next visit to Berkeley ."
+        },
+        {
+          "review_date": "2026-01-13T09:22:47.820Z",
+          "rating": 5,
+          "content": "This spot in Berkeley has a playful and unique feel with both indoor and outdoor seating available. The sandwiches are filling without being overwhelming, and the pricing feels fair for the area. It is a great place to stop for a meal while exploring the nearby campus or checking out the modern art museum."
+        },
+        {
+          "review_date": "2026-06-16T14:32:11.352Z",
+          "rating": 5,
+          "content": "Went there for brunch and thoroughly enjoyed the meal, ambience and service.  The space is beautifully decorated and we sat out in the patio with our dogs.  Breakfast was delicious - good mix of fresh, healthy ingredients  (quinoa, beans, etc.) and with sauces and flavorings to make it very satisfying.  I always appreciate the creativity from chefs using healthy ingredients rather than just using a lot of oil, salt and fat and sugar to make a delicious dish.  Our server was kind, efficient and welcoming."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Good atmosphere, good service, tasty food...a little pricey...\""
+        },
+        {
+          "content": "\"Nice place to eat lunch: salads, pizza, burgers and wraps.\""
+        },
+        {
+          "content": "\"Nice family home meal type of restaurant fair pricing menus\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJDfxCOsB_hYARyIGFSShmlEQ",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Afghan Burrito",
+    "address": "2309 San Pablo Ave, Berkeley, CA 94702, United States",
+    "lat": 37.864351,
+    "lng": -122.2902059,
+    "phone": "+15104102194",
+    "distance_mi": 1.08,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJDfxCOsB_hYARyIGFSShmlEQ",
+      "cid": "4941687014350488008",
+      "name": "Afghan Burrito",
+      "address": "2309 San Pablo Ave, Berkeley, CA 94702, United States",
+      "lat": 37.864351,
+      "lng": -122.2902059,
+      "phone": "+15104102194",
+      "url": "https://www.google.com/maps/place/Afghan%20Burrito/data=!4m7!3m6!1s0x80857fc03a42fc0d:0x44946628498581c8!8m2!3d37.8643510!4d-122.2902059!16s%2Fg%2F11lqdmd4ys!19sChIJDfxCOsB_hYARyIGFSShmlEQ",
+      "categories": [
+        "Burrito restaurant"
+      ],
+      "gcids": [
+        "gcid:burrito_restaurant"
+      ],
+      "rating": 4.7,
+      "reviews_count": 668,
+      "review_distribution": {
+        "1_star_reviews": 19,
+        "2_star_reviews": 7,
+        "3_star_reviews": 21,
+        "4_star_reviews": 44,
+        "5_star_reviews": 577
+      },
+      "open_hours": {
+        "Sunday": "8 am–8 pm",
+        "Saturday": "8 am–12 am",
+        "Friday": "8 am–12 am",
+        "Thursday": "8 am–10 pm",
+        "Wednesday": "8 am–10 pm",
+        "Tuesday": "8 am–10 pm",
+        "Monday": "8 am–10 pm"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": null,
+      "website": "http://afghanburrito.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-05-16T20:40:47.691Z",
+          "rating": 5,
+          "content": "Very yummy food! Im a huge fan of mexican food, and this fusion food brings it to another level. Truthfully ive only ever gotten their bowl with chicken, but getting it with golden rice and all of that is so worth it. Its got a kind of richness and creaminess to it that i love. While ive only tried that one thing, i will say that their ingredients seem very good quality, and ive never gotten a piece of gristle, or wilted lettuce, or anything like that. Their salsas are also very yummy, although i wish they were a bit spicier. But they're very suitable for people with average to low spoce tolerance!!\nThe outside seating is very cute, and the \"inside\" seating next to the main building is pretty nice too. My friend and i normally just get take out, but eating there would be nice, and the place is pretty cute with its decorations.\nI highly recommend you give the Afghan way a try!"
+        },
+        {
+          "review_date": "2025-12-09T02:26:22.545Z",
+          "rating": 5,
+          "content": "I tried the Afghan burrito today, and it was absolutely delicious! Everything was fresh, flavorful, and perfectly seasoned — every bite was full of amazing taste. I loved it so much that I’ll definitely come back to enjoy it again and again.\n\nThe customer service was also excellent — very friendly, welcoming, and attentive, which made the experience even better.\n\nIt’s a great option for family meals and events too. Highly recommended!"
+        },
+        {
+          "review_date": "2026-02-24T01:26:54.787Z",
+          "rating": 5,
+          "content": "Came to this spot last night to break our fast since we were in the area and had heard great things about it. The birria tacos were so delicious, the meat was high quality and very well priced. I also tried the burrito bowl, which came half golden rice, half lettuce, with chicken and topped with guacamole. The bowl was a bit on the blander side, although when I tasted some of the sauce (maybe the golden/sweet sauce?), it was good. I think next time I’d try something different.\n\nOtherwise, the service was great. My only small complaints are that the sauce containers are tiny and the side of chips is more of a sprinkle than an actual side, lol. That said, I really appreciated that they offer dates to break your fast and have tons of Palestinian art and messages throughout the restaurant, it was amazing and very supportive to see. They also use halal meat, and the quality is excellent.\n\nThe bathrooms were impeccably clean, customer service was solid, and I loved that they carry Palestinian soda instead of Coke or Pepsi. Overall, a great experience and I’d definitely come back."
+        },
+        {
+          "review_date": "2026-01-27T03:28:53.294Z",
+          "rating": 5,
+          "content": "What a unique taco experience! It would be a great place with a larger group and there is total privacy which is fun.  We went back and forth on which tacos to order and settled on these but for both of us it was totally about the Birria tacos.   We didn’t finish the 5th one so they are filling."
+        },
+        {
+          "review_date": "2025-03-17T04:31:46.150Z",
+          "rating": 5,
+          "content": "I got the vegan Golden burrito here, it was very tasty and a huge portion! I wasn't blown away by the taste, but it was interesting to try since it was like a normal burrito (beans, rice, fajitas etc) but with their Golden sauce inside. The burrito comes with a few chips and sweet chili sauce on the side. The burrito leaked quite a bit near the end, so it's better to eat it over a plate with a fork ready.\n\nThe menu has clearly labeled vegan options, which I really appreciate! The restaurant is part of a planned outdoor space (Cal Food Garden), so there is plenty of high-quality outdoor seating as well as bike parking."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Small business run by very kind and service oriented people.\""
+        },
+        {
+          "content": "\"Loved their veggie Afghan burrito bowl with golden rice and their loaded fries.\""
+        },
+        {
+          "content": "\"This place is tucked away, has a very cool vibe, staff is friendly.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJd-w1ZwB_hYARdgh5UtCfj2A",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Easterly-Berkeley",
+    "address": "2323 Shattuck Ave., Berkeley, CA 94704, United States",
+    "lat": 37.8671455,
+    "lng": -122.2674073,
+    "phone": "+15106478008",
+    "distance_mi": 0.42,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJd-w1ZwB_hYARdgh5UtCfj2A",
+      "cid": "6957955666396383350",
+      "name": "Easterly-Berkeley",
+      "address": "2323 Shattuck Ave., Berkeley, CA 94704, United States",
+      "lat": 37.8671455,
+      "lng": -122.2674073,
+      "phone": "+15106478008",
+      "url": "https://www.google.com/maps/place/Easterly-Berkeley/data=!4m7!3m6!1s0x80857f006735ec77:0x608f9fd052790876!8m2!3d37.8671455!4d-122.2674073!16s%2Fg%2F11whs1dytq!19sChIJd-w1ZwB_hYARdgh5UtCfj2A",
+      "categories": [
+        "Chinese restaurant"
+      ],
+      "gcids": [
+        "gcid:chinese_restaurant"
+      ],
+      "rating": 4.7,
+      "reviews_count": 475,
+      "review_distribution": {
+        "1_star_reviews": 24,
+        "2_star_reviews": 6,
+        "3_star_reviews": 10,
+        "4_star_reviews": 25,
+        "5_star_reviews": 410
+      },
+      "open_hours": {
+        "Sunday": "11 AM–2:30 PM\n5–8:30 PM",
+        "Saturday": "11 AM–2:30 PM\n5–9 PM",
+        "Friday": "11 AM–2:30 PM\n5–9 PM",
+        "Thursday": "11 AM–2:30 PM\n5–9 PM",
+        "Wednesday": "11 AM–2:30 PM\n5–9 PM",
+        "Tuesday": "11 AM–2:30 PM\n5–9 PM",
+        "Monday": "11 AM–2:30 PM\n5–9 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet",
+        "No wheelchair-accessible car park"
+      ],
+      "reservation_link": "https://www.google.com/searchviewer/42",
+      "website": null,
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-08-16T21:06:27.232Z",
+          "rating": 4,
+          "content": "We came to try this place because our friends recommended it. I love spicy food!\n\nWe ordered the stir-fried beef with the regular spicy level, which was falvorful and the texture was tender. We also got the pork intestine with extra spicy level. The flavor was ont point, but I wish it were little spicer and came with more pork intestine. It's mostly dry chilis. Both dishes were really delicious and satisfiying.\n\nIt's on the pricey side which was $60 for two dishes and one rice. I really enjoyed thefood and would definitely come back to try more dishes!"
+        },
+        {
+          "review_date": "2025-07-28T02:53:38.995Z",
+          "rating": 5,
+          "content": "Had dinner here with some friends, and it did not disappoint! It’s one of my friend’s favorite spots, and now I see why. We shared the spicy chicken, sour pickled fish, garlic shrimp with rice and vermicelli, and garlic green beans! Every dish was packed with flavor. The staff were incredibly friendly and fun; we found ourselves laughing and chatting with them throughout the meal. Great food, great vibes. Definitely coming back!"
+        },
+        {
+          "review_date": "2026-02-10T03:56:41.281Z",
+          "rating": 1,
+          "content": "Scallion pancake is horrible.  Too hard and oily.  Gave feedback to waiter and he continues charge for terrible uneaten dish.  Fish and stir fry beef were fine.  Service ok."
+        },
+        {
+          "review_date": "2025-07-13T05:04:13.639Z",
+          "rating": 4,
+          "content": "I love the authenticity of the restaurant and the interior is very spacious. Great for large gatherings but also valid for a couple. Portions are huge and very convenient for sharing. The beans were so flavorful and was a great side for the chicken. The chicken was also crunchy and had a sweet but spicy sauce.\n\nMedium spice is an appropriate level for a solid kick."
+        },
+        {
+          "review_date": "2024-11-03T01:58:32.985Z",
+          "rating": 5,
+          "content": "After re-opening at this new location, Easterly has become our new go-to when we've wanted a great meal. Our favorite is always the perilla leaf boiling fish 紫苏水煮鱼 which is super flavorful and comes with big portions.\n\nAlso, another new item to this location are the scallion pancakes, which are honestly some of the best we've ever had.\n\nDishes can be made not spicy, which is a nice option, and portions are generous—we had enough leftovers for another meal.\n\nThe place has been busy each time we’ve gone, but the new location is more spacious and easier to find parking than the previous one, which makes for a more comfortable experience overall.\n\nAlso the staff is super friendly and helpful. I really appreciated their attention to detail when they helped us pack and with the sturdy takeout containers that they provided for our leftovers.\n\nI would definitely recommend this place, especially for group outings."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"This place is authentic, reasonably priced, great service and atmosphere.\""
+        },
+        {
+          "content": "\"The food lacked flavor, the beef tasted overwhelmingly salty and nothing else.\""
+        },
+        {
+          "content": "\"The tomato grilled fish tasted so good that my whole family liked it.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJh6DdHZl-hYARK7ScqJIb9T0",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Rojbas Mediterranean Grill",
+    "address": "1901 University Ave, Berkeley, CA 94704, United States",
+    "lat": 37.8717353,
+    "lng": -122.2728321,
+    "phone": "+15106795205",
+    "distance_mi": 0.01,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJh6DdHZl-hYARK7ScqJIb9T0",
+      "cid": "4464504922315732011",
+      "name": "Rojbas Mediterranean Grill",
+      "address": "1901 University Ave, Berkeley, CA 94704, United States",
+      "lat": 37.8717353,
+      "lng": -122.2728321,
+      "phone": "+15106795205",
+      "url": "https://www.google.com/maps/place/Rojbas%20Mediterranean%20Grill/data=!4m7!3m6!1s0x80857e991ddda087:0x3df51b92a89cb42b!8m2!3d37.8717353!4d-122.2728321!16s%2Fg%2F11bw6k37c8!19sChIJh6DdHZl-hYARK7ScqJIb9T0",
+      "categories": [
+        "Mediterranean restaurant",
+        "Restaurant"
+      ],
+      "gcids": [
+        "gcid:mediterranean_restaurant"
+      ],
+      "rating": 4.6,
+      "reviews_count": 411,
+      "review_distribution": {
+        "1_star_reviews": 12,
+        "2_star_reviews": 9,
+        "3_star_reviews": 11,
+        "4_star_reviews": 50,
+        "5_star_reviews": 329
+      },
+      "open_hours": {
+        "Sunday": "11 AM–9 PM",
+        "Saturday": "11 AM–9 PM",
+        "Friday": "11 AM–9 PM",
+        "Thursday": "11 AM–9 PM",
+        "Wednesday": "11 AM–9 PM",
+        "Tuesday": "Closed",
+        "Monday": "11 AM–9 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "No wheelchair-accessible toilet"
+      ],
+      "reservation_link": null,
+      "website": "https://www.berkeleyrojbas.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-06-12T01:25:33.419Z",
+          "rating": 5,
+          "content": "Absolutely one of the best Kurdish restaurants I’ve ever visited. The food was fresh, flavorful, and cooked to perfection. Every dish reflected authentic Kurdish hospitality and tradition. The kebabs were juicy, the portions were generous, and the service was warm and welcoming from the moment we walked in.\n\nThe atmosphere made us feel at home, and it’s clear that the owners take great pride in what they do. If you’re looking for authentic Kurdish and Mediterranean cuisine, Rojbas Grill is a must-visit. I’ll definitely be coming back and recommending it to friends and family."
+        },
+        {
+          "review_date": "2025-12-03T21:53:19.555Z",
+          "rating": 5,
+          "content": "Great place for lunch in UC Berkeley area. We had Falafal and Adana (ground lamb Kabab) Plate. Food was delicious with generous portion size. Adana tasted like the lamb version of Koobideh.\nFalafel came with delicious ‘pickled beet root’ salad. Pita was on a dry/hard side.\nHospitality from the proprietor was exceptional. Thank you for the Tea."
+        },
+        {
+          "review_date": "2025-05-11T18:47:08.315Z",
+          "rating": 4,
+          "content": "Cozy environment and good food! I went in and ordered takeout, the server got me tea while I was waiting and it was amazing. The food came quickly. The plate was good but the meat felt a bit dry, but overall a good experience!"
+        },
+        {
+          "review_date": "2025-12-01T02:19:16.298Z",
+          "rating": 4,
+          "content": "What a great little place. Couldn't find nicer people. Both the Chicken and Beef/Lamb Gyro plates were excellent, and well portioned. My photo of the baklava doesn't do it justice."
+        },
+        {
+          "review_date": "2025-11-21T20:41:24.969Z",
+          "rating": 5,
+          "content": "Definitely one of the best Mediterranean/Kebabs in Berkeley. I had the Adana Kebab and Salmon plate, and everything was delicious. The service is super friendly and you can tell that they put their heart and family recipes into their meals. Will be back if I am in town."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Prices are reasonable, service is great, and the food is really tasty!\""
+        },
+        {
+          "content": "\"Chicken was so delicious and flavorful, lamb was perfectly cooked and juicy.\""
+        },
+        {
+          "content": "\"The plate was good but the meat felt a bit dry, but overall a good experience!\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJj8xuthZ_hYAR0Dsdn06tub4",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Nick The Greek Berkeley",
+    "address": "2109 University Ave, Berkeley, CA 94704, United States",
+    "lat": 37.8723985,
+    "lng": -122.2679832,
+    "phone": "+15105702930",
+    "distance_mi": 0.26,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJj8xuthZ_hYAR0Dsdn06tub4",
+      "cid": "13743206291086326736",
+      "name": "Nick The Greek Berkeley",
+      "address": "2109 University Ave, Berkeley, CA 94704, United States",
+      "lat": 37.8723985,
+      "lng": -122.2679832,
+      "phone": "+15105702930",
+      "url": "https://www.google.com/maps/place/Nick%20The%20Greek%20Berkeley/data=!4m7!3m6!1s0x80857f16b66ecc8f:0xbeb9ad4e9f1d3bd0!8m2!3d37.8723985!4d-122.2679832!16s%2Fg%2F11y2ky_j4x!19sChIJj8xuthZ_hYAR0Dsdn06tub4",
+      "categories": [
+        "Greek restaurant"
+      ],
+      "gcids": [
+        "gcid:greek_restaurant"
+      ],
+      "rating": 4.6,
+      "reviews_count": 353,
+      "review_distribution": {
+        "1_star_reviews": 13,
+        "2_star_reviews": 9,
+        "3_star_reviews": 17,
+        "4_star_reviews": 42,
+        "5_star_reviews": 272
+      },
+      "open_hours": {
+        "Sunday": "11 AM–9 PM",
+        "Saturday": "11 AM–9 PM",
+        "Friday": "11 AM–9 PM",
+        "Thursday": "11 AM–9 PM",
+        "Wednesday": "11 AM–9 PM",
+        "Tuesday": "11 AM–9 PM",
+        "Monday": "11 AM–9 PM"
+      },
+      "services": [
+        "Wheelchair accessible entrance"
+      ],
+      "reservation_link": "https://www.google.com/searchviewer/42",
+      "website": "https://www.nickthegreek.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-03-18T03:08:36.169Z",
+          "rating": 5,
+          "content": "Excellent service, fast and friendly. Fresh food and an excellent Greek flavor experience. The place is very clean and open late."
+        },
+        {
+          "review_date": "2026-05-06T03:34:32.096Z",
+          "rating": 5,
+          "content": "Arrived on the closing time, but still welcomed with greetings, went through whole menu, and she guided us very well. Will definitely come again.  Rubal Was a girl who was serving us, She definitely deserves a good raise…."
+        },
+        {
+          "review_date": "2026-02-26T01:38:41.533Z",
+          "rating": 2,
+          "content": "The store was mostly clean, although the table I was waiting at had sauces smeared on the table. It wasn’t busy at all when I visited around 5:15 PM. The cashier was patient with my indecisiveness, which I appreciated. The food looked and smelled good, and they packaged the order nicely in a neat bag.\n\nUnfortunately, I was a bit disappointed with both the quality and quantity of the food. The rice was undercooked, with crunchy, hard grains, and the portion was quite small. It would have been nice if they had added a little more to properly fill the container. The amount of meat was moderate. The flavor was okay, but nothing particularly memorable. The kale also didn’t seem properly washed, as there was still some mud/dirt on the leaves. It wasn’t sauce. The baklava tasted stale and bitter :("
+        },
+        {
+          "review_date": "2026-06-20T21:18:29.305Z",
+          "rating": 5,
+          "content": "Very delicious food! The pita bread was very fluffy, fresh and a lot of good veggies inside. Best veggie pita I have ever had. My first time here with my family. Everyone loved the food. I would highly recommend this place!!"
+        },
+        {
+          "review_date": "2026-09-01T19:04:09.216Z",
+          "rating": 5,
+          "content": "Whenever I am craving something fresh and easy to digest the first thing I think of is NICK THE GREEK. At the location here the staff is incredibly sweet and supportive. There is always something yummy at Nick the greek. Highly recommend."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Tasty gyro bowl with flavorful meat, fresh veggies, and generous portions.\""
+        },
+        {
+          "content": "\"Nick the greek in Berkeley has great food, service, location, and music!\""
+        },
+        {
+          "content": "\"Quality ingredients, friendly staff and a laid back vibe here.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJ3wpobgB_hYARl3dq9QtMHCI",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Gusto",
+    "address": "1986 Shattuck Ave., Berkeley, CA 94704, United States",
+    "lat": 37.872522,
+    "lng": -122.2687,
+    "phone": "+15109772477",
+    "distance_mi": 0.23,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJ3wpobgB_hYARl3dq9QtMHCI",
+      "cid": "2457923110883194775",
+      "name": "Gusto",
+      "address": "1986 Shattuck Ave., Berkeley, CA 94704, United States",
+      "lat": 37.872522,
+      "lng": -122.2687,
+      "phone": "+15109772477",
+      "url": "https://www.google.com/maps/place/Gusto/data=!4m7!3m6!1s0x80857f006e680adf:0x221c4c0bf56a7797!8m2!3d37.8725220!4d-122.2687000!16s%2Fg%2F11ywvtfsgl!19sChIJ3wpobgB_hYARl3dq9QtMHCI",
+      "categories": [
+        "Restaurant"
+      ],
+      "gcids": [
+        "gcid:restaurant"
+      ],
+      "rating": 4.8,
+      "reviews_count": 277,
+      "review_distribution": {
+        "1_star_reviews": 7,
+        "2_star_reviews": 3,
+        "3_star_reviews": 4,
+        "4_star_reviews": 2,
+        "5_star_reviews": 261
+      },
+      "open_hours": {
+        "Sunday": "11 am–9 pm",
+        "Saturday": "11 am–9 pm",
+        "Friday": "11 am–10 pm",
+        "Thursday": "11 am–9 pm",
+        "Wednesday": "11 am–9 pm",
+        "Tuesday": "11 am–9 pm",
+        "Monday": "11 am–9 pm"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/searchviewer/42",
+      "website": "https://gustoberekeley.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-06-24T02:29:55.004Z",
+          "rating": 5,
+          "content": "Gusto is a locally owned small business that proudly brings authentic Algerian cuisine to downtown Berkeley for prices that the average person can afford. The owner is a kind man who loves his restaurant and really cares about brightening his customers' days. I am proud to support this new local business in its effort to allow Berkeley to try some fantastic Algerian food!\n\nI think the best part is the slightly charred, carefully spiced, succulent Algerian meats. I liked the chicken and beef shawara bowls, but this was my first time trying Marguez, and I was completely blown away by the deliciousness. The chicken and beef shawarma bowls came with delightfully fresh vegetables, but the Marguez sandwich (which you've got to try) had this amazing balance between sauce, flavorful meat, fresh veggies, and the wrap it came in, plus it came with a nice portion of fries that had a bit of sauce of their own. The beef tongue sandwich was also amazing in a similar way. The Tajine plate lamb and the Joojeh Sultani are also great options, especially if you want something very substantial.\n\nThe Algerian sodas from the cooler are so enticing here. I really liked the one that tasted like carbonated lemonade, but there was also a really good one that tasted kind of like licorice. Definitely give them a try; they are so worth it!\n\nAnd don't forget dessert. At the counter you pay at, you will see some amazing desserts on display. The Makrut (this pillowy doughnut-like pastry) and the baklava are delicious and a perfect way to end the meal!\n\nThe eating experience is super casual, and the ambiance is friendly and informal. It's pretty fun trying to catch a glimpse of the magic happening in the kitchen while you sit in the eating area, which is a little sparse and kind of simple but very fitting for a nice, laid-back place to eat alone or dine with family and friends. I love this place!"
+        },
+        {
+          "review_date": "2026-04-19T21:13:10.739Z",
+          "rating": 5,
+          "content": "Its my first time trying Algerian cuisine here, and honestly it was a great experience!\n\nWe tried here the kebab plate which has lamb and chicken, both were tender, juicy,full of flavor and must important prepared fresh right infront.\n\nalso had their signature couscous pot, which was such a highlight for me. It’s a hearty, warm, and comforting dish with lamb, beef sausages, and chicken, all halal as confirmed by the owner.\nIt was rich, satisfying, and I can see why so many people around us were ordering the same dish.\n\nThe chicken shawarma wrap was also very good juicy, well-seasoned, and honestly stood out compared to other local shawarma spots\n\nAnd I’ telling you their traditional sweets are not to be missed its absolutely delicious!\nMy favorite was the white one coated with a light lemon-dusted powder (I think). It was so well-balanced, fresh not overly sweet.\n\nOverall, it’s a great addition to Berkeley. I would definitely recommend it and would revisit again"
+        },
+        {
+          "review_date": "2026-05-02T20:44:34.170Z",
+          "rating": 5,
+          "content": "Absolutely phenomenal addition to the neighborhood serving authentic Algerian food and Persian kabobs. The owner is delightful and very passionate. The food is cooked perfectly and represents both cultures well.\n\nExtremely fair prices, portion sizes and clean Ingredients. You don’t feel heavy at all after the meal. It’s also located super close to the Bart, I’d highly recommend going out of your way to come here.\n\nThe mixed couscous and joojeh soltani were both out of the park."
+        },
+        {
+          "review_date": "2026-04-08T05:35:49.394Z",
+          "rating": 5,
+          "content": "A new Algerian restaurant in Berkeley and such a great discovery!\n\nEverything was fresh and full of flavor, you can really taste the quality. The welcome was also amazing! very warm and genuine.\n\nWishing them lots of success, they truly deserve it. I’ll definitely be back!🇩🇿🇩🇿"
+        },
+        {
+          "review_date": "2026-04-18T05:01:43.217Z",
+          "rating": 5,
+          "content": "We tried the chicken kebab and the beef, and both were incredibly juicy, tender, and just perfect. The first time, we ordered it to go—but it was so good that we decided to come back again and dine in. It seems like there might be a new owner, and whatever changed, they’re doing an amazing job. Definitely worth a visit!"
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"The atmosphere is warm and welcoming, and the service makes you feel at home.\""
+        },
+        {
+          "content": "\"Loved the food, fresh, great spices and meat and veggie options.\""
+        },
+        {
+          "content": "\"Moist chicken, crunchy pickles, and just the right thickness wrap.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJdULJuFN_hYARwHHS_ra15Co",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Tipsy Yeti Restaurant & Bar",
+    "address": "2512 San Pablo Ave, Berkeley, CA 94702, United States",
+    "lat": 37.8606177,
+    "lng": -122.289737,
+    "phone": "+15109899078",
+    "distance_mi": 1.2,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJdULJuFN_hYARwHHS_ra15Co",
+      "cid": "3090795041846882752",
+      "name": "Tipsy Yeti Restaurant & Bar",
+      "address": "2512 San Pablo Ave, Berkeley, CA 94702, United States",
+      "lat": 37.8606177,
+      "lng": -122.289737,
+      "phone": "+15109899078",
+      "url": "https://www.google.com/maps/place/Tipsy%20Yeti%20Restaurant%20%26%20Bar/data=!4m7!3m6!1s0x80857f53b8c94275:0x2ae4b5b6fed271c0!8m2!3d37.8606177!4d-122.2897370!16s%2Fg%2F11l_43rhb4!19sChIJdULJuFN_hYARwHHS_ra15Co",
+      "categories": [
+        "Restaurant",
+        "Bar"
+      ],
+      "gcids": [
+        "gcid:restaurant"
+      ],
+      "rating": 4.8,
+      "reviews_count": 275,
+      "review_distribution": {
+        "1_star_reviews": 3,
+        "2_star_reviews": 6,
+        "3_star_reviews": 6,
+        "4_star_reviews": 12,
+        "5_star_reviews": 248
+      },
+      "open_hours": {
+        "Sunday": "11 AM–10:30 PM",
+        "Saturday": "11 AM–11 PM",
+        "Friday": "11 AM–11 PM",
+        "Thursday": "11 AM–10:30 PM",
+        "Wednesday": "11 AM–10:30 PM",
+        "Tuesday": "11 AM–10:30 PM",
+        "Monday": "11 AM–10:30 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/kR7Ijf_Dlv0",
+      "website": "http://www.tipsyeti.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-08-16T06:06:24.570Z",
+          "rating": 2,
+          "content": "We stopped by this Nepali restaurant for a late weekend lunch. The place was mostly empty, but it has a large dining area and dedicated parking in the back, which is convenient.\n\nWe started with the tornado potato fries, which were crispy, flavorful, and probably my favorite item. The Indian-style chai was okay, while my friend wasn’t impressed with her latte.\n\nUnfortunately, the main food was quite disappointing. The steamed chicken momos were extremely oily, with a strong stale-oil smell, and the chutney wasn’t particularly impressive. We also tried pork sekuwa, which had a nice smoky, char-grilled flavor, but again, everything was excessively oily and seemed to have been cooked in old oil. My vegetarian friend had the chow mein and had the same complaint—it was very oily with that unpleasant stale-oil taste.\n\nOverall, we were disappointed, especially after seeing so many positive reviews. The food might have potential, but the quality of the oil completely overshadowed everything we tried and left a lingering unpleasant taste and smell. Definitely not the experience we were expecting."
+        },
+        {
+          "review_date": "2026-08-07T22:17:55.885Z",
+          "rating": 5,
+          "content": "⭐⭐⭐⭐⭐\n\nWe absolutely loved Tipsy Yeti Restaurant & Bar! We’re visiting San Francisco and decided to stop in, and I’m so glad we did. Everything we ordered was delicious! We had the pasta, burger and fries, pepperoni pizza, and drinks, and everything came out fresh and tasted amazing.\n\nThe atmosphere is really cute and welcoming, and the service was wonderful. Everyone was so friendly and attentive and made us feel right at home. It was one of those places where the whole experience..from the food to the drinks to the service…was just great.\n\nDefinitely recommend stopping by if you’re in San Francisco. We would absolutely come back! ❤️🍕🍝🍔🍹"
+        },
+        {
+          "review_date": "2026-05-02T16:01:29.686Z",
+          "rating": 5,
+          "content": "Wow. This place. It was our first time trying this place out and it was incredible from start to finish! We were greeting by a very friendly, all smiles host. He really gave the initial feel of a friendly restaurant! We were seated and our waitress, a blonde young woman who was also very friendly and recommended I get lamb on my Himalayan Pizza and SHE WAS RIGHT BECAUSE IT WAS SO FREAKIN GOOD! The pizza had so much flavor, the spices, the taste!! It was FRESH and it was absolutely delicious! We also the got Tornado Fries and Chicken Chow Mein and both busting with flavor. I want to add that we also got the fried calamari- IVE NEVER HAD SUCH CRUNCHY CALAMARI IN MY LIFE it was so satisfying! I got a delicious mock tail and the mezcal drink that just knocked your socks off. If you want to try a place with fantastic and flavorful Nepal flavors, you have found your new favorite place! Thank to the friendly staff, really, your genuine smiles and constant attentiveness to your customers and delicious food has won our hearts!"
+        },
+        {
+          "review_date": "2026-04-19T14:54:53.400Z",
+          "rating": 5,
+          "content": "What a lovely experience for a chill date night with my hubby. There was a live band lighting up the atmosphere with beautiful notes and jazzy vibes. The food was all delicious and perfectly prepared. The chicken momos were juicy, almost like soup dumplings. The tornado fries were flavorful, especially the sauces. The lamb was juicy and tender. The cocktail and mocktail were balanced in sweet, tart, savory and spirit (for the alcoholic drink). Our server was warm and friendly, providing us with on point food recommendations and even a nice movie recommendation. I can't wait to visit again on another date night or even with my kid (since they have such a broad menu)."
+        },
+        {
+          "review_date": "2026-04-04T14:39:53.725Z",
+          "rating": 5,
+          "content": "What a gem! We stumbled upon this place by accident, and I’m so glad we did. Everything was absolutely delicious. It was so good that I’m already planning to come back before flying home. We tried a few mocktails: the pineapple coconut one was especially yummy and their famous steamed dumplings. We also ordered the goat curry and the pear and brie salad. Every dish came out looking beautiful and tasted just as amazing. Can’t wait to return!"
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Best food in town, nice & clean place with full Bar service\""
+        },
+        {
+          "content": "\"So my partner ordered their vegan burger and I ordered the vegetable chow mein.\""
+        },
+        {
+          "content": "\"We stuck with the Himalayan menu but they also serve burgers and pizza.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJKz-flWJ_hYAR67uRoy3LkOk",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Tanzie's",
+    "address": "1453 Dwight Way, Berkeley, CA 94702, United States",
+    "lat": 37.8622342,
+    "lng": -122.2815461,
+    "phone": "+15103264199",
+    "distance_mi": 0.81,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJKz-flWJ_hYAR67uRoy3LkOk",
+      "cid": "16830175204361747435",
+      "name": "Tanzie's",
+      "address": "1453 Dwight Way, Berkeley, CA 94702, United States",
+      "lat": 37.8622342,
+      "lng": -122.2815461,
+      "phone": "+15103264199",
+      "url": "https://www.google.com/maps/place/Tanzie's/data=!4m7!3m6!1s0x80857f62959f3f2b:0xe990cb2da391bbeb!8m2!3d37.8622342!4d-122.2815461!16s%2Fg%2F11vt9nlwk8!19sChIJKz-flWJ_hYAR67uRoy3LkOk",
+      "categories": [
+        "Fine dining restaurant",
+        "Brunch restaurant"
+      ],
+      "gcids": [
+        "gcid:fine_dining_restaurant"
+      ],
+      "rating": 4.6,
+      "reviews_count": 224,
+      "review_distribution": {
+        "1_star_reviews": 9,
+        "2_star_reviews": 7,
+        "3_star_reviews": 8,
+        "4_star_reviews": 19,
+        "5_star_reviews": 181
+      },
+      "open_hours": {
+        "Sunday": "8:30 AM–2 PM\n5–9 PM",
+        "Saturday": "8:30 AM–2 PM\n5–9 PM",
+        "Friday": "8:30 AM–2 PM\n5–9 PM",
+        "Thursday": "10 AM–2 PM",
+        "Wednesday": "Closed",
+        "Tuesday": "Closed",
+        "Monday": "10 AM–2 PM\n5–9 PM"
+      },
+      "services": [
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/pAG3gg7nmJk",
+      "website": "http://www.tanziescafe.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-07-06T07:26:43.198Z",
+          "rating": 5,
+          "content": "Got to try this spot for brunch, and we only had to wait about 5–10 minutes before being seated. Since it was our first time, the staff was super helpful and informative about the menu. I ordered the Sai Oua lava egg plate, pork jowl on the side, and khanom krok.\n\nFirst of all, holy hell, that egg was SO soft and yummy. I loved how it was prepared—the texture was amazing, and it was seasoned to perfection with such a savory flavor. The sausage was good, but the pork jowl was where the meal really shined. Next time, I’d definitely get the grilled pork jowl lava egg plate instead. I can be pretty picky with pork, but this one melted in my mouth and had so much flavor.\n\nThe khanom krok was beautiful and a great dish to order if you have friends to share it with. For me, one bite was more than enough as a sweet little dessert at the end of the meal. Their jasmine Thai tea was also really tasty. :)\n\nI’m so glad I finally got to try this spot and would definitely say it deserves all the hype!"
+        },
+        {
+          "review_date": "2026-06-21T03:09:20.492Z",
+          "rating": 5,
+          "content": "​This was my second time dining here, and it completely solidified this restaurant as one of my absolute favorites. I would easily eat here every single week if I lived closer!\n​During this visit, I had the wonderful opportunity to speak with the owner. She is incredibly smart, passionate, and empathetic, and it truly shows in every aspect of the restaurant. I love the way she pours her love for her hometown into the menu and remains unapologetically authentic to her roots.\n​That dedication translates perfectly into the food—every dish feels personal, deeply flavorful, and genuinely authentic. It is rare to find a place that hits the perfect balance of amazing hospitality and outstanding, uncompromising regional flavors.\n​If you haven't been yet, do yourself a favor and check it out. It is a true gem!"
+        },
+        {
+          "review_date": "2026-07-11T19:44:58.180Z",
+          "rating": 5,
+          "content": "While the inside area was a little loud at times, it was a warm familiar feeling. Being surrounded by the plants and cool air felt amazing and refreshing. The staff were so kind and welcoming, and we could not have asked for a better server.\n\nThe food was delicious and felt so worth the price. All of the ingredients were tasted in every dish, and just overall well thought out and balanced. The Lava eggs with the tender wagyu reset my tastebuds - nothing is going to taste as good for weeks. Definitely recommend sharing the Thai Beignets and the Coconut Cakes, as well as the main dishes."
+        },
+        {
+          "review_date": "2026-02-15T00:17:38.624Z",
+          "rating": 5,
+          "content": "we made a reservation ahead of time and ordered the prix fixe brunch, and they customized the menu to accommodate our dietary restrictions (pescatarian). the food was delicious, the atmosphere was so sweet, and the staff was incredibly thoughtful. 100% would go back! (personal faves: iced ube espresso, lava eggs, smoked sturgeon dip, prawn and fish stew, beignet with ube condensed milk and warm soy milk and bean drink)"
+        },
+        {
+          "review_date": "2026-05-15T23:44:05.822Z",
+          "rating": 2,
+          "content": "Second visit and somehow the prices went up again. Ordered the surf and turf special,  server highly recommended but never mentioned the price! I then got hit with a $51 bill for 2 shrimp, 3 scallops, and a tiny tiny steak. Food was fine but nothing special. Love a good surprise, just not on my credit card statement. I understand surf and turf at a mid-range restaurant usually runs $30–45, and even then you’d expect a more generous cut of meat. At $51 you’re in fine dining territory, where you’d also expect the server to be upfront about pricing. The sparkling water was $8 too and no one mentioned its not free..."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"The food is so delish, service is great and it has such a nice atmosphere!\""
+        },
+        {
+          "content": "\"Dry, barely any sauce, and an honestly laughable portion of eggs and sausage.\""
+        },
+        {
+          "content": "\"The restaurant is in a funky little space, staff is very friendly.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJ51r5CHl_hYAR875i7gGqoIg",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "FAVA",
+    "address": "2114 Vine St, Berkeley, CA 94709, United States",
+    "lat": 37.8802111,
+    "lng": -122.2686344,
+    "phone": "",
+    "distance_mi": 0.63,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJ51r5CHl_hYAR875i7gGqoIg",
+      "cid": "9845055710703042291",
+      "name": "FAVA",
+      "address": "2114 Vine St, Berkeley, CA 94709, United States",
+      "lat": 37.8802111,
+      "lng": -122.2686344,
+      "phone": "",
+      "url": "https://www.google.com/maps/place/FAVA/data=!4m7!3m6!1s0x80857f7908f95ae7:0x88a0aa01ee62bef3!8m2!3d37.8802111!4d-122.2686344!16s%2Fg%2F11flvc6xb8!19sChIJ51r5CHl_hYAR875i7gGqoIg",
+      "categories": [
+        "Lunch restaurant"
+      ],
+      "gcids": [
+        "gcid:lunch_restaurant"
+      ],
+      "rating": 4.8,
+      "reviews_count": 217,
+      "review_distribution": {
+        "1_star_reviews": 2,
+        "2_star_reviews": 1,
+        "3_star_reviews": 8,
+        "4_star_reviews": 13,
+        "5_star_reviews": 193
+      },
+      "open_hours": {
+        "Sunday": "Closed",
+        "Saturday": "11 AM–3 PM",
+        "Friday": "11 AM–3 PM",
+        "Thursday": "11 AM–3 PM",
+        "Wednesday": "11 AM–3 PM",
+        "Tuesday": "11 AM–3 PM",
+        "Monday": "Closed"
+      },
+      "services": [
+        "Wheelchair-accessible entrance"
+      ],
+      "reservation_link": "https://www.google.com/searchviewer/42",
+      "website": "http://favaonvine.com/",
+      "description": "A pint-sized lunch venue with outdoor seats that serves vegetable-centric New American cuisine.",
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-07-01T20:41:35.107Z",
+          "rating": 5,
+          "content": "I have been wanting to try this place for a while, and I’m so glad I finally did. The food was very fresh and delicious, and reasonably priced for the quality. The braised lamb sandwich had soft flatbread, crunchy herbs and vegetables, a tangy sauce, and perfectly tender lamb. The service was friendly, warm, and the food came out quickly. Fava is a lovely lunch spot and I would recommend it to anyone looking for a pleasant lunch in North Berkeley."
+        },
+        {
+          "review_date": "2026-06-26T19:38:05.264Z",
+          "rating": 5,
+          "content": "Incredibly fresh and delicious food. The spicy chicken with herbs in soft, chewy flat bread is probably one of the best \"sandwiches\" I have ever had. The ginger tea was like nothing I have ever had, and excellent. Healthy, affordable, and fun."
+        },
+        {
+          "review_date": "2025-11-16T04:41:24.041Z",
+          "rating": 5,
+          "content": "Super yummy and fresh!!! I loved the fresh homemade bread/pita. The falafel was flavorful and delicious. Everything was very herb forward. The cookie was very yummy as well!\n\nI would probably pay 15% more to have 15% more food, but I think basically I just learned that I need a side next time I come here.\n\nThey seem to do a lot of take out.\n\nThe only downside for me was that dining there didn't include any real dishes. I would have preferred this on like an enamel plate or bowl or something with a parchment paper."
+        },
+        {
+          "review_date": "2026-04-29T17:04:15.025Z",
+          "rating": 5,
+          "content": "Wonderful healthy vibrant food that is well presented…especially for takeout. 🩷. The person that took my order was super friendly and efficient. The food came out quickly! Loved the lemony green juice and organic chicken. The tahini cookies are giant and tasty but would be slightly better with a bit more salt in the dough or a bit of flake salt on the top. Also tasted my friend’s soup, and it was super yummy 😋 too! Note, this is a takeaway place with a few outdoor tables. Other than wanting more salt in my cookie, I loved everything."
+        },
+        {
+          "review_date": "2025-10-01T21:04:37.069Z",
+          "rating": 5,
+          "content": "This is amazing food. The spicy chicken sandwich and the falafel sandwich were 10/10 with the home made pita wrap, fresh herbs, and yogurt it’s impossible to go wrong. Also tried the pumpkin pudding and wow wow wow, if you like pumpkin make sure to give it a try. Pictured is the spicy chicken sandwich that is mostly gone, because it was so good I almost forgot to snap a pic 😅"
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Sauce, spices/herbs, texture, tender chicken, hummus flavour👌, SO FRESH...\""
+        },
+        {
+          "content": "\"Excellent clean bright and fresh food simple setting good prices Good vibes\""
+        },
+        {
+          "content": "\"If you don't eat meat the falafel wrap and the salads are great.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJK-x1-qp9hYAR8_4HePqzNUs",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "Burma Berkeley",
+    "address": "2826 Telegraph Ave, Berkeley, CA 94705, United States",
+    "lat": 37.8589734,
+    "lng": -122.2595698,
+    "phone": "+15106479744",
+    "distance_mi": 1.13,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJK-x1-qp9hYAR8_4HePqzNUs",
+      "cid": "5419435614947245811",
+      "name": "Burma Berkeley",
+      "address": "2826 Telegraph Ave, Berkeley, CA 94705, United States",
+      "lat": 37.8589734,
+      "lng": -122.2595698,
+      "phone": "+15106479744",
+      "url": "https://www.google.com/maps/place/Burma%20Berkeley/data=!4m7!3m6!1s0x80857daafa75ec2b:0x4b35b3fa7807fef3!8m2!3d37.8589734!4d-122.2595698!16s%2Fg%2F11x22j_pgn!19sChIJK-x1-qp9hYAR8_4HePqzNUs",
+      "categories": [
+        "Burmese restaurant",
+        "Asian restaurant",
+        "Southeast Asian restaurant"
+      ],
+      "gcids": [
+        "gcid:burmese_restaurant"
+      ],
+      "rating": 4.8,
+      "reviews_count": 98,
+      "review_distribution": {
+        "1_star_reviews": 1,
+        "2_star_reviews": 1,
+        "3_star_reviews": 2,
+        "4_star_reviews": 5,
+        "5_star_reviews": 89
+      },
+      "open_hours": {
+        "Sunday": "11:30 AM–9 PM",
+        "Saturday": "11:30 AM–9:30 PM",
+        "Friday": "11:30 AM–2:30 PM\n5–9:30 PM",
+        "Thursday": "11:30 AM–2:30 PM\n5–9 PM",
+        "Wednesday": "11:30 AM–2:30 PM\n5–9 PM",
+        "Tuesday": "11:30 AM–2:30 PM\n5–9 PM",
+        "Monday": "11:30 AM–2:30 PM\n5–9 PM"
+      },
+      "services": [
+        "Wheelchair-accessible car park",
+        "Wheelchair-accessible entrance",
+        "Wheelchair-accessible seating",
+        "Wheelchair-accessible toilet"
+      ],
+      "reservation_link": "https://www.google.com/maps/reserve/v/dine/c/bz1Kj8o8dsk",
+      "website": "https://www.burmaberkeley.com/",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-04-04T05:00:57.016Z",
+          "rating": 5,
+          "content": "The fried rice pudding is divine…\nThe main dish minted jalapeños chicken, tea leaf salad and coconut rice I ordered were very good too, but I just have to emphasize the pudding because it’s absolutely mind-blowing. The food came really fast, and all the staff members were very friendly and nice."
+        },
+        {
+          "review_date": "2026-06-27T01:14:57.306Z",
+          "rating": 5,
+          "content": "Excellent food. This is our go to place now. We highly recommend it and the staff is very friendly. The best Burmese food we ever had!"
+        },
+        {
+          "review_date": "2026-07-30T02:44:53.026Z",
+          "rating": 5,
+          "content": "Writing this review to really commend the staff and the impeccable service we had during dinner. Nevan was very helpful in accommodating our party’s requests and walking us through the catering options. The food was delicious and we will definitely be considering Burma Berkeley for an upcoming party. Thank you!"
+        },
+        {
+          "review_date": "2025-12-17T06:03:36.444Z",
+          "rating": 5,
+          "content": "Excellent Burmese food without a long weight like you always get at Burma superstar. The people who are extremely helpful and friendly and do not try to rush you out like they do at Burma superstar. This is the place to go if you’re looking for Burmese food in the East Bay."
+        },
+        {
+          "review_date": "2026-06-23T18:05:54.776Z",
+          "rating": 5,
+          "content": "Absolutely love this place!  I've been here for a date, a family dinner, and with a big group, and it has always been fantastic. IMO Burma Berkeley makes the best Burmese food in the East Bay (including the 925). Rich flavors across the menu, great control on spice levels, super-fresh and flavorful vegetables, and generous portions (in addition to being delicious, it is a great value). Service is friendly and welcoming, the food comes fast, and the noise level is perfect for conversation (not too quiet, not too loud)."
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Come for the food and the lovely service, not the decor or the trendy vibe.\""
+        },
+        {
+          "content": "\"Great place for larger group to meet in bar setting or formal dining.\""
+        },
+        {
+          "content": "\"We loved tea salad, shrimp fried rice and mango chicken.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  },
+  {
+    "bdId": "g:ChIJW3kSeI19hYARWVuVHkrurDs",
+    "group": "restaurant",
+    "category": "meal",
+    "name": "El Trompudo",
+    "address": "2441 Dwight Way, Berkeley, CA 94704, United States",
+    "lat": 37.8652662,
+    "lng": -122.2590302,
+    "phone": "+15106161514",
+    "distance_mi": 0.86,
+    "huddleId": null,
+    "google": {
+      "place_id": "ChIJW3kSeI19hYARWVuVHkrurDs",
+      "cid": "4300073746340076377",
+      "name": "El Trompudo",
+      "address": "2441 Dwight Way, Berkeley, CA 94704, United States",
+      "lat": 37.8652662,
+      "lng": -122.2590302,
+      "phone": "+15106161514",
+      "url": "https://www.google.com/maps/place/El%20Trompudo/data=!4m7!3m6!1s0x80857d8d7812795b:0x3bacee4a1e955b59!8m2!3d37.8652662!4d-122.2590302!16s%2Fg%2F11z74wfxbl!19sChIJW3kSeI19hYARWVuVHkrurDs",
+      "categories": [
+        "Restaurant"
+      ],
+      "gcids": [
+        "gcid:restaurant"
+      ],
+      "rating": 4.7,
+      "reviews_count": 54,
+      "review_distribution": {
+        "1_star_reviews": 1,
+        "2_star_reviews": 2,
+        "3_star_reviews": 2,
+        "4_star_reviews": 2,
+        "5_star_reviews": 47
+      },
+      "open_hours": {
+        "Sunday": "11 am–11 pm",
+        "Saturday": "11 am–11 pm",
+        "Friday": "11 am–11 pm",
+        "Thursday": "11 am–11 pm",
+        "Wednesday": "11 am–11 pm",
+        "Tuesday": "11 am–11 pm",
+        "Monday": "11 am–11 pm"
+      },
+      "services": [
+        "Wheelchair-accessible entrance"
+      ],
+      "reservation_link": null,
+      "website": "https://www.eltrompudotacos.com/s/order",
+      "description": null,
+      "is_claimed": true,
+      "temporarily_closed": false,
+      "permanently_closed": false,
+      "top_reviews": [
+        {
+          "review_date": "2026-05-24T23:45:35.718Z",
+          "rating": 5,
+          "content": "Beautiful esthetic. Wonderfully fresh food. Service was stellar. Affordable. Please support them!"
+        },
+        {
+          "review_date": "2026-05-24T23:41:05.738Z",
+          "rating": 5,
+          "content": "Best Quesabirria that I have ever tried. Thank you to our lovely server, Mimi, for recommending it!\nThe salsa was a great complementary appetiser, although the salsa was a bit runny. The service was impeccable. This is definitely a sit down restaurant as well."
+        },
+        {
+          "review_date": "2026-07-17T01:50:57.846Z",
+          "rating": 5,
+          "content": "$3.50 for an AMAZING shrimp taco. Would absolutely go again many times. 👌"
+        },
+        {
+          "review_date": "2026-07-03T20:57:14.534Z",
+          "rating": 5,
+          "content": "The service was amazing they’re so nice. But I wanted to write this review cause the burrito was soooooo good. Absolutely my favorite burrito in Berkeley. I’ve been thinking abt it since I had it and I’m definitely gonna go back for it"
+        },
+        {
+          "review_date": "2026-05-31T03:43:22.227Z",
+          "rating": 5,
+          "content": "The food was amazing. The service was fast and our waiter, Mimi, was great. We didn’t wait long. We were able to sit anywhere we wanted. Great prices for great food!"
+        }
+      ],
+      "reviews_snippets": [
+        {
+          "content": "\"Super yummy tacos , great service and a cute location.\""
+        },
+        {
+          "content": "\"On top of that, the chips are fresh and crunchy accompanied by a savory salsa!\""
+        },
+        {
+          "content": "\"I got a carne asada burrito and they gave me carnitas.\""
+        }
+      ]
+    },
+    "yelp": null,
+    "first_seen_at": "2026-10-24T18:48:13Z",
+    "found_by": [
+      {
+        "keyword": "restaurants",
+        "lat": 37.8716,
+        "lng": -122.2727
+      }
+    ]
+  }
+]

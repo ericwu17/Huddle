@@ -6,7 +6,7 @@ import { requireMember } from "./groups";
 import { replan } from "./replan";
 import { voiceFor } from "./lib/demo";
 import { fakeCallEvents } from "./lib/fakes";
-import { placeById } from "./lib/places";
+import { findPlace } from "./lib/catalog";
 import { availablePlans } from "./lib/availability";
 import type { Tx } from "./lib/types";
 import { at, membersOf, newId, nowMs } from "./lib/util";
@@ -95,7 +95,7 @@ export const runCallJob = spacetimedb.procedure(
       return {
         groupId: b.groupId,
         bookingId: b.id, placeId: b.placeId, restaurantName: b.restaurantName,
-        restaurantPhone: placeById(b.placeId)?.phone ?? "", partySize: b.partySize, time: b.time,
+        restaurantPhone: findPlace(tx.db, b.placeId)?.phone ?? "", partySize: b.partySize, time: b.time,
         nameOnReservation: members[0]?.name ?? "Guest",
         alternativeWindow: { earliest: hhmm(mins - 30), latest: hhmm(mins + 90) },
         language: tx.env.AGENT_LANGUAGE ?? "zh",

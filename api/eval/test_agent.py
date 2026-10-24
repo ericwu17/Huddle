@@ -6,9 +6,9 @@ import unittest
 from fastapi.testclient import TestClient
 from pydantic import TypeAdapter
 
-from api.agent import candidates, coordinate, interpret
-from api.agent_models import AgentNeeds, AgentNeedsRequest, AgentPlanRequest
-from api.catalog import Catalog
+from api.agent import candidates, coordinate, interpret, public_facts
+from api.agent_models import AgentCatalog, AgentNeeds, AgentNeedsRequest, AgentPlanRequest
+from api.catalog import Catalog, CatalogCache
 from api.main import Settings, create_app
 from api.models import Place
 
@@ -149,6 +149,67 @@ class AgentHttpTests(unittest.TestCase):
             self.assertEqual(response.json()["inputRevision"], 7)
             self.assertNotIn("posterior", response.json())
             self.assertNotIn("X-Huddle-Stub", response.headers)
+
+
+def snapshot():
+    """A pushed snapshot: two real meals plus one new scraped venue with evidence."""
+    places = json.loads(Path("data/places.json").read_text())
+    meals = [p for p in places if p["category"] == "meal"][:2]
+    fresh = {**meals[0], "id": "bd_fresh1234", "name": "Fresh Scraped Spot", "googlePlaceId": None,
+             "sources": ["brightdata"]}
+    kept = meals + [fresh] + [p for p in places if p["category"] != "meal"]
+    evidence = {"bd_fresh1234": {"sources": [{"source": "gmaps", "url": "https://www.google.com/maps/place/x",
+                                              "fetchedAt": "2026-10-24T18:00:00Z", "rating": 4.6, "reviewCount": 1204}]}}
+    return {"version": "test-v1", "places": kept, "evidence": evidence}
+
+
+class LiveCatalogTests(unittest.TestCase):
+    headers = {"X-Huddle-Secret": "unit-test-secret"}
+
+    def test_plans_use_only_the_snapshot_the_module_sent(self):
+        live = snapshot()
+        allowed = {p["id"] for p in live["places"]}
+        with TestClient(create_app(Settings(secret="unit-test-secret"), llm=Model())) as client:
+            body = request(catalog=live).model_dump()
+            response = client.post("/agent/plan", headers=self.headers, json=body)
+            self.assertEqual(response.status_code, 200)
+            stops = [s for plan in response.json()["plans"] for s in plan["stops"]]
+            self.assertTrue(stops)
+            self.assertTrue({s["placeId"] for s in stops} <= allowed)
+
+    def test_malformed_snapshots_are_rejected(self):
+        with TestClient(create_app(Settings(secret="unit-test-secret"), llm=Model())) as client:
+            for change in [
+                lambda c: c["places"].append(c["places"][0]),  # duplicate ID
+                lambda c: c.update(places=[p for p in c["places"] if p["category"] != "dessert"]),
+                lambda c: c["places"][0].update(notInContract=1),
+                lambda c: c["evidence"]["bd_fresh1234"]["sources"][0].update(url="http://insecure"),
+            ]:
+                live = snapshot()
+                change(live)
+                body = {**json.loads(request().model_dump_json()), "catalog": live}
+                self.assertEqual(client.post("/agent/plan", headers=self.headers, json=body).status_code, 422)
+
+    def test_rating_fact_needs_scraped_evidence(self):
+        live = AgentCatalog.model_validate(snapshot())
+        catalog = CatalogCache().get(live)
+        plans = [p for p in candidates(catalog, request(catalog=snapshot())).values()
+                 if any(s.placeId == "bd_fresh1234" for s in p.stops)]
+        self.assertTrue(plans)
+        facts = public_facts(catalog, plans[0])
+        self.assertEqual(facts["rating"], "Google Maps showed the meal venue at 4.6 stars from 1,204 reviews on Oct 24, 2026.")
+        bundled = Catalog(TypeAdapter(list[Place]).validate_json(Path("data/places.json").read_text()))
+        other = next(iter(candidates(bundled, request()).values()))
+        self.assertNotIn("rating", public_facts(bundled, other))
+
+    def test_cache_reuses_identical_snapshots(self):
+        cache = CatalogCache(size=2)
+        first = cache.get(AgentCatalog.model_validate(snapshot()))
+        relabeled = {**snapshot(), "version": "same-content-new-label"}
+        self.assertIs(cache.get(AgentCatalog.model_validate(relabeled)), first)
+        changed = snapshot()
+        changed["places"][0]["costPerPerson"] += 1
+        self.assertIsNot(cache.get(AgentCatalog.model_validate(changed)), first)
 
 
 if __name__ == "__main__":

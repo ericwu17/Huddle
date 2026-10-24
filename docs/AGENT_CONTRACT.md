@@ -51,6 +51,16 @@ Each member supplies `memberId`, private `prompt`, confirmed `needs` from the
 needs endpoint, and optional `origin` (`lat`, `lng`). Two or more members are
 required. The module controls membership and confirmation, not model output.
 
+Optional `catalog` (sent whenever the module holds a live venue snapshot, see
+CONTRACT.md S5.5 "Live venue catalog"): `{version, places, evidence}`. `places`
+is 3–160 contract Places with unique IDs and every stop category present.
+`evidence` maps place IDs to `{sources: [{source: gmaps|yelp|google_places,
+url (https or null), fetchedAt, rating, reviewCount}]}`. When present, the API
+plans from those places only and the module validates the reply against the
+same snapshot. Without it the API uses the catalog it loaded at startup. One
+public fact uses evidence: the meal venue's scraped rating, review count, source
+and fetch date. It appears only when the evidence records all of these.
+
 Response:
 
 | Field | Shape |

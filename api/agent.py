@@ -6,6 +6,7 @@ the group privacy boundary. The private prompts remain available for selection.
 """
 
 import asyncio
+from datetime import datetime
 from decimal import Decimal
 import hashlib
 import json
@@ -139,7 +140,27 @@ def public_facts(catalog: Catalog, plan: AgentPlan) -> dict[str, str]:
     }
     if place.dietary:
         facts["dietary"] = "The meal venue lists " + ", ".join(x.replace("_", " ") for x in place.dietary) + " options."
+    rated = rating_fact(catalog.evidence.get(place.id))
+    if rated:
+        facts["rating"] = rated
     return facts
+
+
+SOURCE_NAMES = {"gmaps": "Google Maps", "yelp": "Yelp", "google_places": "Google"}
+
+
+def rating_fact(evidence) -> str | None:
+    """Only from scraped evidence that names its source and fetch time (live snapshots)."""
+    for source in (evidence.sources if evidence else []):
+        if source.rating is None or not source.reviewCount or not source.fetchedAt:
+            continue
+        try:
+            day = datetime.fromisoformat(source.fetchedAt.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        return (f"{SOURCE_NAMES[source.source]} showed the meal venue at {source.rating:g} stars from "
+                f"{source.reviewCount:,} reviews on {day:%b} {day.day}, {day.year}.")
+    return None
 
 
 async def coordinate(llm: LLM, catalog: Catalog, body: AgentPlanRequest) -> AgentPlanResponse:

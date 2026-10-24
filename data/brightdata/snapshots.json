@@ -1,0 +1,542 @@
+[
+  {
+    "source": "gmaps",
+    "key": "ChIJdULJuFN_hYARwHHS_ra15Co",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Tipsy%20Yeti%20Restaurant%20%26%20Bar/data=!4m7!3m6!1s0x80857f53b8c94275:0x2ae4b5b6fed271c0!8m2!3d37.8606177!4d-122.2897370!16s%2Fg%2F11l_43rhb4!19sChIJdULJuFN_hYARwHHS_ra15Co",
+    "rating": 4.8,
+    "reviews_count": 275,
+    "review_distribution": {
+      "1_star_reviews": 3,
+      "2_star_reviews": 6,
+      "3_star_reviews": 6,
+      "4_star_reviews": 12,
+      "5_star_reviews": 248
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 AM–10:30 PM",
+      "Saturday": "11 AM–11 PM",
+      "Friday": "11 AM–11 PM",
+      "Thursday": "11 AM–10:30 PM",
+      "Wednesday": "11 AM–10:30 PM",
+      "Tuesday": "11 AM–10:30 PM",
+      "Monday": "11 AM–10:30 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJh_wjBJ1-hYARK2XCkZUkbg0",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Angeline's%20Louisiana%20Kitchen/data=!4m7!3m6!1s0x80857e9d0423fc87:0xd6e249591c2652b!8m2!3d37.8682333!4d-122.2675528!16s%2Fg%2F1tlw991f!19sChIJh_wjBJ1-hYARK2XCkZUkbg0",
+    "rating": 4.5,
+    "reviews_count": 3096,
+    "review_distribution": {
+      "1_star_reviews": 62,
+      "2_star_reviews": 70,
+      "3_star_reviews": 217,
+      "4_star_reviews": 663,
+      "5_star_reviews": 2084
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "10 AM–9 PM",
+      "Saturday": "10 AM–9 PM",
+      "Friday": "11:30 AM–9 PM",
+      "Thursday": "11:30 AM–9 PM",
+      "Wednesday": "11:30 AM–9 PM",
+      "Tuesday": "11:30 AM–9 PM",
+      "Monday": "Closed"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJMfyhay98hYARs0L2SNx0vmY",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Gypsy's%20Trattoria%20Italiana/data=!4m7!3m6!1s0x80857c2f6ba1fc31:0x66be74dc48f642b3!8m2!3d37.8680755!4d-122.2581506!16s%2Fm%2F01zbwcw!19sChIJMfyhay98hYARs0L2SNx0vmY",
+    "rating": 4.4,
+    "reviews_count": 2056,
+    "review_distribution": {
+      "1_star_reviews": 101,
+      "2_star_reviews": 38,
+      "3_star_reviews": 148,
+      "4_star_reviews": 396,
+      "5_star_reviews": 1373
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "10 AM–12 AM",
+      "Saturday": "10 AM–1 AM",
+      "Friday": "10 AM–1 AM",
+      "Thursday": "10 AM–12 AM",
+      "Wednesday": "10 AM–12 AM",
+      "Tuesday": "10 AM–12 AM",
+      "Monday": "10 AM–12 AM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJ51r5CHl_hYAR875i7gGqoIg",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/FAVA/data=!4m7!3m6!1s0x80857f7908f95ae7:0x88a0aa01ee62bef3!8m2!3d37.8802111!4d-122.2686344!16s%2Fg%2F11flvc6xb8!19sChIJ51r5CHl_hYAR875i7gGqoIg",
+    "rating": 4.8,
+    "reviews_count": 217,
+    "review_distribution": {
+      "1_star_reviews": 2,
+      "2_star_reviews": 1,
+      "3_star_reviews": 8,
+      "4_star_reviews": 13,
+      "5_star_reviews": 193
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "Closed",
+      "Saturday": "11 AM–3 PM",
+      "Friday": "11 AM–3 PM",
+      "Thursday": "11 AM–3 PM",
+      "Wednesday": "11 AM–3 PM",
+      "Tuesday": "11 AM–3 PM",
+      "Monday": "Closed"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJqUoig51-hYARUnXjcqs8-sg",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Gather%20in%20Berkeley/data=!4m7!3m6!1s0x80857e9d83224aa9:0xc8fa3cab72e37552!8m2!3d37.8695038!4d-122.2661179!16s%2Fg%2F1tdn49ry!19sChIJqUoig51-hYARUnXjcqs8-sg",
+    "rating": 4.4,
+    "reviews_count": 1271,
+    "review_distribution": {
+      "1_star_reviews": 24,
+      "2_star_reviews": 38,
+      "3_star_reviews": 126,
+      "4_star_reviews": 364,
+      "5_star_reviews": 719
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "10 am–2 pm\n4–8:30 pm",
+      "Saturday": "10 am–2:30 pm\n4–8:45 pm",
+      "Friday": "11 am–2 pm\n4–8:30 pm",
+      "Thursday": "11 am–2 pm\n4–8:30 pm",
+      "Wednesday": "11 am–2 pm\n4–8:30 pm",
+      "Tuesday": "11 am–2 pm\n4–8:30 pm",
+      "Monday": "11 am–2 pm\n4–8:30 pm"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJwW3-6p5-hYARgxQu2OLd16Q",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Berkeley%20Social%20Club/data=!4m7!3m6!1s0x80857e9eeafe6dc1:0xa4d7dde2d82e1483!8m2!3d37.8718537!4d-122.2694812!16s%2Fg%2F11csq2p9cn!19sChIJwW3-6p5-hYARgxQu2OLd16Q",
+    "rating": 4.3,
+    "reviews_count": 1316,
+    "review_distribution": {
+      "1_star_reviews": 55,
+      "2_star_reviews": 49,
+      "3_star_reviews": 104,
+      "4_star_reviews": 328,
+      "5_star_reviews": 780
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "9 am–3 pm\n5–9 pm",
+      "Saturday": "9 am–3 pm\n5–10 pm",
+      "Friday": "9 am–2:30 pm\n5–10 pm",
+      "Thursday": "9 am–2:30 pm\n5–9 pm",
+      "Wednesday": "9 am–2:30 pm\n5–9 pm",
+      "Tuesday": "9 am–2:30 pm\n5–9 pm",
+      "Monday": "9 am–2:30 pm\n5–9 pm"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJj8xuthZ_hYAR0Dsdn06tub4",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Nick%20The%20Greek%20Berkeley/data=!4m7!3m6!1s0x80857f16b66ecc8f:0xbeb9ad4e9f1d3bd0!8m2!3d37.8723985!4d-122.2679832!16s%2Fg%2F11y2ky_j4x!19sChIJj8xuthZ_hYAR0Dsdn06tub4",
+    "rating": 4.6,
+    "reviews_count": 353,
+    "review_distribution": {
+      "1_star_reviews": 13,
+      "2_star_reviews": 9,
+      "3_star_reviews": 17,
+      "4_star_reviews": 42,
+      "5_star_reviews": 272
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 AM–9 PM",
+      "Saturday": "11 AM–9 PM",
+      "Friday": "11 AM–9 PM",
+      "Thursday": "11 AM–9 PM",
+      "Wednesday": "11 AM–9 PM",
+      "Tuesday": "11 AM–9 PM",
+      "Monday": "11 AM–9 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJKz-flWJ_hYAR67uRoy3LkOk",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Tanzie's/data=!4m7!3m6!1s0x80857f62959f3f2b:0xe990cb2da391bbeb!8m2!3d37.8622342!4d-122.2815461!16s%2Fg%2F11vt9nlwk8!19sChIJKz-flWJ_hYAR67uRoy3LkOk",
+    "rating": 4.6,
+    "reviews_count": 224,
+    "review_distribution": {
+      "1_star_reviews": 9,
+      "2_star_reviews": 7,
+      "3_star_reviews": 8,
+      "4_star_reviews": 19,
+      "5_star_reviews": 181
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "8:30 AM–2 PM\n5–9 PM",
+      "Saturday": "8:30 AM–2 PM\n5–9 PM",
+      "Friday": "8:30 AM–2 PM\n5–9 PM",
+      "Thursday": "10 AM–2 PM",
+      "Wednesday": "Closed",
+      "Tuesday": "Closed",
+      "Monday": "10 AM–2 PM\n5–9 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJh6DdHZl-hYARK7ScqJIb9T0",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Rojbas%20Mediterranean%20Grill/data=!4m7!3m6!1s0x80857e991ddda087:0x3df51b92a89cb42b!8m2!3d37.8717353!4d-122.2728321!16s%2Fg%2F11bw6k37c8!19sChIJh6DdHZl-hYARK7ScqJIb9T0",
+    "rating": 4.6,
+    "reviews_count": 411,
+    "review_distribution": {
+      "1_star_reviews": 12,
+      "2_star_reviews": 9,
+      "3_star_reviews": 11,
+      "4_star_reviews": 50,
+      "5_star_reviews": 329
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 AM–9 PM",
+      "Saturday": "11 AM–9 PM",
+      "Friday": "11 AM–9 PM",
+      "Thursday": "11 AM–9 PM",
+      "Wednesday": "11 AM–9 PM",
+      "Tuesday": "Closed",
+      "Monday": "11 AM–9 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJcYtcJaF-hYAR-VzrwZpQY0E",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Chez%20Panisse/data=!4m7!3m6!1s0x80857ea1255c8b71:0x4163509ac1eb5cf9!8m2!3d37.8796069!4d-122.2689248!16s%2Fm%2F03f7rg!19sChIJcYtcJaF-hYAR-VzrwZpQY0E",
+    "rating": 4.6,
+    "reviews_count": 2523,
+    "review_distribution": {
+      "1_star_reviews": 60,
+      "2_star_reviews": 46,
+      "3_star_reviews": 157,
+      "4_star_reviews": 339,
+      "5_star_reviews": 1921
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "Closed",
+      "Saturday": "11:30 AM–3 PM\n5–10 PM",
+      "Friday": "11:30 AM–3 PM\n5–10 PM",
+      "Thursday": "11:30 AM–2:30 PM\n5–10 PM",
+      "Wednesday": "11:30 AM–2:30 PM\n5–10 PM",
+      "Tuesday": "11:30 AM–2:30 PM\n5–10 PM",
+      "Monday": "5–10 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJB_-A0oJ-hYARwmbyJJR3sUo",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/La%20Note/data=!4m7!3m6!1s0x80857e82d280ff07:0x4ab1779424f266c2!8m2!3d37.8662060!4d-122.2672490!16s%2Fm%2F01zbx7x!19sChIJB_-A0oJ-hYARwmbyJJR3sUo",
+    "rating": 4.4,
+    "reviews_count": 2123,
+    "review_distribution": {
+      "1_star_reviews": 85,
+      "2_star_reviews": 59,
+      "3_star_reviews": 137,
+      "4_star_reviews": 471,
+      "5_star_reviews": 1371
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "8 AM–3 PM",
+      "Saturday": "8 AM–3 PM",
+      "Friday": "8 AM–2 PM",
+      "Thursday": "8 AM–2 PM",
+      "Wednesday": "8 AM–2 PM",
+      "Tuesday": "8 AM–2 PM",
+      "Monday": "8 AM–2 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJNwUiuJ1-hYARlmMobInl1SI",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Jupiter/data=!4m7!3m6!1s0x80857e9db8220537:0x22d5e5896c286396!8m2!3d37.8697958!4d-122.2675820!16s%2Fm%2F01zbwvr!19sChIJNwUiuJ1-hYARlmMobInl1SI",
+    "rating": 4.5,
+    "reviews_count": 4025,
+    "review_distribution": {
+      "1_star_reviews": 92,
+      "2_star_reviews": 69,
+      "3_star_reviews": 241,
+      "4_star_reviews": 1027,
+      "5_star_reviews": 2596
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11:30 AM–10 PM",
+      "Saturday": "11:30 AM–11 PM",
+      "Friday": "11:30 AM–11 PM",
+      "Thursday": "11:30 AM–10 PM",
+      "Wednesday": "11:30 AM–10 PM",
+      "Tuesday": "11:30 AM–10 PM",
+      "Monday": "11:30 AM–10 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJd-w1ZwB_hYARdgh5UtCfj2A",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Easterly-Berkeley/data=!4m7!3m6!1s0x80857f006735ec77:0x608f9fd052790876!8m2!3d37.8671455!4d-122.2674073!16s%2Fg%2F11whs1dytq!19sChIJd-w1ZwB_hYARdgh5UtCfj2A",
+    "rating": 4.7,
+    "reviews_count": 475,
+    "review_distribution": {
+      "1_star_reviews": 24,
+      "2_star_reviews": 6,
+      "3_star_reviews": 10,
+      "4_star_reviews": 25,
+      "5_star_reviews": 410
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 AM–2:30 PM\n5–8:30 PM",
+      "Saturday": "11 AM–2:30 PM\n5–9 PM",
+      "Friday": "11 AM–2:30 PM\n5–9 PM",
+      "Thursday": "11 AM–2:30 PM\n5–9 PM",
+      "Wednesday": "11 AM–2:30 PM\n5–9 PM",
+      "Tuesday": "11 AM–2:30 PM\n5–9 PM",
+      "Monday": "11 AM–2:30 PM\n5–9 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJ3wpobgB_hYARl3dq9QtMHCI",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Gusto/data=!4m7!3m6!1s0x80857f006e680adf:0x221c4c0bf56a7797!8m2!3d37.8725220!4d-122.2687000!16s%2Fg%2F11ywvtfsgl!19sChIJ3wpobgB_hYARl3dq9QtMHCI",
+    "rating": 4.8,
+    "reviews_count": 277,
+    "review_distribution": {
+      "1_star_reviews": 7,
+      "2_star_reviews": 3,
+      "3_star_reviews": 4,
+      "4_star_reviews": 2,
+      "5_star_reviews": 261
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 am–9 pm",
+      "Saturday": "11 am–9 pm",
+      "Friday": "11 am–10 pm",
+      "Thursday": "11 am–9 pm",
+      "Wednesday": "11 am–9 pm",
+      "Tuesday": "11 am–9 pm",
+      "Monday": "11 am–9 pm"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJW3kSeI19hYARWVuVHkrurDs",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/El%20Trompudo/data=!4m7!3m6!1s0x80857d8d7812795b:0x3bacee4a1e955b59!8m2!3d37.8652662!4d-122.2590302!16s%2Fg%2F11z74wfxbl!19sChIJW3kSeI19hYARWVuVHkrurDs",
+    "rating": 4.7,
+    "reviews_count": 54,
+    "review_distribution": {
+      "1_star_reviews": 1,
+      "2_star_reviews": 2,
+      "3_star_reviews": 2,
+      "4_star_reviews": 2,
+      "5_star_reviews": 47
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 am–11 pm",
+      "Saturday": "11 am–11 pm",
+      "Friday": "11 am–11 pm",
+      "Thursday": "11 am–11 pm",
+      "Wednesday": "11 am–11 pm",
+      "Tuesday": "11 am–11 pm",
+      "Monday": "11 am–11 pm"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJO60MVcF-hYARx7apz-2Rr3Y",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Cafe%20Leila/data=!4m7!3m6!1s0x80857ec1550cad3b:0x76af91edcfa9b6c7!8m2!3d37.8725562!4d-122.2935758!16s%2Fg%2F1tfwq5sr!19sChIJO60MVcF-hYARx7apz-2Rr3Y",
+    "rating": 4.4,
+    "reviews_count": 1197,
+    "review_distribution": {
+      "1_star_reviews": 37,
+      "2_star_reviews": 36,
+      "3_star_reviews": 62,
+      "4_star_reviews": 284,
+      "5_star_reviews": 778
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "8 AM–3 PM",
+      "Saturday": "8 AM–3 PM",
+      "Friday": "8 AM–3 PM",
+      "Thursday": "8 AM–3 PM",
+      "Wednesday": "8 AM–3 PM",
+      "Tuesday": "8 AM–3 PM",
+      "Monday": "8 AM–3 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJK-x1-qp9hYAR8_4HePqzNUs",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Burma%20Berkeley/data=!4m7!3m6!1s0x80857daafa75ec2b:0x4b35b3fa7807fef3!8m2!3d37.8589734!4d-122.2595698!16s%2Fg%2F11x22j_pgn!19sChIJK-x1-qp9hYAR8_4HePqzNUs",
+    "rating": 4.8,
+    "reviews_count": 98,
+    "review_distribution": {
+      "1_star_reviews": 1,
+      "2_star_reviews": 1,
+      "3_star_reviews": 2,
+      "4_star_reviews": 5,
+      "5_star_reviews": 89
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11:30 AM–9 PM",
+      "Saturday": "11:30 AM–9:30 PM",
+      "Friday": "11:30 AM–2:30 PM\n5–9:30 PM",
+      "Thursday": "11:30 AM–2:30 PM\n5–9 PM",
+      "Wednesday": "11:30 AM–2:30 PM\n5–9 PM",
+      "Tuesday": "11:30 AM–2:30 PM\n5–9 PM",
+      "Monday": "11:30 AM–2:30 PM\n5–9 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJReiUOpx-hYAR_WgFK4xVwyM",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Eureka!/data=!4m7!3m6!1s0x80857e9c3a94e845:0x23c3558c2b0568fd!8m2!3d37.8699785!4d-122.2690064!16s%2Fg%2F1pty16nzf!19sChIJReiUOpx-hYAR_WgFK4xVwyM",
+    "rating": 4.3,
+    "reviews_count": 2367,
+    "review_distribution": {
+      "1_star_reviews": 99,
+      "2_star_reviews": 65,
+      "3_star_reviews": 202,
+      "4_star_reviews": 687,
+      "5_star_reviews": 1314
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "11 am–12 am",
+      "Saturday": "11 am–1 am",
+      "Friday": "11 am–1 am",
+      "Thursday": "11 am–12 am",
+      "Wednesday": "11 am–12 am",
+      "Tuesday": "11 am–12 am",
+      "Monday": "11 am–12 am"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJxznM_r9-hYARgTkkLOY-fVU",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/La%20Mission/data=!4m7!3m6!1s0x80857ebffecc39c7:0x557d3ee62c243981!8m2!3d37.8698641!4d-122.2879270!16s%2Fg%2F1tgywyh7!19sChIJxznM_r9-hYARgTkkLOY-fVU",
+    "rating": 4.5,
+    "reviews_count": 1989,
+    "review_distribution": {
+      "1_star_reviews": 61,
+      "2_star_reviews": 52,
+      "3_star_reviews": 125,
+      "4_star_reviews": 374,
+      "5_star_reviews": 1377
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "10 AM–11 PM",
+      "Saturday": "10 AM–11:30 PM",
+      "Friday": "10 AM–11:30 PM",
+      "Thursday": "10 AM–11:30 PM",
+      "Wednesday": "10 AM–11:30 PM",
+      "Tuesday": "10 AM–11:30 PM",
+      "Monday": "10 AM–11:30 PM"
+    }
+  },
+  {
+    "source": "gmaps",
+    "key": "ChIJDfxCOsB_hYARyIGFSShmlEQ",
+    "fetched_at": "2026-10-24T18:48:13Z",
+    "source_url": "https://www.google.com/maps/place/Afghan%20Burrito/data=!4m7!3m6!1s0x80857fc03a42fc0d:0x44946628498581c8!8m2!3d37.8643510!4d-122.2902059!16s%2Fg%2F11lqdmd4ys!19sChIJDfxCOsB_hYARyIGFSShmlEQ",
+    "rating": 4.7,
+    "reviews_count": 668,
+    "review_distribution": {
+      "1_star_reviews": 19,
+      "2_star_reviews": 7,
+      "3_star_reviews": 21,
+      "4_star_reviews": 44,
+      "5_star_reviews": 577
+    },
+    "temporarily_closed": false,
+    "permanently_closed": false,
+    "is_claimed": true,
+    "hours": {
+      "Sunday": "8 am–8 pm",
+      "Saturday": "8 am–12 am",
+      "Friday": "8 am–12 am",
+      "Thursday": "8 am–10 pm",
+      "Wednesday": "8 am–10 pm",
+      "Tuesday": "8 am–10 pm",
+      "Monday": "8 am–10 pm"
+    }
+  }
+]

@@ -4,6 +4,7 @@ import { createModuleTestHarness, TestAuth } from "spacetimedb/server/test-utils
 import schema, * as api from "../src/index";
 import { LIVE_PLACES } from "../src/lib/places";
 import { recordCallEvent } from "../src/booking";
+import { catalogSnapshot, findPlace, ingestCatalog, MAX_ACTIVE } from "../src/lib/catalog";
 
 const internal = TestAuth.internal();
 const needs = (cap = 30, hard: any = {}) => ({ hard: { budgetMaxPerPerson: cap, dietary: [], allergies: [],
@@ -182,5 +183,66 @@ describe("single coordinator flow", () => {
     s.submit(0, "new requirements");
     s.reduce(internal, tx => recordCallEvent(tx, { bookingId: booking.id, type: "confirmed", slot: "19:00" }));
     expect(s.test.db.group.id.find(s.group.groupId)?.status).toBe("eliciting");
+  });
+});
+
+describe("live venue catalog", () => {
+  const evidence = { sources: [{ source: "gmaps", url: "https://www.google.com/maps/place/x", fetchedAt: "2026-10-24T18:00:00Z",
+    rating: 4.4, reviewCount: 1625, extra: "dropped" }] };
+  const push = (s: ReturnType<typeof setup>, places: any[], version = "v1") =>
+    s.reduce(internal, tx => ingestCatalog(tx, { version, generatedAt: "2026-10-24T18:00:00Z",
+      venues: places.map(place => ({ place, evidence })) }));
+
+  it("accepts the bundled catalog as a snapshot and sends it with each coordinator request", () => {
+    const s = setup();
+    expect(push(s, LIVE_PLACES)).toMatchObject({ active: LIVE_PLACES.length, deactivated: 0 });
+    expect(s.test.db.catalog_state.id.find(0)?.version).toBe("v1");
+    s.ready(); const runId = s.plan();
+    expect(s.captured().catalog.version).toBe("v1");
+    expect(s.captured().catalog.places).toHaveLength(LIVE_PLACES.length);
+    expect(s.captured().catalog.evidence.p_002.sources[0]).not.toHaveProperty("extra");
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+  });
+
+  it("checks coordinator answers against the pushed snapshot, not the bundled file", () => {
+    const s = setup();
+    push(s, LIVE_PLACES.map(p => p.id === "p_002" ? { ...p, costPerPerson: p.costPerPerson + 5 } : p));
+    s.ready(); const runId = s.plan(); // the fake API answers with bundled costs
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+  });
+
+  it("rejects a bad push whole and keeps the last good snapshot", () => {
+    const s = setup(); push(s, LIVE_PLACES);
+    const p = LIVE_PLACES[0];
+    const first = (x: any) => [x, ...LIVE_PLACES.slice(1)];
+    const bad: [any[], RegExp][] = [
+      [first({ ...p, notInContract: 1 }), /unknown fields: notInContract/], [first({ ...p, category: "bar" }), /category/],
+      [first({ ...p, dwellMinutes: 7.5 }), /dwellMinutes/],
+      [first({ ...p, hours: { ...(p as any).hours, mon: [["21:00", "11:00"]] } }), /hours/],
+      [[...LIVE_PLACES, p], /duplicate id p_001/], [LIVE_PLACES.filter(x => x.category !== "dessert"), /no dessert/],
+      [Array.from({ length: MAX_ACTIVE.meal + 1 }, (_, i) => ({ ...p, id: `m_${i}` })).concat(LIVE_PLACES.slice(20)),
+        /too many meal/],
+    ];
+    for (const [places, why] of bad) expect(() => push(s, places, "bad")).toThrow(why);
+    expect(() => s.reduce(internal, tx => ingestCatalog(tx, { version: "bad", generatedAt: "soon", venues: [] }))).toThrow();
+    expect(s.test.db.catalog_state.id.find(0)?.version).toBe("v1");
+    expect(catalogSnapshot(s.test.db as any)?.places).toHaveLength(LIVE_PLACES.length);
+  });
+
+  it("deactivates dropped venues but still resolves them for earlier runs", () => {
+    const s = setup(); push(s, LIVE_PLACES);
+    const fresh = { ...LIVE_PLACES[0], id: "bd_fresh1234", name: "Fresh Spot" };
+    expect(push(s, [...LIVE_PLACES.filter(p => p.id !== "p_022"), fresh], "v2")).toMatchObject({ deactivated: 1 });
+    const view = api.catalog_venues(s.test.viewContext(s.users[0].auth));
+    expect(view.map(v => v.id)).toContain("bd_fresh1234");
+    expect(view.map(v => v.id)).not.toContain("p_022");
+    expect(api.catalog_status(s.test.viewContext(s.users[1].auth))?.version).toBe("v2");
+    expect(findPlace(s.test.db as any, "p_022")?.name).toBe(LIVE_PLACES.find(p => p.id === "p_022")!.name);
+  });
+
+  it("falls back to the bundled catalog until anything is pushed", () => {
+    const s = setup(); s.ready(); s.plan();
+    expect(s.captured()).not.toHaveProperty("catalog");
+    expect(api.catalog_status(s.test.viewContext(s.users[0].auth))).toBeUndefined();
   });
 });

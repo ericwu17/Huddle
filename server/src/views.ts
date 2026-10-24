@@ -204,3 +204,20 @@ export const my_call_events = spacetimedb.view(pub("my_call_events"), t.array(ca
   if (!g) return [];
   return Array.from(ctx.db.booking.groupId.filter(g.id)).flatMap((b) => Array.from(ctx.db.call_event.bookingId.filter(b.id)));
 });
+
+// The live venue catalog (lib/catalog.ts) is public listing data, not group state, so these
+// two views are the same for every caller. Empty while the bundled catalog applies.
+export const catalog_status = spacetimedb.view(pub("catalog_status"), t.option(t.row("CatalogStatusRow", {
+  id: t.u32().primaryKey(), version: t.string(), generatedAt: t.string(), venueCount: t.u32(), updatedAt: t.f64(),
+})), (ctx) => ctx.db.catalog_state.id.find(0) ?? undefined);
+
+export const catalog_venues = spacetimedb.view(pub("catalog_venues"), t.array(t.row("CatalogVenueRow", {
+  id: t.string().primaryKey(), name: t.string(), category: t.string(), cuisine: t.string(),
+  address: t.string(), lat: t.f64(), lng: t.f64(), costPerPerson: t.f64(), rating: t.f64(), reviewCount: t.u32(),
+  evidenceJson: t.string(), version: t.string(),
+})), (ctx) => Array.from(ctx.db.venue.iter()).filter((v) => v.active).map((v) => {
+  const p = JSON.parse(v.placeJson);
+  return { id: v.id, name: p.name, category: p.category, cuisine: p.cuisine, address: p.address, lat: p.lat,
+    lng: p.lng, costPerPerson: p.costPerPerson, rating: p.rating, reviewCount: p.reviewCount,
+    evidenceJson: v.evidenceJson, version: v.version };
+}));

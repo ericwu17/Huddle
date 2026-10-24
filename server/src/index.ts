@@ -8,9 +8,9 @@ export { runScoutJob, runCouncilJob } from "./council";
 export { startBooking, runCallJob, runFakeEventJob } from "./booking";
 export {
   my_group, my_members, my_private, my_offers, my_plan_runs, my_council_messages,
-  my_scout, my_votes, my_bookings, my_call_events,
+  my_scout, my_votes, my_bookings, my_call_events, catalog_status, catalog_venues,
 } from "./views";
-export { health, callEvent, councilMessage, router } from "./http";
+export { health, callEvent, councilMessage, catalogPush, router } from "./http";
 export {
   createAgentGroup, submitAgentPrefs, confirmAgentNeeds, findAgentPlans,
   runAgentNeedsJob, runAgentPlanJob, postAgentDiscussion, my_agent_session, my_agent_needs,

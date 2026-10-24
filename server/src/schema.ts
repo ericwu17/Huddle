@@ -202,6 +202,19 @@ export const agent_need = table({ name: "agent_need" }, {
   confirmed: t.bool(), error: t.option(t.string()),
 });
 
+// Live venue catalog pushed by data/reviews/collect.py through POST /catalog (lib/catalog.ts).
+// placeJson is a contract Place (docs/CONTRACT.md S5.2); evidenceJson holds source URLs and
+// fetched-at times. Rows are never deleted, only deactivated, so earlier runs still resolve.
+// With no active rows the bundled data/places.json stays the catalog.
+export const venue = table({ name: "venue" }, {
+  id: t.string().primaryKey(), placeJson: t.string(), evidenceJson: t.string(),
+  active: t.bool(), version: t.string(), updatedAt: t.f64(),
+});
+export const catalog_state = table({ name: "catalog_state" }, {
+  id: t.u32().primaryKey(), // always 0: one row
+  version: t.string(), generatedAt: t.string(), venueCount: t.u32(), updatedAt: t.f64(),
+});
+
 // ---- schedule tables: one per background job (jobs.ts). Functions scheduled this way
 // are private, so phones cannot call them directly. ----
 
@@ -231,6 +244,7 @@ const spacetimedb = schema(
     parse_job, swipe_job, preview_job, plan_job, offers_job, scout_job,
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,
     agent_session, agent_need, agent_needs_job, agent_plan_job,
+    venue, catalog_state,
   },
   {
     // Set at publish time. Unset service URLs mean "use fakes" (lib/fakes.ts).
