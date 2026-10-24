@@ -4,10 +4,10 @@ How to serve the real FastAPI service (`api/`) and the voice service (`voice/`)
 from this Mac, expose them with `cloudflared`, and have the Vercel frontend use
 them.
 
-We always run the **real API** (`STUB_MODE=false`): Claude parsing, swipe
-learning, the Monte Carlo solver, offers and the live council, over the 45
-Berkeley places in `data/places.json` ([api/README.md](../api/README.md)). The
-API's old stub mode still exists in code for tests, but don't deploy it.
+The API has no stub mode. It always runs Claude parsing, swipe learning, the
+Monte Carlo solver, offers and the live council over the 45 Berkeley places in
+`data/places.json` ([api/README.md](../api/README.md)), and ignores
+`STUB_MODE`.
 `voice/` has no real mode yet, so it still plays scripted call events and never
 places a phone call.
 
@@ -32,12 +32,12 @@ So:
 | --- | --- |
 | **SpacetimeDB module env** (Maincloud) | `FASTAPI_BASE_URL`, `VOICE_BASE_URL` = the two tunnel URLs, and `STUB_MODE=false`. **This is the main change.** |
 | **Vercel env** | Only `NEXT_PUBLIC_SPACETIMEDB_URI` and `NEXT_PUBLIC_SPACETIMEDB_DB`. These don't change when tunnels change. |
-| `api/.env` (local, ignored) | `HUDDLE_SHARED_SECRET` matching the module's value, `STUB_MODE=false`, `ANTHROPIC_API_KEY`. |
+| `api/.env` (local, ignored) | `HUDDLE_SHARED_SECRET` matching the module's value, `ANTHROPIC_API_KEY`. |
 | `voice/.env` (local, ignored) | The same `HUDDLE_SHARED_SECRET`, `STUB_SCENARIO=confirm`. |
 
-The module's `STUB_MODE=false` is required too. It picks swipe candidates from
-its own copy of the catalog: with `true` it sends the nine fixture IDs, and the
-real API rejects them.
+The module's `STUB_MODE=false` is required. It picks swipe candidates from its
+own copy of the catalog: with `true` it sends the nine fixture IDs, and the API
+rejects them.
 
 Never put `HUDDLE_SHARED_SECRET` (or any other secret) in Vercel. Every
 `NEXT_PUBLIC_*` value is baked into the public JS bundle.
@@ -58,9 +58,8 @@ scripts/tunnels.sh --scenario full --smoke   # voice in "full" mode, then run ch
 scripts/tunnels.sh --help
 ```
 
-The script forces `STUB_MODE=false` for the API whatever `api/.env` says. It
-also points the API's live council messages at the same database it publishes
-to. Logs go to `logs/tunnels/` (gitignored). Read step 0 first. Vercel (step 5)
+The script points the API's live council messages at the same database it
+publishes to. Logs go to `logs/tunnels/` (gitignored). Read step 0 first. Vercel (step 5)
 is still a one-time manual check. If a tunnel dies, the script exits; rerun it
 to get new URLs.
 
@@ -78,8 +77,7 @@ What this laptop needs:
 - `api/.venv` with the real-API dependencies:
   `api/.venv/bin/python -m pip install -r api/requirements.txt`
 - `voice/.venv` ([voice/README.md](../voice/README.md))
-- `api/.env` with `HUDDLE_SHARED_SECRET`, `STUB_MODE=false` and
-  `ANTHROPIC_API_KEY`. Without the key, parsing falls back to keyword rules and
+- `api/.env` with `HUDDLE_SHARED_SECRET` and `ANTHROPIC_API_KEY`. Without the key, parsing falls back to keyword rules and
   the council to the Safe plan.
 - `voice/.env` with the same `HUDDLE_SHARED_SECRET`, `STUB_SCENARIO=confirm`,
   and `SPACETIMEDB_URI=https://maincloud.spacetimedb.com` / `SPACETIMEDB_DB=huddle-calhacks`
@@ -101,8 +99,8 @@ Run each command in its own terminal tab, from the repo root. `caffeinate`
 stops the Mac from sleeping (sleep kills the tunnels).
 
 ```sh
-# tab 1: api (real mode; SPACETIMEDB_* streams council messages live)
-STUB_MODE=false SPACETIMEDB_URI=https://maincloud.spacetimedb.com SPACETIMEDB_DB=huddle-calhacks \
+# tab 1: api (SPACETIMEDB_* streams council messages live)
+SPACETIMEDB_URI=https://maincloud.spacetimedb.com SPACETIMEDB_DB=huddle-calhacks \
   caffeinate -dis api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
 
 # tab 2: voice
@@ -260,7 +258,7 @@ env -i HOME="$HOME" PATH="$PATH" \
   spacetime publish huddle-calhacks -s https://maincloud.spacetimedb.com --env-only --no-config \
   --unset-env FASTAPI_BASE_URL --unset-env VOICE_BASE_URL
 
-# or hand over to another teammate's tunnel (their API must also run STUB_MODE=false)
+# or hand over to another teammate's tunnel
 env -i HOME="$HOME" PATH="$PATH" FASTAPI_BASE_URL=https://<their-url> \
   spacetime publish huddle-calhacks -s https://maincloud.spacetimedb.com --env-only --no-config
 ```
@@ -301,7 +299,7 @@ Set `FASTAPI_BASE_URL=https://huddle-api.<your-domain>` and
 | --- | --- |
 | Plans say synthetic module fallback / smoke "plan came from the api" fails | `FASTAPI_BASE_URL` is wrong or stale, the API tunnel is down, or the secrets differ (API returns 401). |
 | Group shows "Demo mode: cached data" | An API or voice call failed: tunnel down, timeout, 5xx, or a 4xx. `unknown place IDs` in the module logs means the module still has `STUB_MODE=true`; publish `STUB_MODE=false` (step 4) and start a new huddle. Fix the cause, then the host turns demo mode off. |
-| API `/health` says `"stub":true` | `STUB_MODE` in `api/.env` isn't `false` and wasn't overridden. Set it and restart uvicorn. |
+| API `/health` says `"stub":true` | An API version from before stub mode was removed is running. Pull and restart uvicorn. |
 | Parse warnings say keyword rules were used, or the council always picks Safe | `ANTHROPIC_API_KEY` missing or invalid in `api/.env`. |
 | Council panel fills only at the end | The API wasn't started with `SPACETIMEDB_URI` / `SPACETIMEDB_DB`. The transcript still arrives in the response. |
 | Booking immediately fails with reason `error` | Voice tunnel down or `VOICE_BASE_URL` stale. |

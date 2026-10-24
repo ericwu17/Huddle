@@ -11,7 +11,7 @@
 - **Frontend:** Eric Chen reported the Maincloud flow passes. The rapid Plans-to-Vote transition and reopening Plans still need a browser regression check; do not infer those are fixed from the voice stub landing.
 - **Backend fixes deployed:** source `7612d0b` was published with CLI 2.13.0, `--delete-data=never`, and the new public service URLs. Existing shared secret and unspecified environment values were preserved; no data reset. Privacy, stale choices/current budgets, queued booking/late callback guards and host-only settings are live.
 - **Bright Data:** no account/key yet. The ignored root `.env` has a blank `BRIGHTDATA_API_KEY` entry; this is not a configured integration. Haydn owns the account/reviews; Eric Chen was covering the booth task.
-- **Real API implemented and switched on:** [api/README.md](../api/README.md) describes the implementation and limitations. Real-mode HTTP smoke passed through Eric Wu's tunnel. Review aspects are still placeholders and travel times are estimates; scout and phone calls remain cached/scripted.
+- **Real API implemented and switched on:** [api/README.md](../api/README.md) describes the implementation and limitations. Real-mode HTTP smoke passed through Eric Wu's tunnel. The API's stub mode has since been removed: `api/` always serves the real service, and the module integration check runs against it. Review aspects are still placeholders and travel times are estimates; scout and phone calls remain cached/scripted.
 - **Current work split:** Eric Wu owns current `api/` work; Max covers backend integration/evaluation. This deployment did not edit API files or restart Eric's services.
 
 | Piece | Real or fake right now |
@@ -43,7 +43,7 @@
 - [x] Cover backend integration while Eric is away: voice URL configured; successful synthetic booking and voice-originated full-to-re-plan passed through Maincloud.
 - [ ] Keep the FastAPI server + Cloudflare tunnel running. If the URL changes, send the new one (see "Operating" below).
 - [x] First-phase API stubs, auth, deterministic fixtures, budget/dietary fixes, automatic private env loading, shared-secret verification and tunnel smoke checks.
-- [x] Real `/parse-prefs`, learning, solver, offers and council: implemented by Eric Wu behind `STUB_MODE=false` (dietary rule still meals and desserts only). Review [api/README.md](../api/README.md) decisions before relying on numbers.
+- [x] Real `/parse-prefs`, learning, solver, offers and council: implemented by Eric Wu; `api/` has no stub mode now (dietary rule still meals and desserts only). Review [api/README.md](../api/README.md) decisions before relying on numbers.
 - [ ] Note: only ~7 real activities are open after 7:30 PM Saturday; places carry an extra `googlePlaceId` field.
 - [ ] Keep temporary backend changes compatible with the shared contract; sync main before merging/pushing. Max is authorized to cover backend fixes; unresolved shared-shape changes still need agreement.
 - [x] Review experiment method: cumulative-budget bug fixed, API-plan validator and regression checks added; corrected baseline results regenerated. Old numbers withdrawn. Final pitch claim and real API comparison still pending; see [experiments/README.md](experiments/README.md).
@@ -57,6 +57,7 @@
 - [x] Claude API key shared privately with Max; current stubs do not use it.
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO.
 - [x] Real API in `api/` (`STUB_MODE=false`): 37 unit tests, module integration check, HTTP smoke in both modes, and a local real-mode run of the module procedures with live Claude.
+- [x] API stub mode removed: `api/` always serves the real service. 27 unit tests and the module integration check (rewritten for the real API) pass locally.
 - [x] Switch Maincloud to the real API with the team: API and module `STUB_MODE=false` together; new four-identity huddle passes connected smoke.
 
 ### Haydn (out until Saturday)

@@ -157,6 +157,7 @@ determinism comes from the schema and the validators instead.
 
 ```sh
 api/.venv/bin/python -m unittest discover -s api/eval -v   # 27 tests, no network
+api/.venv/bin/python api/eval/check_integration.py         # module procedures + local API, no Claude key
 FASTAPI_BASE_URL=http://127.0.0.1:8000 HUDDLE_SHARED_SECRET=... \
   api/.venv/bin/python api/eval/smoke_http.py              # any running instance
 ```
@@ -166,6 +167,9 @@ FASTAPI_BASE_URL=http://127.0.0.1:8000 HUDDLE_SHARED_SECRET=... \
   the council with a scripted fake Claude client. That exercises the retry,
   validation, fallback and deadline paths: dropped advocates, a chair falling
   back to Safe, prompts free of names and caps, and the council deadline.
+- `check_integration.py` starts the API on a free port without a Claude key and
+  runs the module's test suite against it, including one parse, swipe, plan,
+  offers, roulette and council pass through real module procedures.
 - `smoke_http.py` checks `/health` reports `"stub": false`, then parses the
   four demo phrases (live Claude if the server has a key), plans for the demo
   group, and runs offers, roulette and one live council.

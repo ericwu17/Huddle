@@ -36,12 +36,12 @@ The API contract is in [docs/CONTRACT.md](docs/CONTRACT.md).
 Use Python 3.11+ for both Python services. From the repository root:
 
 ```sh
-STUB_MODE=false api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
+api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
 FastAPI loads the ignored `api/.env` automatically. It needs the matching
-`HUDDLE_SHARED_SECRET`. `STUB_MODE=true` serves the stubs; `STUB_MODE=false` serves the
-real service and uses `ANTHROPIC_API_KEY` (the module's `STUB_MODE` must match). Setup and
+`HUDDLE_SHARED_SECRET` and uses `ANTHROPIC_API_KEY`. It always serves the real service,
+so the module calling it must run with `STUB_MODE=false`. Setup and
 checks: [api/README.md](api/README.md). Running both services from one laptop behind
 Cloudflare tunnels: [docs/LOCAL_TUNNELS.md](docs/LOCAL_TUNNELS.md).
 

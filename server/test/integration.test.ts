@@ -12,6 +12,7 @@ import { PLACE_BY_ID } from "../../web/src/places";
 import { insertCouncilMessage } from "../src/council";
 import { recordCallEvent } from "../src/booking";
 import { planMembers, startRun } from "../src/plans";
+import { MAX_SWIPES } from "../src/lib/constants";
 import requestFixture from "../../api/fixtures/plan.request.json";
 import demo from "../../data/demo_group.json";
 
@@ -531,10 +532,12 @@ describe("SpacetimeDB procedure integration", () => {
 });
 
 // Optional real HTTP check: module procedures use the official in-memory
-// datastore; only their outbound HTTP responder bridges to the local FastAPI.
-// This does not publish or require a running SpacetimeDB host.
-it.runIf(process.env.HUDDLE_TEST_API_URL)("runs parse/swipe/preview/plan/council against local FastAPI", () => {
-  const env = { FASTAPI_BASE_URL: process.env.HUDDLE_TEST_API_URL, HUDDLE_SHARED_SECRET: process.env.HUDDLE_SHARED_SECRET };
+// datastore; only their outbound HTTP responder bridges to the local FastAPI
+// (api/eval/check_integration.py starts it without a Claude key, so parsing uses
+// keyword rules and the council falls back to Safe). No SpacetimeDB host needed.
+it.runIf(process.env.HUDDLE_TEST_API_URL)("runs parse/swipe/preview/plan/offers/council against local FastAPI", () => {
+  const env = { FASTAPI_BASE_URL: process.env.HUDDLE_TEST_API_URL, HUDDLE_SHARED_SECRET: process.env.HUDDLE_SHARED_SECRET,
+                STUB_MODE: "false" };
   const responder = (_test: any, req: any, bytes: Uint8Array) => {
     const bridge = spawnSync(resolve("../api/.venv/bin/python"), ["-c", `
 import json, sys, urllib.request, urllib.error
@@ -556,16 +559,19 @@ print(json.dumps({'code': response.status, 'headers': {'entries': [{'name': k, '
     return response;
   };
   const s = session(env, responder);
-  expect(callApi(s.proc(), "/health", {}).ok).toBe(true);
+  const live = new Set(LIVE_PLACES.map((p) => p.id));
+  const health = callApi(s.proc(), "/health", {});
+  expect(health.ok && health.data).toMatchObject({ ok: true, stub: false });
   for (const user of s.users) s.reduce(user.auth, (tx) => exports.submitPrefs(tx, { text: user.text }));
   for (const job of s.test.db.parse_job.iter()) exports.runParseJob(s.proc(), { job });
   const g = s.test.db.group.id.find(s.group.groupId)!;
   s.test.db.group.id.update({ ...g, status: "eliciting" });
+  // Real learning: swipe until the stopping rule (confidence or the swipe cap) plans the group.
   const processed = new Set<bigint>();
-  for (let round = 0; round < 4; round++) {
+  for (let round = 0; round < MAX_SWIPES && s.test.db.group.id.find(s.group.groupId)!.status === "eliciting"; round++) {
     for (const user of s.users) {
       const prefs = s.test.db.private_prefs.memberId.find(user.id)!;
-      expect(placeById(prefs.nextPairA!)).toBeTruthy();
+      expect(live.has(prefs.nextPairA!) && live.has(prefs.nextPairB!)).toBe(true);
       s.reduce(user.auth, (tx) => exports.submitSwipe(tx, { winnerPlaceId: prefs.nextPairA!, loserPlaceId: prefs.nextPairB! }));
     }
     for (const job of s.test.db.swipe_job.iter()) {
@@ -575,23 +581,32 @@ print(json.dumps({'code': response.status, 'headers': {'entries': [{'name': k, '
     }
     for (const job of s.test.db.preview_job.iter()) exports.runPreviewJob(s.proc(), { job });
   }
-  expect(s.test.db.group.id.find(s.group.groupId)!.confidence).toBe(.93);
-  expect(s.test.db.group.id.find(s.group.groupId)!.status).toBe("planned");
-  const runId = s.test.db.group.id.find(s.group.groupId)!.latestRunId!;
+  const planned = s.test.db.group.id.find(s.group.groupId)!;
+  expect(planned.status).toBe("planned");
+  expect(planned.confidence).toBeGreaterThan(0);
+  const runId = planned.latestRunId!;
   exports.runPlanJob(s.proc(), { job: [...s.test.db.plan_job.iter()][0] });
-  expect(s.test.db.plan_run.runId.find(runId)!.stub).toBe(true);
+  const run = s.test.db.plan_run.runId.find(runId)!;
+  expect(run.status).toBe("done");
+  expect(run.stub).toBe(false);
+  const result = JSON.parse(run.resultJson!);
+  expect(result.plans.length).toBeGreaterThan(0);
+  const caps = demo.members.map((m) => m.hard.budgetMaxPerPerson).filter((cap): cap is number => cap != null);
+  for (const plan of result.plans) {
+    expect(plan.stops.every((stop: any) => live.has(stop.placeId))).toBe(true);
+    expect(plan.costPerPerson).toBeLessThanOrEqual(Math.min(...caps));
+  }
   exports.runOffersJob(s.proc(), { job: [...s.test.db.offers_job.iter()][0] });
-  expect(s.test.db.offer.count()).toBe(0n);
+  const memberIds = new Set(s.users.map((u) => u.id));
+  for (const offer of s.test.db.offer.iter()) expect(memberIds.has(offer.toMemberId)).toBe(true);
   const choice = exports.doRoulette(s.proc(s.users[0].auth), { runId });
-  expect(choice.planId).toBeTruthy();
+  expect(result.plans.map((p: any) => p.id)).toContain(choice.planId);
   exports.runScoutJob(s.proc(), { job: [...s.test.db.scout_job.iter()][0] });
   exports.runCouncilJob(s.proc(), { job: [...s.test.db.council_job.iter()][0] });
-  s.replay();
-  expect(s.test.db.council_message.count()).toBe(9n);
+  // No Claude key: the chair falls back to Safe, ingested directly (no fake replay).
+  const council = JSON.parse(s.test.db.plan_run.runId.find(runId)!.councilJson!);
+  expect(council.fallbackUsed).toBe(true);
+  expect(council.chosenPlanId).toBe(result.plans.find((p: any) => p.kind === "safe").id);
+  expect(s.test.db.fake_event_job.count()).toBe(0n);
   expect(s.test.db.group.id.find(s.group.groupId)!.status).toBe("voting");
-  const result = JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!);
-  for (const plan of result.plans) {
-    expect(plan.stops.every((stop: any) => placeById(stop.placeId))).toBe(true);
-    expect(plan.costPerPerson).toBeLessThanOrEqual(20);
-  }
 });

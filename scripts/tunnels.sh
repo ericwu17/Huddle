@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the real API (api/, STUB_MODE=false) and the voice service (voice/) on this
+# Run the API (api/) and the voice service (voice/) on this
 # laptop, expose them with Cloudflare quick tunnels, and point the SpacetimeDB
 # module at them (FASTAPI_BASE_URL, VOICE_BASE_URL, and STUB_MODE=false so the
 # module swipes over the same real catalog). Background: docs/LOCAL_TUNNELS.md.
@@ -177,9 +177,9 @@ tunnel_url() {
 # Keep the Mac awake for as long as this script runs (lid-close on battery still sleeps).
 start caffeinate caffeinate -dis -w $$
 
-say "Starting the real api on :$API_PORT and voice on :$VOICE_PORT (logs in logs/tunnels/)"
+say "Starting the api on :$API_PORT and voice on :$VOICE_PORT (logs in logs/tunnels/)"
 # Exported values beat api/.env. SPACETIMEDB_* lets the council stream messages live.
-start api env STUB_MODE=false SPACETIMEDB_URI="$SERVER" SPACETIMEDB_DB="$DATABASE" \
+start api env SPACETIMEDB_URI="$SERVER" SPACETIMEDB_DB="$DATABASE" \
   api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port "$API_PORT" --no-access-log
 if [ -n "$SCENARIO" ]; then
   start voice env STUB_SCENARIO="$SCENARIO" \
@@ -190,7 +190,7 @@ fi
 wait_health api "http://127.0.0.1:$API_PORT"
 wait_health voice "http://127.0.0.1:$VOICE_PORT"
 curl -fsS -m 5 -H "X-Huddle-Secret: $SECRET" "http://127.0.0.1:$API_PORT/health" | grep -q '"stub":false' \
-  || die "api is not in real mode (see $LOG_DIR/api.log)"
+  || die "api reports stub mode; an old api version is running (see $LOG_DIR/api.log)"
 
 say "Opening Cloudflare quick tunnels"
 start api_tunnel cloudflared tunnel --no-autoupdate --url "http://localhost:$API_PORT"
