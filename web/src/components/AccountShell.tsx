@@ -29,7 +29,7 @@ export default function AccountShell({ children }: { children: ReactNode }) {
         </> : <NavLink to="/login">Sign in</NavLink>}
       </nav>
       {account ? <div className="sidebar-account">
-        <p className="on-sky text-sm">Signed in as <strong>{account.displayName}</strong></p>
+        <p className="text-sm">Signed in as <strong>{account.displayName}</strong></p>
         <button className="btn btn-quiet" disabled={busy} onClick={() => run(async () => {
           await logout();
           clearAccountBrowserState(true);
