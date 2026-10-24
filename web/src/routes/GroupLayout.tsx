@@ -44,11 +44,10 @@ export default function GroupLayout() {
     if (group && group.id === session.groupId && agent) {
       const key = `${group.latestRunId}:${agent.status}:${group.status}`;
       if (lastAgentState.current === key) return;
-      const firstLoad = lastAgentState.current === null;
       lastAgentState.current = key;
-      // An explicit Vote URL stays open on refresh, including its empty state.
-      // Later run/needs changes still take everyone back through the new plans.
-      if (firstLoad && pathname.endsWith("/vote")) return;
+      // Vote stays navigable during subscription updates and after needs change.
+      // AgentVote removes stale choices and shows its empty state until replanned.
+      if (pathname.endsWith("/vote")) return;
       const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "call"
         : agent.status === "needs" ? "prefs" : "plans";
       navigate(`/g/${session.groupId}/${step}`);

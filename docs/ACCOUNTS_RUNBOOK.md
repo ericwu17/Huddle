@@ -2,6 +2,14 @@
 
 ## Current menu release — October 24, 2026
 
+Later voting/card correction: provisional and untimed suggestions support group
+votes and tie Spin; only ready timed winners support booking/calendar actions.
+Direct Vote links stay open through realtime changes, showing an empty state when
+choices become stale. Preview passed 60 connected and 24 desktop/mobile browser
+checks; local verification passed 110 API and 169 module tests (one HTTP skip),
+build and lint. Cards use AM/PM and known menu prices without source/date or
+confirmation clutter. The same API/tunnel URLs and private configuration remain.
+
 The shared module and API now support the [menu extension](MENU_RECOMMENDATIONS.md).
 Maincloud `huddle-calhacks` holds snapshot
 `2026-10-24T22:29:05Z-d5490f3f-menu-20bc1232fca7`: **130 venues, 950 menu items,

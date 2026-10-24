@@ -185,3 +185,15 @@ Shared backend activation preserved every pre-update group/member/run identifier
 (31/66/24). The API remains at the existing shared tunnel on Max's Mac. The
 latest UI reconciliation keeps the sidebar/vote/map/SPA changes while preserving
 friend invitations and all menu/provisional guards; QR/code sharing was removed.
+
+### Voting and card correction
+
+The later voting update supersedes the historical display-only checks above.
+Preview verification passed 60 connected assertions and 24 desktop/mobile browser
+assertions, including conflicting requirements, provisional ballots, tie Spin,
+direct Vote URLs, untimed ballots and invalidation after changed needs. The local
+suite passed 110 API tests and 169 module tests (one opt-in HTTP skip), frontend
+build/lint and 26 focused rendering/format checks. The shared module was published
+without a data reset and both existing API tunnels returned healthy responses.
+The shared API was restarted on the same URL; no Calendar or Messages settings
+were changed. No texts, Calendar events or restaurant calls were sent by tests.
