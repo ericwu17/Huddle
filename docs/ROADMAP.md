@@ -1,6 +1,6 @@
 # Huddle roadmap
 
-> Maintained by Eric Chen. Last updated Fri 8:15 PM (H2.25). Check things off in your own section as you push them.
+> Maintained by Eric Chen. Last updated Fri 8:20 PM (H2.3). Current state and async task list: [HANDOFF.md](HANDOFF.md). Check things off in your own section as you push them.
 >
 > **H0 = Fri 6:00 PM** (the brief assumed 9 PM, so every gate is 3 hours earlier than `huddle.md` says).
 > Legend: `[x]` done and in the repo · `[~]` in progress or rough draft · `[ ]` not started · `?` unknown (owner: please update)
@@ -9,14 +9,14 @@
 
 | Gate | When | What must be true | Status |
 | --- | --- | --- | --- |
-| H2 stubs | **Fri 8 PM** | Every endpoint exists with contract-shaped fakes; smoke test passes on fakes | `[~]` backend, UI, smoke test yes; api and voice stubs missing |
-| H8 hand-off | **Sat 2 AM** | places.json v1; Eric Chen's hand-off note | `[~]` places.json done; note not yet |
+| H2 stubs | **Fri 8 PM** | Every endpoint exists with contract-shaped fakes; smoke test passes on fakes | `[~]` backend, UI, smoke test, Max's api stubs (connected on Maincloud) yes; voice `/book` stub missing |
+| H8 hand-off | **Sat 2 AM** | places.json v1; Eric Chen's hand-off note | `[~]` places.json done; hand-off note drafted (`docs/HANDOFF.md`), final update before Eric Chen sleeps |
 | L1 (H13) | **Sat 7 AM** | 4 phones join by QR, text parses, plan on a map with cost and timing, voting works; stubs-to-real flip done | `[ ]` |
 | L2 (H19) | **Sat 1 PM** | Swipes with confidence, 3 named plans with robustness, places.json v2, Mapbox leg times, one eval chart. Decide: council, Fetch.ai, live voice vs recording | `[ ]` |
 | L3 (H24) + freeze | **Sat 6 PM** | Offers, scout badge, council streaming, polished screens, voice S1-S3 (or fallback), re-plan loop works once, demo path written | `[ ]` |
 | Submit | **Sun 7:30 AM** (hard 9 AM, checked in by 8 AM) | Devpost complete (T7 checklist) | `[ ]` |
 
-**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed by DM only.
+**Live backend:** SpacetimeDB Maincloud, `https://maincloud.spacetimedb.com`, database `huddle-calhacks`. Shared secret is passed by DM only. Connected to Max's FastAPI stubs (`STUB_MODE=true`); voice not connected yet.
 
 **Sleep/away times need re-checking against the 6 PM start.** If Eric Chen's away window is fixed in clock time (Sat 6 AM to noon), it is now H12 to H18, not H9 to H15.
 
@@ -53,18 +53,21 @@
 - [x] `data/fetch_places.py` and `places.json` v1 (45 real Berkeley places)
 - [x] Published to Maincloud; four-phone test 23/23 there
 - [x] `docs/HONESTY.md`, `docs/DISCLOSURE.md` (seeded; keep updating)
-- [ ] Hand-off note (due Sat 2 AM)
-- [ ] Wire Max's real api (`FASTAPI_BASE_URL`) and rerun the test
+- [~] Hand-off note `docs/HANDOFF.md` (drafted; final update before sleep, due Sat 2 AM)
+- [x] Wired Max's api stubs on Maincloud (`FASTAPI_BASE_URL`, `STUB_MODE=true`); smoke test + frontend flow pass through it
 - [ ] Wire Eric Wu's voice service (`VOICE_BASE_URL`); test the "full" re-plan with him
 - [ ] Demo-mode fallbacks: `data/cached_run.json` from a real run; auto demo mode when /health fails
 - [ ] Live scout via Bright Data (needs `docs/BRIGHTDATA.md`)
-- [~] Council panel `web/src/components/council/` (functional pass in progress)
-- [~] Experiment harness `docs/experiments/` (baselines in progress; "ours" waits for Max's /plan)
+- [x] Council panel `web/src/components/council/` (functional pass; streams live; restyle at H19)
+- [x] Privacy fix: names hidden in plan text and offers unless showWhoCompromised
+- [~] Experiment harness `docs/experiments/` (5 baselines run; "ours" waits for Max's real /plan; numbers not pitch-ready until places.json v2)
 - [ ] README, Devpost writeup, secret scan, submission checklist
 
 ## C. Max: solver and council
 
-- [ ] FastAPI stubs for every endpoint (due H2, 8 PM); tunnel URL to Eric Chen
+- [x] FastAPI stubs for every endpoint, tunnel live and connected (keep it running; send the new URL if it changes)
+- [x] Dietary rule applies to meals/desserts only (tagless activities stay eligible)
+- [x] Budget guards in the module (`server/src/lib/budgets.ts`)
 - [ ] /parse-prefs with keyword fallback
 - [ ] L1 solver: filter, normalization, enumeration, maximin + Nash tie-break, three plans (note: only ~7 activities are open after 7:30 PM Sat; `places.json` has an extra `googlePlaceId` field)
 - [ ] Posterior update, active selection, Monte Carlo robustness, Pareto, posteriorSummary
@@ -76,7 +79,9 @@
 
 - ? Claude API key (moved from Max; share it with Max by DM for /parse-prefs and the council)
 - ? Twilio upgraded + number, Cartesia account, tunnel tool, demo phone verified
-- [ ] `POST /book` stub posting fake events to `/route/call-event` (due H2, 8 PM); URL to Eric Chen
+- [ ] `POST /book` stub posting fake events to `/route/call-event` (**overdue, last H2 piece**); URL to Eric Chen
+- [ ] Bug: app jumps to Vote ~400 ms after the council finishes and Plans bounces back to Vote, so the debate is never seen
+- [ ] `web/.env.local` pointing at Maincloud (see HANDOFF.md)
 - [ ] Voice spike: one Mandarin call end to end; GO / NO-GO
 - [ ] State machine, tools, event posting; scenarios S1, S2
 - [ ] S3 ("we're full") + re-plan loop with Eric Chen
