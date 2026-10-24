@@ -1,0 +1,4402 @@
+[
+  {
+    "id": "p_001",
+    "googlePlaceId": "ChIJYx5P7J5-hYARctvMDW_ZVF8",
+    "name": "Imm Thai Street Food",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "2068 University Ave, Berkeley, CA 94704, USA",
+    "lat": 37.871899299999995,
+    "lng": -122.2691148,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15108981123",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1625,
+    "rating": 4.4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_002",
+    "googlePlaceId": "ChIJxznM_r9-hYARgTkkLOY-fVU",
+    "name": "La Mission",
+    "category": "meal",
+    "cuisine": "latin",
+    "address": "1255 University Ave, Berkeley, CA 94702, USA",
+    "lat": 37.8698641,
+    "lng": -122.287927,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15108455898",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "10:00",
+          "23:30"
+        ]
+      ],
+      "tue": [
+        [
+          "10:00",
+          "23:30"
+        ]
+      ],
+      "wed": [
+        [
+          "10:00",
+          "23:30"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "23:30"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "23:30"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "23:30"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "23:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1989,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_003",
+    "googlePlaceId": "ChIJd4ja7M19hYARg_mH3l7UbsU",
+    "name": "La Mediterranee",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "2936 College Ave, Berkeley, CA 94705, USA",
+    "lat": 37.8575954,
+    "lng": -122.2533803,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15105407773",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [],
+      "tue": [
+        [
+          "11:30",
+          "20:30"
+        ]
+      ],
+      "wed": [
+        [
+          "11:30",
+          "20:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:30",
+          "20:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:30",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:30",
+          "21:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:30",
+          "20:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 813,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_004",
+    "googlePlaceId": "ChIJM7ZMM015hYARTF7hu0UXeZY",
+    "name": "Zachary's Chicago Pizza",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "1853 Solano Ave, Berkeley, CA 94707, USA",
+    "lat": 37.8916146,
+    "lng": -122.27855650000001,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15105255950",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "20:30"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "20:30"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "20:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "20:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "20:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2058,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_005",
+    "googlePlaceId": "ChIJNwUiuJ1-hYARlmMobInl1SI",
+    "name": "Jupiter",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "2181 Shattuck Ave., Berkeley, CA 94704, USA",
+    "lat": 37.8697958,
+    "lng": -122.26758199999999,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:30",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:30",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:30",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:30",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:30",
+          "23:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:30",
+          "23:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:30",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 4025,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_006",
+    "googlePlaceId": "ChIJe8gxJ5l-hYARgeZMbElxEek",
+    "name": "The Butcher’s Son Vegan Delicatessen & Bakery",
+    "category": "meal",
+    "cuisine": "american",
+    "address": "1954 University Ave, Berkeley, CA 94704, USA",
+    "lat": 37.871574599999995,
+    "lng": -122.2716294,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15109840818",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "20:00"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "16:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2083,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_007",
+    "googlePlaceId": "ChIJwSvuAp1-hYARtEN2Qchz4XE",
+    "name": "Toss Noodle Bar",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "2272 Shattuck Ave., Berkeley, CA 94704, USA",
+    "lat": 37.8680017,
+    "lng": -122.26821880000001,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15108458677",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 808,
+    "rating": 4.4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_008",
+    "googlePlaceId": "ChIJw3k8iZ5-hYARJSkLTdSXbls",
+    "name": "Comal",
+    "category": "meal",
+    "cuisine": "latin",
+    "address": "2020 Shattuck Ave., Berkeley, CA 94704, USA",
+    "lat": 37.871580699999996,
+    "lng": -122.2686336,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15109266300",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "17:00",
+          "21:00"
+        ]
+      ],
+      "tue": [
+        [
+          "17:00",
+          "21:00"
+        ]
+      ],
+      "wed": [
+        [
+          "17:00",
+          "21:00"
+        ]
+      ],
+      "thu": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "17:00",
+          "21:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1507,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_009",
+    "googlePlaceId": "ChIJhSHYCc59hYARDNRplrTdMy0",
+    "name": "House of Curries",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "2984 College Ave, Berkeley, CA 94705, USA",
+    "lat": 37.8563839,
+    "lng": -122.253203,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15108411688",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 462,
+    "rating": 4.1,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_010",
+    "googlePlaceId": "ChIJMfyhay98hYARs0L2SNx0vmY",
+    "name": "Gypsy's Trattoria Italiana",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "2519 Durant Ave, Berkeley, CA 94704, USA",
+    "lat": 37.868075499999996,
+    "lng": -122.25815060000001,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15105484860",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2056,
+    "rating": 4.4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_011",
+    "googlePlaceId": "ChIJReiUOpx-hYAR_WgFK4xVwyM",
+    "name": "Eureka!",
+    "category": "meal",
+    "cuisine": "american",
+    "address": "2068 Center St, Berkeley, CA 94704, USA",
+    "lat": 37.869978499999995,
+    "lng": -122.26900640000001,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15108098282",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2367,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_012",
+    "googlePlaceId": "ChIJqUoig51-hYARUnXjcqs8-sg",
+    "name": "Gather in Berkeley",
+    "category": "meal",
+    "cuisine": "american",
+    "address": "2200 Oxford St, Berkeley, CA 94704, USA",
+    "lat": 37.8695038,
+    "lng": -122.2661179,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15108090400",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "14:00"
+        ],
+        [
+          "16:00",
+          "20:30"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "14:00"
+        ],
+        [
+          "16:00",
+          "20:30"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "14:00"
+        ],
+        [
+          "16:00",
+          "20:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "14:00"
+        ],
+        [
+          "16:00",
+          "20:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "14:00"
+        ],
+        [
+          "16:00",
+          "20:30"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "14:30"
+        ],
+        [
+          "16:00",
+          "20:45"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "14:00"
+        ],
+        [
+          "16:00",
+          "20:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1271,
+    "rating": 4.4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_013",
+    "googlePlaceId": "ChIJ-XDvAZ9-hYARAjkpe30Q-JY",
+    "name": "The Noodle, Thai Restaurant",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "1936 Shattuck Ave., Berkeley, CA 94704, USA",
+    "lat": 37.8732119,
+    "lng": -122.26868419999998,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15108486531",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "17:00",
+          "21:45"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "14:45"
+        ],
+        [
+          "17:00",
+          "21:45"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "14:45"
+        ],
+        [
+          "17:00",
+          "21:45"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "14:45"
+        ],
+        [
+          "17:00",
+          "21:45"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "14:45"
+        ],
+        [
+          "17:00",
+          "21:45"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "14:45"
+        ],
+        [
+          "17:00",
+          "21:45"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "14:45"
+        ],
+        [
+          "17:00",
+          "21:45"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 571,
+    "rating": 4.4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_014",
+    "googlePlaceId": "ChIJF7bpISN_hYARv2ng_KB0S1E",
+    "name": "Las Cabañas Mexican Grill & Taqueria",
+    "category": "meal",
+    "cuisine": "latin",
+    "address": "1916 Martin Luther King Jr Way, Berkeley, CA 94704, USA",
+    "lat": 37.8728811,
+    "lng": -122.27343049999999,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15108332507",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ],
+      "tue": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ],
+      "wed": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ],
+      "thu": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ],
+      "fri": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ],
+      "sat": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ],
+      "sun": [
+        [
+          "09:00",
+          "23:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1049,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_015",
+    "googlePlaceId": "ChIJkwSaJWB-hYARZEdqeE8CGyo",
+    "name": "King of Kabab",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "3043 San Pablo Ave, Berkeley, CA 94702, USA",
+    "lat": 37.850738799999995,
+    "lng": -122.2860353,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15103452838",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "sun": []
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 438,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_016",
+    "googlePlaceId": "ChIJYQkwl819hYAR2iShHqXJ5AM",
+    "name": "The Italian Homemade Company (Berkeley)",
+    "category": "meal",
+    "cuisine": "mediterranean",
+    "address": "2905 College Ave, Berkeley, CA 94705, USA",
+    "lat": 37.8581897,
+    "lng": -122.2529509,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15106491495",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 691,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_017",
+    "googlePlaceId": "ChIJp6q5s5l-hYARcoBMxX7UCDQ",
+    "name": "Nation's Giant Hamburgers & Great Pies",
+    "category": "meal",
+    "cuisine": "american",
+    "address": "1800 University Ave, Berkeley, CA 94703, USA",
+    "lat": 37.871095499999996,
+    "lng": -122.27487519999998,
+    "priceLevel": 1,
+    "costPerPerson": 12,
+    "dwellMinutes": 75,
+    "phone": "+15108437326",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "06:30",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2036,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_018",
+    "googlePlaceId": "ChIJF42YyKF-hYARXWrOlU31bsU",
+    "name": "Taste of the Himalayas",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "1700 Shattuck Ave., Berkeley, CA 94709, USA",
+    "lat": 37.876417499999995,
+    "lng": -122.2693087,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15108494983",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "14:30"
+        ],
+        [
+          "16:30",
+          "21:30"
+        ]
+      ],
+      "tue": [],
+      "wed": [
+        [
+          "11:00",
+          "14:30"
+        ],
+        [
+          "16:30",
+          "21:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "14:30"
+        ],
+        [
+          "16:30",
+          "21:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "14:30"
+        ],
+        [
+          "16:30",
+          "21:30"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "14:30"
+        ],
+        [
+          "16:30",
+          "21:30"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "14:30"
+        ],
+        [
+          "16:30",
+          "21:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1080,
+    "rating": 4.7,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_019",
+    "googlePlaceId": "ChIJ3UMEG51-hYARVg-0N89b4eo",
+    "name": "Little Plearn Thai Kitchen",
+    "category": "meal",
+    "cuisine": "asian",
+    "address": "2283 Shattuck Ave., Berkeley, CA 94704, USA",
+    "lat": 37.867944699999995,
+    "lng": -122.26752119999999,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15107041442",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "15:00"
+        ],
+        [
+          "16:00",
+          "21:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "15:00"
+        ],
+        [
+          "16:00",
+          "21:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "15:00"
+        ],
+        [
+          "16:00",
+          "21:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "15:00"
+        ],
+        [
+          "16:00",
+          "21:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "15:00"
+        ],
+        [
+          "16:00",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "21:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 436,
+    "rating": 4.4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_020",
+    "googlePlaceId": "ChIJjQwTop1-hYARh03sE8ZJtd4",
+    "name": "Cancun Sabor Mexicano",
+    "category": "meal",
+    "cuisine": "latin",
+    "address": "2134 Allston Way, Berkeley, CA 94704, USA",
+    "lat": 37.8694305,
+    "lng": -122.26686090000001,
+    "priceLevel": 2,
+    "costPerPerson": 25,
+    "dwellMinutes": 75,
+    "phone": "+15105490964",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "20:00"
+        ]
+      ],
+      "sun": [
+        [
+          "09:00",
+          "20:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1021,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_021",
+    "googlePlaceId": "ChIJB8EriZ1-hYAReKDxrhGFK-o",
+    "name": "Berkeley Art Museum and Pacific Film Archive",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "2155 Center St, Berkeley, CA 94720, USA",
+    "lat": 37.870735599999996,
+    "lng": -122.26648409999999,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15106420808",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [],
+      "wed": [
+        [
+          "11:00",
+          "19:00"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "19:00"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "19:00"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "19:00"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "19:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 931,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_022",
+    "googlePlaceId": "ChIJKeecwZ5-hYAR8Qz1bQJv4G4",
+    "name": "The UC Theatre Taube Family Music Hall",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "2036 University Ave, Berkeley, CA 94704, USA",
+    "lat": 37.8718053,
+    "lng": -122.26980859999999,
+    "priceLevel": null,
+    "costPerPerson": 10,
+    "dwellMinutes": 75,
+    "phone": "+15103564000",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "18:00",
+          "23:30"
+        ]
+      ],
+      "tue": [
+        [
+          "18:00",
+          "23:30"
+        ]
+      ],
+      "wed": [
+        [
+          "18:00",
+          "23:30"
+        ]
+      ],
+      "thu": [
+        [
+          "18:00",
+          "23:30"
+        ]
+      ],
+      "fri": [
+        [
+          "18:00",
+          "23:30"
+        ]
+      ],
+      "sat": [
+        [
+          "18:00",
+          "23:30"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "14:00"
+        ],
+        [
+          "18:00",
+          "23:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1367,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_023",
+    "googlePlaceId": "ChIJMbFwRXl-hYARNFQhL2vqng4",
+    "name": "Black Repertory Group Inc",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "3201 Adeline St, Berkeley, CA 94703, USA",
+    "lat": 37.8505568,
+    "lng": -122.2703069,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15106522120",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [],
+      "wed": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 164,
+    "rating": 4,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_024",
+    "googlePlaceId": "ChIJB-0ytkh8hYARLPEQsVn-oo4",
+    "name": "University of California Botanical Garden",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "Centennial Dr, Berkeley, CA 94705, USA",
+    "lat": 37.875144999999996,
+    "lng": -122.2387194,
+    "priceLevel": null,
+    "costPerPerson": 0,
+    "dwellMinutes": 75,
+    "phone": "+15106432755",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "tue": [],
+      "wed": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2256,
+    "rating": 4.8,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_025",
+    "googlePlaceId": "ChIJVVbd7z58hYARmsbuevROjI0",
+    "name": "The Lawrence Hall of Science",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "1 Centennial Dr, Berkeley, CA 94720, USA",
+    "lat": 37.879205000000006,
+    "lng": -122.246517,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15106425132",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [],
+      "wed": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "17:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 591,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_026",
+    "googlePlaceId": "ChIJRSLWlp5-hYARhmYD96DWEBg",
+    "name": "Berkeley Repertory Theatre",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "2025 Addison St, Berkeley, CA 94704, USA",
+    "lat": 37.871146599999996,
+    "lng": -122.2693194,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15106472949",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "19:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "19:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 897,
+    "rating": 4.8,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_027",
+    "googlePlaceId": "ChIJby_fm51-hYAR8jdg4ZXs7wI",
+    "name": "Brower Center",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "2150 Allston Way, Berkeley, CA 94704, USA",
+    "lat": 37.8694389,
+    "lng": -122.2664611,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15108090900",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "10:00",
+          "16:00"
+        ]
+      ],
+      "tue": [
+        [
+          "10:00",
+          "16:00"
+        ]
+      ],
+      "wed": [
+        [
+          "10:00",
+          "16:00"
+        ]
+      ],
+      "thu": [
+        [
+          "10:00",
+          "16:00"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "14:00"
+        ]
+      ],
+      "sat": [],
+      "sun": []
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 92,
+    "rating": 4.7,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_028",
+    "googlePlaceId": "ChIJAXUZGh18hYARe7Uug71u2io",
+    "name": "Berkeley Rose Garden",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "VPPP+9W6, 1200 Euclid Ave, Berkeley, CA 94708, USA",
+    "lat": 37.8852994,
+    "lng": -122.26288939999999,
+    "priceLevel": null,
+    "costPerPerson": 0,
+    "dwellMinutes": 75,
+    "phone": "+15109816637",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 2062,
+    "rating": 4.7,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_029",
+    "googlePlaceId": "ChIJi_jJRn5-hYARJLmnH4TDgb0",
+    "name": "Lacis Museum of Lace and Textiles",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "2982 Adeline St, Berkeley, CA 94703, USA",
+    "lat": 37.854949399999995,
+    "lng": -122.26951269999999,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15108437290",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "18:00"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "18:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "18:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "18:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "18:00"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "18:00"
+        ]
+      ],
+      "sun": []
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 157,
+    "rating": 4.9,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_030",
+    "googlePlaceId": "ChIJ2Qu8BY19hYARdvBGXQuq2Fw",
+    "name": "Cal Performances",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "101 Zellerbach Hall, Berkeley, CA 94720, USA",
+    "lat": 37.86904570000001,
+    "lng": -122.2606874,
+    "priceLevel": null,
+    "costPerPerson": 10,
+    "dwellMinutes": 75,
+    "phone": "+15106429988",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [
+        [
+          "12:00",
+          "17:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "17:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "17:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "17:00"
+        ]
+      ],
+      "sat": [
+        [
+          "13:00",
+          "17:00"
+        ]
+      ],
+      "sun": [
+        [
+          "13:00",
+          "17:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 827,
+    "rating": 4.7,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_031",
+    "googlePlaceId": "ChIJAcK7wax-hYARYxSnYWfJjTA",
+    "name": "Indian Rock Park",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "950 Indian Rock Ave, Berkeley, CA 94707, USA",
+    "lat": 37.892185,
+    "lng": -122.27269829999997,
+    "priceLevel": null,
+    "costPerPerson": 0,
+    "dwellMinutes": 75,
+    "phone": "+15109816637",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1600,
+    "rating": 4.8,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_032",
+    "googlePlaceId": "ChIJz5Yd739-hYAR0iM8dvuhMac",
+    "name": "Art House Gallery and Cultural Center",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "2905 Shattuck Ave., Berkeley, CA 94705, USA",
+    "lat": 37.8564181,
+    "lng": -122.26622760000001,
+    "priceLevel": null,
+    "costPerPerson": 10,
+    "dwellMinutes": 75,
+    "phone": "+15104723170",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [],
+      "wed": [],
+      "thu": [],
+      "fri": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "20:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 117,
+    "rating": 4.9,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_033",
+    "googlePlaceId": "ChIJ8Tlmy8l-hYAR_Ffc58cc7Ek",
+    "name": "Alternative Music Foundation",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "924 Gilman St, Berkeley, CA 94710, USA",
+    "lat": 37.879658,
+    "lng": -122.29934979999997,
+    "priceLevel": null,
+    "costPerPerson": 10,
+    "dwellMinutes": 75,
+    "phone": "+15105248180",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [],
+      "wed": [],
+      "thu": [],
+      "fri": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "19:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "17:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 295,
+    "rating": 4.8,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_034",
+    "googlePlaceId": "ChIJ20e56JR-hYARezDFlleSt_s",
+    "name": "Strawberry Creek Park",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "1260 Allston Way, Berkeley, CA 94702, USA",
+    "lat": 37.867077099999996,
+    "lng": -122.28621450000001,
+    "priceLevel": null,
+    "costPerPerson": 0,
+    "dwellMinutes": 75,
+    "phone": "+15109815150",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "06:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 795,
+    "rating": 4.7,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_035",
+    "googlePlaceId": "ChIJffjTJqF-hYARCQd9uRkMYiE",
+    "name": "Aftel Archive of Curious Scents",
+    "category": "activity",
+    "cuisine": "none",
+    "address": "cottage down driveway, 1518 Walnut St, Berkeley, CA 94709, USA",
+    "lat": 37.8794825,
+    "lng": -122.26839649999998,
+    "priceLevel": null,
+    "costPerPerson": 15,
+    "dwellMinutes": 75,
+    "phone": "+15108412111",
+    "dietary": [],
+    "hours": {
+      "mon": [],
+      "tue": [],
+      "wed": [],
+      "thu": [],
+      "fri": [],
+      "sat": [
+        [
+          "10:00",
+          "18:00"
+        ]
+      ],
+      "sun": []
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 87,
+    "rating": 4.9,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_036",
+    "googlePlaceId": "ChIJ22MUJC98hYARqoJqj5J4EMA",
+    "name": "CREAM",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "2399 Telegraph Ave, Berkeley, CA 94704, USA",
+    "lat": 37.867035,
+    "lng": -122.258725,
+    "priceLevel": null,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15106491000",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 761,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_037",
+    "googlePlaceId": "ChIJs1T6wgt_hYARtXrU21VSuZI",
+    "name": "U :Dessert Story",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "1849 Shattuck Ave., Berkeley, CA 94709, USA",
+    "lat": 37.8740203,
+    "lng": -122.26841909999999,
+    "priceLevel": 2,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15103564127",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "13:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "13:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "13:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "13:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "13:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "11:30",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "11:30",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 612,
+    "rating": 4.3,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_038",
+    "googlePlaceId": "ChIJxeIO855-hYARH4eCEiixiDk",
+    "name": "Asha Tea House",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "2086 University Ave, Berkeley, CA 94704, USA",
+    "lat": 37.871952,
+    "lng": -122.268853,
+    "priceLevel": null,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "10:00",
+          "18:00"
+        ]
+      ],
+      "tue": [
+        [
+          "10:00",
+          "18:00"
+        ]
+      ],
+      "wed": [],
+      "thu": [
+        [
+          "10:00",
+          "18:00"
+        ]
+      ],
+      "fri": [
+        [
+          "10:00",
+          "18:30"
+        ]
+      ],
+      "sat": [
+        [
+          "10:00",
+          "18:30"
+        ]
+      ],
+      "sun": [
+        [
+          "10:00",
+          "18:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 808,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_039",
+    "googlePlaceId": "ChIJ7VcEacF-hYARLhvrWCW_58M",
+    "name": "Casa Latina Bakery",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "1805 San Pablo Ave, Berkeley, CA 94702, USA",
+    "lat": 37.871514,
+    "lng": -122.292695,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15105587177",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "07:00",
+          "21:00"
+        ]
+      ],
+      "tue": [
+        [
+          "07:00",
+          "21:00"
+        ]
+      ],
+      "wed": [
+        [
+          "07:00",
+          "21:00"
+        ]
+      ],
+      "thu": [
+        [
+          "07:00",
+          "21:00"
+        ]
+      ],
+      "fri": [
+        [
+          "07:00",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "07:00",
+          "21:00"
+        ]
+      ],
+      "sun": [
+        [
+          "08:00",
+          "21:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1759,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_040",
+    "googlePlaceId": "ChIJW93Y1IJ-hYARLKpW4O12Ias",
+    "name": "Endless Summer Sweets",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "2358 Shattuck Ave., Berkeley, CA 94704, USA",
+    "lat": 37.8663532,
+    "lng": -122.26803629999999,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15103564154",
+    "dietary": [
+      "vegetarian"
+    ],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "22:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 674,
+    "rating": 4.6,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_041",
+    "googlePlaceId": "ChIJOWpkg0R_hYAR3h2OHu0xyUM",
+    "name": "Belmo Café",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "1160 University Ave, Berkeley, CA 94702, USA",
+    "lat": 37.869090500000006,
+    "lng": -122.29030969999998,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15109019152",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "07:30",
+          "22:30"
+        ]
+      ],
+      "tue": [
+        [
+          "07:30",
+          "22:30"
+        ]
+      ],
+      "wed": [
+        [
+          "07:30",
+          "22:30"
+        ]
+      ],
+      "thu": [
+        [
+          "07:30",
+          "22:30"
+        ]
+      ],
+      "fri": [
+        [
+          "07:30",
+          "22:30"
+        ]
+      ],
+      "sat": [
+        [
+          "07:30",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "07:30",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 512,
+    "rating": 4.8,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_042",
+    "googlePlaceId": "ChIJR6XJs1p_hYAR1bL7Xq_9FII",
+    "name": "ChaHalo 茶话弄 - Berkeley",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "2041 University Ave, Berkeley, CA 94704, USA",
+    "lat": 37.8721399,
+    "lng": -122.2696186,
+    "priceLevel": null,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15109905536",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "tue": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "wed": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "thu": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "fri": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "sat": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ],
+      "sun": [
+        [
+          "11:00",
+          "21:30"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 488,
+    "rating": 4.9,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_043",
+    "googlePlaceId": "ChIJcSjwf8Z-hYARu81RUdsuexQ",
+    "name": "Acme Bread",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "1601 San Pablo Ave, Berkeley, CA 94702, USA",
+    "lat": 37.8751319,
+    "lng": -122.29357739999999,
+    "priceLevel": 1,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15105241021",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "07:00",
+          "16:00"
+        ]
+      ],
+      "tue": [
+        [
+          "07:00",
+          "16:00"
+        ]
+      ],
+      "wed": [
+        [
+          "07:00",
+          "16:00"
+        ]
+      ],
+      "thu": [
+        [
+          "07:00",
+          "17:00"
+        ]
+      ],
+      "fri": [
+        [
+          "07:00",
+          "17:00"
+        ]
+      ],
+      "sat": [
+        [
+          "07:00",
+          "16:00"
+        ]
+      ],
+      "sun": [
+        [
+          "08:30",
+          "15:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 1407,
+    "rating": 4.8,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_044",
+    "googlePlaceId": "ChIJ-QfyHzJ5hYARLJBzeO0PZ10",
+    "name": "Mr Dewies Cashew Creamery",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "1116 Solano Ave, Albany, CA 94706, USA",
+    "lat": 37.8901639,
+    "lng": -122.29815029999997,
+    "priceLevel": null,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15102259534",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "21:00"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "20:00"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 631,
+    "rating": 4.7,
+    "sources": [
+      "google"
+    ]
+  },
+  {
+    "id": "p_045",
+    "googlePlaceId": "ChIJOaTDxi58hYARnB1yJXzRhdE",
+    "name": "Little Gem Belgian Waffles",
+    "category": "dessert",
+    "cuisine": "cafe_dessert",
+    "address": "2468 Telegraph Ave Ste A, Berkeley, CA 94704, USA",
+    "lat": 37.86562130000001,
+    "lng": -122.25868249999999,
+    "priceLevel": null,
+    "costPerPerson": 9,
+    "dwellMinutes": 30,
+    "phone": "+15108838922",
+    "dietary": [],
+    "hours": {
+      "mon": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "tue": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "wed": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "thu": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "fri": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "sat": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ],
+      "sun": [
+        [
+          "12:00",
+          "23:59"
+        ]
+      ]
+    },
+    "aspects": {
+      "noise": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "crowd": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "wait": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "value": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "romance": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "service": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "outdoor": {
+        "mean": 0.5,
+        "sd": 0.25
+      },
+      "novelty": {
+        "mean": 0.5,
+        "sd": 0.25
+      }
+    },
+    "reviewCount": 263,
+    "rating": 4.5,
+    "sources": [
+      "google"
+    ]
+  }
+]

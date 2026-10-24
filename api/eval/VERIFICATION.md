@@ -3,7 +3,7 @@
 Verified locally after Max explicitly confirmed the hacking period had started.
 
 - Python 3.12.5; FastAPI 0.116.1; Pydantic 2.11.7; uvicorn 0.35.0; httpx 0.28.1.
-- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **15 tests passed**.
+- `api/.venv/bin/python -m unittest discover -s api/eval -v`: **16 tests passed**, including preview responses.
 - Started uvicorn on `127.0.0.1:8000` with an ephemeral in-memory shared secret,
   ran `api/.venv/bin/python api/eval/smoke_http.py`: **all eight routes passed**.
   The HTTP runner checked successful auth, missing-auth rejection, synthetic
@@ -19,15 +19,23 @@ Verified locally after Max explicitly confirmed the hacking period had started.
   duplicate IDs, inconsistent totals, excluded places, veto warnings, dietary
   restrictions, windows, travel caps, request-local council delivery, and
   missing-secret/non-stub-mode startup failures.
-- No real solver, inference, external model/data calls, live council, or
-  SpacetimeDB integration was tested or implemented. Their behavior is not
-  implied by these fixture checks. During PR preparation, installed the pinned
+- No real solver, inference, external model/data calls, or live council was
+  implemented. Their behavior is not implied by these fixture checks. Installed the pinned
   requirements into the isolated `api/.venv` using cached package wheels and
-  reran all 15 tests successfully. A new-machine download was not exercised.
+  ran the API tests successfully. A new-machine download was not exercised.
 
-Source-level integration review against Eric's `2a98c18` found no overlapping
-API edits. Known runtime handoff blockers are recorded in `api/README.md`;
-SpacetimeDB was not launched or tested as part of this API-only verification.
+The integration follow-up resolves the five caller/API gaps documented in
+`api/README.md`. `npm run typecheck --prefix server` passes. Server tests use
+the official SpacetimeDB 2.13.0 native in-memory datastore via Vitest. The local
+HTTP runner checks four members, four swipes each, preview confidence, automatic
+planning, empty offers, roulette, and nine council messages through real module
+procedures calling a temporary FastAPI server. It also verifies current caps
+after delayed HTTP, private offer acceptance, duplicate transcript replay, and
+frontend lookup of all synthetic/real IDs.
+
+No SpacetimeDB host was published, no live backend was modified, and browser
+subscriptions, network deployment configuration, and persistence across host
+restarts are not covered by the in-memory procedure checks.
 
 Reproduce with the exact setup/run/check commands in `api/README.md`. The tests
 generate fresh credentials at runtime and do not store or print them.

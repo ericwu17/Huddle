@@ -24,6 +24,6 @@ Every library, API, and AI tool used. Cal Hacks requires this.
 | Library | Part |
 | --- | --- |
 | spacetimedb (server module + client SDK) | B, A |
-| Next.js, React, Tailwind CSS, shadcn/ui, framer-motion, qrcode.react, Mapbox GL JS | A |
+| Vite, React, React Router, Tailwind CSS, qrcode.react, Mapbox GL JS, oxlint | A |
 | FastAPI, uvicorn, pydantic, numpy, anthropic, httpx | C |
 | Pipecat, Silero VAD | D |

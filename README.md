@@ -8,10 +8,10 @@ Cal Hacks 13.0. Full README (architecture, how to run) lands at H26.
 
 | Path | Owner | What |
 | --- | --- | --- |
-| `web/` | Haydn | Next.js app |
+| `web/` | Haydn | Vite + React app (see [web/README.md](web/README.md)) |
 | `server/` | Eric Chen | SpacetimeDB module (Haydn owns `src/geo.ts` and `src/replan.ts`) |
-| `web/components/council/` | Eric Chen | Council panel |
-| `web/components/call/` | Eric Wu | Call screen |
+| `web/src/components/council/` | Eric Chen | Council panel |
+| `web/src/components/call/` | Eric Wu | Call screen |
 | `api/` | Max | FastAPI solver + council |
 | `voice/` | Eric Wu | Pipecat / Twilio voice service |
 | `data/` | Eric Chen, Haydn (`reviews/`) | Place data, fakes, caches |

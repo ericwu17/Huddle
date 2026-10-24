@@ -7,7 +7,8 @@ import schema, * as exports from "../src/index";
 import { callApi } from "../src/lib/api";
 import { planFitsBudgets, preserveBudget } from "../src/lib/budgets";
 import { fakeApi } from "../src/lib/fakes";
-import { PLACES, placeById } from "../src/lib/places";
+import { PLACES, LIVE_PLACES, placeById, placesForMode } from "../src/lib/places";
+import { PLACE_BY_ID } from "../../web/src/places";
 import { insertCouncilMessage } from "../src/council";
 import { planMembers, startRun } from "../src/plans";
 import requestFixture from "../../api/fixtures/plan.request.json";
@@ -71,6 +72,16 @@ function session(env: Record<string, string | undefined> = {}, responder?: any) 
 }
 
 describe("cumulative budget rules", () => {
+  it("uses one active stub catalog while retaining real and frontend lookups", () => {
+    expect(placesForMode()).toBe(PLACES);
+    expect(placesForMode("true")).toBe(PLACES);
+    expect(placesForMode("false")).toBe(LIVE_PLACES);
+    expect(LIVE_PLACES).toHaveLength(45);
+    for (const place of [...PLACES, ...LIVE_PLACES]) {
+      expect(PLACE_BY_ID.get(place.id)?.name).toBe(place.name);
+      expect(placeById(place.id)?.costPerPerson).toBe(place.costPerPerson);
+    }
+  });
   it("compares sums against every cap, including zero, null, decimal costs and inconsistent totals", () => {
     const plan = (costs: number[], total = costs.reduce((a, b) => a + b, 0)) => ({ costPerPerson: total, stops: costs.map((costPerPerson) => ({ costPerPerson })) });
     expect(planFitsBudgets(plan([20, 15]), [{ hard: { budgetMaxPerPerson: 30 } }])).toBe(false);

@@ -33,7 +33,7 @@ A brief cannot make four AI sessions run perfectly. You still steer, run the smo
 2. **Never run git commit, git push, git init, gh, or create or modify any GitHub repo, PR, issue, or remote.** The human does all commits and pushes by hand. When your work reaches a good state, say "ready to commit" and list the files.
 3. **Never publish or deploy anything** (no Vercel/Vultr deploys, no public pages, no sharing links) unless the human explicitly asks in that message. Local runs and tunnels the human asks for are fine.
 4. **Stay inside your own folder** (see S3). Never edit another person's folder. If you need a change to the contract (S5) or another part, stop and tell the human exactly what to post in the team channel. Do not silently change shared shapes.
-5. **Secrets:** never write a key, token, or phone number into a tracked file. Keys live in `.env` (gitignored) or the Convex dashboard. Create and maintain `.env.example` with names only. Never print a full key.
+5. **Secrets:** never write a key, token, or phone number into a tracked file. Keys live in `.env` (gitignored) or are set at `spacetime publish` time. Create and maintain `.env.example` with names only. Never print a full key.
 6. **Stubs first.** Within the first 2 hours of the event, every endpoint or function in your part must exist and return fake but contract-shaped data. The team wires everything together on fake data before anyone implements for real. Swap one stub for the real thing at a time, then re-test the whole flow.
 7. **Keep dependencies minimal.** Prefer what is already in the stack (S4). Ask before adding a new service, API, or large library.
 8. **Timebox.** If you are stuck on one problem for more than 45 minutes, stop and propose: (a) cut it, (b) swap for something simpler, or (c) fake it with disclosure, and add it to the honesty list (S6).
@@ -78,7 +78,7 @@ A brief cannot make four AI sessions run perfectly. You still steer, run the smo
 
 - **Name:** Huddle.
 - **Area:** Berkeley only for v1, about 45 places: 20 meals, 15 activities, 10 desserts. Optional "area packs" (more of the Bay Area, chosen from members' origins, prefiltered to about 25 places per category) only after the H19 gate is green and only by people who are otherwise idle.
-- **Realtime and state:** Convex. **Solver and council:** Python FastAPI. **Voice:** Pipecat + Twilio + Cartesia, separate Python service.
+- **Realtime and state:** SpacetimeDB (TypeScript module in `server/`). **Solver and council:** Python FastAPI. **Voice:** Pipecat + Twilio + Cartesia, separate Python service.
 - **Scraping:** Bright Data (Google Maps reviews scraper and datasets) behind one adapter interface (`data/reviews/source_*.py`). Google Places API (New) for coordinates, price level, hours, and phone numbers. Yelp and Apify are not used; Apify is only an optional second source behind the same adapter.
 - **Council:** four advocate agents and one chair agent, built as plain model calls (one orchestrator, a shared transcript, two rounds). Each role is a plain function behind one `llm_call` adapter so the model or transport can be swapped in about an hour. Advocates use `CLAUDE_MODEL_FAST`, the chair uses `CLAUDE_MODEL_SMART`. The validator, the acceptable set, and the Safe fallback live in our own code; no agent can override them. A Fetch.ai wrapper is built only if the booth confirms a real prize for 13.0, decided at the H19 gate.
 - **Voice language:** the agent speaks Mandarin and understands Cantonese. No Spanish.
@@ -100,12 +100,13 @@ huddle/
     DISCLOSURE.md           (B)
     BRIGHTDATA.md           (A)  how we call Bright Data (product, endpoint, params, latency)
     experiments/            (B)  simulation scripts, charts, numbers
-  web/                      (A)  Next.js app (App Router, TypeScript)
-    convex/                 (B)  Convex schema + functions (inside web/ so Convex finds it)
-      geo/                  (A)  Mapbox actions: routeGeometry, legTimes, isochrone
-      replan.ts             (A)  the re-plan action (S5.5)
-    components/council/     (B)  council panel UI
-    components/call/        (D)  live call screen UI
+  server/                   (B)  SpacetimeDB module: tables, views, reducers, procedures, HTTP routes
+    src/geo.ts              (A)  Mapbox procedures: routeGeometry, legTimes, isochrone
+    src/replan.ts           (A)  the re-plan job (S5.5)
+  web/                      (A)  Vite + React app (TypeScript)
+    src/module_bindings/    (generated from server/ by `npm run generate`; never edit by hand)
+    src/components/council/ (B)  council panel UI
+    src/components/call/    (D)  live call screen UI
   data/
     fetch_places.py, places.base.json, places.fake.json,
     demo_group.json, cached_run.json, scout_cache.json   (B)
@@ -118,17 +119,17 @@ huddle/
 
 **Ownership is strict:**
 
-- **A** = `web/` except `web/convex/`, `web/components/council/`, `web/components/call/`; plus `web/convex/geo/`, `web/convex/replan.ts`, `data/reviews/`, `data/places.json` (after v1), `scripts/`, `docs/BRIGHTDATA.md`.
-- **B** = the rest of `web/convex/`, `web/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and the `data/` files listed under B.
+- **A** = `web/` except `web/src/components/council/`, `web/src/components/call/`; plus `server/src/geo.ts`, `server/src/replan.ts`, `data/reviews/`, `data/places.json` (after v1), `scripts/`, `docs/BRIGHTDATA.md`.
+- **B** = `server/` (except `geo.ts` and `replan.ts`), `web/src/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and the `data/` files listed under B.
 - **C** = `api/`.
-- **D** = `voice/` and `web/components/call/`.
+- **D** = `voice/` and `web/src/components/call/`.
 
 Cross-folder needs go through the human.
 
 ## S4. Stack and environment
 
-- **Web (A, B, D):** Next.js (App Router, TypeScript), Tailwind CSS, shadcn/ui, framer-motion (drag gestures), qrcode.react, Mapbox GL JS. Realtime via the convex/react hooks.
-- **Convex (B, plus A's geo/ and replan.ts):** tables, queries, mutations, actions, HTTP actions. Server secrets set with `npx convex env set`.
+- **Web (A, B, D):** Vite, React 19, React Router 7 (data mode, `createBrowserRouter`), TypeScript, Tailwind CSS 4, qrcode.react, Mapbox GL JS, oxlint. Env names keep the `NEXT_PUBLIC_` prefix (`vite.config.ts` accepts it). Realtime via the `spacetimedb/react` hooks (`useTable`, `useReducer`, `useProcedure`) on bindings generated from `server/`.
+- **SpacetimeDB (B, plus A's geo.ts and replan.ts):** a `spacetimedb` 2.13.0 TypeScript module: tables, views, reducers, procedures (outbound HTTP), schedule tables, HTTP routes. Server secrets are env keys the module declares, set at `spacetime publish` time.
 - **API (C):** Python 3.11+, FastAPI, uvicorn, pydantic v2, numpy, the anthropic SDK, httpx.
 - **Data:** Python scripts. Bright Data for reviews (A). Google Places API (New) for place basics (B). Claude for review aspect extraction (A).
 - **Voice (D):** Python, FastAPI, Pipecat (extras for Twilio, Silero VAD, speech-to-text, Cartesia, Anthropic; check the Pipecat docs for exact names), Twilio Programmable Voice with Media Streams. Speech-to-text: test Cartesia Ink-Whisper (supports zh and yue) against Deepgram Nova-3 (Mandarin and zh-HK Cantonese) and keep whichever is more accurate; set one language per call. Text-to-speech: Cartesia Sonic with a Mandarin voice (Cantonese speech is not listed, so the agent answers in Mandarin). Verify all of this against current docs.
@@ -137,8 +138,9 @@ Cross-folder needs go through the human.
 **Environment variable names** (values never go in files):
 
 ```
-HUDDLE_SHARED_SECRET        shared by Convex, api, voice (header X-Huddle-Secret)
-NEXT_PUBLIC_CONVEX_URL      CONVEX_DEPLOYMENT      CONVEX_SITE_URL (http actions base; api and voice also read it)
+HUDDLE_SHARED_SECRET        shared by the SpacetimeDB module, api, voice (header X-Huddle-Secret)
+SPACETIMEDB_URI             SPACETIMEDB_DB         (api and voice POST to {SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route/...)
+NEXT_PUBLIC_SPACETIMEDB_URI NEXT_PUBLIC_SPACETIMEDB_DB
 NEXT_PUBLIC_MAPBOX_TOKEN    MAPBOX_TOKEN (server)
 FASTAPI_BASE_URL            VOICE_BASE_URL         PLACES_PATH
 ANTHROPIC_API_KEY           CLAUDE_MODEL_FAST      CLAUDE_MODEL_SMART
@@ -261,7 +263,7 @@ Any field may be null or empty. Veto cap: at most 2 total entries across vetoCui
 
 `kind` is safe, bold, or budget. `ratioMean` is a member's plan utility divided by their own best achievable (so 1.0 is their ideal, 0 their worst).
 
-### S5.3 FastAPI endpoints (owner C; callers: Convex actions)
+### S5.3 FastAPI endpoints (owner C; callers: SpacetimeDB jobs in `server/`)
 
 Every request carries header `X-Huddle-Secret`. All endpoints are stateless: callers pass posteriors in. All return JSON. With `STUB_MODE=true`, each returns contract-shaped fake data.
 
@@ -338,7 +340,7 @@ Every request carries header `X-Huddle-Secret`. All endpoints are stateless: cal
 {"plans": [{"id": "plan_a1", "robustness": 0.93}], "seed": 7} -> {"planId": "plan_b2", "weights": {"plan_a1": 0.5}}
 ```
 
-**POST /council** (called by the Convex action runCouncil after runPlan; this is where the agents live)
+**POST /council** (called by the council job after the scout job; this is where the agents live)
 
 ```jsonc
 // request
@@ -365,10 +367,10 @@ Every request carries header `X-Huddle-Secret`. All endpoints are stateless: cal
 4. **Validator (our code):** every number in a message must match a value in that speaker's tool outputs or the public facts (small tolerance); the chosen plan must be in the acceptable set; no message may contain a member's name unless `showWho` is true. An invalid advocate message is dropped and logged. An invalid chair message, a pick outside the set, or a chair timeout sets `fallbackUsed: true` and `chosenPlanId` = the Safe plan.
 5. **No user free text enters any council prompt.** Only structured values (tool outputs, plan facts, enums).
 6. **Labels:** when `showWho` is false (default), advocates are "Advocate A/B/C/D", shuffled by the seed each run, and names are stripped from text.
-7. **Streaming:** each message is POSTed to Convex `POST /councilMessage` as soon as it passes validation.
+7. **Streaming:** each message is POSTed to `POST {SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route/council-message` (header `X-Huddle-Secret`) as soon as it passes validation.
 8. **Latency:** target 10 s total; hard 8 s timeout per call. A timed-out advocate is skipped for that round.
 
-**CouncilMessage** (what Convex stores and the UI shows):
+**CouncilMessage** (what SpacetimeDB stores and the UI shows):
 
 ```json
 {"runId": "run_1", "round": 1, "speaker": "advocate", "label": "Advocate B", "memberId": "m2",
@@ -380,7 +382,7 @@ Every request carries header `X-Huddle-Secret`. All endpoints are stateless: cal
 
 ### S5.4 Voice endpoints (owner D)
 
-**POST /book** (called by a Convex action)
+**POST /book** (called by the call job in `server/`)
 
 ```jsonc
 // request
@@ -393,7 +395,7 @@ Every request carries header `X-Huddle-Secret`. All endpoints are stateless: cal
 
 In demo mode the service dials `DEMO_RESTAURANT_PHONE` only and refuses any other number unless `ALLOW_REAL_CALLS=true`. Twilio-facing routes: `POST /twiml/{bookingId}`, `WS /ws/{bookingId}`, `POST /status`.
 
-**Call events** (voice posts to Convex `POST {CONVEX_SITE_URL}/callEvent`, header `X-Huddle-Secret`):
+**Call events** (voice posts to `POST {SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route/call-event`, header `X-Huddle-Secret`):
 
 ```json
 {"bookingId": "b1", "type": "dialing", "text": null, "slot": null, "ts": 1761350000000}
@@ -401,54 +403,59 @@ In demo mode the service dials `DEMO_RESTAURANT_PHONE` only and refuses any othe
 
 `type` is one of: `dialing`, `connected`, `transcript` (with `text`, `speaker` of agent or restaurant, and optional `textEn` English translation and `lang`), `slot_offered` (with `slot` like "19:45"), `confirmed` (with `slot`), `failed` (with `reason` one of full, closed, no_answer, refused, error, and optional `text`), `ended`.
 
-### S5.5 Convex data and functions (owner B; A owns geo/ and replan.ts; consumed by A, B, D)
+### S5.5 SpacetimeDB module (owner B; A owns `server/src/geo.ts` and `server/src/replan.ts`; consumed by A, B, C, D)
 
-**Tables:** groups, members, privatePrefs, swipes, planRuns, offers, votes, bookings, callEvents, councilMessages, scoutChecks, geoCache. `groups` also holds `excludedPlaceIds: string[]` and `replanFor?: bookingId`.
+Module: `server/` (TypeScript, `spacetimedb` 2.13.0). Database name `huddle-dev` locally. Clients see **snake_case** names (a function exported as `submitSwipe` is called as `submit_swipe`; columns too).
 
-**Public queries** (any member of the group):
+**Identity replaces memberId + secret.** Each phone connects with its own SpacetimeDB Identity; the SDK keeps the token in local storage. Every reducer acts on the caller's own membership, so no call takes a `memberId` or `secret`. A phone's "current group" is the group it most recently joined, else the one it most recently created.
 
-- `groupState({groupId}) -> {status, code, date, window, demoMode, showWhoCompromised, members: [{id, name, ready, swipeCount}], confidence, latestRunId, replanFor}`. Never returns private prefs.
-- `planRun({runId})` -> latest results. `perMember` and `gaveUp` are removed unless `showWhoCompromised` is true.
-- `votes({runId})`, `callEvents({bookingId})`, `booking({groupId})`.
-- `councilMessages({runId})` -> messages in order. `memberId` is removed unless `showWhoCompromised` is true.
-- `scout({runId}) -> [{placeId, openNow, vegetarianOptions, checkedAt, source, cached}]`.
+**Tables** (all private): group, member, private_prefs, swipe, plan_run, offer, vote, booking, call_event, council_message, scout_check, geo_cache, plus one schedule table per background job (`*_job`). Contract objects owned by the api (hard, posterior, plan results, council result) are stored as JSON strings in `*Json` columns; parse them on the client.
 
-**Private queries** (require memberId + secret):
+**Views** (public, subscribable, each scoped to the caller's own group). Privacy rules are enforced here:
 
-- `myPrivate({memberId, secret}) -> {text, hard, posteriorSummary, nextPair, offers: [...]}`. Only the owner ever reads this.
+- `my_group` -> `{id, code, status, date, window_start, window_end, demo_mode, show_who_compromised, confidence?, latest_run_id?, replan_for?, is_host, my_member_id?}`
+- `my_members` -> `[{id, name, ready, swipe_count}]`. Never private prefs.
+- `my_private` -> the caller's own `{member_id, text, hard_json?, warnings_json, posterior_summary_json?, next_pair_a?, next_pair_b?, next_pair_category?, swipe_count}`. Only the owner ever sees this row.
+- `my_offers` -> open offers addressed to the caller on the latest run. Never says who benefits.
+- `my_plan_runs` -> `[{run_id, status, result_json?, council_json?, roulette_json?, error?, stub, created_at}]`. `result_json` has `perMember`, `gaveUp` and `posteriorSummary` removed unless `show_who_compromised`.
+- `my_council_messages` -> CouncilMessage rows (S5.3) in insert order; `member_id` removed unless `show_who_compromised`.
+- `my_scout`, `my_votes`, `my_bookings`, `my_call_events`.
 
-**Mutations:**
+**Procedures callable by phones** (they return values):
 
-- `createGroup({name?}) -> {groupId, code}`
-- `joinGroup({code, name}) -> {memberId, secret}`
-- `submitPrefs({memberId, secret, text})`
-- `submitSwipe({memberId, secret, winnerPlaceId, loserPlaceId})`
-- `setOrigin({memberId, secret, lat, lng})`
-- `setReady({memberId, secret})`
-- `vote({runId, memberId, secret, planId})` (one vote per member per run; re-voting overwrites; any of the three plans)
-- `acceptOffer({offerId, memberId, secret})`; `declineOffer(...)`
-- `startBooking({groupId, runId, planId, stopIndex})`
-- `setDemoMode({groupId, on})`
-- `setShowWhoCompromised({groupId, on})`
-- STRETCH: `answerSlot({bookingId, memberId, secret, accept})`
+- `create_group(name: Option<String>) -> {groupId, code}`. The creator is the host; they still `join_group` to take part.
+- `join_group(code, name) -> {memberId, groupId}`
+- `do_roulette(run_id) -> {planId}`
 
-**Actions** (server side): parsePrefs, nextPair, previewConfidence (debounced 1.5 s after each swipe), runPlan (idempotent by runId; passes `groups.excludedPlaceIds` as `excludePlaceIds`), runOffers, runScout, runCouncil, doRoulette, placeCall, replan (A), routeGeometry (A), legTimes (A), isochrone (A, optional).
+**Reducers callable by phones:** `set_ready()`, `set_origin(lat, lng)`, `submit_prefs(text)`, `submit_swipe(winner_place_id, loser_place_id)`, `vote(run_id, plan_id)` (one per member per run, re-voting overwrites), `accept_offer(offer_id)`, `decline_offer(offer_id)`, `start_booking(run_id, plan_id, stop_index)`, `set_demo_mode(on)`, `set_show_who_compromised(on)`. STRETCH: `answer_slot(booking_id, accept)`.
 
-**HTTP actions** (header `X-Huddle-Secret` required): `POST /callEvent` (from voice), `POST /councilMessage` (from api). STRETCH: `GET /slotDecision?bookingId=... -> {"decision": "pending"|"accept"|"decline"}`.
+Status flow: `lobby` -> `eliciting` (2+ members, all ready) -> `planned` (stopping rule: confidence >= 0.9 and everyone has >= 4 swipes, or everyone hit 12) -> `voting` -> `booked`.
+
+**Private jobs** (scheduled procedures; the host marks them private so phones cannot call them): parse, swipe (calls /elicit/update then /elicit/next), preview (debounced 1.5 s; /plan with `preview: true`), plan, offers, scout, council, voting cap, call, fake-event replay. Each calls the api with `X-Huddle-Secret`. With `FASTAPI_BASE_URL` / `VOICE_BASE_URL` unset, the module uses canned fakes (`server/src/lib/fakes.ts`).
+
+**HTTP routes** (header `X-Huddle-Secret` required; SpacetimeDB does not authenticate routes, so the module does). Base `{SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route`:
+
+- `GET /health -> {"ok": true, "stub": bool, "placesLoaded": n}`
+- `POST /call-event` (from voice), body = call event (S5.4)
+- `POST /council-message` (from api), body = CouncilMessage (S5.3)
+
+Paths are lowercase (SpacetimeDB requires it). 401 on a bad secret, 400 on a bad body.
 
 **Pipeline after enough swipes** (B owns the wiring):
 
-1. runPlan finishes -> in parallel: runOffers and runScout (scout has a 20 s timeout, then falls back to `data/scout_cache.json`).
-2. When scout is done or timed out -> runCouncil (skipped if `COUNCIL_ENABLED` is false or the api is unreachable). The UI shows the plans immediately and the council messages as they arrive.
-3. When the council finishes or a 12 s cap passes, set `groups.status = 'voting'`. The vote never waits on the council.
+1. The plan job finishes, then the offers job and the scout job run in parallel (scout falls back to `data/scout_cache.json` and marks rows `cached`).
+2. Scout schedules the council job (skipped if `COUNCIL_ENABLED=false`). The UI shows plans immediately and council messages as they arrive. If the council fails, the Safe plan is used with `fallbackUsed: true`.
+3. When the council finishes or 12 s pass (voting-cap job), `status = 'voting'`. The vote never waits on the council.
 
-**Re-plan loop** (`replan({groupId, bookingId})`, written by A, scheduled by B's /callEvent handler):
+**Re-plan loop:**
 
-1. B's /callEvent handler stores every event. On `failed` with reason `full` or `closed`, it schedules replan.
-2. replan adds that booking's placeId to `groups.excludedPlaceIds`, runs runPlan with a new runId, then runScout and runCouncil, and sets `groups.replanFor = bookingId`.
-3. The UI shows "That place is full. New plan ready" with a one-tap "Call again" (startBooking). Never auto-call. Other reason values (no_answer, refused, error) do not replan; the UI shows the failure and offers to retry.
+1. The `/call-event` route stores every event. On `failed` with reason `full` or `closed`, it inserts a row into `replan_job {groupId, bookingId}`.
+2. A's `server/src/replan.ts` defines `spacetimedb.procedure({ onSchedule: replan_job }, ...)` (or a reducer). It adds the booking's placeId to `group.excludedPlaceIds`, calls `startRun(tx, groupId)` from `plans.ts` (which runs plan, offers, scout and council on its own), and sets `group.replanFor = bookingId`. A also exports it from `server/src/index.ts` (tell B).
+3. The UI shows "That place is full. New plan ready" with a one-tap "Call again" (`start_booking`, which clears `replan_for`). Never auto-call. Other reasons (no_answer, refused, error) do not replan.
 
-**Auth model** (hackathon grade, state this honestly): joinGroup mints a random secret stored in the browser's local storage. Private reads and writes compare the secret server-side. This is not production security.
+**Env (set at publish; shell values for declared keys are picked up automatically):** `HUDDLE_SHARED_SECRET`, `FASTAPI_BASE_URL`, `VOICE_BASE_URL`, `COUNCIL_ENABLED`, `AGENT_LANGUAGE`, `STUB_SCENARIO` (fake call: `confirm` or `full`). Update without rebuilding: `spacetime publish huddle-dev --env-only`.
+
+**Auth model** (hackathon grade, state this honestly): each phone's SpacetimeDB identity token sits in the browser's local storage; whoever has the token is that member. Service-to-module calls use the shared `X-Huddle-Secret`. This is not production security.
 
 ## S6. Demo mode, fallbacks, and the honesty list
 
@@ -474,7 +481,7 @@ The UI pings /health and switches to demo mode automatically.
 
 Hours are from the real hacking start. H0 is assumed to be Fri 9:00 PM; shift if different.
 
-- **H2:** every endpoint/function (including /council, runCouncil, /councilMessage, voice /book) exists as a stub returning contract-shaped fakes; `scripts/smoke.mjs` passes on fakes end to end.
+- **H2:** every endpoint/function (including /council, the council job, /council-message, voice /book) exists as a stub returning contract-shaped fakes; `scripts/smoke.mjs` passes on fakes end to end.
 - **H13 (L1 "works"):** four phones join from a QR code, free text parses, a plan appears on the map with cost and timing, voting works (a bare-bones UI is fine). The stubs-to-real flip (`FASTAPI_BASE_URL`, `STUB_MODE=false`) is done and the smoke test still passes.
 - **H19 (L2 "smart"):** swipe loop with confidence, three named plans with robustness %, places.json v2 with review scores, Mapbox leg times, one evaluation chart in progress. Go/no-go decisions at this gate: council, Fetch.ai wrapper, live voice vs recording.
 - **H24 (L3 "impressive") then FEATURE FREEZE:** trade offers, scout badge, council streaming, polished ring/cards/Consensus Map, voice scenarios S1-S3 passing (or fallback chosen), re-plan loop works once, demo click path written down.
@@ -484,7 +491,7 @@ Hours are from the real hacking start. H0 is assumed to be Fri 9:00 PM; shift if
 
 # PART A: DATA / ROUTING / GLUE + CORE SCREENS (Haydn; paste S + this)
 
-You are the integrator. You own: `web/` UI except `web/convex/`, `web/components/council/` and `web/components/call/`; plus `web/convex/geo/`, `web/convex/replan.ts`, `data/reviews/`, `data/places.json` (after B writes v1), `scripts/`, and `docs/BRIGHTDATA.md`. You make the parts fit together and catch drift early. The frontend is deliberately not your whole job: a bare-bones UI goes up first, and polished screens come later.
+You are the integrator. You own: `web/` UI except `web/src/components/council/` and `web/src/components/call/`; plus `server/src/geo.ts`, `server/src/replan.ts`, `data/reviews/`, `data/places.json` (after B writes v1), `scripts/`, and `docs/BRIGHTDATA.md`. You make the parts fit together and catch drift early. The frontend is deliberately not your whole job: a bare-bones UI goes up first, and polished screens come later.
 
 ## A1. Your jobs, in order
 
@@ -497,20 +504,20 @@ You are the integrator. You own: `web/` UI except `web/convex/`, `web/components
 
 ## A2. Smoke test (scripts/smoke.mjs)
 
-A Node script against the live Convex deployment (use the Convex HTTP client; check current docs). Steps, printing PASS or FAIL for each:
+A Node script against the live SpacetimeDB database (use the generated TypeScript bindings; one connection per simulated phone, since each identity is one member). Steps, printing PASS or FAIL for each:
 
-1. createGroup, then joinGroup four times (use `data/demo_group.json`).
-2. submitPrefs for each, then submitSwipe until the group is ready (stub or real).
-3. runPlan finished: three plans, contract-shaped.
-4. councilMessages present for the run (stub or real); scout present.
-5. vote four times; startBooking in stub mode; callEvents ends in `confirmed`.
+1. create_group, then join_group four times (use `data/demo_group.json`).
+2. set_ready and submit_prefs for each, then submit_swipe until the group is planned (stub or real).
+3. The plan run finished: three plans, contract-shaped.
+4. Council messages present for the run (stub or real); scout present.
+5. vote four times; start_booking in stub mode; the call events end in `confirmed`.
 6. Re-plan check: trigger a `failed` event with `reason: "full"` (stub scenario) and confirm a new run excluding that place appears.
 
 Run it at H2, H8, H13, then every 2 hours. When it fails, work out which part drifted and tell the human exactly what to post to whom. Do not fix other people's folders.
 
 ## A3. Bare-bones UI (H2-5): what to build
 
-Six screens, default shadcn styling, no custom design tokens, no animation, 390px width, light mode. Ugly is fine; working is mandatory.
+Six screens, plain Tailwind with the shared `.btn` / `.input` / `.card` classes in `web/src/index.css`, no custom design tokens, no animation, 390px width, light mode. Ugly is fine; working is mandatory.
 
 1. **Home and join:** "Start a huddle" (createGroup), "Join with code", the QR code of `{origin}/join/{code}` (qrcode.react), the big 4-letter code.
 2. **Lobby:** member chips, ready state, host-only "Everyone's in".
@@ -519,7 +526,7 @@ Six screens, default shadcn styling, no custom design tokens, no animation, 390p
 5. **Plans:** three plan cards (name, robustness %, cost, stops) and a Mapbox map with markers (no route line yet).
 6. **Vote:** a button per plan, live counts (vote).
 
-Start with static fake JSON (`data/places.fake.json`, copied by the human), then real Convex hooks. At H5 whatever works ships. Everything else waits for polish. Never show another member's private data. Respect `showWhoCompromised`.
+Start with static fake JSON (`data/places.fake.json`, copied by the human), then the real SpacetimeDB views. At H5 whatever works ships. Everything else waits for polish. Never show another member's private data. Respect `showWhoCompromised`.
 
 ## A4. Review pipeline (data/reviews/) (H9-15)
 
@@ -552,12 +559,12 @@ The three pipeline steps below follow the original design (extraction with evide
 
 Deliver places.json v2 to C by H15 and tell C and the human. If extraction is inconsistent at H18, fall back to aggregate ratings with coarse aspect scores.
 
-## A5. Mapbox and re-plan (web/convex/geo/, web/convex/replan.ts) (H15-19)
+## A5. Mapbox and re-plan (server/src/geo.ts, server/src/replan.ts) (H15-19)
 
 - **routeGeometry({planId}):** Mapbox Directions, walking profile, one route per leg; cache every response in geoCache. Display only.
 - **legTimes({planId}):** Mapbox durations per leg. The UI warns if any leg is more than 10 minutes longer than the solver's estimate. Warning only; it does not feed the solver.
 - **isochrone:** optional; first to cut.
-- **replan({groupId, bookingId}):** implement exactly as in S5.5 (add the failed place to excludedPlaceIds, new runPlan, then runScout and runCouncil, set replanFor). B schedules it from /callEvent; until yours exists, B's call is a no-op, so tell B when it is live.
+- **replan job:** implement exactly as in S5.5 (on `replan_job`: add the failed place to excludedPlaceIds, `startRun` for a new run, set replanFor). B's `/call-event` route inserts the job rows; until yours exists nothing runs them, so tell B when it is live.
 
 ## A6. Polished screens, pass 1 (H19-24)
 
@@ -565,7 +572,7 @@ Now fix design tokens once: one accent color, one font, 16px corner radius, 8px 
 
 1. **Confidence ring** wired to `groupState.confidence`.
 2. **Plan cards:** Safe / Bold / Budget, robustness % ("93% sure nobody's unhappy"), per-person cost, timeline, the Mapbox route line, and the scout badge from `scout({runId})` ("Open now, vegetarian options, checked 2 min ago", or "Checked earlier").
-3. **Vote screen:** the three plans, with the council's pick marked "Recommended by the council" plus its rationale (read from councilMessages; hide the badge if fallbackUsed). Roulette ("Can't decide? Spin") calls doRoulette and animates a wheel.
+3. **Vote screen:** the three plans, with the council's pick marked "Recommended by the council" plus its rationale (read from the run's council result; hide the badge if fallbackUsed). Roulette ("Can't decide? Spin") calls doRoulette and animates a wheel.
 4. **Consensus Map:** SVG scatter, x = meanRatio, y = minRatio, one dot per pareto entry, chosen plan highlighted. A fairness dial w in [0,1]; the highlighted plan maximizes `w * minRatio + (1 - w) * meanRatio` among the pareto points, all computed client-side. Tapping a dot shows its plan card.
 5. **Offers inbox (private):** trade offers only to the member they are addressed to, with accept and decline.
 6. **Re-plan banner:** when `groupState.replanFor` is set, show "That place is full. New plan ready" and a one-tap "Call again".
@@ -581,7 +588,7 @@ Also: loading skeletons, error toasts, the "Demo mode: cached data" banner, and 
 | P1 | H2-5 | Bare-bones UI (A3). Hard stop at H5. |
 | Sleep | H5-9 | Leave a hand-off note: what is done, half-done, and where files are. |
 | P2 | H9-13 | Read B's hand-off note (B is away until about H15). Bright Data spike, then the batch pull and extraction. Write `docs/BRIGHTDATA.md`. |
-| L1 gate | H13 | Do the stubs-to-real flip with the human (`FASTAPI_BASE_URL`, `STUB_MODE=false`); run the smoke test; switch the UI to live Convex hooks everywhere. |
+| L1 gate | H13 | Do the stubs-to-real flip with the human (`FASTAPI_BASE_URL`, `STUB_MODE=false`); run the smoke test; switch the UI to the live SpacetimeDB views everywhere. |
 | P3 | H13-15 | Finish aggregation, build places.json v2, deliver to C. Cover anything B left half-done. |
 | P4 | H15-19 (L2 gate) | routeGeometry, legTimes, replan; run the smoke test every 2 hours. |
 | P5 | H19-24 (L3 gate) | Polished screens (A6). Freeze at H24. |
@@ -599,13 +606,13 @@ Also: loading skeletons, error toasts, the "Demo mode: cached data" banner, and 
 
 ---
 
-# PART B: CONVEX + COUNCIL PANEL + SUBMISSION (Eric Chen; paste S + this)
+# PART B: SPACETIMEDB + COUNCIL PANEL + SUBMISSION (Eric Chen; paste S + this)
 
-You own the rest of `web/convex/` (everything except `geo/` and `replan.ts`), `web/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and these `data/` files: `fetch_places.py`, `places.base.json`, `places.fake.json`, `demo_group.json`, `cached_run.json`, `scout_cache.json`. You make four phones agree on one reality and make everything survive bad Wi-Fi. You are away or asleep from about H9 to H15, so everything others depend on lands by H8, with a hand-off note.
+You own `server/` (everything except `src/geo.ts` and `src/replan.ts`), `web/src/components/council/`, `docs/` (except `BRIGHTDATA.md`), root files, and these `data/` files: `fetch_places.py`, `places.base.json`, `places.fake.json`, `demo_group.json`, `cached_run.json`, `scout_cache.json`. You make four phones agree on one reality and make everything survive bad Wi-Fi. You are away or asleep from about H9 to H15, so everything others depend on lands by H8, with a hand-off note.
 
-## B1. Convex (web/convex/)
+## B1. SpacetimeDB (server/)
 
-Implement every table, query, mutation, action, and HTTP action in S5.5, including councilMessages, scoutChecks, runScout, runCouncil, `POST /councilMessage`, and the pipeline and re-plan scheduling described there.
+Implement every table, view, reducer, procedure, job, and HTTP route in S5.5, including council messages, scout checks, the scout and council jobs, `POST /council-message`, and the pipeline and re-plan scheduling described there.
 
 **Schema (fields):**
 
@@ -616,9 +623,9 @@ Implement every table, query, mutation, action, and HTTP action in S5.5, includi
 - **planRuns:** groupId, idempotencyKey, status (running|done|error), result?, error?, createdAt.
 - **offers:** runId, toMemberId, type, amount, unit, planId, text, status (open|accepted|declined). Readable only by toMemberId.
 - **votes:** runId, memberId, planId. Unique on (runId, memberId); re-voting updates.
-- **councilMessages:** the CouncilMessage shape from S5.3. Public reads strip memberId unless showWhoCompromised.
+- **council_message:** the CouncilMessage shape from S5.3. The view strips memberId unless showWhoCompromised.
 - **scoutChecks:** runId, placeId, openNow?, vegetarianOptions?, checkedAt, source, cached.
-- **bookings, callEvents, geoCache** (key = hash of request, value = response).
+- **booking, call_event, geo_cache** (key = hash of request, value = response).
 
 **Flows:**
 
@@ -626,7 +633,7 @@ Implement every table, query, mutation, action, and HTTP action in S5.5, includi
 - **submitSwipe** records the swipe, calls /elicit/update, increments swipeCount, then schedules nextPair and a debounced previewConfidence (calls /plan with `preview: true` and stores `groups.confidence`). Stopping rule: when confidence >= 0.9 and every member has swipeCount >= 4, set status to planned and run the full runPlan. Cap swipes at 12 per member.
 - **runPlan:** idempotent by runId; builds the /plan request from members' hard + posterior (+ origins) and excludePlaceIds; stores the result; then runs the pipeline from S5.5 (offers and scout in parallel, then council).
 - **acceptOffer:** applies the relaxation to that member's hard (budget cap += amount, or maxTravelMinutes += amount), marks the offer accepted, and re-runs runPlan with a new runId.
-- **placeCall:** calls the voice service `POST /book`; the voice service posts back to `POST /callEvent`, which you store in callEvents; on `failed` with reason `full` or `closed`, schedule A's replan.
+- **call job:** calls the voice service `POST /book`; the voice service posts back to `POST /call-event`, which you store in call_event; on `failed` with reason `full` or `closed`, insert a `replan_job` row for A's replan.
 
 A shared helper `callApi(path, body)`: adds `X-Huddle-Secret`, 20 s timeout, one retry for idempotent calls, structured error.
 
@@ -645,9 +652,9 @@ A shared helper `callApi(path, body)`: adds `X-Huddle-Secret`, 20 s timeout, one
 
 For each of the three plans, take the meal stop's place and run a live check through Bright Data. Use A's `docs/BRIGHTDATA.md` for the product, endpoint, and parameters (synchronous call, 20 s timeout). Store `{openNow, vegetarianOptions, checkedAt, source: "brightdata", cached: false}` in scoutChecks. On timeout or error, use `data/scout_cache.json` and set `cached: true`. Report only what the data says; unknown is null. Never guess.
 
-## B4. Council panel (web/components/council/CouncilPanel.tsx) (H19-24)
+## B4. Council panel (web/src/components/council/CouncilPanel.tsx) (H19-24)
 
-Reads `councilMessages({runId})` live. Shows Round 1, Round 2, then the chair, as speech bubbles that appear as they stream in. Labels are "Advocate A-D" (names only if showWhoCompromised). The chair's bubble ends with "Recommended: {plan name}". If the run's result says fallbackUsed, show "Safe plan used (the council check failed)". Never show messages that failed validation (the api never posts them). Match A's design tokens once A defines them at H19.
+Reads the `my_council_messages` view live. Shows Round 1, Round 2, then the chair, as speech bubbles that appear as they stream in. Labels are "Advocate A-D" (names only if showWhoCompromised). The chair's bubble ends with "Recommended: {plan name}". If the run's result says fallbackUsed, show "Safe plan used (the council check failed)". Never show messages that failed validation (the api never posts them). Match A's design tokens once A defines them at H19.
 
 ## B5. Experiments (docs/experiments/) (H19-26)
 
@@ -663,12 +670,12 @@ Priority: B, A, Council. Produce one chart and 2-3 headline numbers for the pitc
 
 | Phase | Hours | Work |
 | --- | --- | --- |
-| P0 | H0-2 | Convex project; draft schema and access rules; write `docs/CONTRACT.md` (copy of S5); create folders and `.gitignore` (include `.env`, `data/raw/`); help the human create the repo by hand (you do not). |
-| P1 | H1-3 | Convex functions stubbed (all of S5.5, returning fakes or simple versions, including council and scout stubs); places.fake.json; callApi; shared public tunnel with C by H3 (the human sets it up; you add the URL to env). |
-| P2 | H3-8 | Real Convex functions against C's stubs; owner-only reads; unique votes; /callEvent and /councilMessage HTTP actions; fetch_places.py and places.json v1 by H8. |
+| P0 | H0-2 | SpacetimeDB module; draft schema and views (access rules); write `docs/CONTRACT.md` (copy of S5); create folders and `.gitignore` (include `.env`, `data/raw/`); help the human create the repo by hand (you do not). |
+| P1 | H1-3 | Module functions stubbed (all of S5.5, returning fakes or simple versions, including council and scout stubs); places.fake.json; callApi; shared public tunnel with C by H3 (the human sets it up; you add the URL to env). |
+| P2 | H3-8 | Real module functions against C's stubs; owner-only views; unique votes; /call-event and /council-message HTTP routes; fetch_places.py and places.json v1 by H8. |
 | Hand-off | H8 | Hand-off note (required): what is done, half-done, where the files are, and the exact steps to flip from stubs to the real solver (`FASTAPI_BASE_URL`, `STUB_MODE=false`). A does the flip at H13. Then sleep. |
 | Away | H9-15 | Nothing critical is owed. |
-| P3 | H15-19 (L2 gate) | Read A's notes; fix drift between Convex and C's real endpoints; runPlan / runOffers / acceptOffer end to end; health pings and demo-mode switching; wire /callEvent to schedule A's replan. |
+| P3 | H15-19 (L2 gate) | Read A's notes; fix drift between the module and C's real endpoints; plan, offers and accept_offer end to end; health pings and demo-mode switching; wire /call-event to schedule A's replan. |
 | P4 | H19-24 (L3 gate) | runScout, runCouncil, council panel; test the re-plan loop with D (a `full` reply). |
 | P5 | H19-26 | Experiments (B5). |
 | P6 | H24-26 | Pre-warm all caches; save cached_run.json and scout_cache.json; seed the demo group. |
@@ -677,9 +684,9 @@ Priority: B, A, Council. Produce one chart and 2-3 headline numbers for the pitc
 
 ## B7. Done-when and cut rules
 
-Four phones stay in sync; private data is never visible to others; the app works in demo mode with Wi-Fi off; places.json validates; councilMessages stream live.
+Four phones stay in sync; private data is never visible to others; the app works in demo mode with Wi-Fi off; places.json validates; council messages stream live.
 
-**Cut first:** experiments, then the live scout check (use the cache), then the council panel (show only the chair's rationale text). If Convex and FastAPI cannot connect by H6, tell the human; the fallback is moving the solver into TypeScript inside Convex.
+**Cut first:** experiments, then the live scout check (use the cache), then the council panel (show only the chair's rationale text). If the module and FastAPI cannot connect by H6, tell the human; the fallback is moving the solver into TypeScript inside the module.
 
 ---
 
@@ -756,7 +763,7 @@ Find the smallest single-person concession that unlocks a clearly better plan.
 - For each member i: consider relaxing only that member's budgetMaxPerPerson by up to +$15 or maxTravelMinutes by up to +15 min. The minimal amount for a candidate plan is computed directly (for budget: plan cost per person - cap; for travel: needed minutes - cap), not by search.
 - Candidate plans: feasible under the relaxation for member i but infeasible originally, and feasible for everyone else.
 - Evaluate each candidate with the same robustness machinery. Keep it as an offer if robustness(candidate) - robustness(baseline Safe) >= 0.05 or minRatio improves by at least 0.05.
-- Return at most 3 offers total and at most 1 per member, each with toMemberId, type, amount, unit, the plan, and the gains. Never output who benefits. (Convex stores each offer privately to toMemberId.)
+- Return at most 3 offers total and at most 1 per member, each with toMemberId, type, amount, unit, the plan, and the gains. Never output who benefits. (The module stores each offer privately to toMemberId.)
 
 ## C9. /roulette
 
@@ -771,7 +778,7 @@ The full contract (request, response, rules, CouncilMessage) is in S5.3. Build i
 - **`advocate(member, round, transcript, tools) -> message`:** runs the model with its tools. System prompt rules: you represent exactly one person; use only numbers your tools return; cite every number; never state a cap, veto, or other private fact; no names; at most 40 words; output JSON only.
 - **`chair(transcript, solver_ranking, scout) -> message`:** picks one of the three plans, at most 60 words, cites numbers. Same rules.
 - **`validate(message, tool_outputs)`:** implements rule 4 of S5.3. Numbers are matched by regex against the allowed set; reject anything else.
-- **`run_council(request)`:** asyncio.gather for each round; post each valid message to Convex `POST {CONVEX_SITE_URL}/councilMessage` with `X-Huddle-Secret`; compute agreesWithSolver (chair's pick equals the highest-robustness plan); fall back to Safe on any chair failure.
+- **`run_council(request)`:** asyncio.gather for each round; post each valid message to `POST {SPACETIMEDB_URI}/v1/database/{SPACETIMEDB_DB}/route/council-message` with `X-Huddle-Secret`; compute agreesWithSolver (chair's pick equals the highest-robustness plan); fall back to Safe on any chair failure.
 
 `STUB_MODE=true` returns a canned transcript of about 9 messages and a chosen plan.
 
@@ -807,7 +814,7 @@ If the posterior is not ready by H18, ship the L1 solver with Monte Carlo over t
 
 # PART D: VOICE + CALL SCREEN (Eric Wu; paste S + this)
 
-You own `voice/` and `web/components/call/`. You build the booking voice agent (Mandarin) and the live call screen, and you help with the demo video and call rehearsal. You are also the Cartesia liaison.
+You own `voice/` and `web/src/components/call/`. You build the booking voice agent (Mandarin) and the live call screen, and you help with the demo video and call rehearsal. You are also the Cartesia liaison.
 
 ## D1. Service (voice/, FastAPI)
 
@@ -815,7 +822,7 @@ You own `voice/` and `web/components/call/`. You build the booking voice agent (
 - **POST /twiml/{bookingId}:** returns TwiML with `<Connect><Stream url="wss://{host}/ws/{bookingId}"/></Connect>`.
 - **WS /ws/{bookingId}:** the Twilio Media Streams WebSocket, running a Pipecat pipeline: Twilio transport -> VAD (Silero) -> STT (`STT_PROVIDER`: Cartesia or Deepgram) -> LLM (Anthropic, `CLAUDE_MODEL_FAST`) with tools -> TTS (Cartesia) -> Twilio.
 - **POST /status:** Twilio call status callbacks.
-- With `STUB_MODE=true`, /book posts a fake timed sequence of events to Convex (dialing, connected, transcript, slot_offered, confirmed) so A can build the UI.
+- With `STUB_MODE=true`, /book posts a fake timed sequence of events to `/call-event` (dialing, connected, transcript, slot_offered, confirmed) so A can build the UI.
 
 Use Pipecat's phone-bot quickstart as the reference for the exact transport/serializer class names and the tunnel setup.
 
@@ -825,7 +832,7 @@ Use Pipecat's phone-bot quickstart as the reference for the exact transport/seri
 - **Finite-state flow:** GREET -> REQUEST (party size, time, name) -> HANDLE_RESPONSE -> CONFIRM -> END.
 - **Tools the LLM may call:** `record_slot`, `propose_alternative_time` (only times inside alternativeWindow), `confirm_booking`, `fail_booking(reason: full|closed|no_answer|refused|error)`, `end_call`.
 - **Guardrails:** never invent facts; never reveal private group data; max about 3 minutes; silence timeout about 8 seconds; hang up politely if asked to stop; stop immediately on "don't call again."
-- **Event posting:** every state change and every transcript line goes to Convex `POST /callEvent` (S5.4) with the shared secret.
+- **Event posting:** every state change and every transcript line goes to `POST /call-event` on the module (S5.4) with the shared secret.
 - **Barge-in:** if the human talks over the agent, cancel TTS immediately.
 - **Latency log:** per turn, end-of-speech to first agent audio, in milliseconds; keep a file for the pitch.
 
@@ -844,9 +851,9 @@ Run each 10 times. **Pass criteria:** connects 10 of 10; confirmation or clean f
 - **Speaking:** the agent always replies in Mandarin. Cartesia does not list Cantonese speech, so do not promise it.
 - **STRETCH** (only if S1-S3 already pass): language lock (choose the speech-to-text language from the first utterance), an English translation line (`textEn` on transcript events), per-turn latency display, a distinct voice per council advocate.
 
-## D5. Call screen UI (web/components/call/) (H19-24)
+## D5. Call screen UI (web/src/components/call/) (H19-24)
 
-Reads `callEvents({bookingId})` live. Show: a live transcript (the original line, plus the English line under it when `textEn` is present), a status stepper (dialing, connected, slot offered, confirmed), a confirmation card (name, time, party size), and a "Call failed: that place is full" state that hands off to A's re-plan banner. If the call falls back, play the labeled recording and label it "Recorded earlier." Use A's design tokens once A defines them at H19.
+Reads the `my_call_events` view live. Show: a live transcript (the original line, plus the English line under it when `textEn` is present), a status stepper (dialing, connected, slot offered, confirmed), a confirmation card (name, time, party size), and a "Call failed: that place is full" state that hands off to A's re-plan banner. If the call falls back, play the labeled recording and label it "Recorded earlier." Use A's design tokens once A defines them at H19.
 
 ## D6. Phases
 
@@ -878,7 +885,7 @@ Reads `callEvents({bookingId})` live. Show: a live transcript (the original line
 
 - **Everyone:** charge laptops, pack chargers, a phone hotspot, and layers. Eat before kickoff. Nap if you can.
 - **Haydn (A):** Mapbox token and a Bright Data account. Read the council-and-math file. Booth: Meta.
-- **Eric Chen (B):** Convex, Google Places, and Vultr accounts and keys; check each source's quotas and terms. Booths: Bright Data and Convex. Ask Bright Data: what is the prize or credit, which product for Google Maps reviews, rate limits, and what counts as using them.
+- **Eric Chen (B):** SpacetimeDB (`spacetime` CLI 2.13.0, Maincloud login), Google Places, and Vultr accounts and keys; check each source's quotas and terms. Booth: Bright Data. Ask Bright Data: what is the prize or credit, which product for Google Maps reviews, rate limits, and what counts as using them.
 - **Max (C):** the Claude API key; decide the stub /plan shape from the contract; write your default parameters on paper (tau = 0.6, S = 300, veto cap 2); jot 30 example free-text preferences. Booths: Microsoft and Fetch.ai (ask what 13.0 requires for the Fetch prize).
 - **Eric Wu (D):** upgrade Twilio (the trial plays an announcement and only calls verified numbers) and buy a number; Cartesia account and a speech-to-text account; install a tunnel tool; verify the demo-restaurant phone number; write the three call scenarios. Booth: Cartesia (ask about Cantonese speech).
 - **Everyone, at every booth:** "What does a winning project look like for your prize, and is there an extra form, post, or step at submission?" Write the answers in the team channel.
@@ -954,7 +961,7 @@ Disclose anything cached or recorded in one plain sentence during the demo. Prep
 - [ ] Project image uploaded
 - [ ] GitHub repo link works in a logged-out browser
 - [ ] Demo video attached
-- [ ] Targeted tracks selected with any extra steps done (Meta, Cartesia, Convex, Bright Data, and any other track the booths confirmed)
+- [ ] Targeted tracks selected with any extra steps done (Meta, Cartesia, Bright Data, and any other track the booths confirmed)
 - [ ] Honesty and AI-tool disclosure included
 - [ ] No keys in the repo
 
@@ -978,7 +985,7 @@ Disclose anything cached or recorded in one plain sentence during the demo. Prep
 ## T9. Sponsor tracks (confirm exact requirements at the booths)
 
 - **Must hit:** Meta ("Bringing People Closer Together with AI"; winner advances to a Round 2 at Meta's Menlo Park campus) and Cartesia (voice; Meta glasses prize).
-- **Cheap extras that come with the build:** Convex (realtime), Bright Data (reviews and scout; prize unknown, ask), MLH (Gemini, Vultr, GoDaddy domain).
+- **Cheap extras that come with the build:** Bright Data (reviews and scout; prize unknown, ask), MLH (Gemini, Vultr, GoDaddy domain).
 - **Ask before building:** Fetch.ai (Devpost says $1,500 / $1,000 / $500; Fetch's page says $1,250 / $750 / $500 plus two $250; last year required Agentverse registration and the chat protocol), Microsoft "Built for the Real World", Figma, Creao, Apify (a listed prize if we add it as a second review source).
 - **Weak fit or skip:** Visa "Reimagining Shopping"; Hyphenate, Capital One, CRS, Coinbase, SpaceXSI, Solana, Tiger Data, Snowflake.
 - **Not used:** Wajo, Factory, Grok multi-agent.

@@ -1,3 +1,3 @@
 {
-  "//": "PLACEHOLDER. Filled at H24-26 from a real /plan response for the seeded demo group. Until then Convex falls back to web/convex/lib/fakes.ts."
+  "//": "PLACEHOLDER. Filled at H24-26 from a real /plan response for the seeded demo group. Until then the module falls back to server/src/lib/fakes.ts."
 }

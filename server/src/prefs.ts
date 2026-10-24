@@ -5,7 +5,7 @@ import { requireMember } from "./groups";
 import { planMembers, startRun } from "./plans";
 import { callApi } from "./lib/api";
 import { CONFIDENCE_TARGET, MAX_SWIPES, MIN_SWIPES, PREVIEW_DEBOUNCE_MS } from "./lib/constants";
-import { PLACES } from "./lib/places";
+import { placesForMode } from "./lib/places";
 import { guardPlanResult, preserveBudget } from "./lib/budgets";
 import type { Proc } from "./lib/types";
 import { at, membersOf, nowMs, parse } from "./lib/util";
@@ -60,7 +60,7 @@ function fetchNextPair(ctx: Proc, memberId: string) {
   const { posterior, alreadySeen, swipeCount } = readPrefs(ctx, memberId);
   if (swipeCount >= MAX_SWIPES || !posterior) return;
   const res = callApi(ctx, "/elicit/next", {
-    memberId, posterior, alreadySeen, candidatePlaceIds: PLACES.map((p) => p.id), focusPlaceIds: [],
+    memberId, posterior, alreadySeen, candidatePlaceIds: placesForMode(ctx.env.STUB_MODE).map((p) => p.id), focusPlaceIds: [],
   });
   if (!res.ok) throw new Error(`elicit/next failed: ${JSON.stringify(res.error)}`);
   const { a, b, category } = res.data;

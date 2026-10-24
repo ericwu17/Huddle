@@ -88,6 +88,25 @@ ACTIVITY_COST = [
 ]
 DAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]  # Places API: 0 = Sunday
 
+# Text search also returns grocery stores, offices and labs, so each category only keeps
+# places whose Google primaryType fits. Chosen from the types the first real pull returned.
+MEAL_EXTRA_TYPES = {"restaurant", "noodle_shop", "sandwich_shop", "gastropub", "bar_and_grill"}
+ACTIVITY_TYPES = {
+    "performing_arts_theater", "museum", "art_museum", "park", "garden", "botanical_garden",
+    "live_music_venue", "comedy_club", "movie_theater", "art_gallery", "event_venue", "scenic_spot",
+    "bowling_alley", "video_arcade", "amusement_center", "escape_room",
+}  # not amphitheatre: the Greek Theatre lists itself as open 24 hours
+DESSERT_TYPES = {"ice_cream_shop", "bakery", "tea_house", "dessert_restaurant", "dessert_shop"}
+
+
+def fits(category: str, p: dict) -> bool:
+    t = p.get("primaryType", "")
+    if category == "meal":
+        return (t.endswith("_restaurant") and t not in {"dessert_restaurant"}) or t in MEAL_EXTRA_TYPES
+    if category == "activity":
+        return t in ACTIVITY_TYPES
+    return t in DESSERT_TYPES
+
 
 def load_key() -> str:
     key = os.environ.get("GOOGLE_PLACES_API_KEY")
@@ -222,12 +241,15 @@ def to_place(category: str, hint: str | None, p: dict, hours: dict) -> dict:
 def select(results) -> tuple[list[dict], dict]:
     seen: set[str] = set()
     pools: dict[str, list[list[dict]]] = {c: [] for c in TARGETS}
-    skipped = {"duplicate": 0, "not_operational": 0, "no_hours": 0}
+    skipped = {"duplicate": 0, "wrong_type": 0, "not_operational": 0, "no_hours": 0}
     for category, hint, places in results:
         bucket = []
         for p in places:
             if p["id"] in seen:
                 skipped["duplicate"] += 1
+                continue
+            if not fits(category, p):
+                skipped["wrong_type"] += 1
                 continue
             if p.get("businessStatus", "OPERATIONAL") != "OPERATIONAL":
                 skipped["not_operational"] += 1

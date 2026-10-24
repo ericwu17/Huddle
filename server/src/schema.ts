@@ -221,6 +221,7 @@ const spacetimedb = schema(
     env: {
       HUDDLE_SHARED_SECRET: t.option(t.string()),
       FASTAPI_BASE_URL: t.option(t.string()),
+      STUB_MODE: t.option(t.string()), // default true; false only with a future real solver
       VOICE_BASE_URL: t.option(t.string()),
       COUNCIL_ENABLED: t.option(t.string()),
       AGENT_LANGUAGE: t.option(t.string()),

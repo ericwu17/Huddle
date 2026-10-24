@@ -1,6 +1,7 @@
 # Huddle Python API — phase zero
 
-Only `api/` belongs to this implementation. Max confirmed the hacking period had
+The Python service lives in `api/`; the stub integration follow-up also updates
+the SpacetimeDB caller and shared place lookups. Max confirmed hacking had
 started before implementation. This is a separate Python 3.11+ FastAPI service;
 it has no database dependency, external API calls, LLM calls, Bayesian update,
 Monte Carlo, real solver, or live council. All venue data and scores are fake.
@@ -40,6 +41,21 @@ api/.venv/bin/python api/eval/smoke_http.py
 (default `http://127.0.0.1:8000`) and exercises all eight operations. The test suite
 generates temporary credentials in memory and does not require a running server.
 
+To check both services together, install the server's locked development
+dependencies, then use the official SpacetimeDB in-memory module harness:
+
+```sh
+npm ci --prefix server
+npm run typecheck --prefix server
+npm test --prefix server
+api/.venv/bin/python api/eval/check_integration.py
+```
+
+The last command starts a temporary localhost API with a generated test secret,
+runs real module procedures against it, then stops the API. No database is
+published and no real call or vendor API is used. This verifies module logic
+and HTTP contracts, not a deployed host, browser subscriptions, or durability.
+
 ## Configuration
 
 | Name | Meaning |
@@ -71,7 +87,7 @@ also label synthetic data where the existing shapes allow it.
 | `POST /parse-prefs` | Four exact demo phrases below map to canned hard/soft fixtures; identity posterior. Unknown text returns 409 instead of silently discarding a budget. |
 | `POST /elicit/next` | First deterministic unseen same-category fixture pair; focus preferred, no active learning. |
 | `POST /elicit/update` | Validates known same-category distinct place IDs, returns the supplied posterior unchanged. |
-| `POST /plan` | Three fixed itineraries, Safe/Bold/Budget with totals $18/$20/$14; filters fixtures against each member's constraints. May return fewer or none. If the original Safe is removed, the highest-scored remaining fixture receives kind `safe`. |
+| `POST /plan` | Three fixed itineraries, Safe/Bold/Budget with totals $18/$20/$14; filters fixtures against each member's constraints. May return fewer or none. Preview uses the same envelope with at most one Safe plan and no pareto points. If the original Safe is removed, the highest-scored remaining fixture receives kind `safe`. |
 | `POST /offers` | `{"offers":[]}`. No fictional gain or budget change. Baseline ID is opaque and not looked up. |
 | `POST /roulette` | Seeded draw with weights proportional to supplied robustness squared. Zero-weight plans cannot win. Only accepts an already-approved pool. |
 | `POST /council` | Canned two-round transcript (nine messages for four members), then chair picks the supplied Safe plan. A fresh local delivery adapter collects messages; no live streaming or persistence. |
@@ -131,8 +147,8 @@ synthetic values. Repeating identical requests returns identical JSON.
 
 No shared shape was changed to resolve these:
 
-1. `preview=true` says to return only the top robustness but defines no response
-   object. Phase zero returns 409; agree on that response before implementing it.
+1. Preview is now clarified in `docs/CONTRACT.md`: the existing response envelope,
+   at most one Safe plan, `pareto: []`, confidence at `plans[0]?.robustness ?? 0`.
 2. `/elicit/next` has no exhausted-pair result. Phase zero returns HTTP 409 with
    standard `detail`; agree on an eventual empty/exhausted success shape.
 3. `relaxationHints` entries have no schema. They stay `[]`; no invented entries.
@@ -144,7 +160,7 @@ No shared shape was changed to resolve these:
 6. Scout source is a string and unavailable facts can be null here; agree on
    availability semantics before live use. Stub council ignores scout facts.
 
-## SpacetimeDB handoff (decisions still required)
+## SpacetimeDB integration
 
 Eric can connect a **trusted server-side caller** to these HTTP contracts using
 `FASTAPI_BASE_URL` and the shared secret. For each call, assemble one consistent
@@ -154,14 +170,13 @@ does not fetch or write database state. Store response IDs with that run; reject
 stale results according to an agreed version policy. Replan uses a new runId and
 accumulated excluded place IDs.
 
-`CouncilDelivery.deliver(CouncilMessage)` in `delivery.py` is an **internal Python
-seam**, not a proposed database endpoint. `LocalCouncilDelivery` is fresh per
-request and discards its collector after response. Eric and Max still need to
-agree on transport (push or response ingestion), endpoint/module/reducer names,
-payload envelope, authentication, timeouts, ordering, retry and deduplication
-keys, and stale-run behavior. There is no automatic retry or exactly-once claim.
-The current final response includes the transcript so it can be inspected locally;
-do not ingest both an adapter stream and response transcript without deduplication.
+`CouncilDelivery.deliver(CouncilMessage)` in `delivery.py` remains an internal
+Python seam. Phase zero uses response ingestion: the module reads `messages`
+from `/council`, replays stub messages, and stores the transcript. It recognizes
+`X-Huddle-Stub: true` on HTTP responses. Message insertion deduplicates by run,
+round, speaker, and member, including a future callback plus response replay.
+The local Python adapter still makes no external delivery calls. Live streaming
+adapters and stronger retry/version policies remain later work.
 
 Keep hard constraints, caps, posteriors, and offers owner-only. Plan `perMember`
 and `gaveUp`, and council `memberId`, must be removed from public subscriptions
@@ -176,45 +191,39 @@ version, and acceptance before producing a snapshot with a raised cap. Calling
 The existing request shape cannot prove that history; the shared secret alone
 is service authentication, not user consent.
 
-## Integration check against main `2a98c18`
+## Resolved stub gaps and live connection requirements
 
-Eric's SpacetimeDB scaffold merges without overlapping API file changes. This is
-a source-level compatibility review, not an end-to-end SpacetimeDB test. Setting
-`FASTAPI_BASE_URL` is **not yet a working integration switch** for this phase:
+- Both services use `api/fixtures/places.fake.json` in stub mode, and frontend
+  lookups resolve these IDs. Eric's 45-place `data/places.json` remains intact;
+  real and legacy IDs remain resolvable for earlier runs. The module declares
+  `STUB_MODE`, defaulting to true, and uses real candidates only with explicit
+  `STUB_MODE=false`. Do not flip it while the real Python solver is unavailable.
+- Confidence previews use the existing PlanResponse shape, with canned scores
+  clearly labeled. No inference is implied by the confidence ring.
+- Council response messages are stored/replayed exactly once per logical
+  message key. A returned HTTP stub is no longer mistaken for a live council.
+- Server fallbacks check the cumulative sum against every cap. Completed plans
+  and previews recheck current budgets inside the database transaction. Voting,
+  roulette, and booking reject plans outside current budgets.
+- Preference reparsing preserves existing caps against increases or removal.
+  Tightening remains allowed. Delayed parses cannot overwrite newer text.
+  Offer acceptance checks recipient, current run, positive bounded amount,
+  correct units, and affordability for all members after the explicit change.
 
-- `server/src/lib/places.ts` loads `data/places.fake.json`; this API uses its own
-  `stub_*` IDs. `/elicit/next` rejects unknown IDs, and the server cannot resolve
-  API stop IDs through its own place catalog. Agree on one synthetic catalog.
-- `server/src/prefs.ts` calls `/plan` with `preview=true` and reads
-  `plans[0].robustness`. That establishes the caller's current expectation, but
-  the shared preview specification is still ambiguous; this API returns 409
-  until the shape is agreed, as documented above.
-- `server/src/lib/api.ts` labels every successful HTTP response `stub:false`
-  without reading `X-Huddle-Stub`. `server/src/council.ts` then assumes messages
-  were already delivered externally and skips the response transcript. This API
-  delivers only to its request-local adapter, so messages would not be stored.
-  Main now documents a `POST /v1/database/{database}/route/council-message` route;
-  activation, retry/deduplication behavior, and stub handling still need agreement.
-- `server/src/lib/fakes.ts` creates fallback plans without checking member
-  cumulative caps. The API's guarantees do not extend to that separate fallback.
-  `server/src/plans.ts` can use it after a failed API plan call. Eric must apply
-  the authoritative cumulative-budget rule there before relying on that path.
-- `server/src/prefs.ts` replaces stored hard constraints with each parse result.
-  It must preserve an existing budget cap against increases unless the owner
-  explicitly accepted a private offer. The API cannot verify that history from
-  the current parse request alone.
-
-These findings do not change shared shapes, activate a transport, or edit
-teammates' files. They are handoff blockers for wiring the services together,
-not textual Git merge conflicts.
+For a deployed backend to use this API, Eric must republish the updated module
+with `STUB_MODE=true`, the matching `HUDDLE_SHARED_SECRET`, and a reachable
+`FASTAPI_BASE_URL`. A cloud backend cannot reach a laptop's `127.0.0.1` address.
+No service was deployed and no tunnel was opened by these changes. Once both
+processes are reachable, health and private service calls use the shared secret;
+no SpacetimeDB account or deployment token belongs in the Python service.
 
 ## Honesty and disclosure handoff
 
-Eric owns the shared documentation, so nothing outside `api/` was edited. Copy
-these facts into the team's honesty/disclosure files: nine fictional venues;
+The shared honesty/disclosure files should include these facts: nine fictional venues;
 four canned preference fixtures; unchanged identity/update posterior; three
 fixed itineraries; synthetic utility, robustness, pareto, council transcript and
 timestamps; empty offers; no live council delivery. Dependencies: Python standard
 library, FastAPI/Starlette, Pydantic, uvicorn, httpx for checks (plus their transitive
-dependencies). Implementation assisted by OpenAI Codex. FastAPI/Pydantic public
-documentation was consulted. No external data or model API was called.
+dependencies); SpacetimeDB's native module test harness and Vitest for server
+checks. Implementation assisted by OpenAI Codex. Official FastAPI, Pydantic,
+and SpacetimeDB documentation was consulted. No external data/model API was called.
