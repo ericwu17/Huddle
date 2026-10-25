@@ -9,7 +9,8 @@
 #   --database NAME      database to configure  (default huddle-calhacks)
 #   --scenario S         voice STUB_SCENARIO override: confirm | full (default: voice/.env)
 #   --no-publish         start services and tunnels only; leave the module env alone
-#   --yes                don't ask before publishing the new URLs
+#   --yes, -y            don't ask before publishing the new URLs (skips both this script's
+#                        prompt and spacetime's, and never stops for a login; use under systemd)
 #   --smoke              run api/eval/check_live.py after publishing (writes a disposable group;
 #                        its two council checks were written for the old stubs and can fail)
 #   --unset-on-exit      on exit, unset both URLs so the module falls back to its fakes
@@ -39,7 +40,7 @@ while [ $# -gt 0 ]; do
     --database) DATABASE="$2"; shift 2 ;;
     --scenario) SCENARIO="$2"; shift 2 ;;
     --no-publish) PUBLISH=0; shift ;;
-    --yes) ASSUME_YES=1; shift ;;
+    --yes|-y) ASSUME_YES=1; shift ;;
     --smoke) SMOKE=1; shift ;;
     --unset-on-exit) UNSET_ON_EXIT=1; shift ;;
     -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -218,7 +219,7 @@ if [ "$PUBLISH" = 1 ]; then
 fi
 if [ "$PUBLISH" = 1 ]; then
   yes_flag=""
-  [ "$ASSUME_YES" = 1 ] && yes_flag="--yes=remote"
+  [ "$ASSUME_YES" = 1 ] && yes_flag="--yes=remote,skip-login"
   clean_env FASTAPI_BASE_URL="$API_URL" VOICE_BASE_URL="$VOICE_URL" STUB_MODE=false \
     spacetime publish "$DATABASE" -s "$SERVER" --env-only --no-config $yes_flag \
     || die "spacetime publish failed; the module env is unchanged"

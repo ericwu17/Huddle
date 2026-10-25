@@ -572,7 +572,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .calendar-members li { display: grid; gap: 2px; font-size: 14px; }
 .saved-preferences summary, .group-discussion summary { font-weight: 800; cursor: pointer; }
 .saved-preferences[open] > div, .group-discussion[open] > div { margin-top: 16px; }
-.comparison-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: 18px; }
+.comparison-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 18px; }
 .comparison-grid > * { min-width: 0; }
 .option-card { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
 .option-card-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; }
@@ -585,6 +585,8 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .option-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
 .order-summary { border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; font-size: 13px; }
 .order-summary ul { display: grid; gap: 6px; }
+.order-venue { font-weight: 700; }
+.meetup-calendar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
 .order-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .order-summary .muted { font-size: 11px; }
 .order-total { font-weight: 800; border-top: 1px solid rgb(22 21 43 / .15); padding-top: 6px; }
