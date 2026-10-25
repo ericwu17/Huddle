@@ -22,6 +22,8 @@ import HuddleLoading from "../components/HuddleLoading";
 import { useHuddleTiming } from "../huddleTiming";
 import HuddleBrand from "../components/HuddleBrand";
 import { useHuddleNames } from "../accountData";
+import TieBreaker from "../components/TieBreaker";
+import { useTieBreakReveal } from "../useTieBreakReveal";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -44,6 +46,9 @@ export default function GroupLayout() {
   const timing = useHuddleTiming();
   const huddleLocation = useHuddleLocation();
   const ballot = useAgentBallot(group?.id === session.groupId ? group : group === undefined ? undefined : null, agent, session.memberId);
+  const tieKey = group?.id === session.groupId && agent?.groupId === session.groupId && ballot.current && ballot.complete && ballot.leaders.length > 1
+    ? JSON.stringify([group.id, ballot.runId, agent.revision, ballot.signature]) : null;
+  const tieReveal = useTieBreakReveal(tieKey, ballot.winner?.id ?? null, ballot.loading);
   const lastAgentState = useRef<string | null>(null);
   const lastWinner = useRef<{ groupId: string; key: string | null } | null>(null);
 
@@ -82,13 +87,13 @@ export default function GroupLayout() {
   }, [group, agent, mine, navigate, pathname, session.groupId]);
 
   useEffect(() => {
-    if (!agent || agent.groupId !== session.groupId || group?.id !== session.groupId || ballot.loading) return;
+    if (!agent || agent.groupId !== session.groupId || group?.id !== session.groupId || ballot.loading || tieReveal.visible) return;
     const key = ballot.winner ? `${ballot.runId}:${agent.revision}:${ballot.winner.id}` : null;
     const transition = winnerTransition(lastWinner.current, group.id, key,
       pathname.endsWith("/vote") || pathname.endsWith("/prefs"));
     lastWinner.current = transition.state;
     if (transition.follow) navigate(`/g/${session.groupId}/done`);
-  }, [agent, group, ballot.loading, ballot.runId, ballot.winner, navigate, pathname, session.groupId]);
+  }, [agent, group, ballot.loading, ballot.runId, ballot.winner, tieReveal.visible, navigate, pathname, session.groupId]);
 
   // Status only becomes "booked" once the call is confirmed, so follow a new
   // booking too: every phone watches the call live.
@@ -168,6 +173,11 @@ export default function GroupLayout() {
       {!agent ? <OffersInbox ctx={ctx} /> : null}
       <Outlet key={group.id} context={ctx} />
       {agent?.status === "planning" ? <PlanningHuddle members={group.members} start={group.window.start} /> : null}
+      {tieReveal.visible && ballot.winner ? <TieBreaker key={tieReveal.resultKey} winnerId={ballot.winner.id} onComplete={tieReveal.finish}
+        options={ballot.leaders.map(choice => ({
+          id: choice.id, number: ballot.choices.findIndex(option => option.id === choice.id) + 1,
+          who: group.members.find(member => ballot.votes?.byPlan[choice.id]?.includes(member.id))?.name ?? "Huddle agent",
+        }))} /> : null}
       {!agent ? <PhaseFooter ctx={ctx} booking={booking} /> : null}
       </div>
     </main>

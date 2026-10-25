@@ -125,7 +125,7 @@ export default function Home() {
           <p><strong className="huddle-list-name">{huddleNames?.find(h => h.groupId === m.groupId)?.name || `Huddle ${m.code}`}</strong><br /><span className="muted">{m.date} · {m.role} · {m.status}</span></p>
           <div className="flex flex-wrap gap-2">
             <button className="btn" disabled={busy} onClick={() => open(m)}>Open</button>
-            <button className="btn btn-quiet" disabled={busy} aria-label={`Remove huddle ${m.code} from your list`}
+            <button className="btn btn-danger" disabled={busy} aria-label={`Remove huddle ${m.code} from your list`}
               onClick={() => run(() => remove({ groupId: m.groupId }))}>Remove</button>
           </div>
         </li>)}</ul>}
