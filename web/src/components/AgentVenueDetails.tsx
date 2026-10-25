@@ -13,11 +13,13 @@ function EvidencePhoto({ photo, name, compact }: { photo: VenuePhoto; name: stri
   </figure>;
 }
 
-export default function AgentVenueDetails({ place, name, compact = false }: { place?: CatalogListing; name: string; lat?: number; lng?: number; compact?: boolean }) {
+export default function AgentVenueDetails({ place, name, compact = false, photo, showName = false }: { place?: CatalogListing; name: string; lat?: number; lng?: number; compact?: boolean; photo?: VenuePhoto; showName?: boolean }) {
   const foodStyle = place?.label || place?.foodStyle || place?.cuisine?.replaceAll("_", " ");
   const specificStyle = foodStyle && !/^(restaurants?|food|meal|establishment|point of interest)$/i.test(foodStyle.trim()) ? foodStyle : null;
+  const photos = compact ? (photo ? [photo] : place?.photos?.slice(0, 1)) : place?.photos;
   return <div className="space-y-2">
-    {place?.photos?.length ? <div className={compact ? "option-photo" : "grid grid-cols-1 gap-3 sm:grid-cols-3"}>{(compact ? place.photos.slice(0, 1) : place.photos).map(photo => <EvidencePhoto key={photo.url} photo={photo} name={name} compact={compact} />)}</div> : null}
+    {photos?.length ? <div className={compact ? "option-photo" : "grid grid-cols-1 gap-3 sm:grid-cols-3"}>{photos.map(photo => <EvidencePhoto key={photo.url} photo={photo} name={name} compact={compact} />)}</div> : null}
+    {showName ? <p className="text-sm font-bold">{name}</p> : null}
     {specificStyle && !compact ? <p className="text-sm font-bold">{specificStyle}</p> : null}
     {place?.address && !compact ? <p className="text-sm">{place.address}</p> : null}
     {place && Number.isFinite(place.rating) && place.rating > 0 ? <p className="text-sm"><strong>★ {place.rating.toFixed(1)}/5</strong>{place.reviewCount > 0 ? ` · ${place.reviewCount.toLocaleString()} reviews` : ""}</p> : null}

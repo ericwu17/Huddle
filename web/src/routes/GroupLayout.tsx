@@ -60,7 +60,7 @@ export default function GroupLayout() {
       // AgentVote removes stale choices and shows its empty state until replanned.
       if (pathname.endsWith("/vote") || pathname.endsWith("/done") ||
           pathname.endsWith("/prefs") && ["needs", "ready", "blocked"].includes(agent.status)) return;
-      const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "call"
+      const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "done"
         : agent.status === "needs" ? "prefs" : "plans";
       navigate(`/g/${session.groupId}/${step}`);
       return;
@@ -92,13 +92,14 @@ export default function GroupLayout() {
   // booking too: every phone watches the call live.
   const lastBooking = useRef<string | null | undefined>(undefined);
   useEffect(() => {
+    if (agent !== null) return;
     if (booking === undefined) return;
     const id = booking?.bookingId ?? null;
     if (lastBooking.current !== undefined && id && id !== lastBooking.current) {
       navigate(`/g/${session.groupId}/call`);
     }
     lastBooking.current = id;
-  }, [booking, navigate, session.groupId]);
+  }, [agent, booking, navigate, session.groupId]);
 
   if (group === undefined || agent === undefined) return <HuddleLoading label="Loading your group" />;
   // Views only cover this phone's current group: the one it joined last.
@@ -151,7 +152,7 @@ export default function GroupLayout() {
             {ctx.isHost && <span className="sticker sticker-sun ml-1.5">host</span>}
           </span>
         </span>
-        {agent ? <AgentPhaseNav ctx={ctx} booking={booking} /> : <PhaseProgress ctx={ctx} booking={booking} />}
+        {agent ? <AgentPhaseNav ctx={ctx} /> : <PhaseProgress ctx={ctx} booking={booking} />}
         <SidebarPeople ctx={ctx} />
       </aside>
       <div className="group-main space-y-4">
@@ -160,7 +161,7 @@ export default function GroupLayout() {
         ? `${group.date} · ${displayTime(group.window.start)}–${displayTime(group.window.end)}`
         : "Date and time to be decided"}</p>
       <DemoBanner on={group.demoMode} />
-      {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}
+      {!agent ? <ReplanBanner ctx={ctx} /> : null}
       {!agent ? <OffersInbox ctx={ctx} /> : null}
       <Outlet key={group.id} context={ctx} />
       {agent?.status === "planning" ? <PlanningHuddle members={group.members} start={group.window.start} /> : null}

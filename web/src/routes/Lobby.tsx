@@ -10,7 +10,6 @@ import { Buddy } from "../doodle/Doodle";
 import FriendPicker from "../components/FriendPicker";
 import { useAccount, useHuddleInvitations, useInvitationDeliveries } from "../accountData";
 import InvitationDelivery from "../components/InvitationDelivery";
-import CalendarTimeSelector from "../components/CalendarTimeSelector";
 import SendInvitationMessageButton from "../components/SendInvitationMessageButton";
 
 export default function Lobby() {
@@ -72,7 +71,6 @@ export default function Lobby() {
         </button>
       </div>
       <p className="card !py-3 text-sm">Once two people are ready, you can find plans.</p>
-      {agent && account ? <CalendarTimeSelector /> : null}
 
       {isHost && !agent && (
         <section className="card space-y-3 text-sm">

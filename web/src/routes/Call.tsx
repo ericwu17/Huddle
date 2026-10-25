@@ -1,4 +1,5 @@
 import { useReducer } from "spacetimedb/react";
+import { Navigate } from "react-router";
 import { reducers } from "../module_bindings";
 import { useLatestBooking } from "../data";
 import { useRun } from "../useRun";
@@ -11,6 +12,8 @@ export default function Call() {
   const startBooking = useReducer(reducers.startBooking);
   const { run, busy, error } = useRun();
 
+  if (agent) return <Navigate to={`/g/${group.id}/done`} replace />;
+  if (agent === undefined) return <p className="on-sky">Loading…</p>;
   if (booking === undefined) return <p className="on-sky">Loading…</p>;
   if (booking === null) return <p className="on-sky">No booking yet. Vote, then tap "Book it".</p>;
 
@@ -26,7 +29,6 @@ export default function Call() {
 
   return (
     <div className="space-y-2">
-      {agent ? <p className="card card-note">Booking simulation only. No phone call or real reservation is made.{booking.runId !== group.latestRunId ? " This is an older booking; return to the current plans." : ""}</p> : null}
       <CallScreen booking={booking} onRetry={busy ? undefined : retry} />
       {error && <p className="error">{error}</p>}
     </div>
