@@ -53,7 +53,7 @@ export const setHuddleWindow = spacetimedb.reducer({ date: t.string(), windowSta
       !Number.isFinite(clockMinutes(args.windowEnd)) || args.windowStart >= args.windowEnd || args.timeZone !== venueTimeZone)
     throw new SenderError("Choose a valid date and ordered start/end times.");
   if (state.status === "planning") throw new SenderError("Wait for the current planning run before changing its time.");
-  if (group.date === args.date && group.windowStart === args.windowStart && group.windowEnd === args.windowEnd && huddleTiming(tx.db, group.id).source !== "pending") return;
+  if (group.date === args.date && group.windowStart === args.windowStart && group.windowEnd === args.windowEnd && ["calendar", "manual"].includes(huddleTiming(tx.db, group.id).source)) return;
   invalidateAgent(tx, group.id);
   const fresh = tx.db.group.id.find(group.id)!;
   tx.db.group.id.update({ ...fresh, date: args.date, windowStart: args.windowStart, windowEnd: args.windowEnd });

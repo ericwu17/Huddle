@@ -35,12 +35,12 @@ export function useCalendarPlanning() {
         try {
           const response = await schedule(defaultCalendarSearch());
           if (!response.ok) await clearTime();
-          setNotice(response.ok ? "A shared calendar opening was found." : "No shared time was chosen. Showing venue ideas with time unset.");
+          setNotice(response.ok ? "A shared calendar opening was found." : "No shared calendar opening was found. Huddle picked a time for the plans.");
         } catch {
           await clearTime();
-          setNotice("Calendars could not be checked. Showing venue ideas with time unset.");
+          setNotice("Calendars could not be checked. Huddle picked a time for the plans.");
         }
-      } else setNotice("Time is flexible. Connect everyone’s calendar or choose a time to build an itinerary.");
+      } else setNotice("Huddle picked a time for the plans. Connect everyone’s calendar or choose a time to set it yourself.");
     }
     await find();
   }

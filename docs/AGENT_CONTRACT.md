@@ -40,22 +40,32 @@ lengths to `/connectors/calendar/schedule`. Calendar candidates must contain a
 complete meal visit inside one opening interval, not merely an arrival before
 closing. Claude sees the supplied hours for later stops such as dessert; the
 final itinerary independently validates every stop, travel and closing time.
-Calendar errors/missing connections leave time unset; venue ideas remain votable.
+Calendar errors/missing connections leave time unset until Find plans; then
+`startAgentRun` assigns an automatic time (`source: auto`): the participants' most
+common day part (Morning 09:00–12:00, Afternoon 12:00–17:00, otherwise Evening
+17:00–22:00) on the next Pacific day it can start with an hour's notice. A later
+calendar or manual choice replaces it. Every run therefore plans a concrete date and window.
 The optional manual selection is explicit. No calendar event is created by
 finding a time, and the venue's IANA timezone remains in data for correct hours,
 DST and calendar writes without the old fixed location label in the interface.
 
-`/agent/plan` now accepts `date:null, window:null` together. Timed requests keep
-their existing shapes. Unscheduled requests can produce only untimed suggestions;
-the module rejects timed responses without an established window. Shared untimed
-results use `date:null`; timed public results still require a date.
+`/agent/plan` still accepts `date:null, window:null` together, but then plans the
+next evening (17:00–22:00 Pacific) itself. Every response choice is a timed plan;
+`suggestions` is always empty, and the module drops any untimed suggestion (and its
+private orders) from an older service. When nothing fits, the API widens the
+window (later the same day, then 08:00–23:00), then ignores budgets, outing length
+and first-leg travel. Opening hours, venue facts, exclusions, vetoes and destination
+cities are never relaxed. Such plans are `provisional` and list what they fall
+outside of in `relaxed` (`window|budget|duration|travel`). The module accepts only
+declared relaxations on provisional proposals, so they can be voted on and added to
+calendars but never booked. Legacy stored results may still hold untimed suggestions.
 
 ## Done and shared result
 
 A complete ballot with a unique or Spin-resolved winner opens `/g/:groupId/done`.
 Members see the selected route, outing date/time, venues and their own private
-menu order. Untimed venue winners retain an unset time rather than an invented
-schedule. Voting remains available to change a choice; changed needs invalidate
+menu order. Every new winner is timed; only a legacy untimed venue winner shows an
+unset time. Voting remains available to change a choice; changed needs invalidate
 the old result. Calendar actions are explicit and preserve the existing opt-in,
 current-winner and duplicate-event checks. A calendar-file download contains only
 the public itinerary and uses a stable event UID and Berkeley timezone.
@@ -173,9 +183,10 @@ into public explanations. Arbitrary model prose is never published. Schema or
 selection errors allow one repair attempt. The menu coordinator has a 60-second
 model-call budget inside a 90-second module HTTP timeout, with no extra HTTP
 retry. Parsing and other service calls retain their shorter deadlines. Missing
-evidence permits provisional suggestions; missing timed feasibility permits
-untimed alternatives. Provider failure returns explicitly labeled real-catalog
-ideas rather than synthetic recommendations. Validation feedback identifies a
+evidence permits provisional suggestions; missing timed feasibility produces
+provisional relaxed plans (above). Provider failure returns the first validated timed
+candidates with each member's cheapest eligible items, labeled as not Claude's
+choices. Validation feedback identifies a
 failed candidate/member without relaxing their budget or returning private
 context in the public result.
 

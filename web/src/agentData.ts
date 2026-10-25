@@ -12,7 +12,8 @@ export type AgentNeedsResult = { hard: AgentHard; preferences: string[]; questio
 export type AgentNeeds = { memberId: string; text: string; revision: number; result: AgentNeedsResult | null; confirmed: boolean; error?: string };
 export type AgentState = { groupId: string; revision: number; status: string; activeRunId?: string; error?: string; confirmedMemberIds: string[] };
 export type AgentPlan = { id: string; title: string; stops: PlanStop[]; costPerPerson: number; whyLine: string; limitations: string[]; travelMinutes: number;
-  status?: "ready" | "provisional"; summary?: string; costModel?: "own_orders"; costRange?: { min: number; max: number } };
+  status?: "ready" | "provisional"; summary?: string; costModel?: "own_orders"; costRange?: { min: number; max: number };
+  relaxed?: ("window" | "budget" | "duration" | "travel")[] };
 export type AgentSuggestion = { id: string; placeId: string; summary: string; limitations: string[] };
 export type AgentResult = { mode: "agent"; runId: string; inputRevision: number; plans: AgentPlan[]; recommendedPlanId: string | null; rationale: string; conflicts: string[]; warnings: string[]; suggestions?: AgentSuggestion[] };
 export type AgentOrder = { id: string; runId: string; memberId: string; planId: string; items: { placeId: string; itemId: string | null }[]; total: number };

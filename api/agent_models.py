@@ -189,6 +189,9 @@ class AgentPlan(Model):
     summary: Text = "Catalog outing suggestion."
     costModel: Literal["own_orders"] | None = None
     costRange: dict[Literal["min", "max"], Money] | None = None
+    # Limits a provisional plan was scheduled outside of because no itinerary
+    # fit them all. Empty when the plan fits every limit.
+    relaxed: list[Literal["window", "budget", "duration", "travel"]] = Field(default_factory=list, max_length=4)
 
     @model_validator(mode="after")
     def single_stop_is_meal(self):
