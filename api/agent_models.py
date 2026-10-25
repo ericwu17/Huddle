@@ -24,7 +24,7 @@ class AgentHard(Model):
     # deliberately separate from the journey to the first venue.
     maxOutingMinutes: Money | None = None
     # Soft: the group's plans use the stop count nearest the members' average.
-    preferredStops: Annotated[int, Field(ge=1, le=3)] | None = None
+    preferredStops: Annotated[int, Field(ge=1, le=5)] | None = None
 
     @field_validator("allergies", mode="before")
     @classmethod

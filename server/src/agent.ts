@@ -45,7 +45,7 @@ export const submitAgentPrefs = spacetimedb.reducer({ text: t.string() }, (tx, {
 const DIETARY = new Set(["vegetarian", "vegan", "gluten_free", "halal", "kosher"]);
 const INPUT_KEYS = new Set(["budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes", "preferredStops", "dietary", "allergies"]);
 // Soft: the coordinator aims for the stop count nearest the members' average.
-const validStops = (value: any) => value == null || Number.isInteger(value) && value >= 1 && value <= 3;
+const validStops = (value: any) => value == null || Number.isInteger(value) && value >= 1 && value <= 5;
 const emptyHard = () => ({ budgetMaxPerPerson: null, maxOutingMinutes: null, maxTravelMinutes: null, preferredStops: null,
   dietary: [] as string[], allergies: [] as string[], vetoCuisines: [] as string[],
   vetoCategories: [] as string[], rejectedTerms: [] as string[] });
@@ -62,7 +62,7 @@ function structuredInput(json: string, previous: any) {
   for (const key of ["budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes"])
     if (key in input && input[key] !== null && (typeof input[key] !== "number" || !Number.isFinite(input[key]) || input[key] < 0))
       throw new SenderError("Limits must be nonnegative numbers or Flexible.");
-  if (!validStops(input.preferredStops)) throw new SenderError("Choose 1–3 stops or Flexible.");
+  if (!validStops(input.preferredStops)) throw new SenderError("Choose 1–5 stops or Flexible.");
   for (const [key, max] of [["dietary", 5], ["allergies", 12]] as const) {
     if (!Array.isArray(input[key]) || input[key].length > max ||
         input[key].some((value: any) => typeof value !== "string" || !value.trim() || value.length > 2000))

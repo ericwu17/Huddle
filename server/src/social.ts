@@ -42,7 +42,7 @@ function contextJson(text: string) {
       throw new SenderError(`Invalid ${field}.`);
   }
   const stops = value.preferredStops;
-  if (stops !== undefined && stops !== null && !(Number.isInteger(stops) && stops >= 1 && stops <= 3))
+  if (stops !== undefined && stops !== null && !(Number.isInteger(stops) && stops >= 1 && stops <= 5))
     throw new SenderError("Invalid preferredStops.");
   return JSON.stringify({ version: 1, preferences: value.preferences.trim(), dietary, allergies,
     budgetMaxPerPerson: value.budgetMaxPerPerson, maxOutingMinutes: value.maxOutingMinutes,

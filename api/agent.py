@@ -116,7 +116,7 @@ Structured is the member's explicit controls. Preserve every structured dietary 
 The budget slider is the WHOLE outing cost per person, never a per-stop budget.
 maxOutingMinutes is the entire outing's elapsed duration, including travel/waiting BETWEEN stops.
 maxTravelMinutes is only the trip from their starting location TO THE FIRST stop. Never confuse them.
-preferredStops is the member's preferred number of venues (1-3), a soft preference. Set it only when explicitly stated.
+preferredStops is the member's preferred number of venues (1-5), a soft preference. Set it only when explicitly stated.
 Null/omitted choices mean flexible on a first submission; don't invent restrictions or questions.
 Explicit 'no allergies' means no stated allergy, not an unresolved allergy question.
 Known allergies can be saved without a confirmation question; venue evidence is checked during planning.

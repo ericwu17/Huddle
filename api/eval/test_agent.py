@@ -218,6 +218,8 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(counts(3, None), {3})  # Flexible members are not averaged in
         self.assertEqual(counts(2, 3), {2, 3})  # a half-way mean keeps both counts
         self.assertEqual(counts(1, 2), {1, 2})
+        self.assertEqual(counts(5, 5), {3})  # plans top out at 3 stops
+        self.assertEqual(counts(5, 1), {3})
         # Soft: when three stops do not fit the time limit, the nearest feasible count remains.
         self.assertEqual(counts(3, 3, duration=180), {2})
         self.assertEqual(counts(3, 3, duration=90), {1})
@@ -230,7 +232,7 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
             memberId="one", text="just a quick bite", structured=AgentHard()))
         self.assertEqual(result.hard.preferredStops, 1)
         with self.assertRaises(ValueError):
-            AgentHard(preferredStops=4)
+            AgentHard(preferredStops=6)
 
     async def test_invalid_model_id_gets_only_labeled_real_catalog_ideas(self):
         result = await coordinate(Model(bad=True), self.catalog, request())

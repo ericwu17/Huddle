@@ -47,7 +47,7 @@ aspects receive limitations rather than invented scores.
 | `vetoCategories` | Array of refused stop categories |
 | `rejectedTerms` | Array checked against catalog names/category/cuisine labels; not ingredient verification |
 | `maxTravelMinutes` | Nonnegative first-leg travel limit or null; requires an origin to verify |
-| `preferredStops` | Integer 1–3 or null (Flexible); a soft preference, not a hard limit |
+| `preferredStops` | Integer 1–5 or null (Flexible); a soft preference, not a hard limit. Plans still have at most 3 stops, so 4–5 resolve to the longest feasible count |
 
 Lists of preferences, questions and warnings contain bounded plain strings.
 Neither interpretation nor confirmation can raise/remove an established cap.

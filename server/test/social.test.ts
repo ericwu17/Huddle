@@ -65,7 +65,7 @@ describe("private saved context", () => {
     const s = setup();
     for (const value of [{ ...defaults, budgetMaxPerPerson: -1 }, { ...defaults, dietary: ["made-up"] },
       { ...defaults, extraAccountId: "account-bob" }, { ...defaults, maxOutingMinutes: 1441 },
-      { ...defaults, preferredStops: 4 }, { ...defaults, preferredStops: 1.5 },
+      { ...defaults, preferredStops: 6 }, { ...defaults, preferredStops: 1.5 },
       { ...defaults, allergies: Array.from({ length: 13 }, (_, i) => `allergy-${i}`) }])
       expect(() => s.reduce(0, tx => api.saveAccountContext(tx, { contextJson: JSON.stringify(value) }))).toThrow();
     s.reduce(0, tx => api.logoutAccount(tx, {}));

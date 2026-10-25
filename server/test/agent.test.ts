@@ -215,12 +215,13 @@ describe("single coordinator flow", () => {
     }
   });
 
-  it("saves a 1–3 stop preference and rejects other stop counts", () => {
+  it("saves a 1–5 stop preference and rejects other stop counts", () => {
     const s = setup();
     expect(JSON.parse(s.save(0).resultJson!).hard.preferredStops).toBeNull();
+    expect(JSON.parse(s.save(0, { preferredStops: 5 }).resultJson!).hard.preferredStops).toBe(5);
     const saved = s.save(0, { preferredStops: 2 });
     expect(JSON.parse(saved.resultJson!).hard.preferredStops).toBe(2);
-    for (const preferredStops of [0, 4, 1.5, "2"]) {
+    for (const preferredStops of [0, 6, 1.5, "2"]) {
       const structuredJson = JSON.stringify({ budgetMaxPerPerson: null, maxOutingMinutes: null, dietary: [], allergies: [], preferredStops });
       expect(() => s.reduce(s.users[0].auth, tx => api.saveAgentPreferences(tx, { text: "", structuredJson }))).toThrow();
       expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.revision).toBe(saved.revision);
