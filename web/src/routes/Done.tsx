@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { Link } from "react-router";
 import { useGroup } from "../groupContext";
 import { useAgentOrders } from "../agentData";
-import { useAgentBallot } from "../useAgentBallot";
 import ChosenResult from "../components/ChosenResult";
 import MeetupCalendarAction from "../components/MeetupCalendarAction";
 import CalendarDownload from "../components/CalendarDownload";
@@ -11,8 +10,7 @@ import ShareResultAction from "../components/ShareResultAction";
 
 export default function Done() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
-  const { group, agent, session } = useGroup();
-  const { runId, loading, current, complete, winner, winnerNumber } = useAgentBallot(group, agent, session.memberId);
+  const { group, session, ballot: { runId, loading, current, complete, winner, winnerNumber } } = useGroup();
   const orders = useAgentOrders(runId, session.memberId);
   if (loading) return <p className="card" role="status">Loading the group’s choice…</p>;
   if (!current || !complete || !winner || !runId) return <section className="card space-y-4">

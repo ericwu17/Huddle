@@ -1,13 +1,12 @@
 import { Link, useLocation } from "react-router";
 import type { GroupContext } from "../groupContext";
 import Tick from "./Tick";
-import { useAgentBallot } from "../useAgentBallot";
 
 // The huddle's steps as a vertical rail: done steps are ticked, the open screen
 // is highlighted, steps the group hasn't reached yet are shown but locked.
 export default function AgentPhaseNav({ ctx }: { ctx: GroupContext }) {
   const { pathname } = useLocation();
-  const ballot = useAgentBallot(ctx.group, ctx.agent, ctx.session.memberId);
+  const { ballot } = ctx;
   const steps = [
     { route: "lobby", label: "People & invites", open: true },
     { route: "prefs", label: "Preferences", open: true },

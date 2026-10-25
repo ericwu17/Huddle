@@ -1,6 +1,5 @@
-import { useMemo } from "react";
-import { useTable } from "spacetimedb/react";
-import { tables } from "./module_bindings";
+import { createContext, useContext, useEffect } from "react";
+import type { CatalogVenueRow } from "./module_bindings/types";
 import { PLACE_BY_ID } from "./places";
 import type { MenuItem, Place, VenuePhoto } from "./types";
 
@@ -50,17 +49,26 @@ export function parseCatalogEvidence(json: string): Pick<CatalogListing, "observ
 
 // Display data follows the public Maincloud catalog. Never import the large raw
 // scrape into the frontend; legacy and pre-publish plans keep their lookup.
+export function buildCatalogListings(rows: readonly CatalogVenueRow[]) {
+  const listings = new Map<string, CatalogListing>(PLACE_BY_ID);
+  for (const row of rows) {
+    const evidence = parseCatalogEvidence(row.evidenceJson);
+    listings.set(row.id, {
+      ...listings.get(row.id), ...row, ...evidence,
+      rating: evidence.observation?.rating ?? row.rating, reviewCount: evidence.observation?.reviewCount ?? row.reviewCount,
+    });
+  }
+  return listings;
+}
+
+// CatalogProvider holds one subscription and one parsed copy for every card,
+// map and result, kept across routes once a screen has asked for it.
+export const CatalogState = createContext<{ listings: Map<string, CatalogListing>; request: () => void }>({
+  listings: PLACE_BY_ID, request: () => {},
+});
+
 export function useCatalogListings() {
-  const [rows] = useTable(tables.catalogVenues);
-  return useMemo(() => {
-    const listings = new Map<string, CatalogListing>(PLACE_BY_ID);
-    for (const row of rows) {
-      const evidence = parseCatalogEvidence(row.evidenceJson);
-      listings.set(row.id, {
-        ...listings.get(row.id), ...row, ...evidence,
-        rating: evidence.observation?.rating ?? row.rating, reviewCount: evidence.observation?.reviewCount ?? row.reviewCount,
-      });
-    }
-    return listings;
-  }, [rows]);
+  const { listings, request } = useContext(CatalogState);
+  useEffect(request, [request]);
+  return listings;
 }

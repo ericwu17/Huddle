@@ -1,7 +1,7 @@
 import { useHuddleLocation } from "../huddleLocation";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
-import { useGroupState, useLatestBooking, useMyPrivate, useVotes } from "../data";
+import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
 import { readinessFor, stepOf } from "../readiness";
 import type { Session } from "../session";
 import type { GroupStatus } from "../types";
@@ -108,6 +108,12 @@ export default function GroupLayout() {
     lastBooking.current = id;
   }, [agent, booking, navigate, session.groupId]);
 
+  // A stable context lets step screens skip rerendering when only data they
+  // don't read (timing, names, location, bookings) changes.
+  const groupCtx = useMemo<GroupContext | null>(() => group && agent !== undefined
+    ? { session, group, mine, isHost: group.isHost, agent, agentNeeds, ballot } : null,
+  [session, group, mine, agent, agentNeeds, ballot]);
+
   if (group === undefined || agent === undefined) return <HuddleLoading label="Loading your group" />;
   // Views only cover this phone's current group: the one it joined last.
   if (group === null || group.id !== session.groupId) {
@@ -134,14 +140,8 @@ export default function GroupLayout() {
     return <HuddleLoading label="Loading this Huddle’s context" />;
   }
 
-  const ctx: GroupContext = {
-    session,
-    group,
-    mine,
-    isHost: group.isHost,
-    agent,
-    agentNeeds,
-  };
+  // Set whenever group and agent have loaded, which the checks above ensure.
+  const ctx = groupCtx!;
 
   // Web layout: a vertical sidebar (who, steps, people) beside the step's
   // screen. On a phone the sidebar collapses to the header and the step list.
@@ -187,10 +187,9 @@ export default function GroupLayout() {
 
 // Desktop only: joined people and their public readiness.
 function SidebarPeople({ ctx }: { ctx: GroupContext }) {
-  const { group, session } = ctx;
+  const { group, session, ballot: { votes } } = ctx;
   const { pathname } = useLocation();
   const step = stepOf(pathname);
-  const votes = useVotes(group.latestRunId, session.memberId);
   return (
     <section className="sidebar-people card" aria-label="Who's in">
       <h2 className="section-title">Your people</h2>

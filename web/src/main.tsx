@@ -9,6 +9,7 @@ import { DoodleWorld } from "./doodle/Doodle";
 import { loadToken, saveToken } from "./session";
 import "./index.css";
 import AccountContextProvider from "./components/AccountContextProvider";
+import CatalogProvider from "./components/CatalogProvider";
 
 const uri = import.meta.env.NEXT_PUBLIC_SPACETIMEDB_URI as string | undefined;
 const db = import.meta.env.NEXT_PUBLIC_SPACETIMEDB_DB as string | undefined;
@@ -29,7 +30,7 @@ createRoot(document.getElementById("root")!).render(
     <DoodleWorld />
     {connectionBuilder ? (
       <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
-        <AccountContextProvider><RouterProvider router={router} /></AccountContextProvider>
+        <AccountContextProvider><CatalogProvider><RouterProvider router={router} /></CatalogProvider></AccountContextProvider>
       </SpacetimeDBProvider>
     ) : (
       <MissingConfig />

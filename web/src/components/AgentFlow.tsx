@@ -4,7 +4,7 @@ import { useProcedure, useReducer } from "spacetimedb/react";
 import { procedures, reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
-import { isReadyAgentPlan, useAgentMessages, useAgentOrders, useAgentPreferences, useAgentRun, type AgentOrder, type AgentPlan, type AgentStructuredPreferences, type AgentSuggestion } from "../agentData";
+import { isReadyAgentPlan, useAgentMessages, useAgentOrders, useAgentPreferences, type AgentOrder, type AgentPlan, type AgentStructuredPreferences, type AgentSuggestion } from "../agentData";
 import { useAccount, useAccountContext, type AccountContext } from "../accountData";
 import { PreferenceFields } from "./PreferenceFields";
 import { DEFAULT_PREFERENCES } from "../accountContextState";
@@ -14,7 +14,6 @@ import AgentVenueDetails from "./AgentVenueDetails";
 import { displayTime } from "../venueFormatting";
 import PrivateOrderSummary from "./PrivateOrderSummary";
 import { VoteChoice, VoteStatus } from "./VoteTally";
-import { useAgentBallot } from "../useAgentBallot";
 import PageHeading from "./PageHeading";
 import { useCalendarPlanning } from "../huddleTiming";
 import CalendarTimeSelector from "./CalendarTimeSelector";
@@ -182,8 +181,7 @@ export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, headi
 }
 
 export function AgentPlans() {
-  const { group, agent, session, isHost } = useGroup();
-  const planRun = useAgentRun(group.latestRunId);
+  const { group, agent, session, isHost, ballot: { planRun } } = useGroup();
   const orders = useAgentOrders(group.latestRunId, session.memberId);
   const messages = useAgentMessages(group.latestRunId).filter(message => message.speaker === "participant");
   const listings = useCatalogListings();
@@ -230,8 +228,7 @@ export function AgentPlans() {
 }
 
 export function AgentVote() {
-  const { group, session, agent } = useGroup();
-  const { runId, planRun, votes, loading, current, choices, complete, leaders, winner } = useAgentBallot(group, agent, session.memberId);
+  const { group, session, ballot: { runId, planRun, votes, loading, current, choices, complete, leaders, winner } } = useGroup();
   const orders = useAgentOrders(runId, session.memberId);
   const listings = useCatalogListings();
   const vote = useReducer(reducers.vote);

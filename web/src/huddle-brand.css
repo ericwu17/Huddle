@@ -39,23 +39,33 @@
 .huddle-route-view[inert] { visibility: hidden; }
 
 .huddle-loading { position: fixed; inset: 0; z-index: 90; isolation: isolate; display: grid; place-items: center; min-height: 100dvh; overflow: hidden; background: var(--sky); }
+/* The opaque loading screen hides the page's own world, so stop animating it. */
+body:has(.huddle-loading) .app-world * { animation-play-state: paused; }
 .huddle-loading-backdrop { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
 .huddle-loading-backdrop .doodle-world { width: 100%; height: 100%; display: block; }
 .huddle-loading-content { width: min(90vw, 460px); margin-top: -7vh; text-align: center; }
 .huddle-running-stage { position: relative; width: 350px; height: 246px; margin: 0 auto; }
 .huddle-running-track { position: absolute; width: 258px; height: 104px; left: 46px; top: 130px; border: 2px dashed rgb(255 253 247 / .55); border-radius: 50%; background: rgb(255 253 247 / .07); }
-.huddle-runner { position: absolute; left: calc(50% - 31px); top: 72px; will-change: transform; animation: huddle-lap 5.4s linear infinite; animation-delay: var(--run-delay); transform: translate(var(--rest-x), var(--rest-y)); }
+.huddle-runner { position: absolute; left: calc(50% - 31px); top: 72px; will-change: transform; animation: huddle-lap 5.4s linear infinite, huddle-depth 5.4s step-end infinite; animation-delay: var(--run-delay); transform: translate(var(--rest-x), var(--rest-y)); }
 .huddle-runner .pose-walk .fig { animation-duration: .28s; }
 .huddle-runner .pose-walk .arm, .huddle-runner .pose-walk .leg { animation-duration: .56s; }
 @keyframes huddle-lap {
-  0%, 100% { transform: translate(-122px, 0) scale(.95); z-index: 2; }
-  12.5% { transform: translate(-86px, -37px) scale(.89); z-index: 1; }
-  25% { transform: translate(0, -52px) scale(.86); z-index: 1; }
-  37.5% { transform: translate(86px, -37px) scale(.89); z-index: 1; }
-  50% { transform: translate(122px, 0) scale(.95); z-index: 2; }
-  62.5% { transform: translate(86px, 37px) scale(1.02); z-index: 3; }
-  75% { transform: translate(0, 52px) scale(1.05); z-index: 3; }
-  87.5% { transform: translate(-86px, 37px) scale(1.02); z-index: 3; }
+  0%, 100% { transform: translate(-122px, 0) scale(.95); }
+  12.5% { transform: translate(-86px, -37px) scale(.89); }
+  25% { transform: translate(0, -52px) scale(.86); }
+  37.5% { transform: translate(86px, -37px) scale(.89); }
+  50% { transform: translate(122px, 0) scale(.95); }
+  62.5% { transform: translate(86px, 37px) scale(1.02); }
+  75% { transform: translate(0, 52px) scale(1.05); }
+  87.5% { transform: translate(-86px, 37px) scale(1.02); }
+}
+/* Stacking flips halfway between lap keyframes, as integer z-index did when it
+   shared huddle-lap. On its own, the lap's transform can run on the compositor. */
+@keyframes huddle-depth {
+  0%, 93.75%, 100% { z-index: 2; }
+  6.25% { z-index: 1; }
+  43.75% { z-index: 2; }
+  56.25% { z-index: 3; }
 }
 .huddle-loading-caption { display: inline-flex; align-items: baseline; margin-top: 24px; padding-left: .7em; font-family: var(--hand); font-size: clamp(38px, 6vw, 48px); line-height: 1.25; color: var(--paper); text-shadow: 0 3px 0 var(--deep); }
 .huddle-loading-dots { display: inline-flex; width: .85em; }
