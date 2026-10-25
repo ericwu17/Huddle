@@ -276,6 +276,21 @@ describe("single coordinator flow", () => {
     expect(s.test.db.booking.id.find(job.bookingId)?.status).toBe("failed");
   });
 
+  it("keeps each vote secret until everyone has voted, then reveals the whole ballot", () => {
+    const s = setup(); s.ready(); const runId = s.plan();
+    const view = (i: number) => api.my_votes(s.test.viewContext(s.users[i].auth));
+    s.vote(0, runId, "choice-1");
+    // The voter sees their own choice; the other phone only learns THAT someone voted.
+    expect(view(0).map(v => [v.memberId, v.planId])).toEqual([[s.users[0].id, "choice-1"]]);
+    expect(view(1).map(v => [v.memberId, v.planId])).toEqual([[s.users[0].id, "hidden"]]);
+    expect(JSON.stringify(view(1))).not.toContain("choice-");
+    s.vote(1, runId, "choice-2");
+    expect(view(1).map(v => v.planId).sort()).toEqual(["choice-1", "choice-2"]);
+    expect(view(0).map(v => v.planId).sort()).toEqual(["choice-1", "choice-2"]);
+    // Changing a vote before the ballot completes is also kept private; stored rows are unchanged.
+    expect(s.test.db.vote.count()).toBe(2n);
+  });
+
   it("requires a full vote, a winning current plan, and host-only explicit booking", () => {
     const s = setup(); s.ready(); const run = s.plan(); s.vote(0, run);
     expect(() => s.book(0, run)).toThrow();

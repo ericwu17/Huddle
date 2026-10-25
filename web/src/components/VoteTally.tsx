@@ -4,15 +4,15 @@ import Tick from "./Tick";
 
 type Member = { id: string; name: string };
 
-// The strip at the top of the vote screen: how many voted, who is still deciding,
-// and whether there is a winner or a tie.
+// The strip at the top of the vote screen: how many voted and who is still
+// deciding. What each person picked stays secret until everyone has voted.
 export function VoteStatus({ votes, members, winnerTitle, tiedTitles }: {
   votes: Votes | undefined;
   members: Member[];
   winnerTitle?: string | null;
   tiedTitles?: string[];
 }) {
-  const voted = new Set(Object.values(votes?.byPlan ?? {}).flat());
+  const voted = new Set(votes?.voted ?? []);
   const waiting = members.filter((m) => !voted.has(m.id));
   const total = votes?.total ?? 0;
   return (
@@ -29,7 +29,8 @@ export function VoteStatus({ votes, members, winnerTitle, tiedTitles }: {
   );
 }
 
-// Under each plan: the vote button, a tally bar and the faces of who picked it.
+// Under each plan: the vote button. The tally and who picked what appear only
+// once everyone has voted; before that the ballot is secret.
 export function VoteChoice({ planId, title, votes, members, myMemberId, busy, onVote }: {
   planId: string;
   title: string;
@@ -40,6 +41,7 @@ export function VoteChoice({ planId, title, votes, members, myMemberId, busy, on
   onVote: () => void;
 }) {
   const mine = votes?.myVote === planId;
+  const revealed = members.length > 0 && votes?.total === members.length;
   const voterIds = votes?.byPlan?.[planId] ?? [];
   const voters = members.filter((m) => voterIds.includes(m.id));
   const share = members.length ? voterIds.length / members.length : 0;
@@ -53,22 +55,24 @@ export function VoteChoice({ planId, title, votes, members, myMemberId, busy, on
       >
         {mine ? <span className="inline-flex items-center gap-2"><Tick size={18} />Your vote: {title}</span> : `Vote for ${title}`}
       </button>
-      <div className="vote-bar" aria-hidden="true"><span style={{ width: `${Math.round(share * 100)}%` }} /></div>
-      <div className="vote-voters">
-        <b>{voterIds.length} {voterIds.length === 1 ? "vote" : "votes"}</b>
-        {voters.length ? (
-          <ul aria-label={`Voted for ${title}`}>
-            {voters.map((m) => (
-              <li key={m.id}>
-                <Buddy who={m.name} pose="huddle" size={34} />
-                <span>{m.id === myMemberId ? "You" : m.name}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <span className="muted">No votes yet</span>
-        )}
-      </div>
+      {revealed ? <>
+        <div className="vote-bar" aria-hidden="true"><span style={{ width: `${Math.round(share * 100)}%` }} /></div>
+        <div className="vote-voters">
+          <b>{voterIds.length} {voterIds.length === 1 ? "vote" : "votes"}</b>
+          {voters.length ? (
+            <ul aria-label={`Voted for ${title}`}>
+              {voters.map((m) => (
+                <li key={m.id}>
+                  <Buddy who={m.name} pose="huddle" size={34} />
+                  <span>{m.id === myMemberId ? "You" : m.name}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <span className="muted">No votes</span>
+          )}
+        </div>
+      </> : mine ? <p className="on-sky text-sm vote-secret">Your vote is saved. Everyone's choices are revealed once all have voted.</p> : null}
     </div>
   );
 }

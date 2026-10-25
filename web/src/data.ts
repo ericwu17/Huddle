@@ -122,12 +122,15 @@ export function useVotes(runId: string | null, myMemberId: string): Votes | unde
     const counts: Record<string, number> = {};
     const byPlan: Record<string, string[]> = {};
     for (const v of inRun) {
+      // "hidden" stands in for someone else's choice while the ballot is open.
+      if (v.planId === "hidden") continue;
       counts[v.planId] = (counts[v.planId] ?? 0) + 1;
       (byPlan[v.planId] ??= []).push(v.memberId);
     }
     return {
       counts,
       byPlan,
+      voted: inRun.map((v) => v.memberId),
       total: inRun.length,
       myVote: inRun.find((v) => v.memberId === myMemberId)?.planId ?? null,
     };

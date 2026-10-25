@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
+import { readinessFor } from "../readiness";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 import FriendPicker from "../components/FriendPicker";
@@ -12,7 +13,8 @@ import CalendarTimeSelector from "../components/CalendarTimeSelector";
 import SendInvitationMessageButton from "../components/SendInvitationMessageButton";
 
 export default function Lobby() {
-  const { group, session, isHost, agent } = useGroup();
+  const ctx = useGroup();
+  const { group, session, isHost, agent } = ctx;
   const setReady = useReducer(reducers.setReady);
   const setOrigin = useReducer(reducers.setOrigin);
   const setDemoMode = useReducer(reducers.setDemoMode);
@@ -56,7 +58,7 @@ export default function Lobby() {
             <li key={m.id} className="crowd-member">
               <Buddy who={m.name} pose={m.ready ? "huddle" : "idle"} size={76} boil={m.id === session.memberId} />
               <b>{m.name}</b>
-              <span className={`sticker ${m.ready ? "sticker-lime" : ""}`}>{m.ready ? "ready ✓" : "not yet"}</span>
+              <span className={`sticker ${readinessFor("lobby", ctx, m.id).ready ? "sticker-lime" : ""}`}>{readinessFor("lobby", ctx, m.id).label}</span>
             </li>
           ))}
         </ul>
