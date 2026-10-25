@@ -179,7 +179,7 @@ export function AgentPlans() {
   const { group, agent, session, isHost } = useGroup();
   const planRun = useAgentRun(group.latestRunId);
   const orders = useAgentOrders(group.latestRunId, session.memberId);
-  const messages = useAgentMessages(group.latestRunId);
+  const messages = useAgentMessages(group.latestRunId).filter(message => message.speaker === "participant");
   const { findPlans: find, ready: timingReady } = useCalendarPlanning();
   const post = useReducer(reducers.postAgentDiscussion);
   const { run, busy, error } = useRun();
@@ -207,7 +207,7 @@ export function AgentPlans() {
     <details className="card group-discussion">
       <summary>Group conversation{messages.length ? ` (${messages.length})` : ""}</summary>
       <div className="space-y-3">
-      <ol className="space-y-3">{messages.map(m => <li key={String(m.id)}><strong>{m.label}</strong><p>{m.text}</p></li>)}</ol>
+      {messages.length ? <ol className="space-y-3">{messages.map(m => <li key={String(m.id)}><strong>{m.label}</strong><p>{m.text}</p></li>)}</ol> : <p className="muted">No messages yet.</p>}
       {canDiscuss ? <form className="space-y-2" onSubmit={e => { e.preventDefault(); void run(async () => { await post({ text: message }); setMessage(""); }); }}>
         <label htmlFor="group-discussion">Message everyone</label>
         <textarea id="group-discussion" className="input" maxLength={2000} value={message} onChange={e => setMessage(e.target.value)} />

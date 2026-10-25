@@ -188,10 +188,9 @@ function StreetMap({ plan, lines }: Props) {
           </li>
         ))}
       </ol>
-      {plan.stops.length > 1 ? (
+      {plan.stops.length > 1 && !route ? (
         <p className="muted px-4 pb-3 text-sm">
           {route === undefined ? "Finding the walking route…"
-            : route ? "Walking route and times: OpenStreetMap estimate (FOSSGIS OSRM)."
             : "Walking route unavailable. Grey dashes are a straight-line guide, not a path."}
         </p>
       ) : null}
