@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
@@ -12,6 +13,7 @@ import CalendarDownload from "../components/CalendarDownload";
 import ShareResultAction from "../components/ShareResultAction";
 
 export default function Done() {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   const { group, agent, session, isHost } = useGroup();
   const { runId, loading, current, complete, winner, winnerNumber } = useAgentBallot(group, agent, session.memberId);
   const orders = useAgentOrders(runId, session.memberId);
