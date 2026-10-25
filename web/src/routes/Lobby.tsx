@@ -13,7 +13,6 @@ import { Buddy } from "../doodle/Doodle";
 import FriendPicker from "../components/FriendPicker";
 import { useAccount, useHuddleInvitations, useInvitationDeliveries } from "../accountData";
 import InvitationDelivery from "../components/InvitationDelivery";
-import SendInvitationMessageButton from "../components/SendInvitationMessageButton";
 
 export default function Lobby() {
   const ctx = useGroup();
@@ -55,7 +54,7 @@ export default function Lobby() {
           <button className="btn btn-sun" disabled={busy || !selected.length} onClick={() => run(async () => { await invite({ groupId: group.id, friendAccountIds: selected }); setNotice(`In-app invitations sent to ${selected.length} ${selected.length === 1 ? "friend" : "friends"}.`); setSelected([]); })}>Send invitations</button>
           <p className="muted">Invitations arrive in their Huddle inbox.</p>
           {notice ? <p role="status">{notice}</p> : null}
-          {sent.length ? <ul className="space-y-3">{sent.map(i => <li className="space-y-2" key={i.id}><strong>{i.toDisplayName}</strong> · {i.status}<InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} /><SendInvitationMessageButton invitationId={i.id} pending={i.status === "pending"} status={deliveries?.find(d => d.invitationId === i.id)?.status} /></li>)}</ul> : null}
+          {sent.length ? <ul className="space-y-3">{sent.map(i => <li className="space-y-2" key={i.id}><strong>{i.toDisplayName}</strong> · {i.status}<InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} /></li>)}</ul> : null}
         </> : <><p>Sign in to invite friends from your list.</p><Link className="btn" to="/login">Sign in</Link></>}
       </section>
 
