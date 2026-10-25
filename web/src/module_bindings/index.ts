@@ -76,6 +76,7 @@ import * as ConnectorStatusProcedure from "./connector_status_procedure";
 import * as CreateAgentGroupProcedure from "./create_agent_group_procedure";
 import * as CreateGroupProcedure from "./create_group_procedure";
 import * as CreateInvitationHuddleProcedure from "./create_invitation_huddle_procedure";
+import * as CreateNamedInvitationHuddleProcedure from "./create_named_invitation_huddle_procedure";
 import * as CreateResultShareProcedure from "./create_result_share_procedure";
 import * as DoRouletteProcedure from "./do_roulette_procedure";
 import * as GetResultShareProcedure from "./get_result_share_procedure";
@@ -108,6 +109,7 @@ import MyFriendsRow from "./my_friends_table";
 import MyGroupRow from "./my_group_table";
 import MyGroupConnectorsRow from "./my_group_connectors_table";
 import MyHuddleInvitationsRow from "./my_huddle_invitations_table";
+import MyHuddleNamesRow from "./my_huddle_names_table";
 import MyHuddleTimingRow from "./my_huddle_timing_table";
 import MyInvitationDeliveriesRow from "./my_invitation_deliveries_table";
 import MyMeetupRow from "./my_meetup_table";
@@ -262,6 +264,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyHuddleInvitationsRow),
+  myHuddleNames: __table({
+    name: 'my_huddle_names',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyHuddleNamesRow),
   myHuddleTiming: __table({
     name: 'my_huddle_timing',
     indexes: [
@@ -373,6 +382,7 @@ const proceduresSchema = __procedures(
   __procedureSchema("create_agent_group", CreateAgentGroupProcedure.params, CreateAgentGroupProcedure.returnType),
   __procedureSchema("create_group", CreateGroupProcedure.params, CreateGroupProcedure.returnType),
   __procedureSchema("create_invitation_huddle", CreateInvitationHuddleProcedure.params, CreateInvitationHuddleProcedure.returnType),
+  __procedureSchema("create_named_invitation_huddle", CreateNamedInvitationHuddleProcedure.params, CreateNamedInvitationHuddleProcedure.returnType),
   __procedureSchema("create_result_share", CreateResultShareProcedure.params, CreateResultShareProcedure.returnType),
   __procedureSchema("do_roulette", DoRouletteProcedure.params, DoRouletteProcedure.returnType),
   __procedureSchema("get_result_share", GetResultShareProcedure.params, GetResultShareProcedure.returnType),
@@ -427,6 +437,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "my_group_connectors": Omit<typeof tablesSchema.schemaType.tables["myGroupConnectors"], "accessorName"> & { readonly accessorName: "my_group_connectors" };
     /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
     readonly "my_huddle_invitations": Omit<typeof tablesSchema.schemaType.tables["myHuddleInvitations"], "accessorName"> & { readonly accessorName: "my_huddle_invitations" };
+    /** @deprecated Use `myHuddleNames` instead. This alias will be removed in the next major version. */
+    readonly "my_huddle_names": Omit<typeof tablesSchema.schemaType.tables["myHuddleNames"], "accessorName"> & { readonly accessorName: "my_huddle_names" };
     /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
     readonly "my_huddle_timing": Omit<typeof tablesSchema.schemaType.tables["myHuddleTiming"], "accessorName"> & { readonly accessorName: "my_huddle_timing" };
     /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
@@ -483,6 +495,7 @@ const tableAccessorAliases = {
   "my_group": "myGroup",
   "my_group_connectors": "myGroupConnectors",
   "my_huddle_invitations": "myHuddleInvitations",
+  "my_huddle_names": "myHuddleNames",
   "my_huddle_timing": "myHuddleTiming",
   "my_invitation_deliveries": "myInvitationDeliveries",
   "my_meetup": "myMeetup",
@@ -552,6 +565,8 @@ export type DbView = __DbViewBase & {
   readonly "my_group_connectors": __DbViewBase["myGroupConnectors"];
   /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_invitations": __DbViewBase["myHuddleInvitations"];
+  /** @deprecated Use `myHuddleNames` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_names": __DbViewBase["myHuddleNames"];
   /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_timing": __DbViewBase["myHuddleTiming"];
   /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
@@ -614,6 +629,8 @@ export type Tables = __TablesBase & {
   readonly "my_group_connectors": __TablesBase["myGroupConnectors"];
   /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_invitations": __TablesBase["myHuddleInvitations"];
+  /** @deprecated Use `myHuddleNames` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_names": __TablesBase["myHuddleNames"];
   /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_timing": __TablesBase["myHuddleTiming"];
   /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */

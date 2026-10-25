@@ -407,6 +407,7 @@ export const HuddleTiming = __t.object("HuddleTiming", {
   groupId: __t.string(),
   timeOfDay: __t.string(),
   source: __t.string(),
+  membersKey: __t.string(),
 });
 export type HuddleTiming = __Infer<typeof HuddleTiming>;
 
@@ -744,6 +745,15 @@ export type MyHuddleInvitationRow = __Infer<typeof MyHuddleInvitationRow>;
 
 export const MyHuddleInvitations = __t.object("MyHuddleInvitations", {});
 export type MyHuddleInvitations = __Infer<typeof MyHuddleInvitations>;
+
+export const MyHuddleNameRow = __t.object("MyHuddleNameRow", {
+  groupId: __t.string(),
+  name: __t.option(__t.string()),
+});
+export type MyHuddleNameRow = __Infer<typeof MyHuddleNameRow>;
+
+export const MyHuddleNames = __t.object("MyHuddleNames", {});
+export type MyHuddleNames = __Infer<typeof MyHuddleNames>;
 
 export const MyHuddleTiming = __t.object("MyHuddleTiming", {});
 export type MyHuddleTiming = __Infer<typeof MyHuddleTiming>;

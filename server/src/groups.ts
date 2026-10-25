@@ -44,7 +44,15 @@ function requireHost(tx: Tx) {
   return group;
 }
 
+export function cleanHuddleName(name: string): string {
+  const clean = name.trim().replace(/\s+/g, " ");
+  if (!clean || clean.length > 80 || /[\u0000-\u001f\u007f]/u.test(clean))
+    throw new SenderError("Give your Huddle a name between 1 and 80 characters.");
+  return clean;
+}
+
 export function createGroupInTx(tx: Tx, name: string | undefined) {
+  if (name !== undefined) name = cleanHuddleName(name);
   let code = randomCode(tx);
   while (tx.db.group.code.find(code)) code = randomCode(tx);
   const now = nowMs(tx);

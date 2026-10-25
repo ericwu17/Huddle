@@ -20,6 +20,7 @@ import { winnerTransition } from "../agentBallot";
 import HuddleLoading from "../components/HuddleLoading";
 import { useHuddleTiming } from "../huddleTiming";
 import HuddleBrand from "../components/HuddleBrand";
+import { useHuddleNames } from "../accountData";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -34,6 +35,7 @@ export default function GroupLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const group = useGroupState();
+  const huddleNames = useHuddleNames();
   const mine = useMyPrivate();
   const booking = useLatestBooking();
   const agent = useAgentState();
@@ -141,6 +143,7 @@ export default function GroupLayout() {
         <header className="topbar">
           <HuddleBrand />
         </header>
+        <p className="group-name on-sky">{huddleNames?.find(h => h.groupId === group.id)?.name || `Huddle ${group.code}`}</p>
         <span className="me-tag">
           <Buddy who={session.name} size={56} crown />
           <span>

@@ -612,3 +612,21 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
   .comparison-grid .option-route { min-height: 0; }
   .page-actions { width: 100%; }
 }
+
+/* A small paper popup before the invitation/lobby step. */
+.name-huddle-dialog { width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow-y: auto; margin: auto; padding: 28px; border: 3px solid var(--ink); border-radius: 28px; color: var(--ink); background: var(--paper); box-shadow: 8px 9px 0 var(--ink); }
+.name-huddle-dialog::backdrop { background: rgb(20 35 143 / .55); backdrop-filter: blur(5px); }
+.name-huddle-close { position: absolute; top: 12px; right: 14px; width: 44px; height: 44px; border: 2px solid var(--ink); border-radius: 50%; background: var(--paper); font-size: 28px; cursor: pointer; }
+.name-huddle-art { display: flex; justify-content: center; margin-bottom: 8px; }
+.name-huddle-dialog h2 { font-size: clamp(24px, 5vw, 32px); line-height: 1.2; font-weight: 800; text-align: center; margin: 0 0 16px; }
+.name-huddle-dialog h2 span { display: block; color: var(--cobalt); font-family: var(--hand); font-size: 1.3em; font-weight: 400; }
+.name-huddle-dialog > p { text-align: center; margin-bottom: 24px; }
+.name-huddle-field { display: flex; flex-direction: column; gap: 8px; font-weight: 800; }
+.name-huddle-field .input { font-family: var(--hand); font-size: 24px; font-weight: 400; }
+.name-huddle-suggestions { display: flex; flex-wrap: wrap; gap: 8px; }
+.name-suggestion { padding: 8px 12px; min-height: 44px; border: 2px dashed var(--cobalt); border-radius: 999px; color: var(--cobalt); font-size: 13px; font-weight: 700; cursor: pointer; background: #edf0ff; }
+.name-suggestion:hover { background: var(--note); }
+.name-huddle-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.huddle-list-name { overflow-wrap: anywhere; }
+.group-name { font-family: var(--hand); font-size: 28px; line-height: 1.2; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .name-huddle-dialog { padding: 24px 18px; } .name-huddle-actions .btn { flex: 1; } }

@@ -59,3 +59,8 @@ export function useMeetup() {
   const [rows, ready] = useTable(tables.myMeetup);
   return ready ? rows[0] ?? null : undefined;
 }
+
+export function useHuddleNames() {
+  const [rows, ready] = useTable(tables.myHuddleNames);
+  return ready ? rows : undefined;
+}

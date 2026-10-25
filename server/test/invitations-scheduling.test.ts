@@ -146,6 +146,60 @@ describe("private invitation intent and atomic start", () => {
     expect(s.test.db.group.count()).toBe(1n);
   });
 
+  it("shares only the explicit name, persists it for members and keeps retry creation atomic", () => {
+    const s = setup(); s.friend();
+    const args = { requestId: "named-request-01", summary: "PRIVATE_PREFERENCES_DO_NOT_SHARE", outingKind: "hangout",
+      friendAccountIds: [s.account(1).accountId], name: "  Friday   night bites 🍔  " };
+    const first = api.createNamedInvitationHuddle(s.proc(s.users[0]), args);
+    expect(api.createNamedInvitationHuddle(s.proc(s.users[0]), { ...args, name: "Friday night bites 🍔" })).toEqual(first);
+    expect(s.test.db.group.count()).toBe(1n);
+    expect(s.test.db.huddle_invitation.count()).toBe(1n);
+    expect(s.test.db.group.id.find(first.groupId)?.name).toBe("Friday night bites 🍔");
+    expect(api.my_huddle_names(s.test.viewContext(s.users[0]))).toEqual([{ groupId: first.groupId, name: "Friday night bites 🍔" }]);
+    expect(api.my_huddle_names(s.test.viewContext(s.users[1]))).toEqual([]);
+    expect(api.my_huddle_names(s.test.viewContext(s.users[2]))).toEqual([]);
+    const invitation = api.my_huddle_invitations(s.test.viewContext(s.users[1]))[0];
+    expect(invitation.groupName).toBe("Friday night bites 🍔");
+    expect(JSON.stringify(invitation)).not.toContain("PRIVATE_PREFERENCES");
+    s.reduce(s.users[1], tx => api.respondHuddleInvitation(tx, { invitationId: invitation.id, accept: true }));
+    expect(api.my_huddle_names(s.test.viewContext(s.users[1]))).toEqual([{ groupId: first.groupId, name: "Friday night bites 🍔" }]);
+    expect(api.my_account_memberships(s.test.viewContext(s.users[0]))[0].name).toBe("ALICE");
+    expect(() => api.createNamedInvitationHuddle(s.proc(s.users[0]), { ...args, name: "Different draft" })).toThrow(/different invitation/);
+    expect(s.test.db.group.count()).toBe(1n);
+  });
+
+  it("rejects blank, overlong and control-character names before creating anything", () => {
+    const s = setup();
+    for (const name of ["   ", "x".repeat(81), "Dinner\u0000crew"]) {
+      expect(() => api.createNamedInvitationHuddle(s.proc(s.users[0]), { requestId: "invalid-name-01", summary: "",
+        outingKind: "hangout", friendAccountIds: [], name })).toThrow(/name between 1 and 80/);
+    }
+    expect(s.test.db.group.count()).toBe(0n);
+    expect(s.test.db.invitation_start.count()).toBe(0n);
+  });
+
+  it("recovers the name on a new login and hides it again on logout or list removal", () => {
+    const s = setup();
+    const first = api.createNamedInvitationHuddle(s.proc(s.users[0]), { requestId: "name-recovery-01", summary: "",
+      outingKind: "hangout", friendAccountIds: [], name: "Coffee catch-up" });
+    s.reduce(s.users[2], tx => api.logoutAccount(tx, {}));
+    expect(api.loginAccount(s.proc(s.users[2]), { username: "alice", password: "synthetic-password" }).ok).toBe(true);
+    expect(api.my_huddle_names(s.test.viewContext(s.users[2]))).toEqual([{ groupId: first.groupId, name: "Coffee catch-up" }]);
+    s.reduce(s.users[0], tx => api.logoutAccount(tx, {}));
+    expect(api.my_huddle_names(s.test.viewContext(s.users[0]))).toEqual([]);
+    s.reduce(s.users[2], tx => api.removeHuddle(tx, { groupId: first.groupId }));
+    expect(api.my_huddle_names(s.test.viewContext(s.users[2]))).toEqual([]);
+  });
+
+  it("shows a named guest Huddle only to its joined guest", () => {
+    const s = setup();
+    const guest = TestAuth.fromJwtPayload(JSON.stringify({ iss: "invite-calendar-tests", sub: "guest" }), new ConnectionId(4n));
+    const group = api.createAgentGroup(s.proc(guest), { name: "  Guest   adventure  " });
+    api.joinGroup(s.proc(guest), { code: group.code, name: "Riley" });
+    expect(api.my_huddle_names(s.test.viewContext(guest))).toEqual([{ groupId: group.groupId, name: "Guest adventure" }]);
+    expect(api.my_huddle_names(s.test.viewContext(s.users[0]))).toEqual([]);
+  });
+
   it("atomically rejects a foreign friend without creating a huddle or membership", () => {
     const s = setup(); s.friend(1, 2);
     expect(() => s.create({ friendAccountIds: [s.account(2).accountId] })).toThrow();

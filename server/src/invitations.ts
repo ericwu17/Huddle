@@ -1,7 +1,8 @@
 // Recipient preview and an atomic, idempotent invitation start. Never private preferences.
 import { SenderError, t } from "spacetimedb/server";
 import spacetimedb from "./schema";
-import { createGroupInTx } from "./groups";
+import { createGroupInTx, cleanHuddleName } from "./groups";
+import type { Tx } from "./lib/types";
 import { requireAccount, membershipKey } from "./lib/account-state";
 import { callApi } from "./lib/api";
 import { newId, nowMs } from "./lib/util";
@@ -35,35 +36,43 @@ export const parseHuddleIntent = spacetimedb.procedure({ text: t.string() }, int
   });
 });
 
-export const createInvitationHuddle = spacetimedb.procedure(
-  { requestId: t.string(), summary: t.string(), outingKind: t.string(), friendAccountIds: t.array(t.string()) },
-  t.object("CreateInvitationHuddleResult", { groupId: t.string(), memberId: t.string(), code: t.string() }),
-  (ctx, args) => ctx.withTx(tx => {
-    const { account, session } = requireAccount(tx);
-    if (!/^[A-Za-z0-9_-]{8,100}$/.test(args.requestId) || !Object.hasOwn(summaries, args.outingKind)) throw new SenderError("Review the invitation before starting.");
-    const selected = [...new Set(args.friendAccountIds)].sort();
-    if (selected.length > 11 || selected.some(id => !tx.db.account_friend.id.find(`${account.id}:${id}`)))
-      throw new SenderError("Choose up to 11 people from your current friends.");
-    const fingerprint = JSON.stringify([args.outingKind, selected]);
-    const key = `${account.id}:${args.requestId}`;
-    const previous = tx.db.invitation_start.requestId.find(key);
-    if (previous) {
-      if (previous.fingerprint !== fingerprint) throw new SenderError("This request already started a different invitation. Start a new draft.");
-      tx.db.account_session.identity.update({ ...session, activeGroupId: previous.groupId });
-      return { groupId: previous.groupId, memberId: previous.memberId, code: previous.code };
-    }
-    const group = createGroupInTx(tx, summaries[args.outingKind]);
-    tx.db.agent_session.insert({ groupId: group.groupId, revision: 0, status: "needs", activeRunId: undefined, error: undefined });
-    const created = tx.db.group.id.find(group.groupId)!;
-    tx.db.group.id.update({ ...created, date: "", windowStart: "", windowEnd: "" });
-    saveHuddleTiming(tx, group.groupId, "pending");
-    const memberId = newId(tx, "m", id => !!tx.db.member.id.find(id));
-    tx.db.member.insert({ id: memberId, groupId: group.groupId, identity: account.principal, name: account.displayName,
-      originLat: undefined, originLng: undefined, ready: false, swipeCount: 0, joinedAt: nowMs(tx) });
-    tx.db.account_membership.insert({ id: membershipKey(account.id, group.groupId), accountId: account.id, groupId: group.groupId, memberId, role: "host" });
-    tx.db.account_session.identity.update({ ...session, activeGroupId: group.groupId });
-    if (selected.length) inviteFriends(tx, { groupId: group.groupId, friendAccountIds: selected });
-    tx.db.invitation_start.insert({ requestId: key, accountId: account.id, groupId: group.groupId, memberId, code: group.code, fingerprint });
-    return { ...group, memberId };
-  }),
-);
+const startArgs = { requestId: t.string(), summary: t.string(), outingKind: t.string(), friendAccountIds: t.array(t.string()) };
+const startResult = t.object("CreateInvitationHuddleResult", { groupId: t.string(), memberId: t.string(), code: t.string() });
+type StartArgs = { requestId: string; summary: string; outingKind: string; friendAccountIds: string[] };
+
+function startInvitationHuddle(tx: Tx, args: StartArgs, explicitName?: string) {
+  const { account, session } = requireAccount(tx);
+  if (!/^[A-Za-z0-9_-]{8,100}$/.test(args.requestId) || !Object.hasOwn(summaries, args.outingKind)) throw new SenderError("Review the invitation before starting.");
+  const selected = [...new Set(args.friendAccountIds)].sort();
+  if (selected.length > 11 || selected.some(id => !tx.db.account_friend.id.find(`${account.id}:${id}`)))
+    throw new SenderError("Choose up to 11 people from your current friends.");
+  const fingerprint = JSON.stringify(explicitName === undefined ? [args.outingKind, selected] : [args.outingKind, selected, explicitName]);
+  const key = `${account.id}:${args.requestId}`;
+  const previous = tx.db.invitation_start.requestId.find(key);
+  if (previous) {
+    if (previous.fingerprint !== fingerprint) throw new SenderError("This request already started a different invitation. Start a new draft.");
+    tx.db.account_session.identity.update({ ...session, activeGroupId: previous.groupId });
+    return { groupId: previous.groupId, memberId: previous.memberId, code: previous.code };
+  }
+  // Only the separate, explicit name is shared; summary may contain private prompt text.
+  const group = createGroupInTx(tx, explicitName ?? summaries[args.outingKind]);
+  tx.db.agent_session.insert({ groupId: group.groupId, revision: 0, status: "needs", activeRunId: undefined, error: undefined });
+  const created = tx.db.group.id.find(group.groupId)!;
+  tx.db.group.id.update({ ...created, date: "", windowStart: "", windowEnd: "" });
+  saveHuddleTiming(tx, group.groupId, "pending");
+  const memberId = newId(tx, "m", id => !!tx.db.member.id.find(id));
+  tx.db.member.insert({ id: memberId, groupId: group.groupId, identity: account.principal, name: account.displayName,
+    originLat: undefined, originLng: undefined, ready: false, swipeCount: 0, joinedAt: nowMs(tx) });
+  tx.db.account_membership.insert({ id: membershipKey(account.id, group.groupId), accountId: account.id, groupId: group.groupId, memberId, role: "host" });
+  tx.db.account_session.identity.update({ ...session, activeGroupId: group.groupId });
+  if (selected.length) inviteFriends(tx, { groupId: group.groupId, friendAccountIds: selected });
+  tx.db.invitation_start.insert({ requestId: key, accountId: account.id, groupId: group.groupId, memberId, code: group.code, fingerprint });
+  return { ...group, memberId };
+}
+
+// Keep the original four-argument contract for older clients and invitation prompts.
+export const createInvitationHuddle = spacetimedb.procedure(startArgs, startResult,
+  (ctx, args) => ctx.withTx(tx => startInvitationHuddle(tx, args)));
+
+export const createNamedInvitationHuddle = spacetimedb.procedure({ ...startArgs, name: t.string() }, startResult,
+  (ctx, args) => ctx.withTx(tx => startInvitationHuddle(tx, args, cleanHuddleName(args.name))));

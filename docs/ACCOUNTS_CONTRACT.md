@@ -60,6 +60,30 @@ addressed invitation creates/reuses a durable membership and selects that group
 for this device. Selecting an old huddle changes no readiness, needs, votes or
 booking. Joining never implies readiness or acceptance of anyone else's limits.
 
+## Explicit Huddle names
+
+Home's **Start a huddle** opens a themed naming dialog before the invitation/lobby
+screen. Suggestions fill the name input; Cancel/Escape creates nothing. **Skip
+for now** keeps the existing default. A name is an explicit shared label, never
+auto-derived from private preference text.
+
+The additive `create_named_invitation_huddle` procedure takes the original
+`requestId, summary, outingKind, friendAccountIds` arguments followed by `name`.
+It atomically creates the named group, host membership and any addressed invites.
+Names normalize whitespace and must contain 1–80 characters. The normalized name
+is part of the idempotency fingerprint; a repeated request returns the same group,
+while changed inputs cannot silently rename or duplicate it. The original
+four-argument `create_invitation_huddle` contract remains unchanged and still
+ignores untrusted summary text for the public label. Guest creation uses the
+existing optional `name` field with the same validation.
+
+`my_huddle_names` returns `{groupId, name?}` only for the caller's verified account
+memberships (or the current anonymous group). It leaves member display names and
+existing wire shapes unchanged. Home, the group header and addressed invitations
+show the saved label; it survives refresh and same-account login on another device.
+Run `SPACETIMEDB_URI=... SPACETIMEDB_DB=... node scripts/huddle-names-smoke.mjs`
+against an explicit test database for synthetic connected contract checks.
+
 ## Private, explicitly saved context
 
 `account_context` is private and keyed by account ID. `my_account_context` returns

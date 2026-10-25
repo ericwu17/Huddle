@@ -7,7 +7,7 @@ export { runPlanJob, runVotingCapJob, runOffersJob, acceptOffer, declineOffer, c
 export { runScoutJob, runCouncilJob } from "./council";
 export { startBooking, runCallJob, runFakeEventJob } from "./booking";
 export {
-  my_group, my_members, my_private, my_offers, my_plan_runs, my_council_messages,
+  my_group, my_huddle_names, my_members, my_private, my_offers, my_plan_runs, my_council_messages,
   my_scout, my_votes, my_bookings, my_call_events, catalog_status, catalog_venues,
 } from "./views";
 export { health, callEvent, councilMessage, catalogPush, googleOAuthClaim, googleOAuthComplete, router } from "./http";
@@ -29,6 +29,6 @@ export { saveMessageConnector, setCalendarEventConsent, disconnectGoogleCalendar
   my_group_connectors, runInvitationDeliveryJob, runCalendarOAuthExpiryJob, runCalendarRevokeJob } from "./connectors";
 export { searchMacContacts, saveFriendContact, clearFriendContact, my_friend_contact_destinations } from "./contacts";
 export { sendInvitationMessage } from "./connectors";
-export { parseHuddleIntent, createInvitationHuddle } from "./invitations";
+export { parseHuddleIntent, createInvitationHuddle, createNamedInvitationHuddle } from "./invitations";
 export { scheduleHuddle, setHuddleWindow, setHuddleTimePreference, my_huddle_timing, confirmMeetup, runMeetupJob, my_meetup } from "./scheduling";
 export { createResultShare, getResultShare } from "./sharing";

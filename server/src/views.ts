@@ -52,6 +52,22 @@ export const my_group = spacetimedb.view(
   },
 );
 
+// Additive name projection: preserve existing membership/group wire shapes.
+// Account names follow explicit memberships; guests see only their current group.
+export const my_huddle_names = spacetimedb.view(pub("my_huddle_names"), t.array(t.row("MyHuddleNameRow", {
+  groupId: t.string().primaryKey(), name: t.option(t.string()),
+})), ctx => {
+  const session = ctx.db.account_session.identity.find(ctx.sender);
+  const account = session?.accountId && ctx.db.account.id.find(session.accountId);
+  if (account) return Array.from(ctx.db.account_membership.accountId.filter(account.id)).flatMap(m => {
+    const group = ctx.db.group.id.find(m.groupId);
+    const member = ctx.db.member.id.find(m.memberId);
+    return group && member?.identity.isEqual(account.principal) ? [{ groupId: group.id, name: group.name }] : [];
+  });
+  const group = !session && myGroup(ctx);
+  return group ? [{ groupId: group.id, name: group.name }] : [];
+});
+
 export const my_members = spacetimedb.view(
   pub("my_members"),
   t.array(t.row("MyMemberRow", { id: t.string().primaryKey(), name: t.string(), ready: t.bool(), swipeCount: t.u32() })),
