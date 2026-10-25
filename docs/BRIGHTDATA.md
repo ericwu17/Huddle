@@ -18,7 +18,14 @@ Restaurants, boba shops and places to hang out in Berkeley, from **Google Maps a
 | boba | boba, bubble tea, tea house | dessert (`cafe_dessert`) |
 | hangout | bars, cafes, arcade, bowling, karaoke, board game cafe, escape room, museum, live music, comedy club, movie theater, parks | activity (cafes: dessert) |
 
-A place's group comes from its own categories, not from the keyword that found it. Searching "restaurants" also returns cafes. Areas outside Berkeley are kept in the output but never merged into the catalog. The Berkeley area is the `BERKELEY` rectangle in `data/fetch_places.py`.
+A place's group comes from its own categories, not from the keyword that found it. Searching "restaurants" also returns cafes.
+
+**Areas.** `discover --areas` takes a comma list of `berkeley` (the default), `oakland` and `sf`. Each area is a rectangle in `AREAS` in `collect.py`, covered by its own grid of points about 1 mi apart, and runs as its own job.
+- `berkeley` is the `BERKELEY` rectangle in `data/fetch_places.py`, with 12 points.
+- `oakland` runs from North Oakland/Rockridge to the airport edge, with 63 points. It also includes Emeryville, Piedmont and Alameda.
+- `sf` is the city proper, with 63 points.
+
+Every row records its `area`, or `null` for a place outside all three; searches spill past their area's edge. Only Berkeley places are merged into the app's catalog. Oakland and SF rows are collected into `data/brightdata/` and don't reach the app. `--areas` applies to Google Maps only; Yelp searches stay "Berkeley, CA".
 
 ## Products and calls
 
@@ -40,7 +47,9 @@ Async jobs poll `/progress/<snapshot_id>` every 10 s, then download `/snapshot/<
 export BRIGHTDATA_API_KEY=…          # or put it in the repo-root .env
 python3 data/reviews/collect.py probe                                       # free: list scrapers + metadata
 python3 data/reviews/collect.py discover --one-point --keywords restaurants   # spike: ≤120 records
-python3 data/reviews/collect.py discover --yes                              # full: both sources, all groups
+python3 data/reviews/collect.py discover --yes                              # full: Berkeley grid, all groups
+python3 data/reviews/collect.py discover --areas oakland,sf --one-point     # spike: each city's center, ≤1,200 records
+python3 data/reviews/collect.py discover --areas oakland,sf --yes           # full Oakland and SF grids
 python3 data/reviews/collect.py refresh                                     # fresh numbers, one batch per source
 python3 data/reviews/collect.py build                                       # rebuild outputs from data/raw/, no API calls
 python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30 --dry-run  # writes catalog.json only
@@ -152,7 +161,7 @@ api/.venv/bin/python data/reviews/collect.py details --only p_006 --fetch direct
 
 - `data/raw/brightdata_<source>_<kind>_<time>.json` (gitignored): every raw response, along with what was asked.
 - `data/brightdata/places.json`: one row per place:
-  - top level: `bdId`, `group`, `category`, `name`, `lat`, `lng`, `address`, `phone`, `distance_mi` (from downtown), `huddleId` (the matching `p_###` in the catalog, or null), `first_seen_at`, `found_by`;
+  - top level: `bdId`, `group`, `category`, `name`, `lat`, `lng`, `address`, `phone`, `distance_mi` (from downtown Berkeley, for every area), `area` (`berkeley`, `oakland`, `sf` or null), `huddleId` (the matching `p_###` in the catalog, or null), `first_seen_at`, `found_by`;
   - `google`: rating, reviews_count, review_distribution, categories, open_hours, services, 5 top reviews (reviewer identity removed), …;
   - `yelp`: rating, reviews_count, price (`$`–`$$$$`), categories, hours, ….
   - Google and Yelp records are joined when the names match and they're within 75 m, or when the phone numbers match.

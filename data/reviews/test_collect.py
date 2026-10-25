@@ -140,6 +140,17 @@ class Normalize(unittest.TestCase):
         self.assertEqual(len(source_gmaps.discover_inputs(pts, ["boba", "bars"])), 24)
         self.assertIn("find_desc=bubble+tea", source_yelp.discover_inputs(["bubble tea"], "url")[0]["url"])
 
+    def test_areas(self):
+        for name, area in collect.AREAS.items():
+            pts = source_gmaps.grid(area["box"])
+            self.assertTrue(all(collect.area_of(lat, lng) == name for lat, lng in pts), name)
+        self.assertEqual(collect.area_of(37.8719, -122.2585), "berkeley")  # campus
+        self.assertEqual(collect.area_of(37.8019, -122.2585), "oakland")  # Lake Merritt
+        self.assertEqual(collect.area_of(37.7599, -122.4148), "sf")  # the Mission
+        self.assertIsNone(collect.area_of(37.6879, -122.4702))  # Daly City
+        self.assertIsNone(collect.area_of(None, None))
+        self.assertFalse(collect.in_box(37.7599, -122.4148))  # only Berkeley feeds the catalog
+
 
 class Matching(unittest.TestCase):
     def test_same_place(self):

@@ -1,9 +1,11 @@
-"""Collect Berkeley restaurants, boba shops and places to hang out from Google Maps and Yelp
-through Bright Data, and optionally fold them into data/places.json. See docs/BRIGHTDATA.md.
+"""Collect Berkeley (and Oakland/San Francisco) restaurants, boba shops and places to hang out
+from Google Maps and Yelp through Bright Data, and optionally fold the Berkeley ones into
+data/places.json. See docs/BRIGHTDATA.md.
 
     python data/reviews/collect.py probe                  # list Bright Data's Yelp/Maps scrapers (free)
     python data/reviews/collect.py discover --one-point --keywords restaurants --yes   # cheap spike
     python data/reviews/collect.py discover --yes         # full Google Maps grid x all keywords
+    python data/reviews/collect.py discover --areas oakland,sf --yes   # same, for Oakland and SF
     python data/reviews/collect.py refresh                # fresh numbers for every known place
     python data/reviews/collect.py build                  # rebuild outputs from data/raw/ (no API calls)
     python data/reviews/collect.py publish --add meal=10,dessert=5,activity=5   # live in SpacetimeDB
@@ -47,6 +49,20 @@ import source_yelp  # noqa: E402
 OUT = DATA / "brightdata"
 PLACES = DATA / "places.json"
 DOWNTOWN = (37.8716, -122.2727)
+# Discovery areas (Google Maps grid). Only Berkeley feeds the app's catalog (merge/publish use
+# fp.BERKELEY); the others are collected into data/brightdata/ with an "area" on each row.
+# Checked in order, so a place on the Berkeley/Oakland line counts as Berkeley.
+AREAS = {
+    "berkeley": {"box": fp.BERKELEY, "center": DOWNTOWN},
+    # North Oakland/Rockridge to the airport edge, West Oakland to the hills (includes Alameda).
+    "oakland": {"box": {"rectangle": {"low": {"latitude": 37.740, "longitude": -122.320},
+                                      "high": {"latitude": 37.845, "longitude": -122.160}}},
+                "center": (37.8044, -122.2712)},
+    # The city proper, Ocean Beach to the Embarcadero, Fort Mason to the county line.
+    "sf": {"box": {"rectangle": {"low": {"latitude": 37.708, "longitude": -122.515},
+                                 "high": {"latitude": 37.812, "longitude": -122.357}}},
+           "center": (37.7880, -122.4075)},
+}
 CONFIRM_ABOVE = 2000  # records; Web Scraper API bills per record
 USD_PER_1K = 1.5
 
@@ -299,6 +315,10 @@ def in_box(lat, lng, box=fp.BERKELEY) -> bool:
             and lo["longitude"] <= lng <= hi["longitude"])
 
 
+def area_of(lat, lng) -> str | None:
+    return next((name for name, a in AREAS.items() if in_box(lat, lng, a["box"])), None)
+
+
 # build: data/raw/ -> data/brightdata/{places,snapshots}.json
 
 ADAPTERS = {source_gmaps.SOURCE: source_gmaps, source_yelp.SOURCE: source_yelp}
@@ -351,7 +371,8 @@ def unify(latest: dict, first_seen: dict, found: dict, catalog: list[dict]) -> l
         row = {"bdId": f"g:{g['key']}" if g else f"y:{y['key']}", "group": kind[0], "category": kind[1],
                "name": top["name"], "address": top["address"] or (y or {}).get("address", ""),
                "lat": lat, "lng": lng, "phone": top["phone"] or (y or {}).get("phone", ""),
-               "distance_mi": None if lat is None else round(meters(*DOWNTOWN, lat, lng) / 1609.34, 2)}
+               "distance_mi": None if lat is None else round(meters(*DOWNTOWN, lat, lng) / 1609.34, 2),
+               "area": area_of(lat, lng)}
         huddle = catalog_match(row, g, catalog, by_gid)
         keys = [("gmaps", g["key"]) if g else None, ("yelp", y["key"]) if y else None]
         seen = [first_seen[k] for k in keys if k in first_seen]
@@ -641,6 +662,14 @@ def keywords_for(args) -> list[str]:
     return [kw for g in groups for kw in GROUPS[g]]
 
 
+def areas_for(args) -> list[str]:
+    areas = [a.strip() for a in args.areas.split(",") if a.strip()]
+    unknown = set(areas) - set(AREAS)
+    if unknown or not areas:
+        raise SystemExit(f"--areas: unknown {sorted(unknown)}; known: {', '.join(AREAS)}")
+    return areas
+
+
 def run_jobs(jobs: dict) -> bool:
     """jobs: {(source, kind): (inputs, fn)}. Runs them in parallel, saves raw output, then builds."""
     ok = True
@@ -681,12 +710,14 @@ def cmd_discover(args) -> None:
     jobs = {}
     estimate = 0
     if args.source in ("all", "gmaps"):
-        points = [DOWNTOWN] if args.one_point else source_gmaps.grid(fp.BERKELEY)
-        inputs = source_gmaps.discover_inputs(points, keywords)
-        estimate += len(inputs) * args.limit
-        print(f"gmaps: {len(points)} points x {len(keywords)} keywords = {len(inputs)} inputs, "
-              f"up to {len(inputs) * args.limit} records")
-        jobs[("gmaps", "discover")] = (inputs, lambda: source_gmaps.discover(client, inputs, args.limit))
+        for area in areas_for(args):  # one job per area, run in parallel and saved separately
+            points = [AREAS[area]["center"]] if args.one_point else source_gmaps.grid(AREAS[area]["box"])
+            inputs = source_gmaps.discover_inputs(points, keywords)
+            estimate += len(inputs) * args.limit
+            print(f"gmaps {area}: {len(points)} points x {len(keywords)} keywords = {len(inputs)} inputs, "
+                  f"up to {len(inputs) * args.limit} records")
+            kind = "discover" if area == "berkeley" else f"discover-{area}"
+            jobs[("gmaps", kind)] = (inputs, lambda inputs=inputs: source_gmaps.discover(client, inputs, args.limit))
     if args.source in ("all", "yelp"):
         yinputs = source_yelp.discover_inputs(keywords, args.yelp_discover_by)
         estimate += len(yinputs) * args.yelp_limit
@@ -868,7 +899,9 @@ def main() -> None:
     d.add_argument("--source", choices=["all", "gmaps", "yelp"], default="gmaps")
     d.add_argument("--groups", default=",".join(GROUPS), help="comma list of " + ", ".join(GROUPS))
     d.add_argument("--keywords", help="comma list; overrides --groups")
-    d.add_argument("--one-point", action="store_true", help="Google Maps: downtown only instead of the grid")
+    d.add_argument("--areas", default="berkeley",
+                   help=f"Google Maps: comma list of {', '.join(AREAS)} (Yelp stays Berkeley)")
+    d.add_argument("--one-point", action="store_true", help="Google Maps: each area's center only instead of the grid")
     d.add_argument("--limit", type=int, default=20, help="Google Maps records per point and keyword")
     d.add_argument("--yelp-limit", type=int, default=100, help="Yelp records per keyword")
     d.add_argument("--yelp-dataset", default=source_yelp.DISCOVER_DATASET)
