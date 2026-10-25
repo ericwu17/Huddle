@@ -5,8 +5,8 @@ Code: [`data/reviews/`](../data/reviews/). Source note for the Google Maps route
 **Status (2026-10-24):**
 - **Full Google Maps discovery has run:** 360 inputs (12 grid points × 30 keywords) returned 1,023 records, 3 of them errors, covering 1,009 distinct places. 936 of those classify as a stop: 524 restaurants, 380 hangouts and 32 boba shops. Stores, markets and other non-stops are dropped. 41 of the 45 bundled places were found again.
 - **Yelp discovery returned nothing** on two input types (see the Yelp row below), so all of the data is from Google Maps.
-- **The 130-venue catalog snapshot is live on shared `huddle-calhacks` and the isolated preview.** `data/brightdata/catalog.json` has 60 meals, 45 activities and 25 desserts: the 45 bundled places plus 85 new ones. Activation used the exact committed version `2026-10-24T20:17:52Z-a182c74b`, after an additive module publish and API restart from `a029fb6`, without resetting data. The actual Vercel flow selected two new scraped IDs and passed 30 desktop/mobile checks. [Operations](ACCOUNTS_RUNBOOK.md) records the shared targets and verification. The steps under [Go live](#go-live) remain the operator refresh procedure.
-- **Venue details exist for all 130 venues** (`details.json`; see [Venue details](#venue-details-menus-takeout-seating-photos-dietary-evidence)). They are a data file only: neither the module nor the API reads them yet.
+- **The 130-venue catalog snapshot is live on shared `huddle-calhacks` and the isolated preview.** `data/brightdata/catalog.json` has 60 meals, 45 activities and 25 desserts: the 45 bundled places plus 85 new ones. The first activation used the committed version `2026-10-24T20:17:52Z-a182c74b`, after an additive module publish and API restart from `a029fb6`, without resetting data. The actual Vercel flow selected two new scraped IDs and passed 30 desktop/mobile checks. The live snapshot is now the menu-enriched `2026-10-24T22:29:05Z-d5490f3f-menu-20bc1232fca7`, built from the committed `catalog.json` plus `details.json` (route `/health` reports it with 130 venues). [Operations](ACCOUNTS_RUNBOOK.md) records the shared targets and verification. To refresh the data, see [Go live](#go-live).
+- **Venue details exist for all 130 venues** (`details.json`; see [Venue details](#venue-details-menus-takeout-seating-photos-dietary-evidence)). `scripts/publish-menu-catalog.py` adds their menu items and photos to the published catalog ([MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md)). Takeout and seating aren't used yet.
 
 ## What it collects
 
@@ -78,24 +78,25 @@ The coordinator flow shows each stop from the plan result, so new `bd_…` venue
 
 ### Go live
 
-Run these in order. Steps 1 and 3 change the shared `huddle-calhacks` database, so only the designated operator should run them.
+**Done on 2026-10-24.** The shared module has the `venue` and `catalog_state` tables, the shared API accepts the `catalog` field the module sends with each plan request (`api/agent_models.py`), and the catalog is published. You don't need to repeat the module publish or API restart unless a later change needs them.
 
-1. **Republish the module** to Maincloud from an up-to-date `main`, without resetting data:
+**Refreshing the catalog** changes the shared `huddle-calhacks` database, so only the designated operator should do it:
 
-   ```sh
-   npm run typecheck --prefix server && npm test --prefix server
-   spacetime publish huddle-calhacks -s maincloud -p server --delete-data=never --no-config
-   ```
-
-   The change only adds the `venue` and `catalog_state` tables. Publishing over the previous schema on a local database kept all existing rows. Don't pass new environment values, so the shared secret and service URLs stay as they are. Never approve a data reset to make the publish succeed.
-2. **Restart the shared API** from the same commit, so it accepts the `catalog` field the module now sends with each plan request (`api/agent_models.py`). If the tunnel URL changes on restart, update the module's `FASTAPI_BASE_URL` as usual ([AGENT_RUNBOOK.md](AGENT_RUNBOOK.md)).
-3. **Publish the catalog:**
+1. Rebuild the basic snapshot without publishing it:
 
    ```sh
-   python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30
+   python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30 --dry-run
    ```
 
-   This needs `SPACETIMEDB_URI=https://maincloud.spacetimedb.com`, `SPACETIMEDB_DB=huddle-calhacks` and the shared `HUDDLE_SHARED_SECRET`, from the shell, repo-root `.env` or `api/.env`. It needs no Bright Data or Google key. It prints `Published to huddle-calhacks: 130 active venues`. It also rewrites `data/brightdata/catalog.json` with a new version id; commit that file if you want the repo to match what is live.
+   This rewrites `data/brightdata/catalog.json` with a new version id. Update `details.json` too if venues changed (`collect.py details`).
+2. Publish the snapshot with menus joined in:
+
+   ```sh
+   .venv/bin/python scripts/publish-menu-catalog.py --database huddle-calhacks --publish
+   ```
+
+   This needs the shared `HUDDLE_SHARED_SECRET`, from the shell or `api/.env`. It needs no Bright Data or Google key. Don't publish the live catalog with a plain `collect.py publish`: that sends the basic snapshot and drops the menu evidence ([MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md)).
+3. Commit `catalog.json` and `details.json` so the repo matches what is live.
 
 **Check:** `GET https://maincloud.spacetimedb.com/v1/database/huddle-calhacks/route/health` reports the catalog version and venue count, and a new coordinator huddle can plan with `bd_…` venues.
 
