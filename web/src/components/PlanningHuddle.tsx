@@ -40,20 +40,13 @@ export default function PlanningHuddle({ members, start }: { members: Member[]; 
     ...cast.map(m => ({ id: m.id, label: `${m.name}'s agent`, who: m.name })),
   ];
   const activeId = cast[speaker]?.id ?? "coordinator";
-  const activeLabel = cast[speaker] ? `${cast[speaker].name}'s agent` : "Coordinator";
   return (
     <div className="planning-overlay" role="status" aria-live="polite">
       <section className="planning-card card">
         <h2 className="card-title">Your coordinator is planning</h2>
         <p className="muted">Everyone's agents are talking it over.</p>
         <div className="planning-stage">
-          <div className="planning-message-slot">
-            <p key={tick} className="planning-bubble">
-              <span className="planning-speaker">{activeLabel}</span>
-              <span>{line}</span>
-            </p>
-          </div>
-          <AgentCircle agents={agents} activeId={activeId} />
+          <AgentCircle agents={agents} activeId={activeId} speech={{ text: line, turn: tick }} />
         </div>
         <button className="btn btn-quiet" onClick={() => setHidden(true)}>Hide</button>
       </section>
