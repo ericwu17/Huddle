@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { usePlanRun } from "../data";
 import { useGroup } from "../groupContext";
 import ConsensusMap from "../components/ConsensusMap";
@@ -19,7 +20,7 @@ export default function Judge() {
 
   return (
     <div className="space-y-5">
-      <h1 className="shout text-[52px]">Under the hood</h1>
+      <PageHeading lead="Under the" accent="hood" />
       <section className="card space-y-2">
         <h2 className="card-title">Your taste</h2>
         <p className="muted">Posterior mean ± sd. Only you see yours.</p>

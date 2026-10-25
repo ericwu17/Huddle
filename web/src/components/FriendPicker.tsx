@@ -17,7 +17,7 @@ export default function FriendPicker({ selected, onChange, disabled = false, exc
           onChange={e => onChange(e.target.checked ? [...selected, f.accountId] : selected.filter(id => id !== f.accountId))} />
         <span><strong>{f.displayName}</strong> <span className="muted">@{f.username}</span></span>
       </label>) : <p>No friends available yet. <Link className="underline font-bold" to="/friends">Add a friend by username</Link>.</p>}
-      {choices?.length ? <p className="muted">Choose up to 11 friends. They receive a private invitation message with a link to open this Huddle.</p> : null}
+      {choices?.length ? <p className="muted">Choose up to 11 friends.</p> : null}
     </div>
   </details>;
 }

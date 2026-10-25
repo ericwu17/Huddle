@@ -18,8 +18,9 @@ import Context from "./routes/Context";
 import Connectors from "./routes/Connectors";
 import Done from "./routes/Done";
 import SharedResult from "./routes/SharedResult";
+import ScreenTransition from "./components/ScreenTransition";
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter([{ Component: ScreenTransition, children: [
   { path: "/", loader: () => redirect("/start") },
   { path: "/start", Component: Home },
   { path: "/login", Component: Login },
@@ -51,4 +52,4 @@ export const router = createBrowserRouter([
       { path: "judge", Component: Judge },
     ],
   },
-]);
+]}]);

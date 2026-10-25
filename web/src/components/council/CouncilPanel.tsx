@@ -2,6 +2,7 @@ import { useCouncilMessages, useGroupState } from "../../data";
 import type { CouncilMessage, CouncilOutcome, Plan, Stance } from "../../types";
 import { KIND_LABEL } from "../../plans";
 import { Buddy } from "../../doodle/Doodle";
+import AgentCircle, { type CircleAgent } from "../AgentCircle";
 
 type Props = { runId: string; plans: Plan[]; council: CouncilOutcome | null };
 
@@ -16,7 +17,7 @@ const STYLE = {
   section: "council space-y-4",
   roundTitle: "council-round",
   row: "council-row pop-in",
-  advocate: "bubble council-bubble",
+  agent: "bubble council-bubble",
   chair: "bubble bubble-chair council-bubble",
   speaker: "council-speaker",
   text: "council-text",
@@ -35,7 +36,9 @@ const STYLE = {
 
 const STANCE_LABEL: Record<Stance, string> = { support: "for", accept: "ok", oppose: "against" };
 
-// Advocate A stands on the left, B on the right, and so on down the page.
+const agentLabel = (label: string) => label.replace(/^Advocate\b/i, "Agent");
+
+// Agent A stands on the left, B on the right, and so on down the page.
 const sideFor = (label: string) => {
   const letter = /([A-Z])$/.exec(label)?.[1] ?? "A";
   return (letter.charCodeAt(0) - 65) % 2 === 0 ? "is-left" : "is-right";
@@ -56,16 +59,28 @@ export default function CouncilPanel({ runId, plans, council }: Props) {
   const hasChair = messages?.some((m) => m.speaker === "chair") ?? false;
   // Whoever spoke last keeps waving their arms until the next one speaks.
   const latestId = !done && messages?.length ? messages[messages.length - 1].id : null;
+  const agentLabels = [...new Set([
+    ...Array.from({ length: group?.members.length || 3 }, (_, i) => `Agent ${String.fromCharCode(65 + i)}`),
+    ...(messages?.filter(m => m.speaker !== "chair").map(m => agentLabel(m.label)) ?? []),
+  ])].slice(0, 5);
+  const circleAgents: CircleAgent[] = [
+    { id: "chair", label: "Coordinator", who: "Chair", coordinator: true },
+    ...agentLabels.map(label => ({ id: label, label, who: label })),
+  ];
+  const latest = messages?.find(m => m.id === latestId);
 
   return (
     <section className={STYLE.section}>
       <header>
         <h2 className="shout text-[52px]">The council</h2>
-        <p className="on-sky mt-2">Each friend gets an AI advocate who argues for them. The chair picks the plan.</p>
+        <p className="on-sky mt-2">Each friend's agent joins the huddle. The coordinator brings the plan together.</p>
       </header>
+      <div className="card council-huddle">
+        <AgentCircle agents={circleAgents} activeId={latest ? latest.speaker === "chair" ? "chair" : agentLabel(latest.label) : undefined} />
+      </div>
       {messages === undefined && <p className="on-sky">Loading the council…</p>}
       {messages?.length === 0 && !done && (
-        <Waiting who={["Advocate A", "Advocate B", "Advocate C"]} pose="idle" text="Waiting for the advocates" />
+        <Waiting who={["Agent A", "Agent B", "Agent C"]} pose="idle" text="Waiting for the agents" />
       )}
       {messages?.length === 0 && done && !council.fallbackUsed && (
         <p className="on-sky">The council did not post any messages for this plan.</p>
@@ -80,7 +95,7 @@ export default function CouncilPanel({ runId, plans, council }: Props) {
               m.speaker === "chair" ? (
                 <ChairBubble key={m.id} m={m} planName={planName} council={council} />
               ) : (
-                <AdvocateBubble
+                <AgentBubble
                   key={m.id}
                   m={m}
                   live={m.id === latestId}
@@ -93,7 +108,7 @@ export default function CouncilPanel({ runId, plans, council }: Props) {
         );
       })}
       {messages && messages.length > 0 && !hasChair && !done && (
-        <Waiting who={["Advocate B", "Advocate A"]} pose="argue" text="The council is talking" />
+        <Waiting who={["Agent B", "Agent A"]} pose="argue" text="The agents are talking" />
       )}
       {/* The chair bubble carries this when there is one; otherwise show it on its own. */}
       {council?.fallbackUsed && !hasChair && <p className={STYLE.fallback}>Safe plan used (the council check failed)</p>}
@@ -116,7 +131,7 @@ function Waiting({ who, pose, text }: { who: string[]; pose: "idle" | "argue"; t
   );
 }
 
-function AdvocateBubble({
+function AgentBubble({
   m,
   live,
   name,
@@ -130,9 +145,9 @@ function AdvocateBubble({
   return (
     <div className={`${STYLE.row} ${sideFor(m.label)}`}>
       <Buddy who={m.label} pose={live ? "argue" : "idle"} size={88} boil={live} />
-      <div className={STYLE.advocate}>
+      <div className={STYLE.agent}>
         <p className={STYLE.speaker}>
-          {m.label}
+          {agentLabel(m.label)}
           {name && <span className="council-for"> for {name}</span>}
         </p>
         <p className={STYLE.text}>{m.text}</p>

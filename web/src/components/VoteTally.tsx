@@ -72,7 +72,7 @@ export function VoteChoice({ planId, title, votes, members, myMemberId, busy, on
             <span className="muted">No votes</span>
           )}
         </div>
-      </> : mine ? <p className="on-sky text-sm vote-secret">Your vote is saved. Everyone's choices are revealed once all have voted.</p> : null}
+      </> : null}
     </div>
   );
 }

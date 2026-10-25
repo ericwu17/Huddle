@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useMemo, useState } from "react";
 import { usePlanRun, useScout } from "../data";
 import { useGroup } from "../groupContext";
@@ -21,6 +22,7 @@ function LegacyPlans() {
   const planRun = usePlanRun(runId);
   const scout = useScout(runId);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
 
   if (!runId) return <p className="on-sky">No plan yet. Keep swiping until the group is confident.</p>;
   if (planRun === undefined) return <p className="on-sky">Loading plans…</p>;
@@ -45,14 +47,13 @@ function LegacyPlans() {
 
   return (
     <div className="space-y-5">
-      <h1 className="shout text-[52px]">The plans</h1>
+      <PageHeading lead="Your group’s" accent="options" />
       {result.warnings.map((w) => (
         <p key={w} className="error">
           {w}
         </p>
       ))}
-      <RouteView key={selected.id} plan={selected} />
-      {plans.map((p) => (
+      <div className="comparison-grid">{plans.map((p) => (
         <PlanCard
           key={p.id}
           plan={p}
@@ -61,7 +62,11 @@ function LegacyPlans() {
           recommended={planRun.council?.fallbackUsed === false && planRun.council.chosenPlanId === p.id}
           onSelect={() => setSelectedId(p.id)}
         />
-      ))}
+      ))}</div>
+      <details className="card option-details" onToggle={event => setMapOpen(event.currentTarget.open)}>
+        <summary>Selected route</summary>
+        {mapOpen ? <RouteView key={selected.id} plan={selected} /> : null}
+      </details>
       <CouncilPanel runId={runId} plans={plans} council={planRun.council} />
       {group.status === "voting" && <p className="sticker sticker-sun">Voting is open: tap Next when you've read the debate</p>}
       <section className="card space-y-2">
@@ -77,7 +82,7 @@ function Thinking() {
   return (
     <section className="card flex items-center gap-4">
       <span className="flex">
-        {["Advocate A", "Advocate B", "Advocate C"].map((who, i) => (
+        {["Agent A", "Agent B", "Agent C"].map((who, i) => (
           <Buddy key={who} who={who} pose="argue" size={70} boil={i === 1} />
         ))}
       </span>

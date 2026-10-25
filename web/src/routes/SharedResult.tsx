@@ -1,9 +1,11 @@
+import PageHeading from "../components/PageHeading";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useProcedure, useSpacetimeDB } from "spacetimedb/react";
 import { procedures } from "../module_bindings";
 import { parseSharedResult, type SharedResult as PublicResult } from "../sharedResult";
 import ChosenResult from "../components/ChosenResult";
+import HuddleBrand from "../components/HuddleBrand";
 
 export default function SharedResult() {
   const { shareId = "" } = useParams();
@@ -30,8 +32,8 @@ export default function SharedResult() {
   const result = view.shareId === shareId ? view.result : null;
   const pending = !isActive || view.shareId !== shareId || view.pending;
   return <main className="page space-y-5">
-    <Link className="logo" to="/start">huddle</Link>
-    <h1 className="shout text-[48px]">Our Huddle</h1>
+    <HuddleBrand />
+    <PageHeading lead="Our" accent="Huddle" />
     {pending ? <p className="card" role="status">Opening the shared plan…</p> : result ? <>
       <ChosenResult date={result.date} choice={result.choice} />
       <p className="on-sky muted">A shared result. This does not join you to the Huddle or reserve a restaurant.</p>

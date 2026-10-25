@@ -6,6 +6,7 @@ import { saveSession } from "../session";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 import { useAccount } from "../accountData";
+import HuddleBrand from "../components/HuddleBrand";
 
 export default function Join() {
   const { isActive } = useSpacetimeDB();
@@ -27,9 +28,7 @@ export default function Join() {
 
   return (
     <main className="page space-y-6">
-      <a className="logo" href="/">
-        huddle
-      </a>
+      <HuddleBrand />
       <div className="flex items-end gap-4 pt-4">
         <h1 className="shout text-[56px]">
           You're invited to <span className="code-tag inline-block align-middle text-[34px]">{code}</span>

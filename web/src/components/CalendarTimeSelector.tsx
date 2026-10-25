@@ -46,7 +46,7 @@ export default function CalendarTimeSelector() {
         void run(async () => { await setPreference({ timeOfDay: value }); setNotice("Saved. We’ll use this for the next plan."); });
       }}>{TIME_OF_DAY_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
     </div> : <p>Time preference: {TIME_OF_DAY_OPTIONS.find(option => option.value === timeOfDay)?.label ?? "Any time"}</p>}
-    <ul className="space-y-2">{group.members.map(m => <li key={m.id} className="flex flex-wrap items-center justify-between gap-2"><strong>{m.name}</strong><span className="muted">{calendars === undefined ? "Checking…" : calendars.some(c => c.memberId === m.id && c.connected) ? "Connected ✓" : "Not connected"}</span></li>)}</ul>
+    <ul className="calendar-members">{group.members.map(m => <li key={m.id}><strong>{m.name}</strong><span className="muted">{calendars === undefined ? "Checking…" : calendars.some(c => c.memberId === m.id && c.connected) ? "Connected ✓" : "Not connected"}</span></li>)}</ul>
     <Link className="underline font-bold" to="/connectors">{allConnected ? "Calendar settings" : "Connect your calendar"}</Link>
     {isHost ? <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(async () => {
       const response = await schedule({ searchStart: berkeleyMidnight(searchStart), searchEnd: berkeleyMidnight(dateAfter(searchEnd, 1)),

@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useReducer } from "spacetimedb/react";
@@ -32,7 +33,7 @@ export default function Done() {
   const canBook = isHost && timed && isReadyAgentPlan(timed) && mealIndex >= 0;
   const alreadyBooking = booking?.runId === runId && booking.planId === winner.id && ["pending", "calling", "confirmed"].includes(booking.status);
   return <div className="space-y-5">
-    <div><span className="sticker sticker-lime">Everyone has voted</span><h1 className="shout mt-4 text-[48px]">Your Huddle is decided!</h1></div>
+    <div><span className="sticker sticker-lime">Everyone has voted</span><PageHeading lead="It’s" accent="a plan!" /></div>
     <ChosenResult date={group.date} choice={winner} optionNumber={winnerNumber ?? undefined} order={orders.find(order => order.planId === winner.id)} />
     <Link className="btn" to={`/g/${group.id}/vote`}>Change my vote</Link>
     {timed ? <><MeetupCalendarAction key={`${runId}:${winner.id}`} runId={runId} planId={winner.id} isHost={isHost} /><CalendarDownload key={`calendar:${runId}:${winner.id}`} date={group.date} plan={timed} runId={runId} /></> : null}

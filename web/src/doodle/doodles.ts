@@ -58,20 +58,32 @@ const birds = `<g fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="r
 // `only` picks which layers to draw, so the page can stack them as separate planes.
 export type Layer = "sky" | "sun" | "clouds" | "far" | "mid" | "near";
 
-export function world({ sun = true, wobble = "wobA", only = ["sky", "sun", "clouds", "far", "mid", "near"] as Layer[] } = {}) {
+export function world({ sun = true, wobble = "wobA", quietSky = false, only = ["sky", "sun", "clouds", "far", "mid", "near"] as Layer[] } = {}) {
   const has = (k: Layer) => only.includes(k);
   return `
 <svg class="doodle-world" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
   <g filter="url(#${wobble})" stroke-linejoin="round" stroke-linecap="round">
-    ${has("sky") ? `<g class="lay lay-sky"><rect x="-200" y="-300" width="2000" height="1600" fill="url(#hatchSky)"/>${birds}</g>` : ""}
+    ${has("sky") ? `<g class="lay lay-sky"><rect x="-200" y="-300" width="2000" height="1600" fill="url(#hatchSky)"/>${quietSky ? "" : birds}</g>` : ""}
+    ${has("clouds") ? `<g class="lay lay-clouds">${quietSky
+      ? `<g transform="translate(0 125)"><g class="sky-cloud sky-cloud-one">${cloud(0, 0, 0.72)}</g></g>
+         <g transform="translate(0 300)"><g class="sky-cloud sky-cloud-two">${cloud(0, 0, 0.56)}</g></g>
+         <g transform="translate(0 60)"><g class="sky-cloud sky-cloud-three">${cloud(0, 0, 0.52)}</g></g>
+         <g transform="translate(0 425)"><g class="sky-cloud sky-cloud-four">${cloud(0, 0, 0.68)}</g></g>
+         <g transform="translate(0 195)"><g class="sky-cloud sky-cloud-five">${cloud(0, 0, 0.48)}</g></g>
+         <g transform="translate(0 360)"><g class="sky-cloud sky-cloud-six">${cloud(0, 0, 0.62)}</g></g>
+         <g transform="translate(0 485)"><g class="sky-cloud sky-cloud-seven">${cloud(0, 0, 0.5)}</g></g>`
+      : cloud(260, 210, 1.3) + cloud(820, 120, 0.9) + cloud(1080, 330, 1.1) + cloud(-20, 420, 0.8) + cloud(1560, 470, 0.9)}</g>` : ""}
     ${sun && has("sun") ? `<g class="lay lay-sun" transform="translate(1330 190)">
-      <g stroke="${INK}" stroke-width="7">${Array.from({ length: 12 }, (_, i) => { const a = i * 30 * Math.PI / 180; return `<path d="M${(Math.cos(a) * 98).toFixed(0)} ${(Math.sin(a) * 98).toFixed(0)} L${(Math.cos(a) * (i % 2 ? 128 : 142)).toFixed(0)} ${(Math.sin(a) * (i % 2 ? 128 : 142)).toFixed(0)}"/>`; }).join("")}</g>
+      <g class="sun-rays" stroke="${INK}" stroke-width="7">${Array.from({ length: 12 }, (_, i) => { const a = i * 30 * Math.PI / 180; return `<path d="M${(Math.cos(a) * 98).toFixed(0)} ${(Math.sin(a) * 98).toFixed(0)} L${(Math.cos(a) * (i % 2 ? 128 : 142)).toFixed(0)} ${(Math.sin(a) * (i % 2 ? 128 : 142)).toFixed(0)}"/>`; }).join("")}</g>
       <circle r="82" fill="url(#hatchSun)" stroke="${INK}" stroke-width="7"/>
-      <circle cx="-26" cy="-10" r="7" fill="${INK}"/><circle cx="26" cy="-10" r="7" fill="${INK}"/>
-      <path d="M-30 22 q30 30 60 0" fill="none" stroke="${INK}" stroke-width="7"/>
-      <circle cx="-46" cy="16" r="10" fill="#ff8cc8"/><circle cx="46" cy="16" r="10" fill="#ff8cc8"/>
+      <g class="sun-face">
+        <g class="sun-open-eyes"><circle class="sun-eye" cx="-26" cy="-10" r="7" fill="${INK}"/><circle class="sun-eye sun-eye-right" cx="26" cy="-10" r="7" fill="${INK}"/></g>
+        <g class="sun-happy-eyes" fill="none" stroke="${INK}" stroke-width="6"><path d="M-35 -8 q9 -12 18 0"/><path d="M17 -8 q9 -12 18 0"/></g>
+        <path class="sun-smile" d="M-30 22 q30 30 60 0" fill="none" stroke="${INK}" stroke-width="7"/>
+        <g class="sun-grin"><path d="M-27 19 Q0 28 27 19 Q21 51 0 51 Q-21 51 -27 19Z" fill="${INK}"/><path d="M-14 42 Q0 31 14 42 Q0 53 -14 42" fill="#ff8cc8"/></g>
+        <circle cx="-46" cy="16" r="10" fill="#ff8cc8"/><circle cx="46" cy="16" r="10" fill="#ff8cc8"/>
+      </g>
     </g>` : ""}
-    ${has("clouds") ? `<g class="lay lay-clouds">${cloud(260, 210, 1.3)}${cloud(820, 120, 0.9)}${cloud(1080, 330, 1.1)}${cloud(-20, 420, 0.8)}${cloud(1560, 470, 0.9)}</g>` : ""}
     ${has("far") ? `<g class="lay lay-far"><path d="M-100 610 C180 520 380 560 540 600 C700 640 840 530 1020 556 C1200 582 1320 520 1700 580 V1300 H-100Z" fill="url(#hatchFar)" stroke="${INK}" stroke-width="7"/></g>` : ""}
     ${has("mid") ? `<g class="lay lay-mid"><path d="M-100 730 C160 650 360 660 560 712 C760 764 930 650 1130 662 C1330 674 1450 720 1700 690 V1300 H-100Z" fill="url(#hatchMid)" stroke="${INK}" stroke-width="7"/>${flowers(7, 10, 740, 820)}</g>` : ""}
     ${has("near") ? `<g class="lay lay-near"><path d="M-100 850 C200 780 450 796 650 840 C870 888 1060 800 1290 806 C1460 812 1560 846 1700 834 V1300 H-100Z" fill="url(#hatchNear)" stroke="${INK}" stroke-width="7"/>${flowers(19, 14, 870, 980)}</g>` : ""}

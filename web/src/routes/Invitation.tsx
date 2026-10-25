@@ -27,12 +27,12 @@ export default function Invitation() {
     navigate(`/g/${membership.groupId}/lobby`, { replace: true });
   }, [joining, membership, invitation?.status, account?.activeGroupId, selectedGroup?.id, navigate]);
   return <AccountShell loading={!!account && invitations === undefined}>{account === undefined || invitations === undefined ? null : !account ?
-    <section className="card space-y-4"><h1 className="card-title">Your people are gathering</h1><p>Sign in with the account this invitation was sent to. Your invitation will be waiting.</p>
+    <section className="card space-y-4"><h1 className="card-title">Your people are gathering</h1><p>Sign in with the account this invitation was sent to.</p>
       <Link className="btn btn-sun" to={`/login?returnTo=${encodeURIComponent(`/invite/${invitationId}`)}`}>Sign in to open Huddle</Link></section> : !invitation ?
       <section className="card space-y-4"><h1 className="card-title">Invitation unavailable</h1><p>This invitation belongs to a different account or is no longer available. You are signed in as @{account.username}.</p><Link className="btn" to="/inbox">My inbox</Link></section> :
       <section className="card card-note space-y-4"><h1 className="card-title">{invitation.message}</h1><p>{invitation.groupName}</p>
         {invitation.direction !== "incoming" ? <><p>You sent this invitation to {invitation.toDisplayName}.</p><Link className="btn" to="/start">My huddles</Link></> : invitation.status === "pending" ? <>
-          <p>Join your friends, then choose your own private preferences. Accepting an invitation does not mark you ready.</p>
+          <p>Join, then choose your preferences.</p>
           <div className="flex flex-wrap gap-3"><button className="btn btn-sun" disabled={busy || joining} onClick={() => run(async () => { await respond({ invitationId: invitation.id, accept: true }); setJoining(true); })}>{joining ? "Opening your Huddle…" : "Accept & open Huddle"}</button>
             <button className="btn" disabled={busy || joining} onClick={() => run(() => respond({ invitationId: invitation.id, accept: false }))}>Decline invitation</button></div>
         </> : invitation.status === "accepted" && membership ? <button className="btn btn-sun" disabled={busy} onClick={() => run(async () => { await select({ groupId: membership.groupId }); setJoining(true); })}>Open Huddle</button>

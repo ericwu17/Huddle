@@ -12,6 +12,12 @@ export type AccountContext = {
 
 export const EMPTY_CONTEXT: AccountContext = { version: 1, preferences: "", dietary: [], allergies: [], budgetMaxPerPerson: null, maxOutingMinutes: null, preferredStops: null };
 
+// Starting values for a new form; saved profiles and outing needs take priority.
+export const DEFAULT_PREFERENCES: AccountContext = {
+  version: 1, preferences: "", dietary: [], allergies: [],
+  budgetMaxPerPerson: 30, maxOutingMinutes: 180, preferredStops: null,
+};
+
 export type SavedAccountContext = {
   accountId: string;
   contextJson: string;

@@ -5,8 +5,9 @@ import { procedures, reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
 import { isReadyAgentPlan, useAgentMessages, useAgentOrders, useAgentPreferences, useAgentRun, type AgentOrder, type AgentPlan, type AgentStructuredPreferences, type AgentSuggestion } from "../agentData";
-import { EMPTY_CONTEXT, useAccount, useAccountContext, type AccountContext } from "../accountData";
+import { useAccount, useAccountContext, type AccountContext } from "../accountData";
 import { PreferenceFields } from "./PreferenceFields";
+import { DEFAULT_PREFERENCES } from "../accountContextState";
 import { useCatalogListings } from "../catalogData";
 import PlanMap from "./PlanMap";
 import AgentVenueDetails from "./AgentVenueDetails";
@@ -14,6 +15,7 @@ import { displayTime } from "../venueFormatting";
 import PrivateOrderSummary from "./PrivateOrderSummary";
 import { VoteChoice, VoteStatus } from "./VoteTally";
 import { useAgentBallot } from "../useAgentBallot";
+import PageHeading from "./PageHeading";
 import { useCalendarPlanning } from "../huddleTiming";
 import CalendarTimeSelector from "./CalendarTimeSelector";
 
@@ -22,8 +24,8 @@ export function AgentPrefs() {
   const account = useAccount();
   const profile = useAccountContext();
   const structured = useAgentPreferences();
-  if (account === undefined || agentNeeds === undefined || profile === undefined || structured === undefined || (structured && structured.memberId !== session.memberId)) return <p className="card" role="status">Loading your private needs…</p>;
-  return <AgentPrefsForm key={`${account?.accountId ?? "guest"}:${group.id}:${session.memberId}`} initialProfile={profile?.context ?? EMPTY_CONTEXT} initialStructured={structured?.structured} />;
+  if (account === undefined || agentNeeds === undefined || profile === undefined || structured === undefined || (structured && structured.memberId !== session.memberId)) return <p className="card" role="status">Loading preferences…</p>;
+  return <AgentPrefsForm key={`${account?.accountId ?? "guest"}:${group.id}:${session.memberId}`} initialProfile={profile?.context ?? DEFAULT_PREFERENCES} initialStructured={structured?.structured} />;
 }
 
 function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile: AccountContext; initialStructured?: AgentStructuredPreferences }) {
@@ -72,18 +74,18 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
     && (needs.hard.preferredStops ?? null) === draft.preferredStops
     && JSON.stringify(needs.hard.dietary) === JSON.stringify(draft.dietary) && JSON.stringify(needs.hard.allergies) === JSON.stringify(draft.allergies);
   return <div className="space-y-5">
-    <div><h1 className="shout text-[48px]">Your kind of outing</h1><p className="on-sky mt-3">Set what matters. Leave everything else flexible.</p></div>
-    <section className="card space-y-5" aria-label="Your private preferences">
-      <p>Your limits and prompt stay private. The coordinator uses them to plan for everyone.</p>
-      <PreferenceFields value={draft} onChange={value => { untouched.current = false; setDraft(value); }} budgetCeiling={agentNeeds?.result?.hard.budgetMaxPerPerson} />
-      <div className="space-y-2"><label className="block font-bold" htmlFor="agent-prompt">Anything else? (optional)</label>
-        <textarea id="agent-prompt" className="input min-h-32" maxLength={4000} value={draft.preferences}
+    <div><PageHeading lead="Your kind of" accent="outing" /><p className="on-sky mt-2">Leave anything flexible.</p></div>
+    <section className="card preferences-form" aria-label="Your preferences">
+      <PreferenceFields value={draft} onChange={value => { untouched.current = false; setDraft(value); }} budgetCeiling={agentNeeds?.result?.hard.budgetMaxPerPerson}>
+      <div className="preference-extra"><label className="block font-bold" htmlFor="agent-prompt">Anything else? (optional)</label>
+        <textarea id="agent-prompt" className="input" rows={2} maxLength={4000} value={draft.preferences}
           placeholder="Burgers sound good. Somewhere quiet, then a walk…"
           onChange={e => { untouched.current = false; setDraft({ ...draft, preferences: e.target.value }); }} />
-        <p className="muted">Tell Claude your mood, preferences or other restrictions. A blank prompt is fine.</p>
       </div>
-      {account ? <label className="check"><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />Remember these choices as my private defaults</label> : null}
-      <button className="btn btn-sun w-full" disabled={busy || interpreting} onClick={() => run(async () => {
+      </PreferenceFields>
+      <div className="preferences-actions">
+      {account ? <label className="check"><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />Remember for next time</label> : null}
+      <button className="btn btn-sun" disabled={busy || interpreting} onClick={() => run(async () => {
         untouched.current = false;
         lastSubmitted.current = JSON.stringify(draft);
         await submit({ text: draft.preferences, structuredJson: JSON.stringify({
@@ -91,14 +93,15 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
           dietary: draft.dietary, allergies: draft.allergies, maxTravelMinutes: needs?.hard.maxTravelMinutes ?? initialStructured?.maxTravelMinutes ?? null,
         }) });
         try { sessionStorage.removeItem(`huddle:draft:${group.id}`); } catch { /* Optional draft storage. */ }
-        if (remember && account) { await saveContext({ contextJson: JSON.stringify(draft) }); setNotice("Your own choices were also saved as private defaults."); }
-      })}>{interpreting ? "Claude is checking your extra request…" : "Save & ready"}</button>
-      {saved ? <p className="sticker sticker-lime" role="status">Your needs are saved. Ready ✓</p> : interpreting ? <p role="status">Checking only what needs interpretation. Your sliders are already explicit.</p> : <p className="muted">Saving is your ready action. No separate review step is needed.</p>}
-      {agentNeeds?.confirmed && !saved && !interpreting ? <p className="muted" role="status">You have unsaved changes. Save & ready to apply them to this Huddle.</p> : null}
+        if (remember && account) { await saveContext({ contextJson: JSON.stringify(draft) }); setNotice("Saved for next time."); }
+      })}>{interpreting ? "Checking your request…" : "Save & ready"}</button>
+      </div>
+      {saved ? <p className="sticker sticker-lime" role="status">Ready ✓</p> : null}
+      {agentNeeds?.confirmed && !saved && !interpreting ? <p className="muted" role="status">Unsaved changes</p> : null}
       {notice ? <p role="status">{notice}</p> : null}
       {agentNeeds?.error ? <p className="error" role="alert">{agentNeeds.error}</p> : null}
     </section>
-    {needs ? <section className="card space-y-3" aria-label="Your private needs summary"><h2 className="card-title">Your private summary</h2>
+    {needs ? <details className="card saved-preferences" open={needs.questions.length > 0}><summary>Saved preferences</summary><div className="space-y-2">
       <p><strong>Whole-outing budget:</strong> {needs.hard.budgetMaxPerPerson == null ? "Flexible" : `$${needs.hard.budgetMaxPerPerson} per person across all stops`}</p>
       <p><strong>Time available:</strong> {needs.hard.maxOutingMinutes == null ? "Flexible" : `${needs.hard.maxOutingMinutes} minutes for the whole outing`}</p>
       <p><strong>Stops:</strong> {needs.hard.preferredStops == null ? "Flexible" : `${needs.hard.preferredStops} stop${needs.hard.preferredStops === 1 ? "" : "s"}, averaged with the group`}</p>
@@ -106,14 +109,14 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
       <p><strong>Allergies:</strong> {needs.hard.allergies.join(", ") || "None stated"}</p>
       {needs.preferences.length ? <p><strong>Your vibe:</strong> {needs.preferences.join(" · ")}</p> : null}
       {[...needs.hard.vetoCuisines, ...needs.hard.vetoCategories, ...needs.hard.rejectedTerms].length ? <p><strong>Must reject:</strong> {[...needs.hard.vetoCuisines, ...needs.hard.vetoCategories, ...needs.hard.rejectedTerms].join(", ")}</p> : null}
-      {needs.questions.length ? <div className="card-note p-3 space-y-2" role="status"><h3 className="font-bold">One thing to clarify privately</h3><ul>{needs.questions.map(q => <li key={q}>{q}</li>)}</ul><p className="muted">Update the relevant choice or your optional prompt above, then Save & ready again.</p></div> : null}
+      {needs.questions.length ? <div className="card-note p-3 space-y-2" role="status"><h3 className="font-bold">One thing to clarify</h3><ul>{needs.questions.map(q => <li key={q}>{q}</li>)}</ul><p className="muted">Update your choices, then save again.</p></div> : null}
       {needs.warnings.map(w => <p className="muted" key={w}>{w}</p>)}
-    </section> : null}
+    </div></details> : null}
     <CalendarTimeSelector />
-    <section className="card space-y-3"><h2 className="card-title">Your people</h2>
-      <ul className="space-y-2">{group.members.map(m => <li key={m.id}>{m.name}{m.id === session.memberId ? " (you)" : ""}: {agent?.confirmedMemberIds.includes(m.id) ? "ready ✓" : "choosing private needs"}</li>)}</ul>
+    <section className="card space-y-3"><h2 className="section-title">Your people</h2>
+      <ul className="readiness-list">{group.members.map(m => <li key={m.id}>{m.name}{m.id === session.memberId ? " (you)" : ""}: {agent?.confirmedMemberIds.includes(m.id) ? "ready ✓" : "thinking…"}</li>)}</ul>
       {isHost ? <button className="btn btn-sun w-full" disabled={busy || !timingReady || !saved || !allReady || agent?.status === "planning" || group.status === "lobby"} onClick={() => run(() => find())}>Find plans</button> : <p className="muted">The host can find plans when everyone has saved their needs.</p>}
-      {!allReady ? <p className="muted">Waiting for at least two people, each with saved needs.</p> : null}
+      {!allReady ? <p className="muted">At least two people need to be ready.</p> : null}
     </section>
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;
@@ -128,48 +131,48 @@ export function OptionMap({ plan }: { plan: AgentPlan }) {
   return <PlanMap plan={{ ...plan, stops }} lines={lines} />;
 }
 
-export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1, heading }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number; heading?: string }) {
+export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1, heading, compact = false }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number; heading?: string; compact?: boolean }) {
   const listings = useCatalogListings();
   const ready = isReadyAgentPlan(plan);
-  return <section className="card space-y-3">
-    {recommended && ready ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
-    <h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
-    <p className="font-bold">{plan.stops.map(stop => stop.name).join(" → ")}</p>
-    <PrivateOrderSummary order={order} listings={listings} stops={plan.stops} />
-    <ol className="space-y-4">{plan.stops.map(stop => {
-      const place = listings.get(stop.placeId);
-      return <li key={stop.placeId} className="venue-details space-y-2">
-        <strong className="text-lg">{stop.name}</strong><p className="muted">{displayTime(stop.start)}–{displayTime(stop.end)}</p>
-        <AgentVenueDetails place={place} name={stop.name} lat={stop.lat} lng={stop.lng} />
-      </li>;
-    })}</ol>
+  const [expanded, setExpanded] = useState(false);
+  const first = plan.stops[0];
+  const venues = <ol className="space-y-4">{plan.stops.map(stop => <li key={stop.placeId} className="venue-details space-y-2">
+    <strong>{stop.name}</strong><p className="muted">{displayTime(stop.start)}–{displayTime(stop.end)}</p>
+    <AgentVenueDetails place={listings.get(stop.placeId)} name={stop.name} />
+  </li>)}</ol>;
+  return <section className={`card option-card${compact ? " is-compact" : ""}`}>
+    <div className="option-card-heading"><h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
+      {recommended && ready ? <span className="sticker sticker-sun">Recommended</span> : null}</div>
+    <h3 className="option-route">{plan.stops.map(stop => stop.name).join(" → ")}</h3>
+    {compact && first ? <AgentVenueDetails place={listings.get(first.placeId)} name={first.name} compact /> : null}
+    {compact && first ? <p className="option-meta"><span>{displayTime(first.start)}–{displayTime(plan.stops.at(-1)!.end)}</span><span>{plan.stops.length} stop{plan.stops.length === 1 ? "" : "s"}</span></p> : null}
+    <PrivateOrderSummary order={order} listings={listings} stops={plan.stops} compact={compact} />
+    {compact ? <details className="option-details" onToggle={e => setExpanded(e.currentTarget.open)}><summary>Map & details</summary>
+      {expanded ? <div className="space-y-4"><OptionMap plan={plan} />{venues}</div> : null}
+    </details> : venues}
   </section>;
 }
 
-export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, heading }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber?: number; heading?: string }) {
+export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, heading, compact = false }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber?: number; heading?: string; compact?: boolean }) {
   const listings = useCatalogListings();
+  const [expanded, setExpanded] = useState(false);
   const place = listings.get(suggestion.placeId);
   if (!place) return <article className="card space-y-3" role="status"><h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2><p>Loading venue…</p></article>;
   const pin = Number.isFinite(place.lat) && Number.isFinite(place.lng)
     ? { stops: [{ placeId: place.id, name: place.name, lat: place.lat as number, lng: place.lng as number }] } : null;
-  return <div className="space-y-3">
+  return <div className={compact ? "comparison-suggestion" : "space-y-3"}>
     {/* Done and public results already render the selected venue's map. */}
-    {pin && !heading ? <PlanMap plan={pin} lines={[]} /> : null}
-  <article className="card space-y-3">
+    {pin && !heading && !compact ? <PlanMap plan={pin} lines={[]} /> : null}
+  <article className="card option-card">
     <h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
-    <p className="font-bold">{place.name}</p>
-    <p className="muted">Time not set</p>
-    <PrivateOrderSummary order={order} listings={listings} alternative />
-    <AgentVenueDetails place={place} name={place.name} />
+    <h3 className="option-route">{place.name}</h3>
+    {compact ? <AgentVenueDetails place={place} name={place.name} compact /> : null}
+    <p className="muted">Time to be decided</p>
+    <PrivateOrderSummary order={order} listings={listings} alternative compact={compact} />
+    {compact ? <details className="option-details" onToggle={e => setExpanded(e.currentTarget.open)}><summary>Map & details</summary>
+      {expanded ? <div className="space-y-4">{pin ? <PlanMap plan={pin} lines={[]} /> : null}<AgentVenueDetails place={place} name={place.name} /></div> : null}
+    </details> : <AgentVenueDetails place={place} name={place.name} />}
   </article></div>;
-}
-
-function OtherOptions({ suggestions, orders, startAt }: { suggestions: AgentSuggestion[]; orders: AgentOrder[]; startAt: number }) {
-  if (!suggestions.length) return null;
-  return <section className="space-y-4" aria-label="Other options to explore">
-    {suggestions.map((suggestion, index) => <AgentSuggestionCard key={suggestion.id} suggestion={suggestion} optionNumber={startAt + index}
-      order={orders.find(order => order.planId === suggestion.id)} />)}
-  </section>;
 }
 
 export function AgentPlans() {
@@ -181,34 +184,38 @@ export function AgentPlans() {
   const post = useReducer(reducers.postAgentDiscussion);
   const { run, busy, error } = useRun();
   const [message, setMessage] = useState("");
-  if (agent?.status === "planning") return <section className="card space-y-3" role="status"><h1 className="card-title">Your coordinator is planning</h1><p>Considering confirmed prompts and checking catalog itineraries. No booking is being made.</p></section>;
+  if (agent?.status === "planning") return <section className="card" role="status"><h1 className="card-title">Finding your next outing…</h1></section>;
   const result = planRun?.result;
   const active = !!agent && ["ready", "blocked"].includes(agent.status) && result?.inputRevision === agent.revision;
   const hasChoices = active && !!(result?.plans.length || result?.suggestions?.length);
   const canDiscuss = hasChoices;
   return <div className="space-y-5">
-    <h1 className="shout text-[48px]">Your group’s plans</h1>
+    <div className="page-title-row"><PageHeading lead="Your group’s" accent="options" />
+      <div className="page-actions">
+        <Link className="btn btn-quiet" to={`/g/${session.groupId}/prefs`}>Edit preferences</Link>
+        {isHost && agent?.status !== "needs" ? <button className="btn" disabled={busy || !timingReady} onClick={() => run(() => find())}>Plan again</button> : null}
+        {hasChoices ? <Link className="btn btn-sun" to={`/g/${session.groupId}/vote`}>Vote →</Link> : null}
+      </div>
+    </div>
     {agent?.error ? <p className="card error" role="alert">{agent.error}</p> : null}
     {!active && !result?.conflicts.length ? <p className="card">Review everyone's current needs before generating plans.</p> : null}
     {result?.conflicts.map(c => <p className="card card-note" key={c}>{c}</p>)}
-    {active ? result?.plans.map((plan, index) => <div key={plan.id} className="space-y-3"><OptionMap plan={plan} /><AgentPlanCard plan={plan} optionNumber={index + 1} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} /></div>) : null}
-    {active ? <OtherOptions suggestions={result?.suggestions ?? []} orders={orders} startAt={(result?.plans.length ?? 0) + 1} /> : null}
-    <section className="card space-y-3">
-      <h2 className="card-title">Coordinator and group conversation</h2>
-      <p className="muted">This conversation is shared. Update hard requirements privately on the Needs screen.</p>
+    {active ? <div className="comparison-grid" aria-label="Compare outing options">
+      {result?.plans.map((plan, index) => <AgentPlanCard key={plan.id} plan={plan} compact optionNumber={index + 1} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} />)}
+      {result?.suggestions?.map((suggestion, index) => <AgentSuggestionCard key={suggestion.id} suggestion={suggestion} compact optionNumber={(result.plans.length ?? 0) + index + 1} order={orders.find(order => order.planId === suggestion.id)} />)}
+    </div> : null}
+    <details className="card group-discussion">
+      <summary>Group conversation{messages.length ? ` (${messages.length})` : ""}</summary>
+      <div className="space-y-3">
       <ol className="space-y-3">{messages.map(m => <li key={String(m.id)}><strong>{m.label}</strong><p>{m.text}</p></li>)}</ol>
       {canDiscuss ? <form className="space-y-2" onSubmit={e => { e.preventDefault(); void run(async () => { await post({ text: message }); setMessage(""); }); }}>
         <label htmlFor="group-discussion">Message everyone</label>
         <textarea id="group-discussion" className="input" maxLength={2000} value={message} onChange={e => setMessage(e.target.value)} />
         <button className="btn" disabled={busy || !message.trim()}>Send to group</button>
       </form> : null}
-      {canDiscuss ? <p className="muted">The coordinator considers this discussion next time the host chooses Find plans again.</p> : null}
-    </section>
-    <div className="flex flex-wrap gap-3">
-      <Link className="btn" to={`/g/${session.groupId}/prefs`}>Edit my private needs</Link>
-      {hasChoices ? <Link className="btn btn-primary" to={`/g/${session.groupId}/vote`}>Go to vote</Link> : null}
-      {isHost && agent?.status !== "needs" ? <button className="btn" disabled={busy || !timingReady} onClick={() => run(() => find())}>Find plans again</button> : null}
-    </div>
+      {canDiscuss ? <p className="muted">Choose Plan again to include new messages.</p> : null}
+      </div>
+    </details>
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;
 }
@@ -226,22 +233,22 @@ export function AgentVote() {
   if (!runId || !current || !result) return <section className="card space-y-3"><p>There are no current options to vote on yet.</p><Link className="underline font-bold" to={`/g/${session.groupId}/plans`}>Open plans</Link></section>;
   const titleFor = (id: string) => `Option ${choices.findIndex(choice => choice.id === id) + 1}`;
   return <div className="space-y-5">
-    <h1 className="shout text-[48px]">Choose together</h1>
+    <div className="page-title-row"><PageHeading lead="Choose" accent="together" />
+      <div className="page-actions"><Link className="btn" to={`/g/${session.groupId}/plans`}>Plans & chat</Link>
+      {winner ? <Link className="btn btn-sun" to={`/g/${session.groupId}/done`}>See the group’s choice →</Link> : null}</div>
+    </div>
     {choices.length ? <VoteStatus votes={votes} members={group.members} winnerTitle={winner ? titleFor(winner.id) : undefined}
       tiedTitles={complete && !winner ? leaders.map(p => titleFor(p.id)) : undefined} /> : null}
-    <Link className="btn" to={`/g/${session.groupId}/plans`}>Read plans and conversation</Link>
-    {winner ? <Link className="btn btn-sun" to={`/g/${session.groupId}/done`}>See the group’s choice</Link> : null}
     {!choices.length ? <p className="card">No options yet. The host can find plans after everyone saves their needs.</p> : null}
-    {choices.map((choice, index) => <div key={choice.id} className={`vote-option ${votes?.myVote === choice.id ? "is-mine" : ""}`}>
-      {"stops" in choice ? <><OptionMap plan={choice} /><AgentPlanCard plan={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} /></>
-        : <AgentSuggestionCard suggestion={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} />}
+    <div className="comparison-grid" aria-label="Vote on an outing">{choices.map((choice, index) => <div key={choice.id} className={`vote-option ${votes?.myVote === choice.id ? "is-mine" : ""}`}>
       <VoteChoice planId={choice.id} title={`Option ${index + 1}`} votes={votes} members={group.members} myMemberId={session.memberId}
         busy={busy || !("stops" in choice) && !listings.has(choice.placeId)} onVote={() => run(() => vote({ runId, planId: choice.id }))} />
-    </div>)}
-    {choices.length ? <p className="on-sky muted">You can change your vote until the host starts booking.</p> : null}
+      {"stops" in choice ? <AgentPlanCard plan={choice} compact optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} />
+        : <AgentSuggestionCard suggestion={choice} compact optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} />}
+    </div>)}</div>
     {choices.length ? <div className="flex flex-wrap gap-3">
       <button className="btn" disabled={busy || !complete || leaders.length < 2 || !!winner}
-        onClick={() => run(() => spin({ runId }))}>Resolve tie: equal-chance Spin</button>
+        onClick={() => run(() => spin({ runId }))}>Break the tie: spin</button>
     </div> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;

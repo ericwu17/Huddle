@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useState } from "react";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
@@ -19,7 +20,7 @@ export default function Friends() {
   const incoming = requests?.filter(r => r.direction === "incoming" && r.status === "pending") ?? [];
   const outgoing = requests?.filter(r => r.direction === "outgoing" && r.status === "pending") ?? [];
   return <AccountShell loading={!!account && (friends === undefined || requests === undefined)}>{account === undefined ? null : !account ? <AccountRequired /> : <>
-    <div><h1 className="shout text-[56px]">Your people</h1><p className="on-sky mt-3">Find a friend once. Huddle together whenever.</p></div>
+    <div><PageHeading lead="Your" accent="people" /><p className="on-sky mt-3">Find a friend once. Huddle together whenever.</p></div>
     <section className="card space-y-4"><h2 className="card-title">Add a friend</h2>
       <form className="space-y-3" onSubmit={e => { e.preventDefault(); void run(async () => {
         await request({ username: username.trim() }); setUsername(""); setNotice("Friend request sent. Your friend can accept it in Huddle.");
@@ -28,7 +29,7 @@ export default function Friends() {
         <div className="flex flex-wrap gap-3"><input id="friend-username" className="input flex-1 min-w-40" autoCapitalize="none" autoComplete="off" spellCheck={false}
           placeholder="username" maxLength={24} value={username} onChange={e => { setUsername(e.target.value.replace(/^@/, "")); setNotice(""); }} required />
           <button className="btn btn-sun" disabled={busy || !username.trim()}>Send friend request</button></div>
-        <p className="muted">Your username is <strong>@{account.username}</strong>. Both of you choose to connect.</p>
+        <p className="muted">Find me at <strong>@{account.username}</strong></p>
       </form>{notice ? <p role="status">{notice}</p> : null}
     </section>
     {incoming.length ? <section className="card card-note space-y-4"><h2 className="card-title">Friend requests</h2>
@@ -40,7 +41,7 @@ export default function Friends() {
       {friends === undefined ? <p role="status">Loading your friends…</p> : friends.length ? <ul className="space-y-4">{friends.map(f => <li className="social-row" key={f.accountId}>
         <div className="flex items-center gap-3"><Buddy who={f.displayName} pose="wave" size={64} /><p><strong>{f.displayName}</strong><br /><span className="muted">@{f.username}</span></p></div>
         <button className="btn" disabled={busy} onClick={() => { if (window.confirm(`Remove ${f.displayName} from your friends?`)) void run(() => remove({ friendAccountId: f.accountId })); }}>Remove friend</button>
-      </li>)}</ul> : <p>Your friends will gather here. Ask someone for their Huddle username to get started.</p>}
+      </li>)}</ul> : <p>Add a friend by username to get started.</p>}
     </section>
     {outgoing.length ? <section className="card space-y-3"><h2 className="card-title">Waiting for a reply</h2>{outgoing.map(r => <p key={r.id}>{r.toDisplayName} <span className="muted">@{r.toUsername} · request sent</span></p>)}</section> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}

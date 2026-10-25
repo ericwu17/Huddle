@@ -10,7 +10,7 @@ export default function ShareResultAction({ runId, planId }: { runId: string; pl
   const [notice, setNotice] = useState("");
   return <section className="card space-y-3" aria-label="Share the chosen result">
     <h2 className="card-title">Share the plan</h2>
-    <p>Share the route and time with friends. Your order stays private.</p>
+    <p>Share the route and time with friends.</p>
     <button className="btn btn-sun" disabled={busy} onClick={() => run(async () => {
       let nextUrl = url;
       if (!nextUrl) {

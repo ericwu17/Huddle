@@ -19,6 +19,7 @@ import { useAgentBallot } from "../useAgentBallot";
 import { winnerTransition } from "../agentBallot";
 import HuddleLoading from "../components/HuddleLoading";
 import { useHuddleTiming } from "../huddleTiming";
+import HuddleBrand from "../components/HuddleBrand";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -79,7 +80,8 @@ export default function GroupLayout() {
   useEffect(() => {
     if (!agent || agent.groupId !== session.groupId || group?.id !== session.groupId || ballot.loading) return;
     const key = ballot.winner ? `${ballot.runId}:${agent.revision}:${ballot.winner.id}` : null;
-    const transition = winnerTransition(lastWinner.current, group.id, key, pathname.endsWith("/vote") || pathname.endsWith("/prefs"));
+    const transition = winnerTransition(lastWinner.current, group.id, key,
+      pathname.endsWith("/vote") || pathname.endsWith("/prefs"));
     lastWinner.current = transition.state;
     if (transition.follow) navigate(`/g/${session.groupId}/done`);
   }, [agent, group, ballot.loading, ballot.runId, ballot.winner, navigate, pathname, session.groupId]);
@@ -101,9 +103,7 @@ export default function GroupLayout() {
   if (group === null || group.id !== session.groupId) {
     return (
       <main className="page space-y-4">
-        <a className="logo" href="/">
-          huddle
-        </a>
+        <HuddleBrand />
         <section className="card space-y-3">
           <p>This phone isn't in huddle {session.code} anymore.</p>
           {group ? (
@@ -139,9 +139,7 @@ export default function GroupLayout() {
     <main className="group-page">
       <aside className="group-sidebar">
         <header className="topbar">
-          <a className="logo" href="/">
-            huddle
-          </a>
+          <HuddleBrand />
         </header>
         <span className="me-tag">
           <Buddy who={session.name} size={56} crown />
@@ -164,11 +162,6 @@ export default function GroupLayout() {
       <Outlet key={group.id} context={ctx} />
       {agent?.status === "planning" ? <PlanningHuddle members={group.members} start={group.window.start} /> : null}
       {!agent ? <PhaseFooter ctx={ctx} booking={booking} /> : null}
-      <p className="text-center">
-        <Link className="on-sky muted underline" to={`/g/${session.groupId}/judge`}>
-          Under the hood
-        </Link>
-      </p>
       </div>
     </main>
   );
@@ -182,14 +175,14 @@ function SidebarPeople({ ctx }: { ctx: GroupContext }) {
   const votes = useVotes(group.latestRunId, session.memberId);
   return (
     <section className="sidebar-people card" aria-label="Who's in">
-      <h2 className="card-title">Your people</h2>
+      <h2 className="section-title">Your people</h2>
       <ul className="sidebar-members">
         {group.members.map((m) => {
           const { ready, label } = readinessFor(step, ctx, m.id, votes);
           return (
             <li key={m.id}>
               <Buddy who={m.name} pose={ready ? "huddle" : "idle"} size={30} />
-              <span className="min-w-0 flex-1 truncate">{m.id === session.memberId ? `${m.name} (you)` : m.name}</span>
+              <span className="member-name">{m.id === session.memberId ? `${m.name} (you)` : m.name}</span>
               <span className={`sticker ${ready ? "sticker-lime" : ""}`}>{label}</span>
             </li>
           );

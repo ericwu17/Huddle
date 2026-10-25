@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
@@ -79,7 +80,7 @@ function LegacySwipe() {
         </div>
       </section>
 
-      <h1 className="shout text-[52px]">This or that?</h1>
+      <PageHeading lead="This or" accent="that?" />
       {!pair ? (
         <p className="on-sky">
           {(me?.swipeCount ?? 0) >= MAX_SWIPES ? "You're done. Waiting for the group…" : "Loading next pair…"}

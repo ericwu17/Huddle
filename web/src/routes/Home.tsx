@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useProcedure, useReducer, useSpacetimeDB } from "spacetimedb/react";
@@ -7,7 +8,6 @@ import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
 import { useAccount, useAccountMemberships, useHuddleInvitations } from "../accountData";
 import AccountShell from "../components/AccountShell";
-import HuddleWordmark from "../components/HuddleWordmark";
 
 // Start an outing here; invite friends from its lobby or open an addressed invite.
 export default function Home() {
@@ -67,16 +67,16 @@ export default function Home() {
     });
   }
 
-  return <AccountShell loading={!!account && (memberships === undefined || invitations === undefined)}>{account === undefined ? null : <>
+  return <AccountShell className="account-home" loading={!!account && (memberships === undefined || invitations === undefined)}>{account === undefined ? null : <>
     <div className="home-intro home-welcome"><div className="home-welcome-copy">
-      <HuddleWordmark className="home-wordmark" />
-      <h1 className="home-question"><span>What are</span> <span className="home-question-hand">we doing?</span></h1>
-      <p className="on-sky home-greeting">{account ? `Hi ${account.displayName}. ` : ""}Start a huddle and invite your friends.</p></div>
-      <div className="crowd" aria-hidden="true"><Buddy who={account?.displayName ?? "You"} pose="wave" size={116} crown /><Buddy who="Your people" pose="huddle" size={104} /></div></div>
+      <PageHeading lead="What are" accent="we doing?" /></div>
+      <div className="crowd home-hosts" aria-hidden="true"><Buddy who={account?.displayName ?? "You"} pose="wave" size={116} crown /><Buddy who="Your people" pose="huddle" size={104} /><Buddy who="Another friend" pose="idle" size={98} /></div></div>
 
     {pending.length ? <section className="card card-note space-y-3" aria-label="New Huddle invitations"><h2 className="card-title">You're invited</h2>
       {pending.map(i => <div className="social-row" key={i.id}><p>{i.message}</p><Link className="btn btn-sun" to={i.path}>Open</Link></div>)}</section> : null}
 
+    <div className="home-start">
+    <p className="on-sky home-greeting">{account ? `Hi ${account.displayName}. ` : ""}Start a huddle and invite your friends.</p>
     <section className="card space-y-3" aria-label="Start a huddle">
       <h2 className="card-title">Start a huddle</h2>
       {account ? null : <input className="input" placeholder="Your first name" autoComplete="given-name" maxLength={24}
@@ -87,9 +87,10 @@ export default function Home() {
       {!isActive ? <p role="status" className="muted">Connecting to Huddle…</p> : null}
       {error ? <p className="error" role="alert">{error}</p> : null}
     </section>
+    </div>
 
     {account ? <section className="card space-y-4" aria-label="Your huddles"><h2 className="card-title">Your huddles</h2>
-      {memberships === undefined ? <p role="status">Loading your huddles…</p> : !memberships.length ? <p className="muted">Huddles you start or join show up here, on any device you sign in on.</p> :
+      {memberships === undefined ? <p role="status">Loading your huddles…</p> : !memberships.length ? <p className="muted"><strong>Your next adventure starts here.</strong></p> :
         <ul className="space-y-3">{memberships.map(m => <li key={m.id} className="social-row">
           <p><strong>Huddle {m.code}</strong><br /><span className="muted">{m.date} · {m.role} · {m.status}</span></p>
           <div className="flex flex-wrap gap-2">
@@ -98,7 +99,6 @@ export default function Home() {
               onClick={() => run(() => remove({ groupId: m.groupId }))}>Remove</button>
           </div>
         </li>)}</ul>}
-      {memberships?.length ? <p className="muted">Remove takes a huddle off your list only. Others in it keep it.</p> : null}
     </section> : <p className="card !py-3 text-sm">Want your huddles on every device? <Link className="underline font-bold" to="/login">Sign in or create an account</Link></p>}
   </>}</AccountShell>;
 }

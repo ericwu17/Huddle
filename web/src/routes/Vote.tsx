@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useProcedure, useReducer } from "spacetimedb/react";
@@ -55,7 +56,7 @@ function LegacyVote() {
 
   return (
     <div className="space-y-5">
-      <h1 className="shout text-[52px]">Pick one</h1>
+      <PageHeading lead="Pick" accent="one" />
       <VoteStatus votes={votes} members={group.members} winnerTitle={winner ? KIND_LABEL[winner.kind] : null}
         tiedTitles={leaders.length > 1 ? leaders.map((p) => KIND_LABEL[p.kind]) : undefined} />
       {council && !council.fallbackUsed && (
@@ -71,18 +72,18 @@ function LegacyVote() {
         Read the council's debate
       </Link>
 
-      {plans.map((p) => (
-        <div key={p.id} className="space-y-3">
+      <div className="comparison-grid">{plans.map((p) => (
+        <div key={p.id} className="vote-option">
+          <VoteChoice planId={p.id} title={KIND_LABEL[p.kind]} votes={votes} members={group.members}
+            myMemberId={session.memberId} busy={busy} onVote={() => run(() => vote({ runId, planId: p.id }))} />
           <PlanCard
             plan={p}
             scout={scoutByPlace}
             selected={votes?.myVote === p.id}
             recommended={council?.fallbackUsed === false && council.chosenPlanId === p.id}
           />
-          <VoteChoice planId={p.id} title={KIND_LABEL[p.kind]} votes={votes} members={group.members}
-            myMemberId={session.memberId} busy={busy} onVote={() => run(() => vote({ runId, planId: p.id }))} />
         </div>
-      ))}
+      ))}</div>
 
       <div className="flex gap-3">
         <button

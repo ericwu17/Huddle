@@ -15,9 +15,9 @@ export default function AccountStatus() {
   const pendingCount = pendingInvites.length + (requests?.filter(r => r.direction === "incoming" && r.status === "pending").length ?? 0);
   const newest = pendingInvites.toSorted((a, b) => b.createdAt - a.createdAt)[0];
   if (account === undefined) return <p className="on-sky" role="status">Checking account…</p>;
-  return <section className="card space-y-2" aria-label="Account">
+  return <section className="card account-status space-y-2" aria-label="Account">
     {account ? <div className="flex flex-wrap items-center justify-between gap-3">
-      <p>Signed in as <strong>{account.displayName}</strong> <span className="muted">@{account.username}</span></p>
+      <p><strong>{account.displayName}</strong> <span className="muted">@{account.username}</span></p>
       <div className="flex flex-wrap gap-3"><Link className="btn" to="/start">My huddles</Link><Link className="btn" to="/inbox">Inbox{pendingCount ? ` (${pendingCount})` : ""}</Link><Link className="btn" to="/friends">Friends</Link>
         <button className="btn" disabled={busy} onClick={() => run(async () => {
           await logout();

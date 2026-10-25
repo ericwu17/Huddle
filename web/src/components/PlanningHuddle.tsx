@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Buddy } from "../doodle/Doodle";
 import { displayTime } from "../venueFormatting";
+import AgentCircle, { type CircleAgent } from "./AgentCircle";
 
 type Member = { id: string; name: string };
 
 // Shown in the middle of the screen while the coordinator plans. Each person's
-// stick figure "advocates" with generic lines about the outing; nothing here
+// agent chats with generic lines about the outing; nothing here
 // comes from anyone's private needs, budget or prompt.
 const LINES = [
   "Somewhere we can all walk to?",
@@ -15,7 +15,7 @@ const LINES = [
   "Is it open at {start}?",
   "Dessert to finish, maybe?",
   "Let's not go too far.",
-  "Limits stay private, promise.",
+  "Finding something we all like.",
   "That one fits the time window.",
   "Checking the ratings…",
   "Can we all agree on this one?",
@@ -35,25 +35,25 @@ export default function PlanningHuddle({ members, start }: { members: Member[]; 
   }
   const speaker = cast.length ? tick % cast.length : -1;
   const line = LINES[(tick * 5) % LINES.length].replace("{start}", displayTime(start));
+  const agents: CircleAgent[] = [
+    { id: "coordinator", label: "Coordinator", who: "Coordinator", coordinator: true },
+    ...cast.map(m => ({ id: m.id, label: `${m.name}'s agent`, who: m.name })),
+  ];
+  const activeId = cast[speaker]?.id ?? "coordinator";
+  const activeLabel = cast[speaker] ? `${cast[speaker].name}'s agent` : "Coordinator";
   return (
     <div className="planning-overlay" role="status" aria-live="polite">
       <section className="planning-card card">
         <h2 className="card-title">Your coordinator is planning</h2>
-        <p className="muted">Everyone's advocates are talking it over. No booking is being made.</p>
-        <div className="planning-stage" aria-hidden="true">
-          <div className="planning-chair">
-            <span className="planning-figure is-chair"><Buddy who="Coordinator" pose="ear" size={84} crown boil /></span>
-            <span className="planning-name">Coordinator</span>
+        <p className="muted">Everyone's agents are talking it over.</p>
+        <div className="planning-stage">
+          <div className="planning-message-slot">
+            <p key={tick} className="planning-bubble">
+              <span className="planning-speaker">{activeLabel}</span>
+              <span>{line}</span>
+            </p>
           </div>
-          <ul className="planning-ring">
-            {cast.map((m, i) => (
-              <li key={m.id} className={i === speaker ? "is-speaking" : ""}>
-                {i === speaker ? <p className="planning-bubble">{line}</p> : <p className="planning-bubble is-quiet"><span className="dots"><i /><i /><i /></span></p>}
-                <span className="planning-figure" style={{ animationDelay: `${i * -0.37}s` }}><Buddy who={m.name} pose={i === speaker ? "argue" : i % 2 ? "wave" : "huddle"} size={64} boil={i === speaker} /></span>
-                <span className="planning-name">{m.name}'s advocate</span>
-              </li>
-            ))}
-          </ul>
+          <AgentCircle agents={agents} activeId={activeId} />
         </div>
         <button className="btn btn-quiet" onClick={() => setHidden(true)}>Hide</button>
       </section>

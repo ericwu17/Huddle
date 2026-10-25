@@ -15,7 +15,7 @@ export default function OffersInbox({ ctx }: { ctx: GroupContext }) {
 
   return (
     <section className="card card-pink card-tilt-l space-y-3">
-      <h2 className="card-title">Psst, a private offer</h2>
+      <h2 className="card-title">A trade offer</h2>
       <p className="muted">Only you see this.</p>
       {open.map((offer) => (
         <div key={offer.offerId} className="space-y-2">

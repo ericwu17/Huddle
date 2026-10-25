@@ -3,8 +3,8 @@ import type { CatalogListing } from "../catalogData";
 import type { PlanStop } from "../types";
 import { dollars } from "../venueFormatting";
 
-export default function PrivateOrderSummary({ order, listings, stops = [], alternative = false }: {
-  order?: AgentOrder; listings: Map<string, CatalogListing>; stops?: PlanStop[]; alternative?: boolean;
+export default function PrivateOrderSummary({ order, listings, stops = [], alternative = false, compact = false }: {
+  order?: AgentOrder; listings: Map<string, CatalogListing>; stops?: PlanStop[]; alternative?: boolean; compact?: boolean;
 }) {
   if (!order) return null;
   const choices = order.items.map(choice => {
@@ -16,13 +16,13 @@ export default function PrivateOrderSummary({ order, listings, stops = [], alter
   const allPricesKnown = choices.length > 0 && (!stops.length || choices.length === stops.length) && choices.every(({ item }) => item?.price != null);
   const total = allPricesKnown ? choices.reduce((sum, { item }) => sum + item!.price!, 0) : null;
   if (choices.some(({ place, stop }) => !place && !stop)) return <section className="card-note rounded-xl p-4" role="status">Loading your menu suggestions…</section>;
-  return <section className="card-note rounded-xl p-4 space-y-3" aria-label="Your private order suggestion">
-    <h3 className="font-bold">What you could order <span className="muted font-normal">· private to you</span></h3>
-    <ul className="space-y-3">{choices.map(({ choice, place, stop, item }, index) => <li key={`${choice.placeId}:${index}`} className="space-y-1">
-        <p className="text-sm font-bold">{place?.name ?? stop?.name ?? "Venue"}</p>
-        <p>{item?.name ?? (place?.category === "activity" || stop?.category === "activity" ? "Activity" : "Choose at the venue")}
+  return <section className="order-summary card-note" aria-label="Your order suggestions">
+    <div className="order-heading"><h3 className="font-bold">Your order</h3>{compact && total != null ? <strong>{dollars(total)}</strong> : null}</div>
+    <ul>{choices.map(({ choice, place, stop, item }, index) => <li key={`${choice.placeId}:${index}`} title={place?.name ?? stop?.name} aria-label={place?.name ?? stop?.name}>
+        {choices.length > 1 && !compact ? <p className="muted">{place?.name ?? stop?.name ?? "Venue"}</p> : null}
+        <p>{item?.name && !/^(?:check at venue|choose at the venue)$/i.test(item.name.trim()) ? item.name : (place?.category === "activity" || stop?.category === "activity" ? "Activity" : "Up to you")}
           {item?.price != null ? ` · ${dollars(item.price)}` : ""}</p>
       </li>)}</ul>
-    {total != null ? <p className="font-bold">{alternative ? "Listed-item total" : "Your listed-item total"}: {dollars(total)}</p> : null}
+    {total != null && !compact ? <p className="order-total">{alternative ? "Menu total" : "Your total"}: {dollars(total)}</p> : null}
   </section>;
 }

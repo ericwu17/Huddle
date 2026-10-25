@@ -13,7 +13,7 @@ export function readinessFor(step: string, ctx: GroupContext, memberId: string, 
       return ctx.agent ? { ready: true, label: "here" } : { ready: !!member?.ready, label: member?.ready ? "ready" : "not yet" };
     case "prefs": {
       const saved = ctx.agent ? ctx.agent.confirmedMemberIds.includes(memberId) : !!member?.ready;
-      return { ready: saved, label: saved ? "ready" : "writing…" };
+      return { ready: saved, label: saved ? "ready" : "thinking…" };
     }
     case "plans":
       return { ready: false, label: "reading" };

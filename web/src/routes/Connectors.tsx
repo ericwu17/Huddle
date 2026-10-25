@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useProcedure, useReducer, useSpacetimeDB } from "spacetimedb/react";
@@ -23,33 +24,33 @@ function ConnectorForm({ initial, configuration }: { initial: ConnectorSettings 
   const calendarConnected = initial?.calendarStatus === "connected";
   return <div className="space-y-6">
     <section className="card space-y-4" aria-label="Messages connector">
-      <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Messages invitations</h2>
-        <span className={`sticker ${messagesReady ? "sticker-lime" : ""}`}>{configuration === null ? "Checking connection" : messagesReady ? "Demo sender available" : "Not configured"}</span></div>
-      <p>Get an invitation message with a link to open Huddle. In this demo, Messages sends from Max’s Mac using his Messages account.</p>
-      <p className="muted">Your phone number or Apple ID email stays private. Friends cannot see it.</p>
-      {!messagesReady && configuration ? <p className="card-note rounded-xl p-3">The demo host has not connected the Messages sender and public invitation URL. In-app invitations still work.</p> : null}
+      <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Text invites</h2>
+        <span className={`sticker ${messagesReady ? "sticker-lime" : ""}`}>{configuration === null ? "Checking…" : messagesReady ? "Ready" : "Not set up"}</span></div>
+      <p>Get invites in Messages, sent from Max’s Mac.</p>
+
+      {!messagesReady && configuration ? <p className="card-note rounded-xl p-3">Text invites aren’t set up yet. Your Huddle inbox still works.</p> : null}
       <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(async () => {
-        await saveMessages({ enabled, destination }); setNotice(enabled ? "You opted in to external invitation messages." : "External invitation messages are off.");
+        await saveMessages({ enabled, destination }); setNotice(enabled ? "Text invites are on." : "Text invites are off.");
       }); }}>
-        <label className="block font-bold" htmlFor="message-destination">Your Messages address</label>
+        <label className="block font-bold" htmlFor="message-destination">Phone number or Apple ID email</label>
         <input id="message-destination" className="input" type="text" autoComplete="off" maxLength={254} value={destination} onChange={e => setDestination(e.target.value)} placeholder="+15105551234 or your Apple ID email" required={enabled} />
-        <label className="check"><input type="checkbox" checked={enabled} disabled={busy || (!messagesReady && !enabled)} onChange={e => setEnabled(e.target.checked)} />Send Huddle invitation messages to this address</label>
-        <button className="btn btn-sun" disabled={busy}>Save my message settings</button>
+        <label className="check"><input type="checkbox" checked={enabled} disabled={busy || (!messagesReady && !enabled)} onChange={e => setEnabled(e.target.checked)} />Send invites here</label>
+        <button className="btn btn-sun" disabled={busy}>Save settings</button>
       </form>
-      <p className="muted">Submitting to Messages does not confirm delivery. You can always find your invitations in Huddle’s inbox.</p>
+      <p className="muted">Delivery isn’t guaranteed. Invites also appear in your Huddle inbox.</p>
     </section>
     <section className="card space-y-4" aria-label="Google Calendar connector">
-      <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Google Calendar</h2><span className={`sticker ${calendarConnected ? "sticker-lime" : ""}`}>{initial?.calendarStatus ?? "disconnected"}</span></div>
-      <p>Find a time that works for everyone. Availability checks use your primary calendar’s free/busy times. Event names and descriptions are not shared with the group.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Google Calendar</h2><span className={`sticker ${calendarConnected ? "sticker-lime" : ""}`}>{calendarConnected ? "Connected" : initial?.calendarStatus === "pending" ? "Connecting…" : "Not connected"}</span></div>
+      <p>Find a shared time using your primary calendar’s availability. Event details stay hidden.</p>
       {calendarConnected && initial?.calendarEmail ? <p>Connected as <strong>{initial.calendarEmail}</strong></p> : null}
-      {configuration && !configuration.googleConfigured ? <p className="card-note rounded-xl p-3">Google Calendar is not configured by the demo host yet. You can keep using Huddle without connecting a calendar.</p> : null}
+      {configuration && !configuration.googleConfigured ? <p className="card-note rounded-xl p-3">Calendar sync isn’t set up yet. You can still use Huddle.</p> : null}
       <div className="flex flex-wrap gap-3">{!calendarConnected ? <button className="btn btn-sun" disabled={busy || !configuration?.googleConfigured} onClick={() => run(async () => {
         const result = await connect();
         if (!result.ok || !result.authorizationUrl) throw new Error(result.message);
         window.location.assign(result.authorizationUrl);
       })}>{initial?.calendarStatus === "pending" ? "Continue connecting Google Calendar" : "Connect Google Calendar"}</button> : null}
         {initial && initial.calendarStatus !== "disconnected" ? <button className="btn" disabled={busy} onClick={() => run(async () => { await disconnect(); setNotice("Your Google Calendar is disconnected from Huddle."); })}>Disconnect Google Calendar</button> : null}</div>
-      {!calendarConnected ? <p className="muted">This preview uses Google’s test mode. If Google shows 403/access_denied, ask the host to add your exact Google email under Auth Platform → Audience → Test users, then reconnect.</p> : null}
+      {!calendarConnected ? <details className="space-y-2"><summary className="font-bold">Trouble connecting?</summary><p className="muted">If Google blocks sign-in, ask the host to add your email as a test user, then try again.</p></details> : null}
       {configuration?.googleCallbackUrl ? <details className="space-y-3"><summary className="font-bold">Google Calendar setup details</summary>
         <p className="muted">The host must register this exact callback as an authorized redirect URI for the Google OAuth web client. Update it when the API’s public address changes.</p>
         <label className="block font-bold" htmlFor="google-callback">Public callback URL</label>
@@ -61,7 +62,7 @@ function ConnectorForm({ initial, configuration }: { initial: ConnectorSettings 
       </details> : null}
       {initial?.calendarError ? <p className="error" role="alert">{initial.calendarError}</p> : null}
       <label className="check"><input type="checkbox" checked={initial?.calendarEventConsent ?? false} disabled={busy || (!calendarConnected && !initial?.calendarEventConsent)} onChange={e => run(() => eventConsent({ enabled: e.target.checked }))} />Allow Huddle to add an agreed meetup to my calendar</label>
-      <p className="muted">This is a separate opt-in. After everyone votes, the host explicitly adds the agreed meetup to calendars that opted in. It does not reserve a restaurant.</p>
+      <p className="muted">After voting, the host can add the meetup to opted-in calendars.</p>
     </section>
     {notice ? <p className="card" role="status">{notice}</p> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}
@@ -83,8 +84,8 @@ export default function Connectors() {
     return () => { current = false; };
   }, [accountId, isActive, status]);
   return <AccountShell loading={!!account && settings === undefined}>{account === undefined ? null : !account ? <AccountRequired /> : settings === undefined ? null : <>
-    <div><h1 className="shout text-[56px]">Connect your world</h1><p className="on-sky mt-3">Your connections. Your choices. Huddle still works without them.</p></div>
-    {account.activeGroupId ? <Link className="btn" to={`/g/${account.activeGroupId}`}>Back to my current Huddle</Link> : null}
+    <div><PageHeading lead="Connect your" accent="world" /><p className="on-sky mt-3">Optional connections for easier plans.</p></div>
+    {account.activeGroupId ? <Link className="btn" to={`/g/${account.activeGroupId}`}>Back to my huddle</Link> : null}
     {account.username === "maxli" ? <MacContactsConnector /> : null}
     <ConnectorForm key={account.accountId} initial={settings} configuration={configuration} />
     {error ? <p className="error" role="alert">{error}</p> : null}

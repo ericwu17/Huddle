@@ -5,11 +5,10 @@ import { reducers } from "../module_bindings";
 import { useAccount, useFriendRequests, useHuddleInvitations } from "../accountData";
 import { clearAccountBrowserState } from "../session";
 import { useRun } from "../useRun";
-import { Buddy } from "../doodle/Doodle";
 import HuddleLoading from "./HuddleLoading";
-import HuddleWordmark from "./HuddleWordmark";
+import HuddleBrand from "./HuddleBrand";
 
-export default function AccountShell({ children, loading = false }: { children: ReactNode; loading?: boolean }) {
+export default function AccountShell({ children, loading = false, className = "" }: { children: ReactNode; loading?: boolean; className?: string }) {
   const account = useAccount();
   const navigation = useNavigation();
   const logout = useReducer(reducers.logoutAccount);
@@ -21,11 +20,10 @@ export default function AccountShell({ children, loading = false }: { children: 
   // Unknown identity is a loading state, never a flash of signed-out navigation.
   if (account === undefined) return <HuddleLoading />;
   const waiting = loading || navigation.state !== "idle";
-  return <main className="account-page">
+  return <main className={`account-page ${className}`}>
     {waiting ? <HuddleLoading /> : null}
     <aside className="account-sidebar" inert={waiting}>
-      <Link className="brand-home" to="/start" aria-label="Huddle home"><HuddleWordmark /></Link>
-      <div className="sidebar-buddy" aria-hidden="true"><Buddy who={account?.displayName ?? "Huddle"} pose="wave" size={128} crown /></div>
+      <HuddleBrand />
       <nav className="account-nav" aria-label="Your Huddle">
         <NavLink to="/start">Home</NavLink>
         {account ? <>

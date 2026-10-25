@@ -23,8 +23,8 @@ export default function MacContactsConnector() {
   const friend = friends?.find(f => f.accountId === friendId);
   return <section id="mac-contacts" className="card space-y-4" aria-label="Mac Contacts links">
     <h2 className="card-title">Link friends from Mac Contacts</h2>
-    <p>Choose someone from Max’s MacBook Contacts and link their phone number or email to the right Huddle friend. They do not need to enter an address themselves.</p>
-    <p className="muted">Only the contact and destination you choose are saved privately. The address book is not uploaded. Your friend’s own delivery settings take priority, including an explicit opt-out.</p>
+    <p>Match a Mac contact to a Huddle friend for invitation messages.</p>
+    <p className="muted">Only your selected contact is saved. Your friend’s message settings take priority.</p>
     <form className="space-y-3" onSubmit={e => { e.preventDefault(); void run(async () => {
       setChoice(null); setMatches(null); setNotice("");
       const result = await search({ query: query.trim() });
@@ -65,7 +65,7 @@ export default function MacContactsConnector() {
       })}>Link contact</button>
     </div> : null}
     <div className="space-y-3"><h3 className="font-bold">Your linked friends</h3>
-      {mappings === undefined ? <p role="status">Loading your private contact links…</p> : !mappings.length ? <p className="muted">No Mac Contacts linked yet.</p> : <ul className="space-y-3">{mappings.map(m => <li className="social-row" key={m.friendAccountId}>
+      {mappings === undefined ? <p role="status">Loading linked contacts…</p> : !mappings.length ? <p className="muted">No Mac Contacts linked yet.</p> : <ul className="space-y-3">{mappings.map(m => <li className="social-row" key={m.friendAccountId}>
         <p className="min-w-0 break-words"><strong>{friends?.find(f => f.accountId === m.friendAccountId)?.displayName ?? "Huddle friend"}</strong> · {m.contactName}<br /><span className="muted break-all">{m.destination}</span></p>
         <button className="btn" disabled={busy} onClick={() => run(async () => { await clear({ friendAccountId: m.friendAccountId }); setNotice("Contact link removed."); })}>Unlink contact</button>
       </li>)}</ul>}

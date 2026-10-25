@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { useState } from "react";
 import { Link } from "react-router";
 import { useReducer } from "spacetimedb/react";
@@ -40,12 +41,12 @@ export default function Lobby() {
 
   return (
     <div className="space-y-5">
-      <h1 className="shout text-[52px]">Get everyone in</h1>
+      <PageHeading lead="Get everyone" accent="together" />
 
-      <section className="card space-y-4"><h2 className="card-title">Invite Huddle friends</h2>
+      <section className="card space-y-4"><h2 className="card-title">Invite friends</h2>
         {account ? <><FriendPicker selected={selected} onChange={setSelected} disabled={busy} exclude={sent.filter(i => i.status === "pending" || i.status === "accepted").map(i => i.toAccountId)} />
           <button className="btn btn-sun" disabled={busy || !selected.length} onClick={() => run(async () => { await invite({ groupId: group.id, friendAccountIds: selected }); setNotice(`In-app invitations sent to ${selected.length} ${selected.length === 1 ? "friend" : "friends"}.`); setSelected([]); })}>Send invitations</button>
-          <p className="muted">Friends get a message in their Huddle inbox with a link to open this outing.</p>
+          <p className="muted">Invitations arrive in their Huddle inbox.</p>
           {notice ? <p role="status">{notice}</p> : null}
           {sent.length ? <ul className="space-y-3">{sent.map(i => <li className="space-y-2" key={i.id}><strong>{i.toDisplayName}</strong> · {i.status}<InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} /><SendInvitationMessageButton invitationId={i.id} pending={i.status === "pending"} status={deliveries?.find(d => d.invitationId === i.id)?.status} /></li>)}</ul> : null}
         </> : <><p>Sign in to invite friends from your list.</p><Link className="btn" to="/login">Sign in</Link></>}
@@ -65,12 +66,12 @@ export default function Lobby() {
       </section>
 
       <div className="grid grid-cols-2 gap-3">
-        {agent ? <Link className="btn btn-sun" to={`/g/${session.groupId}/prefs`}>{agent.confirmedMemberIds.includes(session.memberId) ? "Edit my private needs" : "Start huddle"}</Link> : <button className="btn btn-primary" disabled={busy || me?.ready} onClick={() => run(() => setReady())}>{me?.ready ? "Ready ✓" : "I'm ready"}</button>}
+        {agent ? <Link className="btn btn-sun" to={`/g/${session.groupId}/prefs`}>{agent.confirmedMemberIds.includes(session.memberId) ? "Edit preferences" : "Start huddle"}</Link> : <button className="btn btn-primary" disabled={busy || me?.ready} onClick={() => run(() => setReady())}>{me?.ready ? "Ready ✓" : "I'm ready"}</button>}
         <button className="btn" disabled={busy} onClick={shareLocation}>
           Use my location
         </button>
       </div>
-      <p className="card !py-3 text-sm">Each person saves their own private needs. The host can find plans once 2+ people are ready.</p>
+      <p className="card !py-3 text-sm">Once two people are ready, you can find plans.</p>
       {agent && account ? <CalendarTimeSelector /> : null}
 
       {isHost && !agent && (

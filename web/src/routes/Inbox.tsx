@@ -1,3 +1,4 @@
+import PageHeading from "../components/PageHeading";
 import { Link } from "react-router";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
@@ -23,7 +24,7 @@ export default function Inbox() {
   const clearableOut = outgoing.filter(i => i.status !== "pending").length;
   const friends = requests?.filter(r => r.direction === "incoming" && r.status === "pending") ?? [];
   return <AccountShell loading={!!account && invitations === undefined}>{account === undefined ? null : !account ? <AccountRequired /> : <>
-    <div><h1 className="shout text-[56px]">You’re invited</h1><p className="on-sky mt-3">Your Huddle invitations and friend requests, all in one place.</p></div>
+    <div><PageHeading lead="You’re" accent="invited" /></div>
     <section className="card space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Huddle messages</h2>
         <button className="btn" disabled={busy || !clearableIn} onClick={() => run(() => clear({ direction: "incoming" }))}>Clear inbox</button></div>
@@ -33,8 +34,7 @@ export default function Inbox() {
         <span className={`sticker ${i.status === "pending" ? "sticker-sun" : ""}`}>{i.status}</span>
         <InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} />
         {i.status === "pending" || i.status === "accepted" ? <p><Link className="btn btn-sun" to={i.path}>Open Huddle →</Link></p> : null}
-      </article>) : <p>Your inbox is clear. New invitations from friends show up here.</p>}
-      <p className="muted">These messages are always available in Huddle. Optional external invitations depend on your <Link className="underline font-bold" to="/connectors">Connectors settings</Link>.</p>
+      </article>) : <p>You’re all caught up.</p>}
     </section>
     {friends.length ? <section className="card card-note space-y-4"><h2 className="card-title">New friend requests</h2>{friends.map(r => <div className="social-row" key={r.id}>
       <p><strong>{r.fromDisplayName}</strong> <span className="muted">@{r.fromUsername}</span> wants to be friends.</p>

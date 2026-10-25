@@ -1,9 +1,8 @@
 import type { CSSProperties } from "react";
 import { figure, filterDefs, world, type Face, type Hair } from "./doodles";
 
-// The hand-drawn hills behind every screen. One still frame: the app scrolls
-// lists and streams messages, so the background never redraws.
-const WORLD = filterDefs + world({ wobble: "wobA" });
+// The hills stay still; CSS animates the clouds and sun without React rerenders.
+const WORLD = filterDefs + world({ wobble: "wobA", quietSky: true });
 
 export function DoodleWorld() {
   return <div className="app-world" aria-hidden="true" dangerouslySetInnerHTML={{ __html: WORLD }} />;
@@ -11,7 +10,7 @@ export function DoodleWorld() {
 
 type Look = { hair: Hair; face: Face; scarf: string };
 
-// The first four are the default friends (and Advocates A to D).
+// The first four are the default friends (and Agents A to D).
 const LOOKS: Look[] = [
   { hair: "curly", face: "smile", scarf: "#8fe03b" },
   { hair: "mop", face: "grin", scarf: "#ff5fb4" },
@@ -23,9 +22,9 @@ const LOOKS: Look[] = [
   { hair: "curly", face: "grin", scarf: "#ff5fb4" },
 ];
 
-// "Advocate B" always looks like the second friend; anyone else is picked by name.
+// Agent labels retain the same looks as historical council labels.
 function lookFor(key: string): Look {
-  const letter = /^Advocate ([A-Z])$/.exec(key)?.[1];
+  const letter = /^(?:Agent|Advocate) ([A-Z])$/.exec(key)?.[1];
   if (letter) return LOOKS[(letter.charCodeAt(0) - 65) % LOOKS.length];
   let h = 7;
   for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;

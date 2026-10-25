@@ -11,8 +11,8 @@ export default function AgentPhaseNav({ ctx, booking }: { ctx: GroupContext; boo
   const ballot = useAgentBallot(ctx.group, ctx.agent, ctx.session.memberId);
   const steps = [
     { route: "lobby", label: "People & invites", open: true },
-    { route: "prefs", label: "Private needs", open: true },
-    { route: "plans", label: "Coordinator & plans", open: !!ctx.group.latestRunId },
+    { route: "prefs", label: "Preferences", open: true },
+    { route: "plans", label: "Options", open: !!ctx.group.latestRunId },
     { route: "vote", label: "Vote", open: ballot.current && ballot.choices.length > 0 },
     { route: "done", label: "Done", open: !!ballot.winner },
     { route: "call", label: "Booking simulation", open: !!booking && booking.runId === ctx.group.latestRunId },
