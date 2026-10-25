@@ -163,7 +163,7 @@ class AgentPlanRequest(Model):
 class AgentPlan(Model):
     id: Identifier
     title: Text
-    stops: Annotated[list[Stop], Field(min_length=1, max_length=3)]
+    stops: Annotated[list[Stop], Field(min_length=1, max_length=5)]
     costPerPerson: Money
     whyLine: Text
     limitations: list[Text]

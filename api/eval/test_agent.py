@@ -207,22 +207,72 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
                             for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
 
     def test_stop_preferences_aim_for_the_nearest_feasible_average(self):
-        def counts(*stops, duration=None):
-            body = request()
+        def counts(*stops, duration=None, start="17:00"):
+            body = request(window={"start": start, "end": "23:00"})
             for member, preferred in zip(body.members, stops):
                 member.needs.hard.preferredStops = preferred
                 member.needs.hard.maxOutingMinutes = duration
             return {len(plan.stops) for plan in candidates(self.catalog, body).values()}
         self.assertEqual(counts(None, None), {1, 2, 3})
+        self.assertEqual(counts(None, None, start="12:00"), {1, 2, 3})  # Flexible never adds long routes
         self.assertEqual(counts(1, 1), {1})
         self.assertEqual(counts(3, None), {3})  # Flexible members are not averaged in
         self.assertEqual(counts(2, 3), {2, 3})  # a half-way mean keeps both counts
+        self.assertEqual(counts(3, 4), {3, 4})
         self.assertEqual(counts(1, 2), {1, 2})
-        self.assertEqual(counts(5, 5), {3})  # plans top out at 3 stops
+        self.assertEqual(counts(4, 4), {4})
+        self.assertEqual(counts(5, 5, start="12:00"), {5})
         self.assertEqual(counts(5, 1), {3})
-        # Soft: when three stops do not fit the time limit, the nearest feasible count remains.
+        # Soft: when a count does not fit the window or time limit, the nearest feasible count remains.
+        self.assertEqual(counts(5, 5), {4})  # five stops need more than six hours
+        self.assertEqual(counts(5, 5, duration=240, start="12:00"), {3})
         self.assertEqual(counts(3, 3, duration=180), {2})
         self.assertEqual(counts(3, 3, duration=90), {1})
+
+    def test_long_routes_keep_one_meal_distinct_venues_and_every_limit(self):
+        body = request(window={"start": "12:00", "end": "23:00"})
+        body.members[0].needs.hard.maxOutingMinutes = 420
+        for count in (4, 5):
+            for member in body.members:
+                member.needs.hard.preferredStops = count
+            plans = candidates(self.catalog, body)
+            self.assertTrue(plans)
+            for plan in plans.values():
+                categories = [s.category for s in plan.stops]
+                self.assertEqual(len(plan.stops), count)
+                self.assertEqual(len({s.placeId for s in plan.stops}), count)
+                self.assertEqual(categories.count("meal"), 1)
+                self.assertLessEqual(categories.count("dessert"), 1)
+                self.assertLessEqual(plan.costPerPerson, 25)
+                self.assertLessEqual(minutes(plan.stops[-1].end) - minutes(plan.stops[0].start), 420)
+                self.assertLessEqual(minutes(plan.stops[-1].end), minutes("23:00"))
+                for a, b in zip(plan.stops, plan.stops[1:]):
+                    leg = self.catalog.legs[self.catalog.index[a.placeId], self.catalog.index[b.placeId]]
+                    self.assertGreaterEqual(minutes(b.start), minutes(a.end) + leg)
+
+    def test_long_route_search_stays_bounded_on_a_full_live_catalog(self):
+        import random
+        import time
+        from api.catalog import ROUTE_CAP
+        rng = random.Random(0)
+        places = []
+        # The module's live snapshot limits: 80 meals, 50 activities, 30 desserts.
+        for category, count in (("meal", 80), ("activity", 50), ("dessert", 30)):
+            pool = [p for p in self.catalog.places if p.category == category]
+            places += [pool[k % len(pool)].model_copy(update={
+                "id": f"{pool[k % len(pool)].id}_{k}", "lat": pool[k % len(pool)].lat + rng.uniform(-0.01, 0.01),
+                "lng": pool[k % len(pool)].lng + rng.uniform(-0.01, 0.01)}) for k in range(count)]
+        catalog = Catalog(places)
+        body = request(window={"start": "12:00", "end": "23:00"})
+        for member in body.members:
+            member.needs.hard.preferredStops = 5
+            member.needs.hard.budgetMaxPerPerson = 200
+        began = time.perf_counter()
+        plans = candidates(catalog, body)
+        self.assertLess(time.perf_counter() - began, 2)
+        self.assertTrue(plans)
+        self.assertLessEqual(len(plans), 2 * ROUTE_CAP)
+        self.assertEqual({len(plan.stops) for plan in plans.values()}, {5})
 
     async def test_structured_stop_choice_survives_model_extraction(self):
         result = await interpret(Model(extracted=needs(None, preferredStops=1)), AgentNeedsRequest(

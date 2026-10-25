@@ -83,8 +83,8 @@ Pick one path and rehearse it on the demo build:
   confirm, so check that all three reach "ready ✓" during rehearsal.
 
 Host's private needs for the demo: **Vegetarian**, **$30** whole-outing budget,
-**2 stops**, prompt "somewhere quiet". Do not choose 4 or 5 stops: plans currently
-top out at 3.
+**2 stops**, prompt "somewhere quiet". 4 stops fit the default 17:00–23:00
+window; 5 stops usually need a longer window and otherwise fall back to 4.
 
 Before going on: API health and tunnel are up, the 130-venue catalog is active,
 and one complete huddle from rehearsal is saved under "Your huddles" as a backup.

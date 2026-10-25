@@ -6,6 +6,7 @@ import { LIVE_PLACES } from "../src/lib/places";
 import { recordCallEvent } from "../src/booking";
 import { catalogSnapshot, findPlace, ingestCatalog, MAX_ACTIVE } from "../src/lib/catalog";
 import { cents, itemContradictsDiet, orderRequiresProvisional } from "../src/lib/agent-orders";
+import { planFitsAgentRequirements } from "../src/lib/agent-constraints";
 
 const internal = TestAuth.internal();
 const needs = (cap = 30, hard: any = {}) => ({ hard: { budgetMaxPerPerson: cap, dietary: [], allergies: [],
@@ -264,6 +265,18 @@ describe("single coordinator flow", () => {
     api.runAgentNeedsJob(s.proc(), { job });
     expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(true);
     expect(JSON.parse(s.test.db.agent_need.memberId.find(s.users[0].id)!.resultJson!).questions).toEqual([]);
+  });
+
+  it("accepts coordinator outings of up to five distinct stops", () => {
+    const categories = ["activity", "meal", "activity", "dessert", "activity", "activity"];
+    const plan = (count: number) => {
+      const stops = categories.slice(0, count).map((category, i) => ({ placeId: `p_${i}`, category, costPerPerson: 5,
+        start: `${12 + 2 * i}:00`, end: `${12 + 2 * i}:45` }));
+      return { stops, costPerPerson: 5 * count };
+    };
+    const members = [{ memberId: "a", hard: { budgetMaxPerPerson: null, dietary: [], allergies: [] } }];
+    expect([4, 5].map(count => planFitsAgentRequirements(plan(count), members))).toEqual([true, true]);
+    expect(planFitsAgentRequirements(plan(6), members)).toBe(false);
   });
 
   it("rejects plans longer than the outing slider including time between stops", () => {
