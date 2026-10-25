@@ -60,20 +60,73 @@ that future features already work. Current integration details: [HANDOFF.md](HAN
 Use the repeatable backend smoke command in [api/README.md](../api/README.md#check-the-live-deployment).
 It creates disposable synthetic groups; it does not replace the browser rehearsal.
 
-## Three-minute script (draft; rehearse with a clock)
+## Three-minute script (coordinator flow; rehearse with a clock)
 
-| Time | Owner | Show and say |
-| --- | --- | --- |
-| 0:00–0:20 | Haydn | “A group can agree on a plan while one person quietly hates it. Huddle makes each person's limits count.” Show the join code. |
-| 0:20–1:10 | Haydn + phone driver | Four people join, enter private preferences and swipe. Show the current plan result. If this build uses stubs, say so before presenting the result. |
-| 1:10–1:40 | Max | Show the plan cost as the sum of its stops. Explain that every person's outing budget is a hard cap and only its owner can accept a private offer to raise it. Show actual trade offers only if implemented. |
-| 1:40–2:15 | Eric Wu | Show the council and vote, then booking. Use the tested synthetic full/re-plan path or the agreed real/recorded path, accurately labeled. Keep a short clip ready if the live path fails. |
-| 2:15–2:45 | Max | Explain the implemented decision rule. If showing the experiment chart: “This compares choice rules on simulated tastes with cumulative budgets enforced; it is not a real-user study or a measurement of our solver.” Do not reuse the withdrawn numbers. |
-| 2:45–3:00 | Eric Wu | State what works in the demo build and one next step. Finish on the group result. |
+This script follows the current account → invite → private needs → coordinator
+plans → vote → booking simulation flow on [Vercel](https://huddle-two-neon.vercel.app/start)
+and shared Maincloud `huddle-calhacks`. Owners are carried over from the earlier
+draft; confirm them at rehearsal. Screen names in quotes are the UI's own labels.
 
-Thirty-second backup: join code → private limits → one valid group plan →
-confirmed or clearly labeled synthetic booking. Skip the chart if there is no
-time to explain its limitations. Never describe a planned feature as working.
+### Stage setup
+
+Pick one path and rehearse it on the demo build:
+
+- **Two phones (preferred).** Register a host account and one friend account
+  beforehand and make them friends in **Friends**. Clear both inboxes. The host
+  phone is the one on the projector.
+- **One phone.** The host starts the huddle and reads its code from "Your huddles"
+  on the Start screen. A laptop runs `node scripts/demo-friends.mjs <CODE>`. Sam
+  ("no sushi"), Jordan ("nothing over $20, outdoors") and Riley ("romantic, price
+  no object") join by code, save seeded private needs and vote for the
+  coordinator's recommendation. They are simulated people: say so on stage. A
+  seeded friend whose needs come back with a clarifying question will not
+  confirm, so check that all three reach "ready ✓" during rehearsal.
+
+Host's private needs for the demo: **Vegetarian**, **$30** whole-outing budget,
+**2 stops**, prompt "somewhere quiet". Do not choose 4 or 5 stops: plans currently
+top out at 3.
+
+Before going on: API health and tunnel are up, the 130-venue catalog is active,
+and one complete huddle from rehearsal is saved under "Your huddles" as a backup.
+
+### Script
+
+| Time | Owner | Show | Say |
+| --- | --- | --- | --- |
+| 0:00–0:20 | Haydn | Signed-in Start screen, "Ready to huddle?" | “Every group chat picks a plan while someone quietly can't afford it or can't eat there. Huddle lets each person say what they need privately, and a Claude coordinator finds an outing that works for all of them.” |
+| 0:20–0:50 | Haydn + phone driver | **Start a huddle** → "Get everyone in". Pick the friend under "Invite Huddle friends" → **Send invitations**. Second phone: inbox → **Open Huddle →** → **Open Huddle**. (One phone: the simulated friends appear under "Who's here".) | “Friends get an invitation in their Huddle inbox. Everyone joins from their own phone.” |
+| 0:50–1:25 | Max | **Start huddle** → "Your kind of outing": budget and time sliders, stops, dietary chips, optional prompt → **Save & ready**. Show "Your private summary". | “This screen is private. The sliders are hard limits; the prompt is for Claude. Nobody else sees my $30 or what I wrote.” |
+| 1:25–2:05 | Max (Eric Wu on the data line) | Host taps **Find plans** → "Your coordinator is planning" → "Your group’s plans": option cards with route names, times, walking map, ratings, photos, menu items and my private total. Point to the "Coordinator's recommendation" sticker. | “Claude reads everyone's needs, but it only picks from itineraries our code has already checked: every person's budget across all stops, dietary needs and opening hours. The venues are 130 Berkeley places we scraped with Bright Data, with menus read from their own websites. My total is just my meal plus the later stops, and only I see it.” |
+| 2:05–2:35 | Eric Wu | **Go to vote** → each phone votes; the tally updates live. (Tie: **Resolve tie: equal-chance Spin**.) Host taps **Simulate booking**. | “Votes sync in real time through SpacetimeDB. Booking here is a simulation; no restaurant is called.” |
+| 2:35–3:00 | Eric Wu | Booking simulation screen, then back to the chosen plan. | State what is real and what is simulated (below), give one next step (real restaurant calls, or takeout and seating data in the planner) and end on the group's plan. |
+
+### Say out loud
+
+- If the one-phone path is used, the other members are scripted, not real people.
+- Booking is a simulation. No phone call or reservation is made.
+- Venue data is a one-time snapshot from October 24, not live availability.
+- An option the code cannot fully verify (for example, an allergy with no venue
+  evidence) can still be voted on but cannot be booked.
+
+### Do not show or claim
+
+- A live restaurant phone call, or a "we're full" re-plan: coordinator bookings
+  always confirm unless an operator changes the module's scenario setting.
+- Google Calendar events or texted invitations: neither has passed a real-provider test.
+- The experiment chart, solver numbers, swipes or confidence scores: they belong
+  to the legacy flow, not this one.
+- Multiple agents negotiating: there is one coordinator.
+
+### If something fails
+
+New huddles have no cached fallback: if the API or tunnel is down, planning
+shows a retryable error. Open the saved rehearsal huddle from "Your huddles" and
+continue from its plans, or play the recorded clip. Check in rehearsal that the
+saved huddle still opens with its plans.
+
+Thirty-second backup: Start a huddle → invite (or simulated friends) → private
+needs, **Save & ready** → **Find plans** → one option on the map with my private
+total → vote → labeled booking simulation. Never describe a planned feature as working.
 
 ## Evaluation release checks (Max)
 
