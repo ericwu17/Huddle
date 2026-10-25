@@ -164,9 +164,10 @@ export default function GroupLayout() {
       </aside>
       <div className="group-main space-y-4">
       <AccountStatus />
-      <p className="on-sky text-sm">{timing?.groupId === group.id && timing.source !== "pending"
+      {/* The final page shows the agreed date and time in its own card. */}
+      {!pathname.endsWith("/done") ? <p className="on-sky text-sm">{timing?.groupId === group.id && timing.source !== "pending"
         ? `${group.date} · ${displayTime(group.window.start)}–${displayTime(group.window.end)}`
-        : "Date and time to be decided"}</p>
+        : "Date and time to be decided"}</p> : null}
       {huddleLocation?.groupId === group.id && huddleLocation.destinationCities.length ? <p className="on-sky text-sm">Planning in {huddleLocation.destinationCities.join(" or ")}{huddleLocation.destinationCities.length > 1 ? " · tied city preferences" : ""}</p> : null}
       <DemoBanner on={group.demoMode} />
       {!agent ? <ReplanBanner ctx={ctx} /> : null}
