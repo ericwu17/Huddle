@@ -14,10 +14,13 @@
 #   --smoke              run api/eval/check_live.py after publishing (writes a disposable group;
 #                        its two council checks were written for the old stubs and can fail)
 #   --unset-on-exit      on exit, unset both URLs so the module falls back to its fakes
+#   --pull-every SECS    git pull (fast-forward only) this often, and restart the api and voice
+#                        when it brings new commits; the tunnels and their URLs stay up
+#                        (default 10; 0 turns it off). Changes to this script need a rerun.
 #
 # Secrets stay in api/.env and voice/.env (gitignored) and are never printed.
-# Requires bash 3.2+ (macOS default), cloudflared, spacetime, curl, and the
-# api/.venv and voice/.venv virtualenvs.
+# Runs on macOS and Linux. Requires bash 3.2+ (macOS default), git, cloudflared,
+# spacetime, curl, and the api/.venv and voice/.venv virtualenvs (dig is optional).
 
 set -euo pipefail
 
@@ -31,6 +34,7 @@ PUBLISH=1
 ASSUME_YES=0
 SMOKE=0
 UNSET_ON_EXIT=0
+PULL_EVERY=10
 API_PORT=8000
 VOICE_PORT=8001
 
@@ -43,13 +47,15 @@ while [ $# -gt 0 ]; do
     --yes|-y) ASSUME_YES=1; shift ;;
     --smoke) SMOKE=1; shift ;;
     --unset-on-exit) UNSET_ON_EXIT=1; shift ;;
-    -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --pull-every) PULL_EVERY="$2"; shift 2 ;;
+    -h|--help) sed -n '2,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown option: $1 (try --help)" >&2; exit 2 ;;
   esac
 done
 
 case "$SCENARIO" in ""|confirm|full) ;; *) echo "--scenario must be confirm or full" >&2; exit 2 ;; esac
 [ "$SMOKE" = 1 ] && [ "$PUBLISH" = 0 ] && { echo "--smoke needs the URLs published; drop --no-publish" >&2; exit 2; }
+case "$PULL_EVERY" in ""|*[!0-9]*) echo "--pull-every must be a whole number of seconds" >&2; exit 2 ;; esac
 
 LOG_DIR="$ROOT/logs/tunnels"
 mkdir -p "$LOG_DIR"
@@ -59,7 +65,7 @@ die() { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 # ---------- preflight ----------
 
-for cmd in cloudflared spacetime curl lsof; do
+for cmd in git cloudflared spacetime curl; do
   command -v "$cmd" >/dev/null || die "$cmd not found on PATH"
 done
 [ -x api/.venv/bin/python ] || die "api/.venv missing; see api/README.md"
@@ -86,7 +92,8 @@ if [ -n "$voice_db" ] && [ "$voice_db" != "$DATABASE" ]; then
 fi
 
 for port in "$API_PORT" "$VOICE_PORT"; do
-  if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+  # bash's /dev/tcp works on macOS and Linux without lsof or ss
+  if (exec 3<>"/dev/tcp/127.0.0.1/$port") 2>/dev/null; then
     die "port $port is already in use (another uvicorn or a previous run?)"
   fi
 done
@@ -120,10 +127,10 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT TERM
 
-# start NAME CMD... : run in the background, log to logs/tunnels/NAME.log
+# start NAME CMD... : run in the background, append to logs/tunnels/NAME.log
 start() {
   local name="$1"; shift
-  "$@" >"$LOG_DIR/$name.log" 2>&1 &
+  "$@" >>"$LOG_DIR/$name.log" 2>&1 &
   PIDS="$PIDS $!"
   eval "PID_$name=$!"
 }
@@ -156,7 +163,70 @@ wait_health() {
     fi
     sleep 1
   done
-  die "$name did not become healthy at $url (see $LOG_DIR/$name.log)"
+  echo "$name did not become healthy at $url (see $LOG_DIR/$name.log)" >&2
+  return 1
+}
+
+# local_health : both local services answer, and the api is the real one
+local_health() {
+  wait_health api "http://127.0.0.1:$API_PORT" || return 1
+  wait_health voice "http://127.0.0.1:$VOICE_PORT" || return 1
+  curl -fsS -m 5 -H "X-Huddle-Secret: $SECRET" "http://127.0.0.1:$API_PORT/health" | grep -q '"stub":false' \
+    || { echo "api reports stub mode; an old api version is running (see $LOG_DIR/api.log)" >&2; return 1; }
+}
+
+start_services() {
+  # Exported values beat api/.env. SPACETIMEDB_* lets the council stream messages live.
+  start api env SPACETIMEDB_URI="$SERVER" SPACETIMEDB_DB="$DATABASE" \
+    api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port "$API_PORT" --no-access-log
+  if [ -n "$SCENARIO" ]; then
+    start voice env STUB_SCENARIO="$SCENARIO" \
+      voice/.venv/bin/python -m uvicorn voice.main:app --host 127.0.0.1 --port "$VOICE_PORT"
+  else
+    start voice voice/.venv/bin/python -m uvicorn voice.main:app --host 127.0.0.1 --port "$VOICE_PORT"
+  fi
+}
+
+# stop_services : stop the api and voice and wait for their ports to free up; tunnels keep running
+stop_services() {
+  local pid rest="" i
+  for pid in $PIDS; do
+    [ "$pid" = "$PID_api" ] || [ "$pid" = "$PID_voice" ] || rest="$rest $pid"
+  done
+  kill "$PID_api" "$PID_voice" 2>/dev/null || true
+  # uvicorn's graceful shutdown waits on open requests; give it 10s, then force it
+  for i in $(seq 1 10); do
+    kill -0 "$PID_api" 2>/dev/null || kill -0 "$PID_voice" 2>/dev/null || break
+    sleep 1
+  done
+  kill -9 "$PID_api" "$PID_voice" 2>/dev/null || true
+  wait "$PID_api" 2>/dev/null || true
+  wait "$PID_voice" 2>/dev/null || true
+  PIDS="$rest"
+}
+
+# pull_updates : fast-forward to upstream; succeeds only when HEAD moved
+PULL_FAILING=0
+pull_updates() {
+  local before after changed
+  before="$(git rev-parse HEAD)"
+  if ! GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh} -o BatchMode=yes" \
+      git pull --ff-only --quiet >>"$LOG_DIR/git.log" 2>&1; then
+    [ "$PULL_FAILING" = 1 ] || echo "warning: git pull failed (see $LOG_DIR/git.log); keeping the running code" >&2
+    PULL_FAILING=1
+    return 1
+  fi
+  PULL_FAILING=0
+  after="$(git rev-parse HEAD)"
+  [ "$before" != "$after" ] || return 1
+  say "Pulled $(git rev-list --count "$before..$after") new commit(s), now at $(git log -1 --format='%h %s')"
+  changed="$(git diff --name-only "$before" "$after")"
+  if grep -Eq '(^|/)requirements[^/]*\.txt$' <<<"$changed"; then
+    echo "warning: requirements changed; reinstall into api/.venv or voice/.venv if the restart fails" >&2
+  fi
+  if grep -qx 'scripts/tunnels.sh' <<<"$changed"; then
+    echo "note: scripts/tunnels.sh changed; this run keeps the old version until you rerun it" >&2
+  fi
 }
 
 # tunnel_url NAME : read the quick-tunnel URL from cloudflared's log once it has registered
@@ -175,33 +245,27 @@ tunnel_url() {
 
 # ---------- run ----------
 
-# Keep the Mac awake for as long as this script runs (lid-close on battery still sleeps).
-start caffeinate caffeinate -dis -w $$
+# Fresh logs for this run; restarts append to them.
+for name in caffeinate api voice api_tunnel voice_tunnel git; do : >"$LOG_DIR/$name.log"; done
+
+# Keep a Mac awake for as long as this script runs (lid-close on battery still sleeps).
+if command -v caffeinate >/dev/null; then
+  start caffeinate caffeinate -dis -w $$
+fi
 
 say "Starting the api on :$API_PORT and voice on :$VOICE_PORT (logs in logs/tunnels/)"
-# Exported values beat api/.env. SPACETIMEDB_* lets the council stream messages live.
-start api env SPACETIMEDB_URI="$SERVER" SPACETIMEDB_DB="$DATABASE" \
-  api/.venv/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port "$API_PORT" --no-access-log
-if [ -n "$SCENARIO" ]; then
-  start voice env STUB_SCENARIO="$SCENARIO" \
-    voice/.venv/bin/python -m uvicorn voice.main:app --host 127.0.0.1 --port "$VOICE_PORT"
-else
-  start voice voice/.venv/bin/python -m uvicorn voice.main:app --host 127.0.0.1 --port "$VOICE_PORT"
-fi
-wait_health api "http://127.0.0.1:$API_PORT"
-wait_health voice "http://127.0.0.1:$VOICE_PORT"
-curl -fsS -m 5 -H "X-Huddle-Secret: $SECRET" "http://127.0.0.1:$API_PORT/health" | grep -q '"stub":false' \
-  || die "api reports stub mode; an old api version is running (see $LOG_DIR/api.log)"
+start_services
+local_health || die "the local services did not come up"
 
 say "Opening Cloudflare quick tunnels"
-start api_tunnel cloudflared tunnel --no-autoupdate --url "http://localhost:$API_PORT"
-start voice_tunnel cloudflared tunnel --no-autoupdate --url "http://localhost:$VOICE_PORT"
+start api_tunnel cloudflared tunnel --no-autoupdate --url "http://127.0.0.1:$API_PORT"
+start voice_tunnel cloudflared tunnel --no-autoupdate --url "http://127.0.0.1:$VOICE_PORT"
 API_URL="$(tunnel_url api_tunnel)"
 VOICE_URL="$(tunnel_url voice_tunnel)"
 
 say "Checking tunnels from outside (DNS can take a few seconds)"
-wait_health api "$API_URL"
-wait_health voice "$VOICE_URL"
+wait_health api "$API_URL" || die "the api tunnel is not reachable"
+wait_health voice "$VOICE_URL" || die "the voice tunnel is not reachable"
 code="$(curl_out "$API_URL/health" -sS -m 10 -o /dev/null -w '%{http_code}' || true)"
 [ "$code" = 401 ] || die "api tunnel answered $code without a secret; expected 401"
 echo "    api:   $API_URL  ($(curl_out "$API_URL/health" -fsS -m 10 -H "X-Huddle-Secret: $SECRET"))"
@@ -234,14 +298,43 @@ if [ "$SMOKE" = 1 ]; then
 fi
 
 say "Up. Ctrl-C to stop. Tail logs with: tail -f logs/tunnels/*.log"
+[ "$PULL_EVERY" -gt 0 ] && echo "    Pulling every ${PULL_EVERY}s; new commits restart the api and voice."
 
-# Exit (and clean up) as soon as any service or tunnel dies; bash 3.2 has no wait -n.
+# Exit (and clean up) as soon as a tunnel dies; bash 3.2 has no wait -n. With
+# pulling on, a dead service leaves the tunnels up and waits for a fix to land.
+SERVICES_DOWN=0
+LAST_PULL=$SECONDS
 while :; do
-  for name in api voice api_tunnel voice_tunnel; do
+  for name in api_tunnel voice_tunnel; do
     eval "pid=\$PID_$name"
     if ! kill -0 "$pid" 2>/dev/null; then
       die "$name exited (see $LOG_DIR/$name.log). A restarted tunnel gets a new URL, so rerun this script."
     fi
   done
+  if [ "$SERVICES_DOWN" = 0 ]; then
+    for name in api voice; do
+      eval "pid=\$PID_$name"
+      kill -0 "$pid" 2>/dev/null && continue
+      [ "$PULL_EVERY" -gt 0 ] || die "$name exited (see $LOG_DIR/$name.log)"
+      echo "warning: $name exited (see $LOG_DIR/$name.log); tunnels stay up, restarting after the next pulled commit" >&2
+      SERVICES_DOWN=1
+      break
+    done
+  fi
+  if [ "$PULL_EVERY" -gt 0 ] && [ $((SECONDS - LAST_PULL)) -ge "$PULL_EVERY" ]; then
+    LAST_PULL=$SECONDS
+    if pull_updates; then
+      say "Restarting the api and voice (tunnels stay up)"
+      stop_services
+      for name in api voice; do printf '\n==> restart at %s\n' "$(date '+%F %T')" >>"$LOG_DIR/$name.log"; done
+      start_services
+      SERVICES_DOWN=0
+      if local_health; then
+        say "Restarted on $(git log -1 --format=%h)"
+      else
+        echo "warning: the restart is unhealthy; tunnels stay up until a fix is pulled" >&2
+      fi
+    fi
+  fi
   sleep 5
 done

@@ -55,6 +55,7 @@ scripts/tunnels.sh                    # run, tunnel, ask, publish
 scripts/tunnels.sh --no-publish       # run and tunnel only
 scripts/tunnels.sh --unset-on-exit    # on Ctrl-C, unset the URLs so the module falls back to fakes
 scripts/tunnels.sh --scenario full --smoke   # voice in "full" mode, then run check_live.py
+scripts/tunnels.sh --pull-every 0     # don't auto-pull (default: every 10s)
 scripts/tunnels.sh --help
 ```
 
@@ -62,6 +63,15 @@ The script points the API's live council messages at the same database it
 publishes to. Logs go to `logs/tunnels/` (gitignored). Read step 0 first. Vercel (step 5)
 is still a one-time manual check. If a tunnel dies, the script exits; rerun it
 to get new URLs.
+
+While it runs, the script does a fast-forward-only `git pull` every 10 seconds.
+When that brings new commits it restarts the API and voice service, and leaves
+both tunnels (and so the published URLs) alone. If a pull fails, for example
+because of local changes or a diverged branch, it warns and keeps the running
+code (details in `logs/tunnels/git.log`). If a service crashes or comes back
+unhealthy, the tunnels stay up and the next pulled commit retries the restart.
+It doesn't reinstall dependencies or reload `tunnels.sh` itself, so rerun the
+script when either of those changes.
 
 ## 0. Before you start
 
