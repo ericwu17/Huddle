@@ -2,16 +2,15 @@ import { useContext, useMemo } from "react";
 import { useTable } from "spacetimedb/react";
 import { tables } from "./module_bindings";
 import { AccountContextState } from "./accountContextState";
+import { AccountNavigationState } from "./accountNavigationState";
 export { EMPTY_CONTEXT, type AccountContext } from "./accountContextState";
 
 export function useAccount() {
-  const [rows, ready] = useTable(tables.myAccount);
-  return ready ? rows[0] ?? null : undefined;
+  return useContext(AccountNavigationState)?.account;
 }
 
 export function useAccountMemberships() {
-  const [rows, ready] = useTable(tables.myAccountMemberships);
-  return ready ? rows : undefined;
+  return useContext(AccountNavigationState)?.memberships;
 }
 
 export function useAccountContext() {
@@ -19,18 +18,15 @@ export function useAccountContext() {
 }
 
 export function useFriends() {
-  const [rows, ready] = useTable(tables.myFriends);
-  return ready ? rows : undefined;
+  return useContext(AccountNavigationState)?.friends;
 }
 
 export function useFriendRequests() {
-  const [rows, ready] = useTable(tables.myFriendRequests);
-  return ready ? rows : undefined;
+  return useContext(AccountNavigationState)?.requests;
 }
 
 export function useHuddleInvitations() {
-  const [rows, ready] = useTable(tables.myHuddleInvitations);
-  return ready ? rows : undefined;
+  return useContext(AccountNavigationState)?.invitations;
 }
 
 // Invitations this account cleared from its own Inbox (hidden only for them).

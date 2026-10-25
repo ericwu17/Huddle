@@ -82,7 +82,7 @@ export default function Connectors() {
     void status().then(result => { if (current) { setConfiguration(result); setError(""); } }).catch(() => { if (current) setError("Could not check connector availability. Refresh to try again."); });
     return () => { current = false; };
   }, [accountId, isActive, status]);
-  return <AccountShell>{account === undefined || settings === undefined ? <p role="status">Loading your connections…</p> : !account ? <AccountRequired /> : <>
+  return <AccountShell loading={!!account && settings === undefined}>{account === undefined ? null : !account ? <AccountRequired /> : settings === undefined ? null : <>
     <div><h1 className="shout text-[56px]">Connect your world</h1><p className="on-sky mt-3">Your connections. Your choices. Huddle still works without them.</p></div>
     {account.activeGroupId ? <Link className="btn" to={`/g/${account.activeGroupId}`}>Back to my current Huddle</Link> : null}
     {account.username === "maxli" ? <MacContactsConnector /> : null}

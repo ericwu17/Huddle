@@ -26,7 +26,7 @@ export default function Invitation() {
     saveSession({ groupId: membership.groupId, memberId: membership.memberId, code: membership.code, name: membership.name });
     navigate(`/g/${membership.groupId}/lobby`, { replace: true });
   }, [joining, membership, invitation?.status, account?.activeGroupId, selectedGroup?.id, navigate]);
-  return <AccountShell>{account === undefined || invitations === undefined ? <p role="status">Opening your invitation…</p> : !account ?
+  return <AccountShell loading={!!account && invitations === undefined}>{account === undefined || invitations === undefined ? null : !account ?
     <section className="card space-y-4"><h1 className="card-title">Your people are gathering</h1><p>Sign in with the account this invitation was sent to. Your invitation will be waiting.</p>
       <Link className="btn btn-sun" to={`/login?returnTo=${encodeURIComponent(`/invite/${invitationId}`)}`}>Sign in to open Huddle</Link></section> : !invitation ?
       <section className="card space-y-4"><h1 className="card-title">Invitation unavailable</h1><p>This invitation belongs to a different account or is no longer available. You are signed in as @{account.username}.</p><Link className="btn" to="/inbox">My inbox</Link></section> :

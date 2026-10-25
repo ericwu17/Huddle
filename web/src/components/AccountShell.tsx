@@ -1,23 +1,30 @@
 import type { ReactNode } from "react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigation } from "react-router";
 import { useReducer } from "spacetimedb/react";
 import { reducers } from "../module_bindings";
 import { useAccount, useFriendRequests, useHuddleInvitations } from "../accountData";
 import { clearAccountBrowserState } from "../session";
 import { useRun } from "../useRun";
 import { Buddy } from "../doodle/Doodle";
+import HuddleLoading from "./HuddleLoading";
+import HuddleWordmark from "./HuddleWordmark";
 
-export default function AccountShell({ children }: { children: ReactNode }) {
+export default function AccountShell({ children, loading = false }: { children: ReactNode; loading?: boolean }) {
   const account = useAccount();
+  const navigation = useNavigation();
   const logout = useReducer(reducers.logoutAccount);
   const { run, busy } = useRun();
   const requests = useFriendRequests();
   const invitations = useHuddleInvitations();
   const count = (requests?.filter(r => r.direction === "incoming" && r.status === "pending").length ?? 0)
     + (invitations?.filter(i => i.direction === "incoming" && i.status === "pending").length ?? 0);
+  // Unknown identity is a loading state, never a flash of signed-out navigation.
+  if (account === undefined) return <HuddleLoading />;
+  const waiting = loading || navigation.state !== "idle";
   return <main className="account-page">
-    <aside className="account-sidebar">
-      <Link className="logo" to="/start">huddle</Link>
+    {waiting ? <HuddleLoading /> : null}
+    <aside className="account-sidebar" inert={waiting}>
+      <Link className="brand-home" to="/start" aria-label="Huddle home"><HuddleWordmark /></Link>
       <div className="sidebar-buddy" aria-hidden="true"><Buddy who={account?.displayName ?? "Huddle"} pose="wave" size={128} crown /></div>
       <nav className="account-nav" aria-label="Your Huddle">
         <NavLink to="/start">Home</NavLink>
@@ -37,7 +44,9 @@ export default function AccountShell({ children }: { children: ReactNode }) {
         })}>Sign out</button>
       </div> : null}
     </aside>
-    <div className="account-main space-y-6">{children}</div>
+    <div className="account-main space-y-6" aria-busy={waiting} inert={waiting}>
+      {children}
+    </div>
   </main>;
 }
 

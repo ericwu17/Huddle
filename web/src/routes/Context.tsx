@@ -28,7 +28,7 @@ function ContextForm({ initial }: { initial: AccountContext }) {
 export default function Context() {
   const account = useAccount();
   const saved = useAccountContext();
-  return <AccountShell>{account === undefined || saved === undefined ? <p role="status">Loading your private defaults…</p> : !account ? <AccountRequired /> : <>
+  return <AccountShell loading={!!account && saved === undefined}>{account === undefined ? null : !account ? <AccountRequired /> : saved === undefined ? null : <>
     <div><h1 className="shout text-[56px]">Preferences</h1><p className="on-sky mt-3">A head start for your next hangout. Always yours to edit.</p></div>
     <ContextForm key={account.accountId} initial={saved?.context ?? EMPTY_CONTEXT} />
   </>}</AccountShell>;

@@ -22,7 +22,7 @@ export default function Inbox() {
   const clearableIn = incoming.filter(i => i.status !== "pending").length;
   const clearableOut = outgoing.filter(i => i.status !== "pending").length;
   const friends = requests?.filter(r => r.direction === "incoming" && r.status === "pending") ?? [];
-  return <AccountShell>{account === undefined ? <p role="status">Loading your inbox…</p> : !account ? <AccountRequired /> : <>
+  return <AccountShell loading={!!account && invitations === undefined}>{account === undefined ? null : !account ? <AccountRequired /> : <>
     <div><h1 className="shout text-[56px]">You’re invited</h1><p className="on-sky mt-3">Your Huddle invitations and friend requests, all in one place.</p></div>
     <section className="card space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Huddle messages</h2>

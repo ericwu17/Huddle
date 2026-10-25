@@ -1,0 +1,11 @@
+Generated with the built-in GPT Image tool, October 24, 2026.
+
+Use case: logo-brand.
+Asset type: production transparent wordmark PNG for an existing playful friend-outing web app.
+Primary request: Create one beautifully crafted oversized wordmark reading exactly "huddle" (h-u-d-d-l-e, lowercase), suitable as the main brand on a blue illustrated sky.
+Style: confident hand-lettered comic display typography, friendly chunky compact rounded letters, slightly irregular ink contours and subtle individual letter lean. Tight, intentional optical spacing, cohesive silhouette, highly legible at both 200px and 600px wide. An art-directed finished typographic logo, not a speech bubble.
+Color palette: warm cream #fffdf7 letter faces, substantial near-black navy #16152b hand-inked outlines, short solid cobalt #1f3fd8 offset extrusion/drop shadow edged in navy, tiny restrained yellow #ffd23a inset highlights only if needed. No gradients.
+Composition: single horizontal wordmark, centered, width-to-height about 3:1, use almost all canvas with roughly 4 percent transparent padding; keep the whole outline and shadow visible.
+Scene/backdrop: genuinely transparent background. Output only the lettering with transparent negative spaces inside and outside the letters.
+Avoid: clouds, cloud-shaped containers, badges, banners, characters, circles, scenery, sparkle icons, extra words, slogans, watermark, frame, photographic texture, mockup.
+Text (verbatim): "huddle".

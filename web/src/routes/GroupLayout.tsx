@@ -17,6 +17,7 @@ import AccountStatus from "../components/AccountStatus";
 import { displayTime } from "../venueFormatting";
 import { useAgentBallot } from "../useAgentBallot";
 import { winnerTransition } from "../agentBallot";
+import HuddleLoading from "../components/HuddleLoading";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -92,7 +93,7 @@ export default function GroupLayout() {
     lastBooking.current = id;
   }, [booking, navigate, session.groupId]);
 
-  if (group === undefined || agent === undefined) return <main className="page on-sky">Loading group…</main>;
+  if (group === undefined || agent === undefined) return <HuddleLoading label="Loading your group" />;
   // Views only cover this phone's current group: the one it joined last.
   if (group === null || group.id !== session.groupId) {
     return (
@@ -117,7 +118,7 @@ export default function GroupLayout() {
   }
 
   if ((agent && agent.groupId !== group.id) || (agentNeeds && agentNeeds.memberId !== session.memberId)) {
-    return <main className="page on-sky">Loading this huddle’s context…</main>;
+    return <HuddleLoading label="Loading this Huddle’s context" />;
   }
 
   const ctx: GroupContext = {

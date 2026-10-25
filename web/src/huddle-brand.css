@@ -1,0 +1,58 @@
+/* A still wordmark and a little motion only while Huddle is actually loading. */
+.app-world .lay-clouds { display: none; }
+.huddle-wordmark { display: block; width: 100%; height: auto; object-fit: contain; }
+.brand-home { display: block; width: 178px; max-width: 100%; text-decoration: none; }
+.home-intro.home-welcome { align-items: flex-end; gap: 20px; padding: 8px 0 12px; }
+.home-welcome-copy { flex: 1; min-width: 0; }
+.home-wordmark { width: min(100%, 460px); }
+.home-question { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 12px; margin-top: 20px; color: var(--paper); font-family: var(--text); font-size: clamp(27px, 3.1vw, 38px); font-weight: 800; line-height: 1.22; letter-spacing: -0.045em; text-shadow: 0 2px 0 var(--deep); }
+.home-question-hand { position: relative; display: inline-block; font-family: var(--hand); font-size: 1.42em; font-weight: 400; letter-spacing: -0.02em; color: var(--sun); white-space: nowrap; }
+.home-question-hand::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 5px; border-radius: 50%; background: var(--sun); transform: rotate(-2deg); }
+.home-welcome .crowd { flex: none; flex-wrap: nowrap; gap: 0; padding-bottom: 4px; }
+.home-welcome .crowd .buddy + .buddy { margin-left: -8px; }
+.home-welcome .home-greeting { max-width: 440px; margin-top: 20px; font-size: 15px; line-height: 1.6; }
+
+.huddle-loading { position: fixed; inset: 0; z-index: 90; isolation: isolate; display: grid; place-items: center; min-height: 100dvh; overflow: hidden; background: var(--sky); }
+.huddle-loading-backdrop { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.huddle-loading-backdrop .doodle-world { width: 100%; height: 100%; display: block; }
+.huddle-loading-content { width: min(90vw, 460px); margin-top: -7vh; text-align: center; }
+.huddle-running-stage { position: relative; width: 350px; height: 260px; margin: 0 auto; }
+.huddle-running-track { position: absolute; width: 310px; height: 124px; left: 20px; top: 119px; border: 3px dashed rgb(255 253 247 / .8); border-radius: 50%; transform: rotate(-8deg); background: rgb(255 253 247 / .08); }
+.huddle-running-center { position: absolute; left: 50%; top: 83px; transform: translateX(-50%); display: flex; gap: 2px; z-index: 2; }
+.huddle-running-center .buddy:last-child .fig { animation-delay: -.8s; }
+.huddle-runner { position: absolute; left: calc(50% - 33px); top: 68px; will-change: transform; animation: huddle-lap 5.4s linear infinite; animation-delay: var(--run-delay); }
+.huddle-runner .pose-walk .fig { animation-duration: .22s; }
+.huddle-runner .pose-walk .arm, .huddle-runner .pose-walk .leg { animation-duration: .44s; }
+.huddle-runner-0 { transform: translate(-132px, 0) scale(.9); z-index: 2; }
+.huddle-runner-1 { transform: translate(112px, -30px) scale(.82); z-index: 1; }
+.huddle-runner-2 { transform: translate(40px, 60px) scale(1.08); z-index: 3; }
+@keyframes huddle-lap {
+  0%, 100% { transform: translate(-132px, 0) scale(.9); z-index: 2; }
+  12.5% { transform: translate(-93px, -42px) scale(.82); z-index: 1; }
+  25% { transform: translate(0, -60px) scale(.78); z-index: 1; }
+  37.5% { transform: translate(93px, -42px) scale(.82); z-index: 1; }
+  50% { transform: translate(132px, 0) scale(.9); z-index: 2; }
+  62.5% { transform: translate(93px, 42px) scale(1.02); z-index: 3; }
+  75% { transform: translate(0, 60px) scale(1.1); z-index: 3; }
+  87.5% { transform: translate(-93px, 42px) scale(1.02); z-index: 3; }
+}
+.huddle-loading-caption { display: inline-flex; align-items: baseline; margin-top: 24px; padding-left: .7em; font-family: var(--hand); font-size: clamp(38px, 6vw, 48px); line-height: 1.25; color: var(--paper); text-shadow: 0 3px 0 var(--deep); }
+.huddle-loading-dots { display: inline-flex; width: .85em; }
+.huddle-loading-dots span { animation: huddle-dot 1.2s ease-in-out infinite; }
+.huddle-loading-dots span:nth-child(2) { animation-delay: .16s; }
+.huddle-loading-dots span:nth-child(3) { animation-delay: .32s; }
+@keyframes huddle-dot { 0%, 65%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-5px); opacity: 1; } }
+@media (max-width: 760px) {
+  .brand-home { width: 146px; }
+  .home-wordmark { width: min(100%, 390px); }
+  .home-question { margin-top: 14px; font-size: clamp(27px, 6.5vw, 36px); }
+  .home-welcome .home-greeting { margin-top: 16px; }
+}
+@media (max-width: 380px) {
+  .huddle-running-stage { transform: scale(.85); transform-origin: center bottom; margin-left: calc((100% - 350px) / 2); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .huddle-loading *, .huddle-loading *::before, .huddle-loading *::after { animation: none !important; }
+  .huddle-runner { will-change: auto; }
+  .huddle-loading-dots span { opacity: 1; }
+}
