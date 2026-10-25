@@ -640,3 +640,14 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .huddle-list-name { overflow-wrap: anywhere; }
 .group-name { font-family: var(--hand); font-size: 28px; line-height: 1.2; overflow-wrap: anywhere; }
 @media (max-width: 480px) { .name-huddle-dialog { padding: 24px 18px; } .name-huddle-actions .btn { flex: 1; } }
+
+/* Comparison labels use current catalog facts, never a fixed option number. */
+.option-labels { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.option-label { display: inline-block; max-width: 100%; padding: 4px 9px; border: 2px solid var(--ink); border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 1.35; color: var(--ink); background: var(--note); }
+.option-label-rating { background: #fff0b6; }
+.option-label-price { background: #e3f9d0; }
+.option-label-travel { background: #ddeaff; }
+.option-label-variety { background: #ffe2f1; }
+.google-maps-link { display: inline-block; width: fit-content; max-width: 100%; padding: 8px 0; color: var(--cobalt); font-size: 14px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.google-maps-link:hover { color: var(--deep); }
+.google-maps-link.is-standalone { padding: 10px 14px; background: var(--paper); border: 2px solid var(--ink); border-radius: 14px; }

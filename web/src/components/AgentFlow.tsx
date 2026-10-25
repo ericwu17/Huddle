@@ -18,6 +18,9 @@ import { useAgentBallot } from "../useAgentBallot";
 import PageHeading from "./PageHeading";
 import { useCalendarPlanning } from "../huddleTiming";
 import CalendarTimeSelector from "./CalendarTimeSelector";
+import { labelOptions, type OptionLabel } from "../optionLabels";
+import OptionLabels from "./OptionLabels";
+import GoogleMapsAction from "./GoogleMapsAction";
 
 export function AgentPrefs() {
   const { agentNeeds, group, session } = useGroup();
@@ -131,7 +134,7 @@ export function OptionMap({ plan }: { plan: AgentPlan }) {
   return <PlanMap plan={{ ...plan, stops }} lines={lines} />;
 }
 
-export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1, heading, compact = false }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number; heading?: string; compact?: boolean }) {
+export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1, heading, compact = false, labels, showMapsLink = true }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number; heading?: string; compact?: boolean; labels?: readonly OptionLabel[]; showMapsLink?: boolean }) {
   const listings = useCatalogListings();
   const ready = isReadyAgentPlan(plan);
   const [expanded, setExpanded] = useState(false);
@@ -142,18 +145,20 @@ export function AgentPlanCard({ plan, order, recommended = false, optionNumber =
   </li>)}</ol>;
   return <section className={`card option-card${compact ? " is-compact" : ""}`}>
     <div className="option-card-heading"><h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
-      {recommended && ready ? <span className="sticker sticker-sun">Recommended</span> : null}</div>
+      <OptionLabels labels={labels} />
+      {recommended && ready ? <span className="sticker sticker-sun">Claude’s pick</span> : null}</div>
     <h3 className="option-route">{plan.stops.map(stop => stop.name).join(" → ")}</h3>
     {compact && first ? <AgentVenueDetails place={listings.get(first.placeId)} name={first.name} compact /> : null}
     {compact && first ? <p className="option-meta"><span>{displayTime(first.start)}–{displayTime(plan.stops.at(-1)!.end)}</span><span>{plan.stops.length} stop{plan.stops.length === 1 ? "" : "s"}</span></p> : null}
     <PrivateOrderSummary order={order} listings={listings} stops={plan.stops} compact={compact} />
+    {showMapsLink ? <GoogleMapsAction stops={plan.stops} /> : null}
     {compact ? <details className="option-details" onToggle={e => setExpanded(e.currentTarget.open)}><summary>Map & details</summary>
       {expanded ? <div className="space-y-4"><OptionMap plan={plan} />{venues}</div> : null}
     </details> : venues}
   </section>;
 }
 
-export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, heading, compact = false }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber?: number; heading?: string; compact?: boolean }) {
+export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, heading, compact = false, labels, showMapsLink = true }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber?: number; heading?: string; compact?: boolean; labels?: readonly OptionLabel[]; showMapsLink?: boolean }) {
   const listings = useCatalogListings();
   const [expanded, setExpanded] = useState(false);
   const place = listings.get(suggestion.placeId);
@@ -164,11 +169,12 @@ export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, headi
     {/* Done and public results already render the selected venue's map. */}
     {pin && !heading && !compact ? <PlanMap plan={pin} lines={[]} /> : null}
   <article className="card option-card">
-    <h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
+    <div className="option-card-heading"><h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2><OptionLabels labels={labels} /></div>
     <h3 className="option-route">{place.name}</h3>
     {compact ? <AgentVenueDetails place={place} name={place.name} compact /> : null}
     <p className="muted">Time to be decided</p>
     <PrivateOrderSummary order={order} listings={listings} alternative compact={compact} />
+    {showMapsLink ? <GoogleMapsAction stops={[{ placeId: place.id, name: place.name, lat: place.lat, lng: place.lng }]} /> : null}
     {compact ? <details className="option-details" onToggle={e => setExpanded(e.currentTarget.open)}><summary>Map & details</summary>
       {expanded ? <div className="space-y-4">{pin ? <PlanMap plan={pin} lines={[]} /> : null}<AgentVenueDetails place={place} name={place.name} /></div> : null}
     </details> : <AgentVenueDetails place={place} name={place.name} />}
@@ -180,6 +186,7 @@ export function AgentPlans() {
   const planRun = useAgentRun(group.latestRunId);
   const orders = useAgentOrders(group.latestRunId, session.memberId);
   const messages = useAgentMessages(group.latestRunId).filter(message => message.speaker === "participant");
+  const listings = useCatalogListings();
   const { findPlans: find, ready: timingReady } = useCalendarPlanning();
   const post = useReducer(reducers.postAgentDiscussion);
   const { run, busy, error } = useRun();
@@ -189,6 +196,7 @@ export function AgentPlans() {
   const active = !!agent && ["ready", "blocked"].includes(agent.status) && result?.inputRevision === agent.revision;
   const hasChoices = active && !!(result?.plans.length || result?.suggestions?.length);
   const canDiscuss = hasChoices;
+  const labels = labelOptions(result ? [...result.plans, ...(result.suggestions ?? [])] : [], listings, orders);
   return <div className="space-y-5">
     <div className="page-title-row"><PageHeading lead="Your group’s" accent="options" />
       <div className="page-actions">
@@ -201,8 +209,8 @@ export function AgentPlans() {
     {!active && !result?.conflicts.length ? <p className="card">Review everyone's current needs before generating plans.</p> : null}
     {result?.conflicts.map(c => <p className="card card-note" key={c}>{c}</p>)}
     {active ? <div className="comparison-grid" aria-label="Compare outing options">
-      {result?.plans.map((plan, index) => <AgentPlanCard key={plan.id} plan={plan} compact optionNumber={index + 1} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} />)}
-      {result?.suggestions?.map((suggestion, index) => <AgentSuggestionCard key={suggestion.id} suggestion={suggestion} compact optionNumber={(result.plans.length ?? 0) + index + 1} order={orders.find(order => order.planId === suggestion.id)} />)}
+      {result?.plans.map((plan, index) => <AgentPlanCard key={plan.id} plan={plan} labels={labels.get(plan.id)} compact optionNumber={index + 1} order={orders.find(order => order.planId === plan.id)} recommended={plan.id === result.recommendedPlanId} />)}
+      {result?.suggestions?.map((suggestion, index) => <AgentSuggestionCard key={suggestion.id} suggestion={suggestion} labels={labels.get(suggestion.id)} compact optionNumber={(result.plans.length ?? 0) + index + 1} order={orders.find(order => order.planId === suggestion.id)} />)}
     </div> : null}
     <details className="card group-discussion">
       <summary>Group conversation{messages.length ? ` (${messages.length})` : ""}</summary>
@@ -231,6 +239,7 @@ export function AgentVote() {
   const result = planRun?.result;
   if (loading) return <p className="card" role="status">Loading the plans…</p>;
   if (!runId || !current || !result) return <section className="card space-y-3"><p>There are no current options to vote on yet.</p><Link className="underline font-bold" to={`/g/${session.groupId}/plans`}>Open plans</Link></section>;
+  const labels = labelOptions(choices, listings, orders);
   const titleFor = (id: string) => `Option ${choices.findIndex(choice => choice.id === id) + 1}`;
   return <div className="space-y-5">
     <div className="page-title-row"><PageHeading lead="Choose" accent="together" />
@@ -243,8 +252,8 @@ export function AgentVote() {
     <div className="comparison-grid" aria-label="Vote on an outing">{choices.map((choice, index) => <div key={choice.id} className={`vote-option ${votes?.myVote === choice.id ? "is-mine" : ""}`}>
       <VoteChoice planId={choice.id} title={`Option ${index + 1}`} votes={votes} members={group.members} myMemberId={session.memberId}
         busy={busy || !("stops" in choice) && !listings.has(choice.placeId)} onVote={() => run(() => vote({ runId, planId: choice.id }))} />
-      {"stops" in choice ? <AgentPlanCard plan={choice} compact optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} />
-        : <AgentSuggestionCard suggestion={choice} compact optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} />}
+      {"stops" in choice ? <AgentPlanCard plan={choice} labels={labels.get(choice.id)} compact optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} />
+        : <AgentSuggestionCard suggestion={choice} labels={labels.get(choice.id)} compact optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} />}
     </div>)}</div>
     {choices.length ? <div className="flex flex-wrap gap-3">
       <button className="btn" disabled={busy || !complete || leaders.length < 2 || !!winner}

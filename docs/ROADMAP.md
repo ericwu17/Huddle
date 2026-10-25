@@ -1,5 +1,12 @@
 # Huddle roadmap
 
+Option comparison and map update: Plans/Vote label evidence-backed differences
+in ratings, owner-private total cost, inter-stop travel and variety. Options,
+Done and shared results open Google Maps with the blue underlined **Click here
+to see the map!** action. The key-free URL phase is implemented; paid routing,
+embedded Google Maps and context-based adventurousness remain follow-ups in
+[GOOGLE_MAPS_PLAN.md](GOOGLE_MAPS_PLAN.md).
+
 Post-vote result: Done shows the chosen route/date/time and each owner's order,
 with Calendar download/opt-in creation and a public result link. Public shares
 contain venue facts only and are checked against the current winner. Parsing and
