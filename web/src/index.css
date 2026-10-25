@@ -495,7 +495,10 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 
 /* One shared circle for the coordinator and every participant's agent. */
 .agent-circle { position: relative; width: min(100%, 400px); height: 330px; margin: 0 auto; padding: 0; list-style: none; }
-.agent-circle-member { position: absolute; display: grid; justify-items: center; gap: 4px; width: 98px; transform: translate(-50%, -50%); }
+.agent-circle-member { --agent-width: 98px; position: absolute; display: grid; justify-items: center; gap: 4px; width: var(--agent-width); transform: translate(-50%, -50%); }
+.agent-speech { position: absolute; bottom: calc(100% + 20px); left: 50%; width: 220px; transform: translateX(-50%); pointer-events: none; }
+.speech-left .agent-speech { left: auto; right: -16px; transform: none; --speech-tail: calc(100% - var(--agent-width) / 2 - 16px); }
+.speech-right .agent-speech { left: -16px; transform: none; --speech-tail: calc(var(--agent-width) / 2 + 16px); }
 .agent-circle-figure { display: block; transform-origin: 50% 100%; animation: agent-sway 2.8s ease-in-out infinite; animation-delay: var(--agent-delay); }
 .agent-circle .pose-huddle .fig { animation: none; }
 .agent-circle .pose-argue .fig { animation-duration: .6s; }
@@ -510,14 +513,19 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 /* The speech bubble changes speaker while the whole group stays together. */
 .planning-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgb(22 21 43 / .45); backdrop-filter: blur(4px); }
 .planning-card { width: min(600px, 100%); max-height: calc(100dvh - 32px); display: grid; gap: 10px; justify-items: center; text-align: center; overflow-y: auto; animation: popIn 420ms var(--pop) both; }
-.planning-stage { width: 100%; display: grid; justify-items: center; gap: 12px; }
-.planning-message-slot { width: min(100%, 320px); min-height: 92px; display: grid; align-items: center; padding-bottom: 8px; }
+.planning-stage { width: 100%; display: grid; justify-items: center; padding-top: 132px; }
 .planning-bubble { position: relative; display: grid; gap: 5px; place-items: center; min-height: 76px; padding: 10px 16px; border: 2.5px solid var(--ink); border-radius: 18px; background: var(--note); font-family: var(--hand); font-size: 20px; line-height: 1.2; animation: popIn 340ms var(--pop) both; }
-.planning-bubble::after { content: ""; position: absolute; left: calc(50% - 6px); bottom: -8px; width: 12px; height: 12px; background: var(--note); border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); transform: rotate(45deg); }
-.planning-speaker { font-family: var(--text); font-size: 11px; font-weight: 800; color: var(--cobalt); }
+.planning-bubble::after { content: ""; position: absolute; left: calc(var(--speech-tail, 50%) - 6px); bottom: -8px; width: 12px; height: 12px; background: var(--note); border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); transform: rotate(45deg); }
+.planning-speaker { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--text); font-size: 11px; font-weight: 800; color: var(--cobalt); }
 .planning-pill { position: fixed; right: 16px; bottom: 16px; z-index: 2000; }
+@media (max-width: 640px) {
+  .planning-stage .agent-circle { height: 400px; }
+  .agent-speech { width: min(200px, calc(100vw - 80px)); }
+  .speech-left .agent-speech { left: -10px; right: auto; --speech-tail: calc(var(--agent-width) / 2 + 10px); }
+  .speech-right .agent-speech { left: auto; right: -10px; --speech-tail: calc(100% - var(--agent-width) / 2 - 10px); }
+}
 @media (max-width: 480px) {
-  .agent-circle-member { width: 78px; }
+  .agent-circle-member { --agent-width: 78px; }
   .agent-circle-name { font-size: 10px; padding: 3px 5px; }
   .planning-card { padding: 20px 14px; }
   .planning-card .card-title { font-size: 20px; }
