@@ -34,7 +34,9 @@ function LegacyVote() {
   if (!plans) return <p className="on-sky">Loading plans…</p>;
 
   const council = planRun!.council;
-  const counts = votes?.counts ?? {};
+  // Choices are secret until everyone has voted, so no winner can be called early.
+  const revealed = votes?.total === group.members.length;
+  const counts = revealed ? votes?.counts ?? {} : {};
   const top = Math.max(0, ...plans.map((p) => counts[p.id] ?? 0));
   const leaders = plans.filter((p) => (counts[p.id] ?? 0) === top && top > 0);
   // Ties are broken by the roulette, never silently.

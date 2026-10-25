@@ -201,8 +201,11 @@ export type Votes = {
   counts: Record<string, number>;
   total: number;
   myVote: string | null;
-  // memberIds per planId, so screens can show who picked what and who is still deciding.
+  // memberIds per planId. Other people's choices stay hidden by the server until
+  // everyone has voted, so before that this only holds your own pick.
   byPlan: Record<string, string[]>;
+  // Everyone who has voted, whatever they picked (it is public THAT you voted).
+  voted: string[];
 };
 
 export type FailReason = "full" | "closed" | "no_answer" | "refused" | "error";

@@ -189,12 +189,22 @@ export const my_scout = spacetimedb.view(pub("my_scout"), t.array(scout_check.ro
   return g ? runsOf(ctx.db, g.id).flatMap((r) => Array.from(ctx.db.scout_check.runId.filter(r.runId))) : [];
 });
 
+// Stands in for another member's choice while the ballot is still open.
+const HIDDEN_VOTE = "hidden";
+
 export const my_votes = spacetimedb.view(pub("my_votes"), t.array(vote.rowType), (ctx) => {
   const g = myGroup(ctx);
   if (!g?.latestRunId) return [];
   const ids = new Set(availableVotingChoices(ctx.db, g.id, g.latestRunId).map((p) => p.id));
   // Keep historical rows in storage; only currently usable votes count live.
-  return Array.from(ctx.db.vote.runId.filter(g.latestRunId)).filter((v) => ids.has(v.planId));
+  const rows = Array.from(ctx.db.vote.runId.filter(g.latestRunId)).filter((v) => ids.has(v.planId));
+  // Secret ballot: until every member has voted, other people's rows only say
+  // THAT they voted (so phones can show "waiting on …"), never FOR WHAT.
+  const members = membersOf(ctx.db, g.id);
+  const everyoneVoted = members.length > 0 && members.every((m) => rows.some((v) => v.memberId === m.id));
+  if (everyoneVoted) return rows;
+  const me = currentMember(ctx.db, ctx.sender);
+  return rows.map((v) => (v.memberId === me?.id ? v : { ...v, planId: HIDDEN_VOTE }));
 });
 
 export const my_bookings = spacetimedb.view(pub("my_bookings"), t.array(booking.rowType), (ctx) => {
