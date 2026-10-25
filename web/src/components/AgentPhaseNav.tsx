@@ -13,7 +13,7 @@ export default function AgentPhaseNav({ ctx, booking }: { ctx: GroupContext; boo
     { route: "lobby", label: "People & invites", open: true },
     { route: "prefs", label: "Private needs", open: true },
     { route: "plans", label: "Coordinator & plans", open: !!ctx.group.latestRunId },
-    { route: "vote", label: "Vote", open: true },
+    { route: "vote", label: "Vote", open: ballot.current && ballot.choices.length > 0 },
     { route: "done", label: "Done", open: !!ballot.winner },
     { route: "call", label: "Booking simulation", open: !!booking && booking.runId === ctx.group.latestRunId },
   ];
