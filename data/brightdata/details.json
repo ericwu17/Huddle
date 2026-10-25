@@ -1079,33 +1079,180 @@
       }
     ],
     "menu": {
-      "status": "menu_in_ordering_app",
-      "reason": "the site links its menu to an ordering app we cannot read (grubhub, toasttab)",
+      "status": "ok",
+      "reason": null,
       "website": "https://zacharys.com/",
       "pages": [
         {
           "url": "https://zacharys.com/",
-          "fetchedAt": "2026-10-24T20:20:05Z",
-          "mode": "unlocker",
+          "fetchedAt": "2026-10-25T11:18:27Z",
+          "mode": "contextdev",
           "truncated": false,
           "isMenu": false,
           "items": 0,
           "unverifiedDropped": 0,
           "duplicates": 0
+        },
+        {
+          "url": "https://order.toasttab.com/online/locations/a17ab75d-0e30-44d3-a0d6-51b4fe659182/f8f1cac1-00fd-48bc-98f4-d16036647cfe",
+          "fetchedAt": "2026-10-25T11:18:41Z",
+          "mode": "contextdev",
+          "truncated": false,
+          "isMenu": false,
+          "items": 0,
+          "unverifiedDropped": 0,
+          "duplicates": 0
+        },
+        {
+          "url": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z",
+          "mode": "contextdev",
+          "truncated": false,
+          "isMenu": true,
+          "items": 10,
+          "unverifiedDropped": 0,
+          "duplicates": 0
         }
       ],
       "legend": null,
-      "itemCount": 0,
+      "itemCount": 10,
       "highlights": {
-        "vegan": [],
+        "vegan": [
+          {
+            "name": "Small Stuffed Mediterranean",
+            "priceText": "$35.04+",
+            "price": 35.04,
+            "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/"
+          }
+        ],
         "steak": [],
         "fries": [],
         "dessert": []
       },
-      "items": [],
-      "extractedAt": "2026-10-24T20:20:10Z"
+      "items": [
+        {
+          "name": "Small Stuffed",
+          "section": "Small Stuffed",
+          "priceText": "$26.82+",
+          "price": 26.82,
+          "description": "Create Your Own and Half & Half pizzas start here. (Please note that we cannot guarantee perfect halves.)",
+          "labels": [],
+          "quote": "Small Stuffed\nCreate Your Own and Half & Half pizzas start here. (Please note that we cannot guarantee perfect halves.)\n$26.82+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Barbecue Chicken",
+          "section": "Small Stuffed",
+          "priceText": "$35.64+",
+          "price": 35.64,
+          "description": "Free range chicken breast, red onions, cilantro, sweet-smoky barbecue sauce, cheddar and Monterey Jack cheese (Served with Zachary's pizza sauce)",
+          "labels": [],
+          "quote": "Small Stuffed Barbecue Chicken\nFree range chicken breast, red onions, cilantro, sweet-smoky barbecue sauce, cheddar and Monterey Jack cheese (Served with Zachary's pizza sauce)\n$35.64+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Buffalo Chicken",
+          "section": "Small Stuffed",
+          "priceText": "$35.64+",
+          "price": 35.64,
+          "description": "Free-range chicken breast in cayenne pepper \"wing sauce,\" pepperoni, and mozzarella cheese. Finished with a swirl of house-made blue cheese dressing",
+          "labels": [],
+          "quote": "Small Stuffed Buffalo Chicken\nFree-range chicken breast in cayenne pepper \"wing sauce,\" pepperoni, and mozzarella cheese. Finished with a swirl of house-made blue cheese dressing\n$35.64+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Carne",
+          "section": "Small Stuffed",
+          "priceText": "$35.94+",
+          "price": 35.94,
+          "description": "Italian sausage, pepperoni, salami, chopped bacon and mozzarella",
+          "labels": [],
+          "quote": "Small Stuffed Carne\nItalian sausage, pepperoni, salami, chopped bacon and mozzarella\n$35.94+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Chicken Special",
+          "section": "Small Stuffed",
+          "priceText": "$35.64+",
+          "price": 35.64,
+          "description": "Free range chicken breast, mushrooms, mozzarella with our fresh basil, garlic, tomato sauce",
+          "labels": [],
+          "quote": "Small Stuffed Chicken Special\nFree range chicken breast, mushrooms, mozzarella with our fresh basil, garlic, tomato sauce\n$35.64+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Good Health",
+          "section": "Small Stuffed",
+          "priceText": "$35.64+",
+          "price": 35.64,
+          "description": "Free range chicken breast, chopped fresh spinach, reduced fat mozzarella on a wheat crust",
+          "labels": [],
+          "quote": "Small Stuffed Good Health\nFree range chicken breast, chopped fresh spinach, reduced fat mozzarella on a wheat crust\n$35.64+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Mediterranean",
+          "section": "Small Stuffed",
+          "priceText": "$35.04+",
+          "price": 35.04,
+          "description": "Red bell pepper, green olives, artichoke hearts, feta and Monterey Jack cheese Note: Ingredients pre-mixed. Vegan option is not available.",
+          "labels": [],
+          "quote": "Small Stuffed Mediterranean\nRed bell pepper, green olives, artichoke hearts, feta and Monterey Jack cheese Note: Ingredients pre-mixed. Vegan option is not available.\n$35.04+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Rustic Italian",
+          "section": "Small Stuffed",
+          "priceText": "$35.94+",
+          "price": 35.94,
+          "description": "Whole roasted garlic cloves, hot Italian sausage (more mildly warm than spicy), feta, and mozzarella cheese, topped with fresh rosemary",
+          "labels": [],
+          "quote": "Small Stuffed Rustic Italian\nWhole roasted garlic cloves, hot Italian sausage (more mildly warm than spicy), feta, and mozzarella cheese, topped with fresh rosemary\n$35.94+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Spinach & Mushroom",
+          "section": "Small Stuffed",
+          "priceText": "$33.72+",
+          "price": 33.72,
+          "description": "Our pride and joy! Fresh spinach, mushrooms and a blend of three cheeses and special spices",
+          "labels": [],
+          "quote": "Small Stuffed Spinach & Mushroom\nOur pride and joy! Fresh spinach, mushrooms and a blend of three cheeses and special spices\n$33.72+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        },
+        {
+          "name": "Small Stuffed Sweet Heat",
+          "section": "Small Stuffed",
+          "priceText": "$34.38+",
+          "price": 34.38,
+          "description": "NEW SPECIALl! Pepperoni, ricotta, red pepper flakes, and mozzarella, finished with fresh basil and a drizzle of honey.",
+          "labels": [],
+          "quote": "Small Stuffed Sweet Heat\nNEW SPECIALl! Pepperoni, ricotta, red pepper flakes, and mozzarella, finished with fresh basil and a drizzle of honey.\n$34.38+",
+          "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+          "fetchedAt": "2026-10-25T11:18:48Z"
+        }
+      ],
+      "extractedAt": "2026-10-25T11:19:03Z"
     },
     "dietary": [
+      {
+        "tag": "vegan",
+        "evidence": "explicit_menu",
+        "basis": "the item's own menu text",
+        "item": "Small Stuffed Mediterranean",
+        "quote": "Small Stuffed Mediterranean\nRed bell pepper, green olives, artichoke hearts, feta and Monterey Jack cheese Note: Ingredients pre-mixed. Vegan option is not available.\n$35.04+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
       {
         "tag": "vegetarian",
         "evidence": "inferred",
@@ -1116,7 +1263,7 @@
         "fetchedAt": "2026-10-24T20:18:07Z"
       }
     ],
-    "dietaryCoverage": "inferred_only",
+    "dietaryCoverage": "explicit_menu",
     "safetyNote": "Dietary tags describe how items are listed or labeled. They do not establish allergen or cross-contact safety; confirm with the venue."
   },
   {

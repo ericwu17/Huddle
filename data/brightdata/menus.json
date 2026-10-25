@@ -1167,25 +1167,155 @@
     "model": "claude-sonnet-5-5"
   },
   "ChIJM7ZMM015hYARTF7hu0UXeZY": {
-    "status": "menu_in_ordering_app",
+    "status": "ok",
     "website": "https://zacharys.com/",
     "pages": [
       {
         "url": "https://zacharys.com/",
-        "fetchedAt": "2026-10-24T20:20:05Z",
-        "mode": "unlocker",
+        "fetchedAt": "2026-10-25T11:18:27Z",
+        "mode": "contextdev",
         "truncated": false,
         "isMenu": false,
         "items": 0,
         "unverifiedDropped": 0,
         "duplicates": 0
+      },
+      {
+        "url": "https://order.toasttab.com/online/locations/a17ab75d-0e30-44d3-a0d6-51b4fe659182/f8f1cac1-00fd-48bc-98f4-d16036647cfe",
+        "fetchedAt": "2026-10-25T11:18:41Z",
+        "mode": "contextdev",
+        "truncated": false,
+        "isMenu": false,
+        "items": 0,
+        "unverifiedDropped": 0,
+        "duplicates": 0
+      },
+      {
+        "url": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z",
+        "mode": "contextdev",
+        "truncated": false,
+        "isMenu": true,
+        "items": 10,
+        "unverifiedDropped": 0,
+        "duplicates": 0
       }
     ],
-    "items": [],
+    "items": [
+      {
+        "name": "Small Stuffed",
+        "section": "Small Stuffed",
+        "priceText": "$26.82+",
+        "price": 26.82,
+        "description": "Create Your Own and Half & Half pizzas start here. (Please note that we cannot guarantee perfect halves.)",
+        "labels": [],
+        "quote": "Small Stuffed\nCreate Your Own and Half & Half pizzas start here. (Please note that we cannot guarantee perfect halves.)\n$26.82+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Barbecue Chicken",
+        "section": "Small Stuffed",
+        "priceText": "$35.64+",
+        "price": 35.64,
+        "description": "Free range chicken breast, red onions, cilantro, sweet-smoky barbecue sauce, cheddar and Monterey Jack cheese (Served with Zachary's pizza sauce)",
+        "labels": [],
+        "quote": "Small Stuffed Barbecue Chicken\nFree range chicken breast, red onions, cilantro, sweet-smoky barbecue sauce, cheddar and Monterey Jack cheese (Served with Zachary's pizza sauce)\n$35.64+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Buffalo Chicken",
+        "section": "Small Stuffed",
+        "priceText": "$35.64+",
+        "price": 35.64,
+        "description": "Free-range chicken breast in cayenne pepper \"wing sauce,\" pepperoni, and mozzarella cheese. Finished with a swirl of house-made blue cheese dressing",
+        "labels": [],
+        "quote": "Small Stuffed Buffalo Chicken\nFree-range chicken breast in cayenne pepper \"wing sauce,\" pepperoni, and mozzarella cheese. Finished with a swirl of house-made blue cheese dressing\n$35.64+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Carne",
+        "section": "Small Stuffed",
+        "priceText": "$35.94+",
+        "price": 35.94,
+        "description": "Italian sausage, pepperoni, salami, chopped bacon and mozzarella",
+        "labels": [],
+        "quote": "Small Stuffed Carne\nItalian sausage, pepperoni, salami, chopped bacon and mozzarella\n$35.94+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Chicken Special",
+        "section": "Small Stuffed",
+        "priceText": "$35.64+",
+        "price": 35.64,
+        "description": "Free range chicken breast, mushrooms, mozzarella with our fresh basil, garlic, tomato sauce",
+        "labels": [],
+        "quote": "Small Stuffed Chicken Special\nFree range chicken breast, mushrooms, mozzarella with our fresh basil, garlic, tomato sauce\n$35.64+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Good Health",
+        "section": "Small Stuffed",
+        "priceText": "$35.64+",
+        "price": 35.64,
+        "description": "Free range chicken breast, chopped fresh spinach, reduced fat mozzarella on a wheat crust",
+        "labels": [],
+        "quote": "Small Stuffed Good Health\nFree range chicken breast, chopped fresh spinach, reduced fat mozzarella on a wheat crust\n$35.64+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Mediterranean",
+        "section": "Small Stuffed",
+        "priceText": "$35.04+",
+        "price": 35.04,
+        "description": "Red bell pepper, green olives, artichoke hearts, feta and Monterey Jack cheese Note: Ingredients pre-mixed. Vegan option is not available.",
+        "labels": [],
+        "quote": "Small Stuffed Mediterranean\nRed bell pepper, green olives, artichoke hearts, feta and Monterey Jack cheese Note: Ingredients pre-mixed. Vegan option is not available.\n$35.04+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Rustic Italian",
+        "section": "Small Stuffed",
+        "priceText": "$35.94+",
+        "price": 35.94,
+        "description": "Whole roasted garlic cloves, hot Italian sausage (more mildly warm than spicy), feta, and mozzarella cheese, topped with fresh rosemary",
+        "labels": [],
+        "quote": "Small Stuffed Rustic Italian\nWhole roasted garlic cloves, hot Italian sausage (more mildly warm than spicy), feta, and mozzarella cheese, topped with fresh rosemary\n$35.94+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Spinach & Mushroom",
+        "section": "Small Stuffed",
+        "priceText": "$33.72+",
+        "price": 33.72,
+        "description": "Our pride and joy! Fresh spinach, mushrooms and a blend of three cheeses and special spices",
+        "labels": [],
+        "quote": "Small Stuffed Spinach & Mushroom\nOur pride and joy! Fresh spinach, mushrooms and a blend of three cheeses and special spices\n$33.72+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      },
+      {
+        "name": "Small Stuffed Sweet Heat",
+        "section": "Small Stuffed",
+        "priceText": "$34.38+",
+        "price": 34.38,
+        "description": "NEW SPECIALl! Pepperoni, ricotta, red pepper flakes, and mozzarella, finished with fresh basil and a drizzle of honey.",
+        "labels": [],
+        "quote": "Small Stuffed Sweet Heat\nNEW SPECIALl! Pepperoni, ricotta, red pepper flakes, and mozzarella, finished with fresh basil and a drizzle of honey.\n$34.38+",
+        "sourceUrl": "https://www.doordash.com/en/business/zacharys-chicago-pizza-7219/",
+        "fetchedAt": "2026-10-25T11:18:48Z"
+      }
+    ],
     "legend": null,
-    "extractedAt": "2026-10-24T20:20:10Z",
-    "model": "claude-sonnet-5-5",
-    "reason": "the site links its menu to an ordering app we cannot read (grubhub, toasttab)"
+    "extractedAt": "2026-10-25T11:19:03Z",
+    "model": "claude-opus-5-5"
   },
   "ChIJNwUiuJ1-hYARlmMobInl1SI": {
     "status": "ok",
@@ -1745,22 +1875,45 @@
     "model": "claude-sonnet-5-5"
   },
   "ChIJw3k8iZ5-hYARJSkLTdSXbls": {
-    "status": "no_menu_found",
+    "status": "menu_in_ordering_app",
     "website": "http://www.comalberkeley.com/",
     "pages": [
       {
         "url": "http://www.comalberkeley.com/",
-        "fetchedAt": "2026-10-24T20:22:43Z",
-        "mode": "unlocker",
+        "fetchedAt": "2026-10-25T11:21:28Z",
+        "mode": "contextdev",
         "truncated": false,
-        "error": "page has no readable text (likely rendered by JavaScript)"
+        "isMenu": false,
+        "items": 0,
+        "unverifiedDropped": 0,
+        "duplicates": 0
+      },
+      {
+        "url": "http://www.comalberkeley.com/menus/",
+        "fetchedAt": "2026-10-25T11:21:32Z",
+        "mode": "contextdev",
+        "truncated": false,
+        "isMenu": false,
+        "items": 0,
+        "unverifiedDropped": 0,
+        "duplicates": 0
+      },
+      {
+        "url": "https://www.toasttab.com/comal-2020shattuck/marketing-signup",
+        "fetchedAt": "2026-10-25T11:21:48Z",
+        "mode": "contextdev",
+        "truncated": false,
+        "isMenu": false,
+        "items": 0,
+        "unverifiedDropped": 0,
+        "duplicates": 0
       }
     ],
     "items": [],
     "legend": null,
-    "extractedAt": "2026-10-24T20:22:43Z",
-    "model": "claude-sonnet-5-5",
-    "reason": "no verifiable menu items on the home page or its menu links"
+    "extractedAt": "2026-10-25T11:21:51Z",
+    "model": "claude-opus-5-5",
+    "reason": "the site links its menu to an ordering app we cannot read (toasttab)"
   },
   "ChIJhSHYCc59hYARDNRplrTdMy0": {
     "status": "ok",
@@ -2739,25 +2892,839 @@
     "model": "claude-sonnet-5-5"
   },
   "ChIJMfyhay98hYARs0L2SNx0vmY": {
-    "status": "no_menu_found",
+    "status": "ok",
     "website": "http://www.gypsysitaliana.com/",
     "pages": [
       {
         "url": "http://www.gypsysitaliana.com/",
-        "fetchedAt": "2026-10-24T20:26:33Z",
-        "mode": "unlocker",
+        "fetchedAt": "2026-10-25T11:21:55Z",
+        "mode": "contextdev",
         "truncated": false,
-        "isMenu": false,
-        "items": 0,
+        "isMenu": true,
+        "items": 74,
         "unverifiedDropped": 0,
         "duplicates": 0
       }
     ],
-    "items": [],
+    "items": [
+      {
+        "name": "Crazy Alfredo",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Sausage, roasted red peppers, Red wine, in Alfredo sauce tossed w/ Fettuccine",
+        "labels": [],
+        "quote": "Crazy Alfredo Chicken, Sausage, roasted red peppers, Red wine, in Alfredo sauce tossed w/ Fettuccine\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Melanzana Con Pollo",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Spinach, Grilled eggplant, Garlic, Tomato sauce, cream, cheese w/ Penne",
+        "labels": [],
+        "quote": "Melanzana Con Pollo Chicken, Spinach, Grilled eggplant, Garlic, Tomato sauce, cream, cheese w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Godfather's Favorite",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Pancetta, Egg, Parmigiano cheese, tossed w/ Penne",
+        "labels": [],
+        "quote": "Godfather's Favorite Chicken, Pancetta, Egg, Parmigiano cheese, tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pollo Gorgonzola",
+        "section": "Chicken Plates",
+        "priceText": "13.4915.49",
+        "price": 13.49,
+        "description": "Tri color Tortellini, Chicken, Garlic, Gorgonzola cheese w/ pink sauce",
+        "labels": [],
+        "quote": "Pollo Gorgonzola Tri color Tortellini, Chicken, Garlic, Gorgonzola cheese w/ pink sauce\n13.4915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken and Broccoli",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Broccoli, Garlic, Parmigiano cheese tossed w/ Penne",
+        "labels": [],
+        "quote": "Chicken and Broccoli Chicken, Broccoli, Garlic, Parmigiano cheese tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Piccata",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken breast sautéed in a light buttery lemon, Capers, White wine sauce over Linguine",
+        "labels": [],
+        "quote": "Chicken Piccata Chicken breast sautéed in a light buttery lemon, Capers, White wine sauce over Linguine\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Marsala",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken breast sautéed with mushrooms in a sweet Sicilian Marsala sauce over Linguine",
+        "labels": [],
+        "quote": "Chicken Marsala Chicken breast sautéed with mushrooms in a sweet Sicilian Marsala sauce over Linguine\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Parmigiano",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken breast with marinara sauce & Mozzarella cheese over Spaghetti",
+        "labels": [],
+        "quote": "Chicken Parmigiano Chicken breast with marinara sauce & Mozzarella cheese over Spaghetti\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pollo Con Pesto",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Pesto sauce (Pine, Walnut, Pistachio nuts), Parmigiano w/ Fettuccine",
+        "labels": [],
+        "quote": "Pollo Con Pesto Chicken, Pesto sauce (Pine, Walnut, Pistachio nuts), Parmigiano w/ Fettuccine\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Gnocchi",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Tri color potato pasta, Chicken, and cream sauce",
+        "labels": [],
+        "quote": "Chicken Gnocchi Tri color potato pasta, Chicken, and cream sauce\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Gypsy's Chicken",
+        "section": "Chicken Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Garlic, Mushrooms, Cream & Parmigiano cheese tossed w/ Penne",
+        "labels": [],
+        "quote": "Gypsy's Chicken Chicken, Garlic, Mushrooms, Cream & Parmigiano cheese tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Bronx Tale",
+        "section": "Beef Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Meatball & Sausage, Tomato sauce, Cheese, tossed w/ Penne",
+        "labels": [],
+        "quote": "Bronx Tale Meatball & Sausage, Tomato sauce, Cheese, tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Spaghetti with Meatballs",
+        "section": "Beef Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Homemade meatballs, Marinara sauce, cheese tossed w/ Spaghetti",
+        "labels": [],
+        "quote": "Spaghetti with Meatballs Homemade meatballs, Marinara sauce, cheese tossed w/ Spaghetti\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Lasagna",
+        "section": "Beef Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Homemade meat Lasagna topped with Marinara sauce & Mozzarella cheese",
+        "labels": [],
+        "quote": "Lasagna Homemade meat Lasagna topped with Marinara sauce & Mozzarella cheese\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Ravioli Bolognese",
+        "section": "Beef Plates",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Homemade meat sauce tossed w/ cheese Ravioli",
+        "labels": [],
+        "quote": "Ravioli Bolognese Homemade meat sauce tossed w/ cheese Ravioli\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Carbonara",
+        "section": "Beef Plates",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Pancetta, Egg, and Parmigiano tossed w/ Spaghetti",
+        "labels": [],
+        "quote": "Carbonara Pancetta, Egg, and Parmigiano tossed w/ Spaghetti\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Victor's Spaghetti",
+        "section": "Beef Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Thinly sliced steak, Roasted red peppers, Oregano, Red wine, Tomato sauce w/ Spaghetti",
+        "labels": [],
+        "quote": "Victor's Spaghetti Thinly sliced steak, Roasted red peppers, Oregano, Red wine, Tomato sauce w/ Spaghetti\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Speciale (1) Tagliata",
+        "section": "Beef Plates",
+        "priceText": "18.9920.49",
+        "price": 18.99,
+        "description": "Grilled sliced steak, mushroom, bell pepper, w/ creamy tomato sauce, w/ fettucine",
+        "labels": [],
+        "quote": "Speciale (1) Tagliata Grilled sliced steak, mushroom, bell pepper, w/ creamy tomato sauce, w/ fettucine\n18.9920.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Speciale (2) Tagliata",
+        "section": "Beef Plates",
+        "priceText": "18.9920.49",
+        "price": 18.99,
+        "description": "Grilled sliced steak, red onion, bell pepper, w/ creamy pesto sauce, w/ fettucine",
+        "labels": [],
+        "quote": "Speciale (2) Tagliata Grilled sliced steak, red onion, bell pepper, w/ creamy pesto sauce, w/ fettucine\n18.9920.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Shrimp Alfredo",
+        "section": "Seafood Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Shrimp, Mushrooms, Garlic with cream and Parmigiano cheese sauce over Fettuccine",
+        "labels": [],
+        "quote": "Shrimp Alfredo Shrimp, Mushrooms, Garlic with cream and Parmigiano cheese sauce over Fettuccine\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Fettuccine Al Salmone",
+        "section": "Seafood Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Salmon, Capers, Red onions, Tomato sauce tossed w/ Fettuccine",
+        "labels": [],
+        "quote": "Fettuccine Al Salmone Salmon, Capers, Red onions, Tomato sauce tossed w/ Fettuccine\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Shrimp Alla Primavera",
+        "section": "Seafood Plates",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Shrimp, Garlic, Assorted Vegetables, Tomato sauce w/ Angel Hair Pasta",
+        "labels": [],
+        "quote": "Shrimp Alla Primavera Shrimp, Garlic, Assorted Vegetables, Tomato sauce w/ Angel Hair Pasta\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Frutti Di Mare",
+        "section": "Seafood Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Fresh Calamari, Shrimp, Mussels, Garlic, Tomato sauce w/ Angel Hair Pasta",
+        "labels": [],
+        "quote": "Frutti Di Mare Fresh Calamari, Shrimp, Mussels, Garlic, Tomato sauce w/ Angel Hair Pasta\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Gamberi e Capesante",
+        "section": "Seafood Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Shrimp, Scallops, garlic in creamy tomato sauce w/ Linguine",
+        "labels": [],
+        "quote": "Gamberi e Capesante Shrimp, Scallops, garlic in creamy tomato sauce w/ Linguine\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Scampi",
+        "section": "Seafood Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Shrimp, Scallops, garlic, Capers in white wine lemon sauce w/ Spaghetti",
+        "labels": [],
+        "quote": "Scampi Shrimp, Scallops, garlic, Capers in white wine lemon sauce w/ Spaghetti\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Gambaretti e Pollo",
+        "section": "Seafood Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Shrimp, Chicken, Broccoli, Mushroom, Garlic, White wine pink sauce",
+        "labels": [],
+        "quote": "Gambaretti e Pollo Shrimp, Chicken, Broccoli, Mushroom, Garlic, White wine pink sauce\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Salmone Alfredo",
+        "section": "Seafood Plates",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Salmon, Garlic, Mushroom, Bell pepper, White wine cream sauce",
+        "labels": [],
+        "quote": "Salmone Alfredo Salmon, Garlic, Mushroom, Bell pepper, White wine cream sauce\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Tagliata e Gamberetti",
+        "section": "Seafood Plates",
+        "priceText": "21.9923.49",
+        "price": 21.99,
+        "description": "Grilled sliced steak, grilled shrimp, broccoli, red onion, Alfredo sauce, w/ fettucine",
+        "labels": [],
+        "quote": "Tagliata e Gamberetti Grilled sliced steak, grilled shrimp, broccoli, red onion, Alfredo sauce, w/ fettucine\n21.9923.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Eggplant Parmigiano",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Fried Eggplant with marinara sauce & Mozzarella cheese over Penne pasta",
+        "labels": [],
+        "quote": "Eggplant Parmigiano Fried Eggplant with marinara sauce & Mozzarella cheese over Penne pasta\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Penne Gorgonzola",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Spinach, Fresh tomato, Gorgonzola cheese & Cream tossed w/ Penne",
+        "labels": [],
+        "quote": "Penne Gorgonzola Spinach, Fresh tomato, Gorgonzola cheese & Cream tossed w/ Penne\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Spaghetti Alla Primavera",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Assorted vegetables sautéed in Garlic, Olive oil, Tomato sauce w/ Spaghetti",
+        "labels": [],
+        "quote": "Spaghetti Alla Primavera Assorted vegetables sautéed in Garlic, Olive oil, Tomato sauce w/ Spaghetti\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Capricciosa",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Spinach, roasted red peppers, Garlic, Tomato sauce, Trace of cream & cheese tossed w/ Penne",
+        "labels": [],
+        "quote": "Capricciosa Spinach, roasted red peppers, Garlic, Tomato sauce, Trace of cream & cheese tossed w/ Penne\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Ravioli Alfredo",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Cheese Ravioli with Alfredo & Parmeggiano, cheese sauce",
+        "labels": [],
+        "quote": "Ravioli Alfredo Cheese Ravioli with Alfredo & Parmeggiano, cheese sauce\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Fettuccine Con Pesto",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Fettuccine tossed with Pesto sauce (Pine, Walnut, Pistachio nuts) & Parmigiano cheese",
+        "labels": [],
+        "quote": "Fettuccine Con Pesto Fettuccine tossed with Pesto sauce (Pine, Walnut, Pistachio nuts) & Parmigiano cheese\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Fettuccine Alfredo",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Alfredo sauce, Mushrooms, tossed w/ Fettuccine",
+        "labels": [],
+        "quote": "Fettuccine Alfredo Alfredo sauce, Mushrooms, tossed w/ Fettuccine\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Gnocchi Primavera",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Tri Color Gnocchi, Assorted vegetables, Basil, Parmigiano cheese & pink sauce",
+        "labels": [],
+        "quote": "Gnocchi Primavera Tri Color Gnocchi, Assorted vegetables, Basil, Parmigiano cheese & pink sauce\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pomodoro",
+        "section": "Vegetarian Plates",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Fresh Tomato, fresh Basil, Garlic, Topped with shredded Parmigiano cheese w/ Angel hair pasta",
+        "labels": [],
+        "quote": "Pomodoro Fresh Tomato, fresh Basil, Garlic, Topped with shredded Parmigiano cheese w/ Angel hair pasta\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Alfredo",
+        "section": "Pasta Filled Calzone",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Parmigiano Mozzarella cheese, tossed w/ Penne",
+        "labels": [],
+        "quote": "Chicken Alfredo Chicken, Parmigiano Mozzarella cheese, tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Godfather",
+        "section": "Pasta Filled Calzone",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Pancetta, Egg, Parmigiano Mozzarella cheese, tossed w/ Penne",
+        "labels": [],
+        "quote": "Godfather Chicken, Pancetta, Egg, Parmigiano Mozzarella cheese, tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pollo Pesto",
+        "section": "Pasta Filled Calzone",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Chicken, Pesto sauce (Pine, Walnut, Pistachio nuts), Parmigiano Mozzarella cheese with Penne",
+        "labels": [],
+        "quote": "Pollo Pesto Chicken, Pesto sauce (Pine, Walnut, Pistachio nuts), Parmigiano Mozzarella cheese with Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Meatball & Sausage",
+        "section": "Pasta Filled Calzone",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Tomato sauce, Parmigiano Mozzarella cheese, tossed w/ Penne",
+        "labels": [],
+        "quote": "Meatball & Sausage Tomato sauce, Parmigiano Mozzarella cheese, tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Shrimp with Alfredo",
+        "section": "Pasta Filled Calzone",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Parmigiano Mozzarella cheese sauce tossed w/ Penne",
+        "labels": [],
+        "quote": "Shrimp with Alfredo Parmigiano Mozzarella cheese sauce tossed w/ Penne\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Margarita",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Mozzarella & Cheddar cheese with Tomato sauce",
+        "labels": [],
+        "quote": "Margarita Mozzarella & Cheddar cheese with Tomato sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Caprese",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Mozzarella & Cheddar cheese, Tomato sauce topped with fresh Mozzarella, fresh Tomato & Basil",
+        "labels": [],
+        "quote": "Caprese Mozzarella & Cheddar cheese, Tomato sauce topped with fresh Mozzarella, fresh Tomato & Basil\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Primavera",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Mushroom, Green pepper, Kalamata olives, Onion, Broccoli, cheese and Tomato sauce",
+        "labels": [],
+        "quote": "Primavera Mushroom, Green pepper, Kalamata olives, Onion, Broccoli, cheese and Tomato sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Milano",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Pepperoni, Mushroom, Mozzarella & Cheddar cheese with Tomato sauce",
+        "labels": [],
+        "quote": "Milano Pepperoni, Mushroom, Mozzarella & Cheddar cheese with Tomato sauce\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Hawaiian",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Ham, Mozzarella & Cheddar cheese, Pineapple and Tomato sauce",
+        "labels": [],
+        "quote": "Hawaiian Ham, Mozzarella & Cheddar cheese, Pineapple and Tomato sauce\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pesto",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Mozzarella & Cheddar cheese, Pesto sauce, topped with sautéed Chicken",
+        "labels": [],
+        "quote": "Pesto Mozzarella & Cheddar cheese, Pesto sauce, topped with sautéed Chicken\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Venezia",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Pepperoni, Bacon, Mushroom, Pepper, Onion, cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Venezia Pepperoni, Bacon, Mushroom, Pepper, Onion, cheese, Tomato sauce\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Paradiso",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Pepperoni, Sausage, Salami, Green pepper, Mushroom, Olive, Onion, cheese and Tomato sauce",
+        "labels": [],
+        "quote": "Paradiso Pepperoni, Sausage, Salami, Green pepper, Mushroom, Olive, Onion, cheese and Tomato sauce\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Amante Della Carne",
+        "section": "Gypsy's 10\" Pizza",
+        "priceText": "13.9915.49",
+        "price": 13.99,
+        "description": "Ham, Salami, Italian sausage, Bacon, Jalapeño, cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Amante Della Carne Ham, Salami, Italian sausage, Bacon, Jalapeño, cheese, Tomato sauce\n13.9915.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Primavera",
+        "section": "Calzone",
+        "priceText": "10.9912.49",
+        "price": 10.99,
+        "description": "Assorted Vegetables, Mozzarella cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Primavera Assorted Vegetables, Mozzarella cheese, Tomato sauce\n10.9912.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pollo",
+        "section": "Calzone",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Chicken, Mushrooms, Onions, Cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Pollo Chicken, Mushrooms, Onions, Cheese, Tomato sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Sicilia",
+        "section": "Calzone",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Thinly sliced Steak, Mushrooms, Onions, Cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Sicilia Thinly sliced Steak, Mushrooms, Onions, Cheese, Tomato sauce\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Sausage",
+        "section": "Calzone",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Italian Sausage, Mushrooms, Onions, Cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Sausage Italian Sausage, Mushrooms, Onions, Cheese, Tomato sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Ham",
+        "section": "Calzone",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Ham, Mushrooms, Cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Ham Ham, Mushrooms, Cheese, Tomato sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Meatball",
+        "section": "Calzone",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Homemade Meatballs, Mushroom, Onions, Cheese, Tomato Sauce",
+        "labels": [],
+        "quote": "Meatball Homemade Meatballs, Mushroom, Onions, Cheese, Tomato Sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Pesto",
+        "section": "Calzone",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Chicken, Ricotta and Mozzarella cheese, and Pesto sauce",
+        "labels": [],
+        "quote": "Pesto Chicken, Ricotta and Mozzarella cheese, and Pesto sauce\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Combo",
+        "section": "Calzone",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Chicken, Sausage, Ham, Mushrooms, Onions, Cheese, Tomato sauce",
+        "labels": [],
+        "quote": "Combo Chicken, Sausage, Ham, Mushrooms, Onions, Cheese, Tomato sauce\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Small Salad (with meal only)",
+        "section": "Salads & Sandwiches",
+        "priceText": "4.995.49",
+        "price": 4.99,
+        "description": "Romaine lettuce, cucumber, tomato, choice of dressing",
+        "labels": [],
+        "quote": "Small Salad (with meal only) Romaine lettuce, cucumber, tomato, choice of dressing\n4.995.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Caesar Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "6.998.49",
+        "price": 6.99,
+        "description": "Romaine lettuce, shredded Parmigiano, Croutons with Caesar dressing",
+        "labels": [],
+        "quote": "Caesar Salad Romaine lettuce, shredded Parmigiano, Croutons with Caesar dressing\n6.998.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Caprese Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "9.9911.49",
+        "price": 9.99,
+        "description": "Fresh Mozzarella, Tomato, Basil with Balsamic vinegar olive oil mix or Caesar dressing",
+        "labels": [],
+        "quote": "Caprese Salad Fresh Mozzarella, Tomato, Basil with Balsamic vinegar olive oil mix or Caesar dressing\n9.9911.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Greek Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "9.9911.49",
+        "price": 9.99,
+        "description": "Romaine, Cucumber, Tomato, Kalamata olives, Red Onions, Feta cheese & Roasted garlic bread",
+        "labels": [],
+        "quote": "Greek Salad Romaine, Cucumber, Tomato, Kalamata olives, Red Onions, Feta cheese & Roasted garlic bread\n9.9911.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Romaine, Cucumber, Tomato & Julian chicken breast with roasted garlic bread",
+        "labels": [],
+        "quote": "Chicken Salad Romaine, Cucumber, Tomato & Julian chicken breast with roasted garlic bread\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Shrimp Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Shrimp sautéed with Red Onion, Romaine, Tomato, Avocado, Marinated artichoke",
+        "labels": [],
+        "quote": "Shrimp Salad Shrimp sautéed with Red Onion, Romaine, Tomato, Avocado, Marinated artichoke\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Salmon Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Salmon sautéed with Red Onion, Romaine, Tomato, Avocado, Marinated artichoke",
+        "labels": [],
+        "quote": "Salmon Salad Salmon sautéed with Red Onion, Romaine, Tomato, Avocado, Marinated artichoke\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Steak Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "16.9918.49",
+        "price": 16.99,
+        "description": "Grilled steak, red onion, Romaine, Cucumber, Tomato, balsamic vinaigrette, roasted garlic bread",
+        "labels": [],
+        "quote": "Steak Salad Grilled steak, red onion, Romaine, Cucumber, Tomato, balsamic vinaigrette, roasted garlic bread\n16.9918.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Lemon Chicken Salad",
+        "section": "Salads & Sandwiches",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Chicken sautéed in a light buttery lemon sauce over Romaine lettuce and bread",
+        "labels": [],
+        "quote": "Lemon Chicken Salad Chicken sautéed in a light buttery lemon sauce over Romaine lettuce and bread\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Steak Sandwich",
+        "section": "Salads & Sandwiches",
+        "priceText": "14.9916.49",
+        "price": 14.99,
+        "description": "Thinly sliced steak sautéed with onions, green / red peppers, tomato sauce, and cheese",
+        "labels": [],
+        "quote": "Steak Sandwich Thinly sliced steak sautéed with onions, green / red peppers, tomato sauce, and cheese\n14.9916.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Eggplant Sandwich",
+        "section": "Salads & Sandwiches",
+        "priceText": "11.9913.49",
+        "price": 11.99,
+        "description": "Eggplant, Marinara sauce, and Mozzarella cheese / Roasted garlic spread upon request",
+        "labels": [],
+        "quote": "Eggplant Sandwich Eggplant, Marinara sauce, and Mozzarella cheese / Roasted garlic spread upon request\n11.9913.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Chicken Sandwich",
+        "section": "Salads & Sandwiches",
+        "priceText": "12.9914.49",
+        "price": 12.99,
+        "description": "Chicken, Marinara sauce & Mozzarella cheese / Roasted garlic spread upon request",
+        "labels": [],
+        "quote": "Chicken Sandwich Chicken, Marinara sauce & Mozzarella cheese / Roasted garlic spread upon request\n12.9914.49",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Steak Pizza",
+        "section": null,
+        "priceText": null,
+        "price": null,
+        "description": null,
+        "labels": [],
+        "quote": "Steak PizzaSteak with Pesto",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Steak with Pesto",
+        "section": null,
+        "priceText": null,
+        "price": null,
+        "description": null,
+        "labels": [],
+        "quote": "Steak PizzaSteak with Pesto",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      },
+      {
+        "name": "Combo Meal Special",
+        "section": null,
+        "priceText": "$15.99*",
+        "price": 15.99,
+        "description": "Any Item + Salad + Any Drink",
+        "labels": [],
+        "quote": "Combo Meal Special: Any Item + Salad + Any Drink $15.99*",
+        "sourceUrl": "http://www.gypsysitaliana.com/",
+        "fetchedAt": "2026-10-25T11:21:55Z"
+      }
+    ],
     "legend": null,
-    "extractedAt": "2026-10-24T20:26:36Z",
-    "model": "claude-sonnet-5-5",
-    "reason": "no verifiable menu items on the home page or its menu links"
+    "extractedAt": "2026-10-25T11:23:01Z",
+    "model": "claude-opus-5-5"
   },
   "ChIJReiUOpx-hYAR_WgFK4xVwyM": {
     "status": "ok",
@@ -3515,16 +4482,29 @@
     "pages": [
       {
         "url": "https://thenoodlebay.com/",
-        "fetchedAt": "2026-10-24T20:28:53Z",
-        "mode": "unlocker",
+        "fetchedAt": "2026-10-25T11:23:05Z",
+        "mode": "contextdev",
         "truncated": false,
-        "error": "page has no readable text (likely rendered by JavaScript)"
+        "isMenu": false,
+        "items": 0,
+        "unverifiedDropped": 0,
+        "duplicates": 0
+      },
+      {
+        "url": "https://thenoodlebay.com/order",
+        "fetchedAt": "2026-10-25T11:23:09Z",
+        "mode": "contextdev",
+        "truncated": false,
+        "isMenu": false,
+        "items": 0,
+        "unverifiedDropped": 0,
+        "duplicates": 0
       }
     ],
     "items": [],
     "legend": null,
-    "extractedAt": "2026-10-24T20:28:53Z",
-    "model": "claude-sonnet-5-5",
+    "extractedAt": "2026-10-25T11:23:16Z",
+    "model": "claude-opus-5-5",
     "reason": "no verifiable menu items on the home page or its menu links"
   },
   "ChIJF7bpISN_hYARv2ng_KB0S1E": {
@@ -3673,7 +4653,7 @@
     "items": [],
     "legend": null,
     "extractedAt": null,
-    "model": "claude-sonnet-5-5",
+    "model": "claude-opus-5-5",
     "reason": "no website on the listing"
   },
   "ChIJYQkwl819hYAR2iShHqXJ5AM": {
