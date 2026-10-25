@@ -7,8 +7,8 @@ equally when choosing a common calendar opening; conflicts allow a compromise.
 Actual calendar busy periods, outing-length limits and full venue opening hours
 remain binding. A host still initiates the search or explicitly picks a manual
 window. Editing a choice invalidates the old shared time, plans and votes without
-changing private budgets or dietary needs. The additive module/API/UI are ready
-for coordinated release; the isolated preview passed the checks recorded in
+changing private budgets or dietary needs. The additive module/API/UI are deployed to shared Maincloud, Eric Wu’s existing
+API and Vercel; the isolated preview passed the checks recorded in
 [operations](ACCOUNTS_RUNBOOK.md).
 
 Updated October 24, 2026. This is the current direction agreed with Max. It takes

@@ -1,6 +1,6 @@
 # Connectors: Messages invitations and Google Calendar
 
-**Participant time preference extension — October 24, tested for release:**
+**Participant time preference extension — October 24, shared release active:**
 `set_huddle_time_preference({timeOfDay})` now derives the caller's current
 membership and accepts `flexible|morning|afternoon|evening` for any joined member.
 The private `member_time_preference` table and scoped `my_time_preference` view

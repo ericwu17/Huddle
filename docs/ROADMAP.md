@@ -1,6 +1,6 @@
 # Huddle roadmap
 
-**Participant time preferences — tested, awaiting shared release:** all members
+**Participant time preferences — shared release active:** all members
 can choose optional Any time/Morning/Afternoon/Evening independently. Claude
 considers every choice during common free/busy scheduling; conflicting dayparts
 are soft preferences. Non-host edits clear stale shared times and plans/votes;

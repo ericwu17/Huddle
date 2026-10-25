@@ -2,8 +2,8 @@
 
 ## Participant time preferences — October 24, 2026
 
-The additive module/API/UI are tested in `huddle-account-max-check` and ready
-for coordinated shared release. On Preferences, every joined member sees
+The additive module/API/UI passed isolated testing and are deployed on shared
+Maincloud `huddle-calhacks`, Eric Wu’s existing API and `huddle.compare`. On Preferences, every joined member sees
 **Your time preference (optional)** with Any time/Morning/Afternoon/Evening.
 Each choice is private and Huddle-specific. Claude considers all participants
 equally when the host finds a common calendar opening. Conflicts can compromise;
@@ -27,6 +27,15 @@ verify `SchedulingMember.timeOfDay` in the live OpenAPI schema; publish the
 additive module with `--delete-data=never`; then push the matching UI/bindings.
 Preserve Eric Wu's API/voice URLs, Google callback/encryption configuration and
 all catalog/menu/photo rows. No catalog republish is needed for this extension.
+
+Shared rollout completed from API prerequisite `eff02c8` and UI/module commit
+`273d9fc`; Vercel reported success. The actual public bundle includes the new
+control and scoped view, and the live API retains its correct Calendar callback.
+The module update added only the private preference table/view and used
+`--delete-data=never`. Read-only checks preserved all 100 Huddles, 174 memberships,
+66 plan runs, 57 accounts and 200 venues. Eric Wu's intervening `96ac1b8` UI change
+was synced without conflict. No production test accounts, calendar events or
+external messages were created. Menus/photos and scraping source were untouched.
 
 ## Maps, city coverage and personal Calendar release — October 24, 2026
 
