@@ -37,11 +37,12 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
     return { ...initialProfile, ...(initialStructured ? {
       budgetMaxPerPerson: initialStructured.budgetMaxPerPerson,
       maxOutingMinutes: initialStructured.maxOutingMinutes,
+      preferredStops: initialStructured.preferredStops ?? null,
       dietary: initialStructured.dietary,
       allergies: initialStructured.allergies,
     } : {}), ...(hard ? {
       budgetMaxPerPerson: hard.budgetMaxPerPerson, maxOutingMinutes: hard.maxOutingMinutes ?? null,
-      dietary: hard.dietary, allergies: hard.allergies,
+      preferredStops: hard.preferredStops ?? null, dietary: hard.dietary, allergies: hard.allergies,
     } : {}), preferences: agentNeeds?.text ?? initialProfile.preferences };
   });
   const [remember, setRemember] = useState(false);
@@ -62,10 +63,12 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
     lastApplied.current = agentNeeds.revision;
     if (lastSubmitted.current !== JSON.stringify(draft)) return;
     setDraft(current => ({ ...current, budgetMaxPerPerson: needs.hard.budgetMaxPerPerson,
-      maxOutingMinutes: needs.hard.maxOutingMinutes ?? null, dietary: needs.hard.dietary, allergies: needs.hard.allergies }));
+      maxOutingMinutes: needs.hard.maxOutingMinutes ?? null, preferredStops: needs.hard.preferredStops ?? null,
+      dietary: needs.hard.dietary, allergies: needs.hard.allergies }));
   }, [agentNeeds, needs, draft]);
   const saved = !!agentNeeds?.confirmed && !!needs && agentNeeds.text === draft.preferences.trim()
     && needs.hard.budgetMaxPerPerson === draft.budgetMaxPerPerson && (needs.hard.maxOutingMinutes ?? null) === draft.maxOutingMinutes
+    && (needs.hard.preferredStops ?? null) === draft.preferredStops
     && JSON.stringify(needs.hard.dietary) === JSON.stringify(draft.dietary) && JSON.stringify(needs.hard.allergies) === JSON.stringify(draft.allergies);
   return <div className="space-y-5">
     <div><h1 className="shout text-[48px]">Your kind of outing</h1><p className="on-sky mt-3">Set what matters. Leave everything else flexible.</p></div>
@@ -83,7 +86,7 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
         untouched.current = false;
         lastSubmitted.current = JSON.stringify(draft);
         await submit({ text: draft.preferences, structuredJson: JSON.stringify({
-          budgetMaxPerPerson: draft.budgetMaxPerPerson, maxOutingMinutes: draft.maxOutingMinutes,
+          budgetMaxPerPerson: draft.budgetMaxPerPerson, maxOutingMinutes: draft.maxOutingMinutes, preferredStops: draft.preferredStops,
           dietary: draft.dietary, allergies: draft.allergies, maxTravelMinutes: needs?.hard.maxTravelMinutes ?? initialStructured?.maxTravelMinutes ?? null,
         }) });
         try { sessionStorage.removeItem(`huddle:draft:${group.id}`); } catch { /* Optional draft storage. */ }
@@ -97,6 +100,7 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
     {needs ? <section className="card space-y-3" aria-label="Your private needs summary"><h2 className="card-title">Your private summary</h2>
       <p><strong>Whole-outing budget:</strong> {needs.hard.budgetMaxPerPerson == null ? "Flexible" : `$${needs.hard.budgetMaxPerPerson} per person across all stops`}</p>
       <p><strong>Time available:</strong> {needs.hard.maxOutingMinutes == null ? "Flexible" : `${needs.hard.maxOutingMinutes} minutes for the whole outing`}</p>
+      <p><strong>Stops:</strong> {needs.hard.preferredStops == null ? "Flexible" : `${needs.hard.preferredStops} stop${needs.hard.preferredStops === 1 ? "" : "s"}, averaged with the group`}</p>
       <p><strong>Dietary requirements:</strong> {needs.hard.dietary.join(", ") || "None"}</p>
       <p><strong>Allergies:</strong> {needs.hard.allergies.join(", ") || "None stated"}</p>
       {needs.preferences.length ? <p><strong>Your vibe:</strong> {needs.preferences.join(" · ")}</p> : null}

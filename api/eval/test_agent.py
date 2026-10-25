@@ -206,6 +206,32 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(tuple(self.catalog.places[i].category for i in plan.stops) != ("meal", "dessert")
                             for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
 
+    def test_stop_preferences_aim_for_the_nearest_feasible_average(self):
+        def counts(*stops, duration=None):
+            body = request()
+            for member, preferred in zip(body.members, stops):
+                member.needs.hard.preferredStops = preferred
+                member.needs.hard.maxOutingMinutes = duration
+            return {len(plan.stops) for plan in candidates(self.catalog, body).values()}
+        self.assertEqual(counts(None, None), {1, 2, 3})
+        self.assertEqual(counts(1, 1), {1})
+        self.assertEqual(counts(3, None), {3})  # Flexible members are not averaged in
+        self.assertEqual(counts(2, 3), {2, 3})  # a half-way mean keeps both counts
+        self.assertEqual(counts(1, 2), {1, 2})
+        # Soft: when three stops do not fit the time limit, the nearest feasible count remains.
+        self.assertEqual(counts(3, 3, duration=180), {2})
+        self.assertEqual(counts(3, 3, duration=90), {1})
+
+    async def test_structured_stop_choice_survives_model_extraction(self):
+        result = await interpret(Model(extracted=needs(None, preferredStops=1)), AgentNeedsRequest(
+            memberId="one", text="just a quick bite", structured=AgentHard(preferredStops=3)))
+        self.assertEqual(result.hard.preferredStops, 3)
+        result = await interpret(Model(extracted=needs(None, preferredStops=1)), AgentNeedsRequest(
+            memberId="one", text="just a quick bite", structured=AgentHard()))
+        self.assertEqual(result.hard.preferredStops, 1)
+        with self.assertRaises(ValueError):
+            AgentHard(preferredStops=4)
+
     async def test_invalid_model_id_gets_only_labeled_real_catalog_ideas(self):
         result = await coordinate(Model(bad=True), self.catalog, request())
         self.assertFalse(result.plans)
