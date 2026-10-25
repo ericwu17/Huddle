@@ -126,8 +126,7 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
   </div>;
 }
 
-// Every option gets its own street map; straight segments are only the
-// fallback the map draws if the walking route can't be fetched.
+// Embedded directions when configured; otherwise venue pins and distances.
 export function OptionMap({ plan }: { plan: AgentPlan }) {
   const stops = plan.stops.filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lng));
   if (!stops.length) return null;

@@ -2,6 +2,22 @@
 
 React 19 + React Router v7 (data mode, `createBrowserRouter`) + Vite + Tailwind. It talks to the SpacetimeDB module in [../server/](../server/) through `spacetimedb/react`. Bare-bones UI for testing the backend; not the final design.
 
+## Optional Google Maps directions preview
+
+Enable Maps Embed API, create a browser key restricted to that API and your
+local/production website origins, then set
+`NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY` in `web/.env.local`. Restart Vite after
+changing it; for Vercel, set the same frontend environment name and rebuild.
+No FastAPI environment change or module publish is needed for this feature.
+
+Map & details and Done show Google's directions, distance and estimated travel
+time, starting with Driving. Walking, Public transport and Biking switch the
+local map preview and matching external link. This does not replan or change
+saved outing times/votes. Transit previews consecutive legs individually.
+Without the key, the map shows venue pins and clearly labeled straight-line
+distances, with no walking-time claims. Maps Embed usage is free; see
+[setup and scope](../docs/GOOGLE_MAPS_PLAN.md).
+
 ## Current direction October 24
 
 **Shared activation complete:** `https://huddle.compare/login` now

@@ -1,105 +1,47 @@
 import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { FeatureCollection } from "geojson";
 import type { PlanStop } from "../types";
-import { walkRoute, type WalkRoute } from "../walkRoute";
 import { displayTime } from "../venueFormatting";
+import { useCatalogListings } from "../catalogData";
+import { DIRECTIONS_MODES, directionsLabels, googleMapsEmbedUrl, mapsSegments } from "../googleMaps";
+import { useDirectionsMode } from "../directionsMode";
+import { distanceKm, displayDistance } from "../routeDistance";
 
-const token = import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
-
-// `lines` are [lng, lat] polylines: Mapbox route legs when routeGeometry
-// returned, otherwise straight lines between stops.
+const embedKey = import.meta.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY as string | undefined;
 type MapStop = Pick<PlanStop, "placeId" | "name" | "lat" | "lng"> & Partial<Pick<PlanStop, "start" | "end">>;
 type Props = { plan: { stops: MapStop[] }; lines: [number, number][][] };
 
 export default function PlanMap(props: Props) {
-  return token ? <MapboxMap {...props} /> : <StreetMap {...props} />;
+  return embedKey ? <GoogleRouteMap {...props} /> : <StreetMap {...props} />;
 }
 
-function MapboxMap({ plan, lines }: Props) {
-  const container = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const map = new mapboxgl.Map({
-      container: container.current!,
-      accessToken: token,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [-122.2727, 37.8716], // Berkeley
-      zoom: 14,
-    });
-    map.on("load", () => setLoaded(true));
-    mapRef.current = map;
-    return () => map.remove();
-  }, []);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !loaded) return;
-
-    const markers = plan.stops.map((s, i) =>
-      new mapboxgl.Marker()
-        .setLngLat([s.lng, s.lat])
-        .setPopup(new mapboxgl.Popup().setText(`${i + 1}. ${s.name}`))
-        .addTo(map),
-    );
-
-    const data: FeatureCollection = {
-      type: "FeatureCollection",
-      features: lines.map((coordinates) => ({
-        type: "Feature",
-        properties: {},
-        geometry: { type: "LineString", coordinates },
-      })),
-    };
-    const source = map.getSource("route") as mapboxgl.GeoJSONSource | undefined;
-    if (source) {
-      source.setData(data);
-    } else {
-      map.addSource("route", { type: "geojson", data });
-      map.addLayer({
-        id: "route",
-        type: "line",
-        source: "route",
-        paint: { "line-color": "#ff5fb4", "line-width": 5, "line-dasharray": [1, 1.4] },
-      });
-    }
-
-    if (plan.stops.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      plan.stops.forEach((s) => bounds.extend([s.lng, s.lat]));
-      map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
-    }
-
-    return () => markers.forEach((m) => m.remove());
-  }, [plan, lines, loaded]);
-
-  return <div ref={container} className="card h-64 w-full overflow-hidden !p-0" />;
+function GoogleRouteMap({ plan }: Props) {
+  const listings = useCatalogListings();
+  const [mode, setMode] = useDirectionsMode(plan.stops);
+  const [leg, setLeg] = useState(0);
+  const segments = mapsSegments(plan.stops, mode);
+  const selected = Math.min(leg, segments.length - 1);
+  const url = googleMapsEmbedUrl(segments[selected] ?? [], listings, mode, embedKey!);
+  if (!url) return <p className="muted">Map unavailable for these stops.</p>;
+  return <section className="card map-card" aria-label="Route directions">
+    {plan.stops.length > 1 ? <div className="directions-controls">
+      <div className="directions-heading"><strong>Preview your route</strong><span className="muted text-sm">Travel time shown on the map</span></div>
+      <div className="directions-modes" role="group" aria-label="Travel mode">{DIRECTIONS_MODES.map(value =>
+        <button key={value} type="button" className="directions-mode" aria-pressed={mode === value} onClick={() => { setMode(value); setLeg(0); }}>{directionsLabels[value]}</button>)}</div>
+      {segments.length > 1 ? <div className="directions-legs" role="group" aria-label="Transit legs">{segments.map((_, index) =>
+        <button key={index} className="directions-mode" aria-pressed={selected === index} onClick={() => setLeg(index)}>Stop {index + 1} → {index + 2}</button>)}</div> : null}
+    </div> : null}
+    <iframe className="google-route-map" title={plan.stops.length === 1 ? `Map of ${plan.stops[0].name}` : `${directionsLabels[mode]} route${segments.length > 1 ? `, leg ${selected + 1}` : ""}`}
+      src={url} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+    {plan.stops.length > 1 ? <p className="muted directions-note text-sm">Directions preview. Switching transport doesn’t change your outing’s scheduled times.</p> : null}
+  </section>;
 }
 
-// No Mapbox token: a free OpenStreetMap street map (no key needed)
-// with big numbered pins, a cased route line and a legend, so it reads on a phone.
 function StreetMap({ plan, lines }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const boundsRef = useRef<L.LatLngBounds | null>(null);
-  // Walking geometry along streets; "none" means the router failed and the
-  // straight `lines` are drawn as a labeled guide instead.
-  const routeKey = plan.stops.map((s) => `${s.lng},${s.lat}`).join(";");
-  const [walk, setWalk] = useState<{ key: string; route: WalkRoute | null } | null>(null);
-  const route = walk?.key === routeKey ? walk.route : undefined;
-
-  useEffect(() => {
-    let live = true;
-    const points = routeKey.split(";").map((p) => { const [lng, lat] = p.split(",").map(Number); return { lat, lng }; });
-    void walkRoute(points).then((r) => { if (live) setWalk({ key: routeKey, route: r }); });
-    return () => { live = false; };
-  }, [routeKey]);
-
   useEffect(() => {
     const map = L.map(container.current!, {
       center: [37.8716, -122.2727], // Berkeley
@@ -112,7 +54,7 @@ function StreetMap({ plan, lines }: Props) {
     });
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · routes <a href="https://routing.openstreetmap.de/">FOSSGIS OSRM</a>',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
     mapRef.current = map;
     // The layout can widen after mount (sidebar, fonts); re-measure and refit.
@@ -135,17 +77,10 @@ function StreetMap({ plan, lines }: Props) {
     const map = mapRef.current;
     if (!map) return;
     const layer = L.layerGroup().addTo(map);
-    if (route) {
-      const pts = route.line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
-      // A white casing under the line keeps it visible over busy streets.
-      L.polyline(pts, { color: "#fffdf7", weight: 10, opacity: 0.95, lineCap: "round", lineJoin: "round" }).addTo(layer);
-      L.polyline(pts, { color: "#ff5fb4", weight: 5, lineCap: "round", lineJoin: "round" }).addTo(layer);
-    } else if (route === null) {
-      // No walking route: a thin grey guide, labeled in the legend as straight-line.
-      for (const line of lines) {
-        const pts = line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
-        L.polyline(pts, { color: "#6b6880", weight: 3, dashArray: "4 8", opacity: 0.8 }).addTo(layer);
-      }
+    // A guide between public venue pins, not a claimed walking/driving path.
+    for (const line of lines) {
+      const pts = line.map(([lng, lat]) => [lat, lng] as L.LatLngTuple);
+      L.polyline(pts, { color: "#6b6880", weight: 3, dashArray: "4 8", opacity: 0.8 }).addTo(layer);
     }
     plan.stops.forEach((s, i) => {
       const icon = L.divIcon({
@@ -169,7 +104,7 @@ function StreetMap({ plan, lines }: Props) {
     return () => {
       if (mapRef.current === map) { map.stop(); layer.remove(); }
     };
-  }, [plan, lines, route]);
+  }, [plan, lines]);
 
   return (
     <div className="card map-card">
@@ -182,18 +117,13 @@ function StreetMap({ plan, lines }: Props) {
               <b>{s.name}</b>
               <span className="muted block">
                 {s.start && s.end ? `${displayTime(s.start)}–${displayTime(s.end)}` : "Time not set"}
-                {route && i < route.legMinutes.length ? ` · then ~${route.legMinutes[i]} min walk` : ""}
+                {i < plan.stops.length - 1 ? ` · ${displayDistance(distanceKm(s, plan.stops[i + 1]))} to next stop` : ""}
               </span>
             </span>
           </li>
         ))}
       </ol>
-      {plan.stops.length > 1 && !route ? (
-        <p className="muted px-4 pb-3 text-sm">
-          {route === undefined ? "Finding the walking route…"
-            : "Walking route unavailable. Grey dashes are a straight-line guide, not a path."}
-        </p>
-      ) : null}
+      {plan.stops.length > 1 ? <p className="muted px-4 pb-3 text-sm">Distances and dashed lines are straight-line guides, not road directions.</p> : null}
     </div>
   );
 }

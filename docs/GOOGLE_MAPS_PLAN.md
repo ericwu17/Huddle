@@ -3,8 +3,11 @@
 **Implementation update:** [CITY_COVERAGE.md](CITY_COVERAGE.md) records the new
 isolated preview: 200 stored venues, bounded area-aware retrieval, optional typed
 city selection/GPS, participant-city plurality/ties, and hard destination checks.
-The original audit and proposal below are retained for context; transport-mode
-controls, Routes API and an embedded Google map remain follow-ups. Shared release
+The original audit and proposal below are retained for context. The branch now
+adds a frontend-only Google Maps Embed directions preview with driving by default
+and walking/transit/biking controls. Google displays the route, distance and travel
+time; changing this local preview does not alter the saved outing schedule.
+Routes API integration into planning remains a follow-up. Shared release
 is pending; Eric Wu's scraper and shared API/tunnels remain untouched.
 
 October 24, 2026. Keep the local FastAPI/tunnel, shared Maincloud state and Vercel
@@ -60,22 +63,51 @@ rows or merely increasing caps is not a safe multi-city implementation.
 
 On each option and on Done/shared results, **Click here to see the map!** is blue
 and underlined. It opens Google Maps in a separate tab, preserving the current
-Huddle page and votes. One venue opens its place search; 2–5 stops open walking
-directions in the itinerary's order, including intermediate stops. The URL
-contains only public venue coordinates/addresses, with no private orders,
-budgets, preferences, account IDs or participant starting locations.
+Huddle page and votes. One venue opens its place search; 2–5 stops open driving
+directions by default, in the itinerary's order, including intermediate stops.
+When the embedded route is configured, its transport control also updates the
+external link. Transit uses one consecutive leg at a time so no waypoint is lost.
+The URL contains only public venue coordinates/addresses; private orders,
+budgets, preferences, account IDs and participant starting locations stay out.
 
-Google's universal [Maps URLs](https://developers.google.com/maps/documentation/urls/get-started)
-open the installed Maps app or its website and require no API key. Five Huddle
-stops use three intermediate waypoints, within the documented mobile-browser
-limit. Empty, invalid, overlong or unsupported routes do not produce a link;
-stops are never silently dropped. Some Google Maps products ignore waypoints,
-so the existing Huddle stop list remains the itinerary reference.
+Google's [Maps Embed directions mode](https://developers.google.com/maps/documentation/embed/embedding-map#directions_mode)
+displays route geometry, distance and travel time. Enable **Maps Embed API** and
+create a browser key restricted to that API and exact local/production website
+origins. Put `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY` in `web/.env.local` for local
+preview and in the Vercel frontend environment for deployment; restart/rebuild the
+frontend. No Maps secret, Routes API key, OAuth change, backend restart or module
+republish is needed for this display-only feature.
 
-The existing embedded OpenStreetMap/Mapbox map and walking-geometry adapter stay
-available under Map & details. Opening Google Maps does not fetch its route data
-back into Huddle, prove live availability, change the outing time or reserve
-anything. Calendar OAuth needs no change for this first step.
+[Maps Embed is free with unlimited requests](https://developers.google.com/maps/documentation/embed/usage-and-billing).
+Do not enable premium routing merely to display directions. No iframe contents
+are scraped or saved; Google renders its own directions, notices and attribution.
+Maps URLs opened externally also require no API key.
+
+Without an Embed key, the OpenStreetMap fallback retains public venue pins and
+dashed straight-line guides. Its legend shows straight-line distance in feet or
+miles, never walking minutes. The old OSRM foot-router calls are removed. This
+fallback does not claim road distance or travel time. The Google iframe is only
+mounted when Map & details is opened, or on the final result page.
+
+Display-mode controls are local to the viewer and synchronized between map and
+external links for that stop sequence. They do not change another participant's
+view, replan, invalidate votes, change a budget, create a Calendar event or alter
+booking. Feeding actual mode-specific travel times into feasibility checks is a
+separate planner contract change, still deferred. Google directions use Google's
+current routing context; the saved itinerary date/time remains Huddle's schedule.
+
+### Branch verification
+
+- Module/type checks and frontend build/lint pass; 234 automated tests pass,
+  with one existing opt-in integration test skipped.
+- 55 connected browser checks pass on the isolated Maincloud preview, including
+  real Claude/catalog options, owner-only Calendar actions, voting/Done/sharing,
+  private data exclusion and desktop/mobile distance fallback.
+- All four embed modes, matching external links and unchanged votes were tested
+  with an explicitly synthetic iframe response. No Google route was fetched.
+- Live Google rendering remains pending a configured Embed key and allowed
+  website origins. No shared API, module, scraper, tunnel or Vercel deployment
+  was changed by this display update.
 
 ## Current option labels
 
@@ -147,9 +179,10 @@ planner. Three complete, useful city samples beat thousands of raw-only rows.
   considered when requested and when actual routing supports the outing length.
   Do not infer a walk across the Bay from a short straight-line distance.
 
-**Current bug to fix with this phase:** `web/src/googleMaps.ts` hardcodes
-`travelmode=walking`. Navigation links, proposed travel times and the chosen
-mode must agree on Plans, Vote, Done and shared results.
+**Display update on this branch:** Maps links now default to driving and follow
+the local embedded preview mode. Planner travel estimates are still the original
+contract; synchronizing the saved schedule with a chosen group travel mode is a
+separate follow-up.
 
 ### 3. Give Claude route facts and validate the resulting itinerary
 

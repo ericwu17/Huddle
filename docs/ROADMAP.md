@@ -19,6 +19,11 @@ to see the map!** action. The key-free URL phase is implemented. The October 24 
 Routes API/embedded-map rollout are follow-ups in
 [GOOGLE_MAPS_PLAN.md](GOOGLE_MAPS_PLAN.md).
 
+Map display update on the review branch: optional free Maps Embed directions,
+driving by default with local walking/transit/biking preview controls. Without a
+key, show straight-line distances instead of walking minutes. Actual travel-time
+validation in planning remains follow-up scope. See [Maps setup](GOOGLE_MAPS_PLAN.md).
+
 Post-vote result: Done shows the chosen route/date/time and each owner's order,
 with Calendar download/opt-in creation and a public result link. Public shares
 contain venue facts only and are checked against the current winner. Parsing and
