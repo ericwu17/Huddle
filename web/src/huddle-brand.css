@@ -21,6 +21,7 @@
 .home-intro.home-welcome { align-items: center; justify-content: flex-start; gap: 24px; min-height: 174px; padding: 10px 0 22px; }
 .home-welcome-copy { flex: 0 1 460px; min-width: 0; }
 .home-question, .page-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 12px; margin: 0; color: var(--paper); font-family: var(--text); font-size: clamp(27px, 3.1vw, 38px); font-weight: 800; line-height: 1.22; letter-spacing: -0.045em; text-shadow: 0 2px 0 var(--deep); }
+.page-heading { padding-bottom: 20px; }
 .home-question-hand, .page-heading-accent { position: relative; display: inline-block; font-family: var(--hand); font-size: 1.42em; font-weight: 400; letter-spacing: -0.02em; color: var(--sun); white-space: nowrap; }
 .home-question-hand::after, .page-heading-accent::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 5px; border-radius: 50%; background: var(--sun); transform: rotate(-2deg); }
 .home-welcome .crowd { flex: none; flex-wrap: nowrap; gap: 0; padding-bottom: 4px; }
