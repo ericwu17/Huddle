@@ -5,8 +5,8 @@ Code: [`data/reviews/`](../data/reviews/). Source note for the Google Maps route
 **Status (2026-10-24):**
 - **Full Google Maps discovery has run:** 360 inputs (12 grid points × 30 keywords) returned 1,023 records, 3 of them errors, covering 1,009 distinct places. 936 of those classify as a stop: 524 restaurants, 380 hangouts and 32 boba shops. Stores, markets and other non-stops are dropped. 41 of the 45 bundled places were found again.
 - **Yelp discovery returned nothing** on two input types (see the Yelp row below), so all of the data is from Google Maps.
-- **The 130-venue catalog snapshot is live on shared `huddle-calhacks` and the isolated preview.** `data/brightdata/catalog.json` has 60 meals, 45 activities and 25 desserts: the 45 bundled places plus 85 new ones. The first activation used the committed version `2026-10-24T20:17:52Z-a182c74b`, after an additive module publish and API restart from `a029fb6`, without resetting data. The actual Vercel flow selected two new scraped IDs and passed 30 desktop/mobile checks. The live snapshot is now the menu-enriched `2026-10-24T22:29:05Z-d5490f3f-menu-20bc1232fca7`, built from the committed `catalog.json` plus `details.json` (route `/health` reports it with 130 venues). [Operations](ACCOUNTS_RUNBOOK.md) records the shared targets and verification. To refresh the data, see [Go live](#go-live).
-- **Venue details exist for all 130 venues** (`details.json`; see [Venue details](#venue-details-menus-takeout-seating-photos-dietary-evidence)). `scripts/publish-menu-catalog.py` adds their menu items and photos to the published catalog ([MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md)). Takeout and seating aren't used yet.
+- **The 140-venue catalog snapshot is live on shared `huddle-calhacks` and the isolated preview.** `data/brightdata/catalog.json` has 60 meals, 50 activities and 30 desserts. The October 24 refresh retains all 130 previously active venue IDs and adds ten Berkeley venues from the expanded scrape. The first activation used the committed version `2026-10-24T20:17:52Z-a182c74b`, after an additive module publish and API restart from `a029fb6`, without resetting data. The actual Vercel flow selected two new scraped IDs and passed 30 desktop/mobile checks. The live snapshot is now the menu-enriched `2026-10-25T02:00:25Z-e73d83f6-menu-70fd1361f328`, built from the committed `catalog.json` plus `details.json` (route `/health` reports it with 140 venues). All 950 existing menu items and 386 photos, including their stable IDs and attribution, are retained unchanged. The new scrape also refreshes available source observations; Oakland/SF discoveries remain outside the active Berkeley catalog. [Operations](ACCOUNTS_RUNBOOK.md) records the shared targets and verification. To refresh the data, see [Go live](#go-live).
+- **Venue details remain available for the original 130 venues** (`details.json`; the ten added venues have no menu/photo sidecar yet; see [Venue details](#venue-details-menus-takeout-seating-photos-dietary-evidence)). `scripts/publish-menu-catalog.py` adds their menu items and photos to the published catalog ([MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md)). Takeout and seating aren't used yet.
 
 ## What it collects
 
@@ -52,14 +52,14 @@ python3 data/reviews/collect.py discover --areas oakland,sf --one-point     # sp
 python3 data/reviews/collect.py discover --areas oakland,sf --yes           # full Oakland and SF grids
 python3 data/reviews/collect.py refresh                                     # fresh numbers, one batch per source
 python3 data/reviews/collect.py build                                       # rebuild outputs from data/raw/, no API calls
-python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30 --dry-run  # writes catalog.json only
-python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30            # live in SpacetimeDB
-python3 data/reviews/collect.py merge --add meal=40,dessert=15,activity=30 --dry-run    # bundled fallback file
+python3 data/reviews/collect.py publish --add meal=40,dessert=20,activity=35 --dry-run  # writes catalog.json only
+python3 data/reviews/collect.py publish --add meal=40,dessert=20,activity=35            # live in SpacetimeDB
+python3 data/reviews/collect.py merge --add meal=40,dessert=20,activity=35 --dry-run    # bundled fallback file
 python3 -m unittest data/reviews/test_collect.py data/reviews/test_details.py         # offline tests
 ```
 
 - `discover` stops without `--yes` when it could return more than 2,000 records. It searches Google Maps only unless you pass `--source yelp` or `--source all`. The full Google run is 360 inputs × up to 20 results, so up to 7,200 records before dedup; the real run returned 1,023. Narrow it with `--groups`, `--keywords` or `--one-point`.
-- `publish` and `merge` look up new restaurants on Google Places for their price, and skip a restaurant that has none. The results are cached in `google_places.json`, so the committed `--add meal=40,dessert=15,activity=30` makes no new lookups and needs no `GOOGLE_PLACES_API_KEY`. Larger `--add` values need the key.
+- `publish` and `merge` look up new restaurants on Google Places for their price, and skip a restaurant that has none. The results are cached in `google_places.json`, so the committed `--add meal=40,dessert=20,activity=35` makes no new lookups and needs no `GOOGLE_PLACES_API_KEY`. Larger `--add` values need the key.
 - Discovery takes minutes (about 4.3 min for 20 places in the measured run), so it runs as a job and never on a click.
 
 ## How it reaches the app
@@ -94,7 +94,7 @@ The coordinator flow shows each stop from the plan result, so new `bd_…` venue
 1. Rebuild the basic snapshot without publishing it:
 
    ```sh
-   python3 data/reviews/collect.py publish --add meal=40,dessert=15,activity=30 --dry-run
+   python3 data/reviews/collect.py publish --add meal=40,dessert=20,activity=35 --dry-run
    ```
 
    This rewrites `data/brightdata/catalog.json` with a new version id. Update `details.json` too if venues changed (`collect.py details`).

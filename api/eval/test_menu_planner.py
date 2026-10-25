@@ -145,7 +145,9 @@ class RealMenuSidecarTests(unittest.TestCase):
         details = json.loads(Path("data/brightdata/details.json").read_text())
         result = enrich_catalog(snapshot, details)
         self.assertEqual(result, enrich_catalog(snapshot, details))
-        self.assertEqual(len(result["venues"]), 130)
+        self.assertEqual({v["place"]["id"] for v in result["venues"]},
+                         {v["place"]["id"] for v in snapshot["venues"]})
+        self.assertEqual(sum(len(v["evidence"]["photos"]) for v in result["venues"]), 386)
         self.assertEqual(sum(len(v["evidence"]["menu"]["items"]) for v in result["venues"]), 950)
         cheese = next(v for v in result["venues"] if v["place"]["id"] == "bd_6cfb614522")
         self.assertIn("pizza", cheese["evidence"]["foodStyle"].casefold())

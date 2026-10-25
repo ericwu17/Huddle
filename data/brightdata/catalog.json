@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-24T22:29:05Z-d5490f3f",
-  "generatedAt": "2026-10-24T22:29:05Z",
+  "version": "2026-10-25T02:00:25Z-e73d83f6",
+  "generatedAt": "2026-10-25T02:00:25Z",
   "venues": [
     {
       "place": {
@@ -4260,7 +4260,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Asha%20Tea%20House/data=!4m7!3m6!1s0x80857e9ef30ee2c5:0x3988b1281282871f!8m2!3d37.8719520!4d-122.2688530!16s%2Fg%2F11gzt43bh!19sChIJxeIO855-hYARH4eCEiixiDk",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:30:39Z",
             "rating": 4.5,
             "reviewCount": 808
           }
@@ -6856,6 +6856,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:22Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Caff%C3%A8+Strada/@37.869146,-122.254859,17z/data=!3m1!4b1!4m6!3m5!1s0x80857c2fe65aee25:0x43f6bea2790d5d28!8m2!3d37.869146!4d-122.254859!16s%2Fm%2F01zbv4m",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -7583,6 +7590,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:23Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Cafe%20Leila/data=!4m7!3m6!1s0x80857ec1550cad3b:0x76af91edcfa9b6c7!8m2!3d37.8725562!4d-122.2935758!16s%2Fg%2F1tfwq5sr!19sChIJO60MVcF-hYARx7apz-2Rr3Y",
@@ -9116,6 +9130,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:23Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/900+Grayson/@37.8551575,-122.2922999,17z/data=!3m1!4b1!4m6!3m5!1s0x80857ef3bffc35e5:0x130a30ffbb947e60!8m2!3d37.8551575!4d-122.2922999!16s%2Fg%2F1w0sd2n6",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -9228,9 +9249,16 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:24Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Victory+Point+Cafe/@37.8751742,-122.2684613,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e9f793e8573:0x12a4d9e6777828e6!8m2!3d37.8751742!4d-122.2684613!16s%2Fg%2F11bw150bdm",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Victory%20Point%20Cafe/data=!4m7!3m6!1s0x80857e9f793e8573:0x12a4d9e6777828e6!8m2!3d37.8751742!4d-122.2684613!16s%2Fg%2F11bw150bdm!19sChIJc4U-eZ9-hYAR5ih4d-bZpBI",
+            "fetchedAt": "2026-10-25T01:30:39Z",
             "rating": 4.7,
             "reviewCount": 951
           }
@@ -10068,6 +10096,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:24Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Starry%20Plough%20Pub/data=!4m7!3m6!1s0x80857e8239698059:0xeeadcc7353a9cf1c!8m2!3d37.8529903!4d-122.2659426!16s%2Fm%2F0k1c2pq!19sChIJWYBpOYJ-hYARHM-pU3PMre4",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -10179,6 +10214,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:24Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Lavender%20Bakery%20%26%20Cafe'/data=!4m7!3m6!1s0x80857eb32abfffff:0x7987ccc2cf0fa016!8m2!3d37.8910929!4d-122.2795915!16s%2Fg%2F11fct7bq8p!19sChIJ__-_KrN-hYARFqAPz8LMh3k",
@@ -10763,6 +10805,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:25Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Prizefighter/data=!4m7!3m6!1s0x80857e5f61380f41:0x423898339ada707f!8m2!3d37.8491309!4d-122.2921237!16s%2Fg%2F1hc0yz0z3!19sChIJQQ84YV9-hYARf3DamjOYOEI",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -10874,6 +10923,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:25Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Third%20Culture%20Bakery%20Berkeley/data=!4m7!3m6!1s0x80857edd53eaf2cb:0xec4f17b3f1995dac!8m2!3d37.8569603!4d-122.2917118!16s%2Fg%2F11dfr1nw57!19sChIJy_LqU91-hYARrF2Z8bMXT-w",
@@ -10987,6 +11043,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:25Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Raleigh's%20Pub/data=!4m7!3m6!1s0x80857c2edb0b258b:0xb56ef3288598567b!8m2!3d37.8663063!4d-122.2589516!16s%2Fm%2F01zby6s!19sChIJiyUL2y58hYARe1aYhSjzbrU",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -11099,6 +11162,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:26Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Paradise+Park+Cafe/@37.8468426,-122.28468,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e612d3a9645:0x50a9397cc272582a!8m2!3d37.8468426!4d-122.28468!16s%2Fg%2F11c71_l3lv",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -11210,6 +11280,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:26Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Club%20Mallard/data=!4m7!3m6!1s0x8085792fd22f3555:0x13cbf02a872410a9!8m2!3d37.8923920!4d-122.3000000!16s%2Fg%2F1td2mqdg!19sChIJVTUv0i95hYARqRAkhyrwyxM",
@@ -11435,6 +11512,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:27Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/elaichi+co./@37.8697087,-122.2665418,17z/data=!3m1!4b1!4m6!3m5!1s0x80857fe7a9bb7bc5:0x7ae61ee1d8090a2!8m2!3d37.8697087!4d-122.2665418!16s%2Fg%2F11vpc0n2wl",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -11659,6 +11743,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:28Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Triple%20Rock%20Brewing/data=!4m7!3m6!1s0x80857e9dbb45d507:0xc0a080520e1030e6!8m2!3d37.8734160!4d-122.2687553!16s%2Fm%2F01zbyzs!19sChIJB9VFu51-hYAR5jAQDlKAoMA",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -11771,6 +11862,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:28Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Blue%20Bottle%20Coffee/data=!4m7!3m6!1s0x80857e9e66038b4b:0xa3a24e7603b46f21!8m2!3d37.8720889!4d-122.2676333!16s%2Fg%2F11cs17yck3!19sChIJS4sDZp5-hYARIW-0A3ZOoqM",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -11882,6 +11980,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:28Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Missouri%20Lounge%20%26%20Cafe/data=!4m7!3m6!1s0x80857ef2a48beb39:0x6258db8c4ccf8202!8m2!3d37.8591472!4d-122.2891778!16s%2Fg%2F1tfp2p9v!19sChIJOeuLpPJ-hYARAoLPTIzbWGI",
@@ -12106,6 +12211,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:29Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Tupper+%26+Reed/@37.8681444,-122.2675583,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e9d0fe4b989:0xad545714a6bfa5e8!8m2!3d37.8681444!4d-122.2675583!16s%2Fg%2F11b768_54r",
@@ -12555,6 +12667,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:31Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Peet's%20Coffee/data=!4m7!3m6!1s0x80857ea12b318d1d:0x1b0fe71cdb63e238!8m2!3d37.8802629!4d-122.2683283!16s%2Fg%2F1yl47h12q!19sChIJHY0xK6F-hYAROOJj2xznDxs",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -12666,6 +12785,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:31Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Cafenated%20Coffee%20Company/data=!4m7!3m6!1s0x80857f40a25b85cf:0x5eba0f1a2cb196f7!8m2!3d37.8803291!4d-122.2699044!16s%2Fg%2F11fktzjpy4!19sChIJz4VbokB_hYAR95axLBoPul4",
@@ -12779,6 +12905,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:31Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Qargo%20Coffee/data=!4m7!3m6!1s0x80857dbdb21d9b47:0xb0f82bf492c7e9de!8m2!3d37.8679437!4d-122.2592771!16s%2Fg%2F11sj5gb_9y!19sChIJR5sdsr19hYAR3unHkvQr-LA",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -12891,6 +13024,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:32Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Spats%20Berkeley/data=!4m7!3m6!1s0x80857e9efa22a973:0x53e8cdb99bf3595c!8m2!3d37.8726497!4d-122.2687563!16s%2Fg%2F1tcv6jxm!19sChIJc6ki-p5-hYARXFnzm7nN6FM",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -12992,6 +13132,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:32Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Cheese+Board+Collective+Bakery+and+Cheese+Shop/@37.8799754,-122.2695303,17z/data=!3m1!4b1!4m6!3m5!1s0x80857f303512a431:0x331e227b3b1d80e0!8m2!3d37.8799754!4d-122.2695303!16s%2Fg%2F11r7nq9w6t",
@@ -13772,11 +13919,130 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:34Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Hidden%20Cafe/data=!4m7!3m6!1s0x80857f99c1a87305:0x2d8a50b1feb72a97!8m2!3d37.8684254!4d-122.2869747!16s%2Fg%2F11fn9cp6fg!19sChIJBXOowZl_hYARlyq3_rFQii0",
             "fetchedAt": "2026-10-24T19:38:32Z",
             "rating": 4.6,
             "reviewCount": 459
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_3a54c18269",
+        "googlePlaceId": "ChIJW2yuxCh8hYARGGQHIaJzsZc",
+        "name": "1951 Coffee Company",
+        "category": "dessert",
+        "cuisine": "cafe_dessert",
+        "address": "2410 Channing Way, Berkeley, CA 94704, United States",
+        "lat": 37.8666433,
+        "lng": -122.2599786,
+        "priceLevel": null,
+        "costPerPerson": 9,
+        "dwellMinutes": 30,
+        "phone": "",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "07:00",
+              "17:00"
+            ]
+          ],
+          "tue": [
+            [
+              "07:00",
+              "17:00"
+            ]
+          ],
+          "wed": [
+            [
+              "07:00",
+              "17:00"
+            ]
+          ],
+          "thu": [
+            [
+              "07:00",
+              "17:00"
+            ]
+          ],
+          "fri": [
+            [
+              "07:00",
+              "17:00"
+            ]
+          ],
+          "sat": [
+            [
+              "08:00",
+              "15:00"
+            ]
+          ],
+          "sun": [
+            [
+              "08:00",
+              "15:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 452,
+        "rating": 4.6,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Coffee shop"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/1951+Coffee+Company/@37.8666433,-122.2599786,17z/data=!3m1!4b1!4m6!3m5!1s0x80857c28c4ae6c5b:0x97b173a221076418!8m2!3d37.8666433!4d-122.2599786!16s%2Fg%2F11c6ltfl4g",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.6,
+            "reviewCount": 452
           }
         ]
       }
@@ -13884,11 +14150,232 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:35Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Study+Hall+Rooftop+Lounge/@37.8705712,-122.2672031,17z/data=!3m1!4b1!4m6!3m5!1s0x80857f031b99b639:0x2064dc2be7fb95d7!8m2!3d37.8705712!4d-122.2672031!16s%2Fg%2F11pz7k9qld",
             "fetchedAt": "2026-10-24T19:38:32Z",
             "rating": 4.2,
             "reviewCount": 448
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_b112ce7b40",
+        "googlePlaceId": "ChIJ1Rpga2p9hYARgmlzMSklkmk",
+        "name": "Baker & Commons",
+        "category": "dessert",
+        "cuisine": "cafe_dessert",
+        "address": "2900 College Ave, Berkeley, CA 94705, United States",
+        "lat": 37.8583396,
+        "lng": -122.2533577,
+        "priceLevel": null,
+        "costPerPerson": 9,
+        "dwellMinutes": 30,
+        "phone": "+15108431300",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "07:30",
+              "18:30"
+            ]
+          ],
+          "tue": [
+            [
+              "07:30",
+              "18:30"
+            ]
+          ],
+          "wed": [
+            [
+              "07:30",
+              "18:30"
+            ]
+          ],
+          "thu": [
+            [
+              "07:30",
+              "18:30"
+            ]
+          ],
+          "fri": [
+            [
+              "07:30",
+              "20:00"
+            ]
+          ],
+          "sat": [
+            [
+              "07:30",
+              "20:00"
+            ]
+          ],
+          "sun": [
+            [
+              "07:30",
+              "18:30"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 434,
+        "rating": 4.4,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Cafe"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Baker%20%26%20Commons/data=!4m7!3m6!1s0x80857d6a6b601ad5:0x6992252931736982!8m2!3d37.8583396!4d-122.2533577!16s%2Fg%2F11f61fcj2l!19sChIJ1Rpga2p9hYARgmlzMSklkmk",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.4,
+            "reviewCount": 434
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_824afe68dc",
+        "googlePlaceId": "ChIJxapf8PF_hYARPg1Ki7Ws9pE",
+        "name": "MY Coffee Roastery",
+        "category": "dessert",
+        "cuisine": "cafe_dessert",
+        "address": "2080 Martin Luther King Jr Way, Berkeley, CA 94704, United States",
+        "lat": 37.8707119,
+        "lng": -122.2731315,
+        "priceLevel": null,
+        "costPerPerson": 9,
+        "dwellMinutes": 30,
+        "phone": "",
+        "dietary": [],
+        "hours": {
+          "mon": [],
+          "tue": [],
+          "wed": [
+            [
+              "08:00",
+              "16:00"
+            ]
+          ],
+          "thu": [
+            [
+              "08:00",
+              "16:00"
+            ]
+          ],
+          "fri": [
+            [
+              "08:00",
+              "16:00"
+            ]
+          ],
+          "sat": [
+            [
+              "08:30",
+              "16:00"
+            ]
+          ],
+          "sun": [
+            [
+              "08:30",
+              "16:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 422,
+        "rating": 4.7,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Coffee shop"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/MY%20Coffee%20Roastery/data=!4m7!3m6!1s0x80857ff1f05faac5:0x91f6acb58b4a0d3e!8m2!3d37.8707119!4d-122.2731315!16s%2Fg%2F11fm39x442!19sChIJxapf8PF_hYARPg1Ki7Ws9pE",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.7,
+            "reviewCount": 422
           }
         ]
       }
@@ -13995,6 +14482,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:35Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Schmidt%E2%80%99s%20Tobacco%20%26%20Trading%20Co./data=!4m7!3m6!1s0x808579357e83f1fb:0x320a5cf77d995139!8m2!3d37.8906511!4d-122.2883100!16s%2Fg%2F1td0t31n!19sChIJ-_GDfjV5hYAROVGZffdcCjI",
@@ -14108,11 +14602,242 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:36Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Tap%20Haus/data=!4m7!3m6!1s0x80857c2f166365c5:0x15898b0888927c2f!8m2!3d37.8676720!4d-122.2581416!16s%2Fg%2F11b7rtnmfy!19sChIJxWVjFi98hYARL3ySiAiLiRU",
             "fetchedAt": "2026-10-24T19:38:32Z",
             "rating": 4.2,
             "reviewCount": 383
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_ca271b347d",
+        "googlePlaceId": "ChIJCyrJNwB9hYAR8R-0FdNBW9Q",
+        "name": "Chicha San Chen 吃茶三千",
+        "category": "dessert",
+        "cuisine": "cafe_dessert",
+        "address": "2400A Bancroft Way, Berkeley, CA 94704, United States",
+        "lat": 37.8683082,
+        "lng": -122.2612332,
+        "priceLevel": null,
+        "costPerPerson": 9,
+        "dwellMinutes": 30,
+        "phone": "",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "11:30",
+              "21:30"
+            ]
+          ],
+          "tue": [
+            [
+              "11:30",
+              "21:30"
+            ]
+          ],
+          "wed": [
+            [
+              "11:30",
+              "21:30"
+            ]
+          ],
+          "thu": [
+            [
+              "11:30",
+              "21:30"
+            ]
+          ],
+          "fri": [
+            [
+              "11:30",
+              "22:00"
+            ]
+          ],
+          "sat": [
+            [
+              "11:30",
+              "22:00"
+            ]
+          ],
+          "sun": [
+            [
+              "11:30",
+              "21:30"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 377,
+        "rating": 4.7,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Bubble tea store"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Chicha%20San%20Chen%20%E5%90%83%E8%8C%B6%E4%B8%89%E5%8D%83/data=!4m7!3m6!1s0x80857d0037c92a0b:0xd45b41d315b41ff1!8m2!3d37.8683082!4d-122.2612332!16s%2Fg%2F11wwh8zx5c!19sChIJCyrJNwB9hYAR8R-0FdNBW9Q",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.7,
+            "reviewCount": 377
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_8ccb846398",
+        "googlePlaceId": "ChIJY8u0k_R-hYARbkIhyTMGmxk",
+        "name": "Berkeley Bowl West Cafe",
+        "category": "dessert",
+        "cuisine": "cafe_dessert",
+        "address": "920-998 Heinz Ave, Berkeley, CA 94710, United States",
+        "lat": 37.8537039,
+        "lng": -122.2900213,
+        "priceLevel": null,
+        "costPerPerson": 9,
+        "dwellMinutes": 30,
+        "phone": "+15108989555",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ],
+          "tue": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ],
+          "wed": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ],
+          "thu": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ],
+          "fri": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ],
+          "sat": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ],
+          "sun": [
+            [
+              "10:00",
+              "19:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 376,
+        "rating": 4.4,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Cafe"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Berkeley%20Bowl%20West%20Cafe/data=!4m7!3m6!1s0x80857ef493b4cb63:0x199b0633c921426e!8m2!3d37.8537039!4d-122.2900213!16s%2Fg%2F11dxhbn8hn!19sChIJY8u0k_R-hYARbkIhyTMGmxk",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.4,
+            "reviewCount": 376
           }
         ]
       }
@@ -14326,6 +15051,13 @@
       },
       "evidence": {
         "sources": [
+          {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:36Z",
+            "rating": null,
+            "reviewCount": null
+          },
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/White%20Horse%20Inn/data=!4m7!3m6!1s0x80857dd72846c45f:0x21a324bd7e535f35!8m2!3d37.8518352!4d-122.2606209!16s%2Fg%2F11dxl22qsz!19sChIJX8RGKNd9hYARNV9Tfr0koyE",
@@ -14551,6 +15283,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:37Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Acme%20Bar%20%26%20Company/data=!4m7!3m6!1s0x80857eea700fa4d5:0xb74e408b4ae0ba05!8m2!3d37.8676861!4d-122.2914694!16s%2Fg%2F1tcxpx6h!19sChIJ1aQPcOp-hYARBbrgSotATrc",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -14775,6 +15514,13 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:37Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Heads%20and%20Tails%20Barbecue/data=!4m7!3m6!1s0x80857f0035770497:0x58abcf0f3f1edd76!8m2!3d37.8674543!4d-122.2912178!16s%2Fg%2F11vt6hlcmn!19sChIJlwR3NQB_hYARdt0ePw_Pq1g",
             "fetchedAt": "2026-10-24T19:38:32Z",
@@ -14887,11 +15633,575 @@
       "evidence": {
         "sources": [
           {
+            "source": "google_places",
+            "url": null,
+            "fetchedAt": "2026-10-24T20:18:38Z",
+            "rating": null,
+            "reviewCount": null
+          },
+          {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Tap%20in%20lounge/data=!4m7!3m6!1s0x80857e9e8c16aebb:0x56e2a33844a64653!8m2!3d37.8717388!4d-122.2687119!16s%2Fg%2F11gcxzz31t!19sChIJu64WjJ5-hYARU0amRDij4lY",
             "fetchedAt": "2026-10-24T19:38:32Z",
             "rating": 4.1,
             "reviewCount": 271
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_277d353530",
+        "googlePlaceId": "ChIJ53ZlmJ5-hYAR6Vx25lvILwA",
+        "name": "The Freight",
+        "category": "activity",
+        "cuisine": "none",
+        "address": "2020 Addison St, Berkeley, CA 94704, United States",
+        "lat": 37.8708514,
+        "lng": -122.2695846,
+        "priceLevel": null,
+        "costPerPerson": 10,
+        "dwellMinutes": 75,
+        "phone": "+15106442020",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "12:00",
+              "22:00"
+            ]
+          ],
+          "tue": [],
+          "wed": [
+            [
+              "18:00",
+              "22:00"
+            ]
+          ],
+          "thu": [
+            [
+              "18:00",
+              "22:00"
+            ]
+          ],
+          "fri": [
+            [
+              "16:00",
+              "22:00"
+            ]
+          ],
+          "sat": [
+            [
+              "16:00",
+              "22:00"
+            ]
+          ],
+          "sun": [
+            [
+              "18:00",
+              "22:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 267,
+        "rating": 4.8,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Arts organization"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/The%20Freight/data=!4m7!3m6!1s0x80857e9e986576e7:0x2fc85be6765ce9!8m2!3d37.8708514!4d-122.2695846!16s%2Fm%2F096hc6!19sChIJ53ZlmJ5-hYAR6Vx25lvILwA",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.8,
+            "reviewCount": 267
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_d66ad4a6bb",
+        "googlePlaceId": "ChIJTaxTTJ1-hYARxQdA42v1VB0",
+        "name": "Beta Lounge Bar & Kitchen",
+        "category": "activity",
+        "cuisine": "none",
+        "address": "2129 Durant Ave, Berkeley, CA 94704, United States",
+        "lat": 37.8670058,
+        "lng": -122.2661456,
+        "priceLevel": null,
+        "costPerPerson": 10,
+        "dwellMinutes": 75,
+        "phone": "+15103915318",
+        "dietary": [
+          "vegan"
+        ],
+        "hours": {
+          "mon": [
+            [
+              "15:00",
+              "22:00"
+            ]
+          ],
+          "tue": [
+            [
+              "15:00",
+              "22:00"
+            ]
+          ],
+          "wed": [
+            [
+              "15:00",
+              "22:00"
+            ]
+          ],
+          "thu": [
+            [
+              "15:00",
+              "23:59"
+            ]
+          ],
+          "fri": [
+            [
+              "15:00",
+              "23:59"
+            ]
+          ],
+          "sat": [
+            [
+              "15:00",
+              "23:59"
+            ]
+          ],
+          "sun": [
+            [
+              "13:00",
+              "21:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 231,
+        "rating": 4.4,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Wine bar"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Beta%20Lounge%20Bar%20%26%20Kitchen/data=!4m7!3m6!1s0x80857e9d4c53ac4d:0x1d54f56be34007c5!8m2!3d37.8670058!4d-122.2661456!16s%2Fg%2F1tftx5dp!19sChIJTaxTTJ1-hYARxQdA42v1VB0",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.4,
+            "reviewCount": 231
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_c9cd9a6e3d",
+        "googlePlaceId": "ChIJX2r8-j9_hYAR9CkR-8fK8as",
+        "name": "Tipsea",
+        "category": "activity",
+        "cuisine": "none",
+        "address": "2327 Shattuck Ave., Berkeley, CA 94704, United States",
+        "lat": 37.8670969,
+        "lng": -122.2673551,
+        "priceLevel": null,
+        "costPerPerson": 10,
+        "dwellMinutes": 75,
+        "phone": "+15107619166",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ],
+          "tue": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ],
+          "wed": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ],
+          "thu": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ],
+          "fri": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ],
+          "sat": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ],
+          "sun": [
+            [
+              "14:00",
+              "23:59"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 206,
+        "rating": 4.4,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Bar"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Tipsea/data=!4m7!3m6!1s0x80857f3ffafc6a5f:0xabf1cac7fb1129f4!8m2!3d37.8670969!4d-122.2673551!16s%2Fg%2F11t5_hyqk5!19sChIJX2r8-j9_hYAR9CkR-8fK8as",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.4,
+            "reviewCount": 206
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_8faab29237",
+        "googlePlaceId": "ChIJNY6tkwF8hYARbk-Crt8jBjQ",
+        "name": "Cragmont Rock Park",
+        "category": "activity",
+        "cuisine": "none",
+        "address": "960 Regal Rd, Berkeley, CA 94708, United States",
+        "lat": 37.8920762,
+        "lng": -122.2637155,
+        "priceLevel": null,
+        "costPerPerson": 0,
+        "dwellMinutes": 75,
+        "phone": "+15109815150",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "tue": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "wed": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "thu": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "fri": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "sat": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "sun": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 178,
+        "rating": 4.7,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Park"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Cragmont%20Rock%20Park/data=!4m7!3m6!1s0x80857c0193ad8e35:0x340623dfae824f6e!8m2!3d37.8920762!4d-122.2637155!16s%2Fg%2F1thml6lf!19sChIJNY6tkwF8hYARbk-Crt8jBjQ",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.7,
+            "reviewCount": 178
+          }
+        ]
+      }
+    },
+    {
+      "place": {
+        "id": "bd_0a178b7b37",
+        "googlePlaceId": "ChIJ5aqECz59hYARffNQyfAERns",
+        "name": "Redfield Cider Bar & Bottle Shop",
+        "category": "activity",
+        "cuisine": "none",
+        "address": "5815 College Ave, Oakland, CA 94618, United States",
+        "lat": 37.8464598,
+        "lng": -122.2521569,
+        "priceLevel": null,
+        "costPerPerson": 10,
+        "dwellMinutes": 75,
+        "phone": "+15102509058",
+        "dietary": [],
+        "hours": {
+          "mon": [
+            [
+              "16:30",
+              "22:00"
+            ]
+          ],
+          "tue": [
+            [
+              "16:30",
+              "22:00"
+            ]
+          ],
+          "wed": [
+            [
+              "14:00",
+              "22:00"
+            ]
+          ],
+          "thu": [
+            [
+              "14:00",
+              "22:00"
+            ]
+          ],
+          "fri": [
+            [
+              "14:00",
+              "23:00"
+            ]
+          ],
+          "sat": [
+            [
+              "12:00",
+              "23:00"
+            ]
+          ],
+          "sun": [
+            [
+              "12:00",
+              "21:00"
+            ]
+          ]
+        },
+        "aspects": {
+          "noise": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "crowd": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "wait": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "value": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "romance": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "service": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "outdoor": {
+            "mean": 0.5,
+            "sd": 0.25
+          },
+          "novelty": {
+            "mean": 0.5,
+            "sd": 0.25
+          }
+        },
+        "reviewCount": 169,
+        "rating": 4.9,
+        "sources": [
+          "brightdata"
+        ],
+        "label": "Bar"
+      },
+      "evidence": {
+        "sources": [
+          {
+            "source": "gmaps",
+            "url": "https://www.google.com/maps/place/Redfield%20Cider%20Bar%20%26%20Bottle%20Shop/data=!4m7!3m6!1s0x80857d3e0b84aae5:0x7b4604f0c950f37d!8m2!3d37.8464598!4d-122.2521569!16s%2Fg%2F11gzmtzd95!19sChIJ5aqECz59hYARffNQyfAERns",
+            "fetchedAt": "2026-10-24T19:38:32Z",
+            "rating": 4.9,
+            "reviewCount": 169
           }
         ]
       }
