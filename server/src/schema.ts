@@ -343,13 +343,16 @@ export const personal_meetup_job = job("personal_meetup_job", { requestId: t.str
 export const group_schedule = table({ name: "group_schedule" }, {
   groupId: t.string().primaryKey(), timeZone: t.string(), start: t.string(), end: t.string(), checkedAt: t.f64(),
 });
+export const member_time_preference = table({ name: "member_time_preference" }, {
+  memberId: t.string().primaryKey(), timeOfDay: t.string(),
+});
 export const huddle_timing = table({ name: "huddle_timing" }, {
   groupId: t.string().primaryKey(), timeOfDay: t.string(), source: t.string(), membersKey: t.string(),
 });
 
 const spacetimedb = schema(
   {
-    group, member, member_location, private_prefs, swipe, plan_run, offer, vote, booking, call_event,
+    group, member, member_location, member_time_preference, private_prefs, swipe, plan_run, offer, vote, booking, call_event,
     council_message, scout_check, geo_cache,
     parse_job, swipe_job, preview_job, plan_job, offers_job, scout_job,
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,

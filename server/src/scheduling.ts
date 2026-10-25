@@ -1,5 +1,6 @@
 // Calendar scheduling is separate from venue selection and restaurant simulation.
 import { SenderError, t } from "spacetimedb/server";
+import { requireMember } from "./groups";
 import spacetimedb, { meetup_job, personal_meetup_job } from "./schema";
 import { requireAccount, requireActor } from "./lib/account-state";
 import { currentGroup, currentMember, membersOf, nowMs, at, parse } from "./lib/util";
@@ -12,7 +13,7 @@ import { postalCity } from "../../shared/geography";
 import { invalidateAgent, agentBallot, agentVotingChoices } from "./lib/agent-state";
 import { clockMinutes } from "./lib/agent-constraints";
 import type { ReadDb, Tx } from "./lib/types";
-import { huddleTiming, saveHuddleTiming, TIME_OF_DAY, TIME_OF_DAY_WINDOWS } from "./lib/huddle-timing";
+import { huddleTiming, saveHuddleTiming, memberTimePreference, TIME_OF_DAY } from "./lib/huddle-timing";
 
 const result = t.object("ScheduleHuddleResult", { ok: t.bool(), message: t.string(), date: t.option(t.string()), windowStart: t.option(t.string()), windowEnd: t.option(t.string()) });
 const failed = (message: string) => ({ ok: false, message, date: undefined, windowStart: undefined, windowEnd: undefined });
@@ -61,17 +62,44 @@ export const setHuddleWindow = spacetimedb.reducer({ date: t.string(), windowSta
   saveHuddleTiming(tx, group.id, "manual");
 });
 
+function clearGroupTime(tx: Tx, groupId: string, legacyHostPreference?: string) {
+  invalidateAgent(tx, groupId);
+  const group = tx.db.group.id.find(groupId)!;
+  tx.db.group.id.update({ ...group, date: "", windowStart: "", windowEnd: "" });
+  tx.db.group_schedule.groupId.delete(groupId);
+  saveHuddleTiming(tx, groupId, "pending", legacyHostPreference);
+}
+
 export const setHuddleTimePreference = spacetimedb.reducer({ timeOfDay: t.string() }, (tx, { timeOfDay }) => {
+  const me = requireMember(tx), group = tx.db.group.id.find(me.groupId)!;
+  const state = tx.db.agent_session.groupId.find(group.id);
+  if (!state) throw new SenderError("Time preferences are available in coordinator Huddles.");
+  if (!TIME_OF_DAY.has(timeOfDay)) throw new SenderError("Choose Any time, Morning, Afternoon or Evening.");
+  if (state.status === "planning") throw new SenderError("Wait for the current planning run before changing your time preference.");
+  if (memberTimePreference(tx.db, group.id, me.id) === timeOfDay) return;
+  const preference = { memberId: me.id, timeOfDay };
+  if (tx.db.member_time_preference.memberId.find(me.id)) tx.db.member_time_preference.memberId.update(preference);
+  else tx.db.member_time_preference.insert(preference);
+  // Keep the legacy timing column compatible for older host clients, but it no
+  // longer filters out other participants' preferred windows.
+  clearGroupTime(tx, group.id, me.identity.isEqual(group.hostIdentity) ? timeOfDay : undefined);
+});
+
+// Calendar-search failures must clear the selected window, never overwrite an
+// individual's preference merely to reset shared scheduling state.
+export const clearHuddleWindow = spacetimedb.reducer((tx) => {
   const group = hostGroup(tx), state = tx.db.agent_session.groupId.find(group.id)!;
-  if (!TIME_OF_DAY.has(timeOfDay)) throw new SenderError("Choose Flexible, Morning, Afternoon or Evening.");
   if (state.status === "planning") throw new SenderError("Wait for the current planning run before changing its time.");
-  const current = huddleTiming(tx.db, group.id);
-  if (current.timeOfDay === timeOfDay && current.source === "pending") return;
-  invalidateAgent(tx, group.id);
-  const fresh = tx.db.group.id.find(group.id)!;
-  tx.db.group.id.update({ ...fresh, date: "", windowStart: "", windowEnd: "" });
-  tx.db.group_schedule.groupId.delete(group.id);
-  saveHuddleTiming(tx, group.id, "pending", timeOfDay);
+  if (!group.date && !group.windowStart && !group.windowEnd && huddleTiming(tx.db, group.id).source === "pending") return;
+  clearGroupTime(tx, group.id);
+});
+
+export const my_time_preference = spacetimedb.view({ name: "my_time_preference", public: true }, t.option(t.row("MyTimePreferenceRow", {
+  memberId: t.string().primaryKey(), groupId: t.string(), timeOfDay: t.string(),
+})), ctx => {
+  const me = currentMember(ctx.db, ctx.sender);
+  return me && ctx.db.agent_session.groupId.find(me.groupId)
+    ? { memberId: me.id, groupId: me.groupId, timeOfDay: memberTimePreference(ctx.db, me.groupId, me.id) } : undefined;
 });
 
 export const my_huddle_timing = spacetimedb.view({ name: "my_huddle_timing", public: true }, t.option(t.row("MyHuddleTimingRow", {
@@ -100,16 +128,15 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
         connections, members: connections.map(connection => {
           const need = tx.db.agent_need.memberId.find(connection.memberId);
           const hard = parse(tx.db.private_prefs.memberId.find(connection.memberId)?.hardJson);
-          return { accountId: connection.accountId, prompt: need?.text ?? "", maxOutingMinutes: hard?.maxOutingMinutes ?? null };
+          return { accountId: connection.accountId, timeOfDay: memberTimePreference(tx.db, group.id, connection.memberId), prompt: need?.text ?? "", maxOutingMinutes: hard?.maxOutingMinutes ?? null };
         }) };
     });
     const duration = args.durationMinutes || Math.floor(Math.min(120, ...snapshot.members.map(member => member.maxOutingMinutes ?? 720)));
     if (duration < 15 || snapshot.members.some(member => member.maxOutingMinutes != null && duration > member.maxOutingMinutes))
       return failed("The requested length exceeds a participant's private outing limit. Try a shorter outing; no limits were changed.");
-    const [earliest, latest] = TIME_OF_DAY_WINDOWS[snapshot.timeOfDay] ?? TIME_OF_DAY_WINDOWS.flexible;
-    const dayStart = args.dayStart > earliest ? args.dayStart : earliest;
-    const dayEnd = args.dayEnd < latest ? args.dayEnd : latest;
-    if (dayStart >= dayEnd) return failed("The search window does not overlap the selected time of day. Choose another search window or Any time.");
+    // Explicit search bounds are hard; each member's day-part choice is soft
+    // context for Claude, not a host-only veto over the search range.
+    const dayStart = args.dayStart, dayEnd = args.dayEnd;
     const response = callApi(ctx, "/connectors/calendar/schedule", {
       connections: snapshot.connections.map(({ accountId, tokenCiphertext }) => ({ accountId, tokenCiphertext })),
       members: snapshot.members, timeMin: args.searchStart, timeMax: args.searchEnd,

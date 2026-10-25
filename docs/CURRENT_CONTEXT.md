@@ -1,5 +1,16 @@
 # Huddle current product and architecture
 
+**Participant time preferences — October 24:** the tested extension lets every
+joined participant, including non-hosts, save their own optional Any time,
+Morning, Afternoon or Evening choice per Huddle. Claude receives all choices
+equally when choosing a common calendar opening; conflicts allow a compromise.
+Actual calendar busy periods, outing-length limits and full venue opening hours
+remain binding. A host still initiates the search or explicitly picks a manual
+window. Editing a choice invalidates the old shared time, plans and votes without
+changing private budgets or dietary needs. The additive module/API/UI are ready
+for coordinated release; the isolated preview passed the checks recorded in
+[operations](ACCOUNTS_RUNBOOK.md).
+
 Updated October 24, 2026. This is the current direction agreed with Max. It takes
 precedence over conflicting product scope, math requirements, ownership and
 hosting proposals in the original build brief and task split. It describes the

@@ -11,6 +11,7 @@ import CancelHuddleInvitationReducer from "../cancel_huddle_invitation_reducer";
 import CastVoteReducer from "../cast_vote_reducer";
 import ClearAccountContextReducer from "../clear_account_context_reducer";
 import ClearFriendContactReducer from "../clear_friend_contact_reducer";
+import ClearHuddleWindowReducer from "../clear_huddle_window_reducer";
 import ClearInvitationsReducer from "../clear_invitations_reducer";
 import ClearOriginReducer from "../clear_origin_reducer";
 import ConfirmAgentNeedsReducer from "../confirm_agent_needs_reducer";
@@ -50,6 +51,7 @@ export type CancelHuddleInvitationParams = __Infer<typeof CancelHuddleInvitation
 export type CastVoteParams = __Infer<typeof CastVoteReducer>;
 export type ClearAccountContextParams = __Infer<typeof ClearAccountContextReducer>;
 export type ClearFriendContactParams = __Infer<typeof ClearFriendContactReducer>;
+export type ClearHuddleWindowParams = __Infer<typeof ClearHuddleWindowReducer>;
 export type ClearInvitationsParams = __Infer<typeof ClearInvitationsReducer>;
 export type ClearOriginParams = __Infer<typeof ClearOriginReducer>;
 export type ConfirmAgentNeedsParams = __Infer<typeof ConfirmAgentNeedsReducer>;

@@ -1,5 +1,23 @@
 # Connectors: Messages invitations and Google Calendar
 
+**Participant time preference extension — October 24, tested for release:**
+`set_huddle_time_preference({timeOfDay})` now derives the caller's current
+membership and accepts `flexible|morning|afternoon|evening` for any joined member.
+The private `member_time_preference` table and scoped `my_time_preference` view
+store/expose only that member's choice per Huddle. Existing host choices fall
+back to the legacy timing row; other members default to Flexible. A changed
+choice invalidates the selected shared window, active run, votes and in-flight
+calendar proposal; unchanged values are no-ops. Private needs remain saved.
+
+The protected `POST /connectors/calendar/schedule` request adds optional
+`members[].timeOfDay` (default `flexible`, validated enum). All members' choices
+reach Claude privately. They are soft daypart preferences, not a host-only hard
+search filter; actual free/busy, explicit search bounds, outing lengths and
+opening hours remain binding. Public responses do not expose the private
+choices. The host retains `schedule_huddle` and manual `set_huddle_window`;
+new host-only `clear_huddle_window()` clears shared timing without overwriting
+anyone's preference. This extension does not create Google events.
+
 **Personal Calendar update (shared release active October 24):** every participant, including a
 non-host, uses **Add to my calendar** on Done. Each request can write only the
 authenticated owner's connected primary calendar. The host cannot add events to
@@ -59,6 +77,9 @@ account ID to read/write someone else's connector.
 | `my_connectors` | Own accountId, messageEnabled, messageDestination, messageStatus, calendarStatus, optional calendarEmail/calendarError and calendarEventConsent. |
 | `my_invitation_deliveries` | Sender/recipient only: invitationId, status and optional safe error; no recipient destination, credential or calendar contents. |
 | `my_group_connectors` | Current group only: memberId, connected and eventConsent booleans. No busy intervals, titles, email or event IDs. |
+| `set_huddle_time_preference` | Any joined member; timeOfDay enum; edits only the authenticated member’s private choice and invalidates stale shared timing. |
+| `my_time_preference` | Own current membership only: memberId, groupId and timeOfDay. |
+| `clear_huddle_window` | Host-only, no arguments; clears shared time without changing personal preferences. |
 | `schedule_huddle` | Host-only searchStart/searchEnd, dayStart/dayEnd, durationMinutes and timeZone; require all current members' calendar connections before checking a common slot. |
 | `set_huddle_window` | Host-only date, windowStart/windowEnd and `America/Los_Angeles`; explicit manual fallback that makes no calendar-availability claim. |
 | `confirm_meetup` | Any signed-in participant: runId, planId only. Require the current complete timed winner and the caller’s connected, opted-in calendar. Derive accountId from authentication; enqueue one owner-scoped request. |

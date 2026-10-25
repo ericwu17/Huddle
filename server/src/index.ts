@@ -30,5 +30,5 @@ export { saveMessageConnector, setCalendarEventConsent, disconnectGoogleCalendar
 export { searchMacContacts, saveFriendContact, clearFriendContact, my_friend_contact_destinations } from "./contacts";
 export { sendInvitationMessage } from "./connectors";
 export { parseHuddleIntent, createInvitationHuddle, createNamedInvitationHuddle } from "./invitations";
-export { scheduleHuddle, setHuddleWindow, setHuddleTimePreference, my_huddle_timing, confirmMeetup, runMeetupJob, runPersonalMeetupJob, my_meetup } from "./scheduling";
+export { scheduleHuddle, setHuddleWindow, clearHuddleWindow, setHuddleTimePreference, my_huddle_timing, my_time_preference, confirmMeetup, runMeetupJob, runPersonalMeetupJob, my_meetup } from "./scheduling";
 export { createResultShare, getResultShare } from "./sharing";

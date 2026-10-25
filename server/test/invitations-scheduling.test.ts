@@ -281,14 +281,20 @@ describe("calendar scheduling snapshot and meetup authorization", () => {
     expect(venues.every((venue: any) => pool.venues.find((v: any) => v.place.id === venue.placeId).place.address.includes(", Oakland,"))).toBe(true);
   });
 
-  it("starts invitation Huddles unscheduled and keeps optional time preferences host-owned", () => {
+  it("lets each joined participant save only their own optional time preference", () => {
     const s = setup(), group = s.joined();
     expect(s.test.db.group.id.find(group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "" });
     expect(api.my_huddle_timing(s.test.viewContext(s.users[0]))).toMatchObject({ timeOfDay: "flexible", source: "pending" });
-    expect(() => s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "morning" }))).toThrow(/host/);
+    s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "morning" }));
+    expect(api.my_time_preference(s.test.viewContext(s.users[1]))).toMatchObject({ timeOfDay: "morning" });
+    expect(api.my_time_preference(s.test.viewContext(s.users[0]))).toMatchObject({ timeOfDay: "flexible" });
+    expect(() => s.reduce(s.users[2], tx => api.setHuddleTimePreference(tx, { timeOfDay: "evening" }))).toThrow();
+    expect(api.my_time_preference(s.test.viewContext(s.users[2]))).toBeUndefined();
     expect(() => s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "invented" }))).toThrow();
     s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "afternoon" }));
     expect(api.my_huddle_timing(s.test.viewContext(s.users[1]))).toMatchObject({ timeOfDay: "afternoon", source: "pending" });
+    expect(api.my_time_preference(s.test.viewContext(s.users[1]))).toMatchObject({ timeOfDay: "morning" });
+    expect(api.my_time_preference(s.test.viewContext(s.users[0]))).toMatchObject({ timeOfDay: "afternoon" });
     expect(s.calls).toEqual([]);
     expect(api.my_huddle_timing(s.test.viewContext(s.users[2]))).toBeUndefined();
   });
@@ -313,13 +319,52 @@ describe("calendar scheduling snapshot and meetup authorization", () => {
     expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
   });
 
-  it("enforces the saved day part against a service reply even when the caller supplies a full-day search", () => {
+  it("sends every member's soft preference to Claude without making the host's preference a hard filter", () => {
     const s = setup(), group = s.joined(); s.calendars();
     s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "morning" }));
-    expect(api.scheduleHuddle(s.proc(s.users[0]), { ...scheduleArgs, dayStart: "00:00", dayEnd: "23:59" }).ok).toBe(false);
-    expect(s.calls[0].body).toMatchObject({ dayStart: "06:00", dayEnd: "12:00" });
-    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
+    s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "evening" }));
+    expect(api.scheduleHuddle(s.proc(s.users[0]), { ...scheduleArgs, dayStart: "00:00", dayEnd: "23:59" }).ok).toBe(true);
+    expect(s.calls[0].body).toMatchObject({ dayStart: "00:00", dayEnd: "23:59", members: [
+      { accountId: s.account(0).accountId, timeOfDay: "morning" },
+      { accountId: s.account(1).accountId, timeOfDay: "evening" },
+    ] });
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe(chosen.date);
   });
+
+  it("rejects an in-flight time after a non-host changes their preference", () => {
+    const s = setup(), group = s.joined(); s.calendars();
+    s.intercept(() => s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "afternoon" })));
+    expect(api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs).ok).toBe(false);
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
+    expect(api.my_time_preference(s.test.viewContext(s.users[1]))).toMatchObject({ timeOfDay: "afternoon" });
+  });
+
+  it("invalidates a saved window on a non-host preference change without changing anybody's budget", () => {
+    const s = setup(), group = s.joined(); s.prefs(0, 30, 90); s.prefs(1, 40, 180);
+    s.reduce(s.users[0], tx => api.setHuddleWindow(tx, { date: chosen.date, windowStart: "17:00", windowEnd: "18:30", timeZone: "America/Los_Angeles" }));
+    const revision = s.test.db.agent_session.groupId.find(group.groupId)!.revision;
+    const before = [...s.test.db.private_prefs.iter()].map(row => ({ id: row.memberId, hard: row.hardJson }));
+    s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "afternoon" }));
+    expect(s.test.db.agent_session.groupId.find(group.groupId)!.revision).toBe(revision + 1);
+    expect(s.test.db.group.id.find(group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "", latestRunId: undefined });
+    expect([...s.test.db.private_prefs.iter()].map(row => ({ id: row.memberId, hard: row.hardJson }))).toEqual(before);
+  });
+
+  it("keeps personal choices when the host clears a failed calendar window and ignores unchanged preferences", () => {
+    const s = setup(), group = s.joined();
+    s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "afternoon" }));
+    s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "evening" }));
+    s.reduce(s.users[0], tx => api.setHuddleWindow(tx, { date: chosen.date, windowStart: "17:00", windowEnd: "19:00", timeZone: "America/Los_Angeles" }));
+    const revision = s.test.db.agent_session.groupId.find(group.groupId)!.revision;
+    s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "evening" }));
+    expect(s.test.db.agent_session.groupId.find(group.groupId)!.revision).toBe(revision);
+    expect(() => s.reduce(s.users[1], tx => api.clearHuddleWindow(tx, {}))).toThrow(/host/);
+    s.reduce(s.users[0], tx => api.clearHuddleWindow(tx, {}));
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
+    expect(api.my_time_preference(s.test.viewContext(s.users[0]))).toMatchObject({ timeOfDay: "afternoon" });
+    expect(api.my_time_preference(s.test.viewContext(s.users[1]))).toMatchObject({ timeOfDay: "evening" });
+  });
+
   it("requires the current host and every participant's own connected calendar", () => {
     const s = setup(); s.joined(); s.calendars([0]);
     expect(() => api.scheduleHuddle(s.proc(s.users[1]), scheduleArgs)).toThrow(/host/);

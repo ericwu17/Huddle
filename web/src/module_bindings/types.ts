@@ -528,6 +528,12 @@ export const MemberLocation = __t.object("MemberLocation", {
 });
 export type MemberLocation = __Infer<typeof MemberLocation>;
 
+export const MemberTimePreference = __t.object("MemberTimePreference", {
+  memberId: __t.string(),
+  timeOfDay: __t.string(),
+});
+export type MemberTimePreference = __Infer<typeof MemberTimePreference>;
+
 export const MessageConnector = __t.object("MessageConnector", {
   accountId: __t.string(),
   enabled: __t.bool(),
@@ -873,6 +879,16 @@ export type MyPrivateRow = __Infer<typeof MyPrivateRow>;
 
 export const MyScout = __t.object("MyScout", {});
 export type MyScout = __Infer<typeof MyScout>;
+
+export const MyTimePreference = __t.object("MyTimePreference", {});
+export type MyTimePreference = __Infer<typeof MyTimePreference>;
+
+export const MyTimePreferenceRow = __t.object("MyTimePreferenceRow", {
+  memberId: __t.string(),
+  groupId: __t.string(),
+  timeOfDay: __t.string(),
+});
+export type MyTimePreferenceRow = __Infer<typeof MyTimePreferenceRow>;
 
 export const MyVotes = __t.object("MyVotes", {});
 export type MyVotes = __Infer<typeof MyVotes>;

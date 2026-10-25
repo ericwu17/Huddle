@@ -25,3 +25,13 @@ export function saveHuddleTiming(tx: Tx, groupId: string, source: string, timeOf
     membersKey: source === "calendar" ? Array.from(tx.db.member.groupId.filter(groupId)).map(member => member.id).sort().join("|") : "" };
   if (old) tx.db.huddle_timing.groupId.update(row); else tx.db.huddle_timing.insert(row);
 }
+
+// Private to each membership. Preserve a legacy host preference until that host
+// explicitly changes it; other participants default to Flexible.
+export function memberTimePreference(db: ReadDb, groupId: string, memberId: string): string {
+  const personal = db.member_time_preference.memberId.find(memberId);
+  if (personal) return personal.timeOfDay;
+  const group = db.group.id.find(groupId), member = db.member.id.find(memberId);
+  return group && member?.identity.isEqual(group.hostIdentity)
+    ? db.huddle_timing.groupId.find(groupId)?.timeOfDay ?? "flexible" : "flexible";
+}

@@ -39,6 +39,7 @@ import CancelHuddleInvitationReducer from "./cancel_huddle_invitation_reducer";
 import CastVoteReducer from "./cast_vote_reducer";
 import ClearAccountContextReducer from "./clear_account_context_reducer";
 import ClearFriendContactReducer from "./clear_friend_contact_reducer";
+import ClearHuddleWindowReducer from "./clear_huddle_window_reducer";
 import ClearInvitationsReducer from "./clear_invitations_reducer";
 import ClearOriginReducer from "./clear_origin_reducer";
 import ConfirmAgentNeedsReducer from "./confirm_agent_needs_reducer";
@@ -121,6 +122,7 @@ import MyOffersRow from "./my_offers_table";
 import MyPlanRunsRow from "./my_plan_runs_table";
 import MyPrivateRow from "./my_private_table";
 import MyScoutRow from "./my_scout_table";
+import MyTimePreferenceRow from "./my_time_preference_table";
 import MyVotesRow from "./my_votes_table";
 
 /** Type-only namespace exports for generated type groups. */
@@ -337,6 +339,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyScoutRow),
+  myTimePreference: __table({
+    name: 'my_time_preference',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyTimePreferenceRow),
   myVotes: __table({
     name: 'my_votes',
     indexes: [
@@ -353,6 +362,7 @@ const reducersSchema = __reducers(
   __reducerSchema("vote", CastVoteReducer),
   __reducerSchema("clear_account_context", ClearAccountContextReducer),
   __reducerSchema("clear_friend_contact", ClearFriendContactReducer),
+  __reducerSchema("clear_huddle_window", ClearHuddleWindowReducer),
   __reducerSchema("clear_invitations", ClearInvitationsReducer),
   __reducerSchema("clear_origin", ClearOriginReducer),
   __reducerSchema("confirm_agent_needs", ConfirmAgentNeedsReducer),
@@ -469,6 +479,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "my_private": Omit<typeof tablesSchema.schemaType.tables["myPrivate"], "accessorName"> & { readonly accessorName: "my_private" };
     /** @deprecated Use `myScout` instead. This alias will be removed in the next major version. */
     readonly "my_scout": Omit<typeof tablesSchema.schemaType.tables["myScout"], "accessorName"> & { readonly accessorName: "my_scout" };
+    /** @deprecated Use `myTimePreference` instead. This alias will be removed in the next major version. */
+    readonly "my_time_preference": Omit<typeof tablesSchema.schemaType.tables["myTimePreference"], "accessorName"> & { readonly accessorName: "my_time_preference" };
     /** @deprecated Use `myVotes` instead. This alias will be removed in the next major version. */
     readonly "my_votes": Omit<typeof tablesSchema.schemaType.tables["myVotes"], "accessorName"> & { readonly accessorName: "my_votes" };
   };
@@ -519,6 +531,7 @@ const tableAccessorAliases = {
   "my_plan_runs": "myPlanRuns",
   "my_private": "myPrivate",
   "my_scout": "myScout",
+  "my_time_preference": "myTimePreference",
   "my_votes": "myVotes",
 } as const;
 
@@ -600,6 +613,8 @@ export type DbView = __DbViewBase & {
   readonly "my_private": __DbViewBase["myPrivate"];
   /** @deprecated Use `myScout` instead. This alias will be removed in the next major version. */
   readonly "my_scout": __DbViewBase["myScout"];
+  /** @deprecated Use `myTimePreference` instead. This alias will be removed in the next major version. */
+  readonly "my_time_preference": __DbViewBase["myTimePreference"];
   /** @deprecated Use `myVotes` instead. This alias will be removed in the next major version. */
   readonly "my_votes": __DbViewBase["myVotes"];
 };
@@ -666,6 +681,8 @@ export type Tables = __TablesBase & {
   readonly "my_private": __TablesBase["myPrivate"];
   /** @deprecated Use `myScout` instead. This alias will be removed in the next major version. */
   readonly "my_scout": __TablesBase["myScout"];
+  /** @deprecated Use `myTimePreference` instead. This alias will be removed in the next major version. */
+  readonly "my_time_preference": __TablesBase["myTimePreference"];
   /** @deprecated Use `myVotes` instead. This alias will be removed in the next major version. */
   readonly "my_votes": __TablesBase["myVotes"];
 };

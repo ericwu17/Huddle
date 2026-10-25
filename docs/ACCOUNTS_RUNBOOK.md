@@ -1,5 +1,33 @@
 # Accounts, invitations, preferences and connectors: operations
 
+## Participant time preferences — October 24, 2026
+
+The additive module/API/UI are tested in `huddle-account-max-check` and ready
+for coordinated shared release. On Preferences, every joined member sees
+**Your time preference (optional)** with Any time/Morning/Afternoon/Evening.
+Each choice is private and Huddle-specific. Claude considers all participants
+equally when the host finds a common calendar opening. Conflicts can compromise;
+busy periods, private duration limits and venue opening hours stay binding.
+A host-picked exact time remains an explicit manual override.
+
+Changing either member's choice clears the shared window and invalidates old
+plans/votes and in-flight calendar results. It leaves private needs/caps saved.
+The new `clear_huddle_window` operation resets shared time without resetting
+personal preferences. Legacy saved host choices are retained until edited.
+
+Verification: 129 API tests, 237 module/UI tests (one optional integration skip),
+server typecheck, web build/lint, and 17 connected two-account browser checks
+passed. Desktop/mobile screenshots showed enabled non-host controls without
+overflow or runtime/console errors. Real Claude honored a non-host morning choice
+(9:30–11:00 AM) and evening choice (6:30–8:00 PM) with synthetic free/busy and
+venue facts. These checks made no real Google reads/writes or Messages sends.
+
+Release order: push the backwards-compatible API request/model addition first;
+verify `SchedulingMember.timeOfDay` in the live OpenAPI schema; publish the
+additive module with `--delete-data=never`; then push the matching UI/bindings.
+Preserve Eric Wu's API/voice URLs, Google callback/encryption configuration and
+all catalog/menu/photo rows. No catalog republish is needed for this extension.
+
 ## Maps, city coverage and personal Calendar release — October 24, 2026
 
 Main/Vercel and shared `huddle-calhacks` now include all three approved changes.

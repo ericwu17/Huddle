@@ -5,7 +5,7 @@ import { procedures, reducers } from "../module_bindings";
 import { useGroupConnectors } from "../accountData";
 import { useGroup } from "../groupContext";
 import { useRun } from "../useRun";
-import { useHuddleTiming } from "../huddleTiming";
+import { useHuddleTiming, useMyTimePreference } from "../huddleTiming";
 import { OUTING_TIME_ZONE, TIME_OF_DAY_OPTIONS, berkeleyMidnight, berkeleyToday, dateAfter, dayBounds } from "../calendarTime";
 import { displayTime } from "../venueFormatting";
 
@@ -13,6 +13,7 @@ export default function CalendarTimeSelector() {
   const { group, isHost, agent } = useGroup();
   const calendars = useGroupConnectors();
   const timing = useHuddleTiming();
+  const preference = useMyTimePreference();
   const schedule = useProcedure(procedures.scheduleHuddle);
   const setWindow = useReducer(reducers.setHuddleWindow);
   const setPreference = useReducer(reducers.setHuddleTimePreference);
@@ -26,9 +27,9 @@ export default function CalendarTimeSelector() {
   const [manualEnd, setManualEnd] = useState("");
   const [duration, setDuration] = useState(0);
   const [notice, setNotice] = useState("");
-  const timeOfDay = timing?.groupId === group.id ? timing.timeOfDay : "flexible";
+  const timeOfDay = preference?.groupId === group.id ? preference.timeOfDay : "flexible";
   const scheduled = timing?.groupId === group.id && timing.source !== "pending";
-  const locked = busy || agent?.status === "planning" || timing === undefined;
+  const locked = busy || agent?.status === "planning" || timing === undefined || preference === undefined;
   const allConnected = group.members.length >= 2 && group.members.every(m => calendars?.some(c => c.memberId === m.id && c.connected));
   useEffect(() => {
     let current = true;
@@ -39,18 +40,19 @@ export default function CalendarTimeSelector() {
     <h2 className="card-title">When are we going?</h2>
     {scheduled ? <p><strong>{group.date} · {displayTime(group.window.start)}–{displayTime(group.window.end)}</strong>
       {timing.source === "calendar" ? " · Works with everyone’s calendar" : " · Picked by the host"}</p>
-      : <p>Find a time that works for everyone, or pick one yourself.</p>}
-    {isHost ? <div className="space-y-2"><label className="block font-bold" htmlFor="outing-time-of-day">Time of day (optional)</label>
+      : <p>{isHost ? "Find a time that works for everyone, or pick one yourself." : "Share when you’d prefer to go. The host can find a time using everyone’s preferences."}</p>}
+    <div className="space-y-2"><label className="block font-bold" htmlFor="outing-time-of-day">Your time preference (optional)</label>
       <select id="outing-time-of-day" className="input" value={timeOfDay} disabled={locked} onChange={e => {
         const value = e.target.value;
-        void run(async () => { await setPreference({ timeOfDay: value }); setNotice("Saved. We’ll use this for the next plan."); });
+        void run(async () => { await setPreference({ timeOfDay: value }); setNotice("Saved. Everyone’s time preferences will guide the next shared time search."); });
       }}>{TIME_OF_DAY_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
-    </div> : <p>Time preference: {TIME_OF_DAY_OPTIONS.find(option => option.value === timeOfDay)?.label ?? "Any time"}</p>}
+      <p className="muted text-sm">Any time means you’re flexible. We’ll consider everyone’s preference alongside calendar availability and opening hours.</p>
+    </div>
     <ul className="calendar-members">{group.members.map(m => <li key={m.id}><strong>{m.name}</strong><span className="muted">{calendars === undefined ? "Checking…" : calendars.some(c => c.memberId === m.id && c.connected) ? "Connected ✓" : "Not connected"}</span></li>)}</ul>
     <Link className="underline font-bold" to="/connectors">{allConnected ? "Calendar settings" : "Connect your calendar"}</Link>
     {isHost ? <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(async () => {
       const response = await schedule({ searchStart: berkeleyMidnight(searchStart), searchEnd: berkeleyMidnight(dateAfter(searchEnd, 1)),
-        ...dayBounds(timeOfDay), durationMinutes: duration, timeZone: OUTING_TIME_ZONE });
+        ...dayBounds("flexible"), durationMinutes: duration, timeZone: OUTING_TIME_ZONE });
       setNotice(response.message);
       if (!response.ok) throw new Error(response.message);
     }); }}>

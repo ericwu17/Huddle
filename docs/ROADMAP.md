@@ -1,5 +1,14 @@
 # Huddle roadmap
 
+**Participant time preferences — tested, awaiting shared release:** all members
+can choose optional Any time/Morning/Afternoon/Evening independently. Claude
+considers every choice during common free/busy scheduling; conflicting dayparts
+are soft preferences. Non-host edits clear stale shared times and plans/votes;
+they cannot change another person's preference, budgets or calendar. Manual exact
+windows and starting a calendar search remain host-owned. Verification: 129 API
+tests, 237 module/UI tests (one optional skip), 17 connected two-account browser
+checks and two real-Claude scheduling checks with synthetic free/busy passed.
+
 **Personal Calendar addition, shared release active:** Done exposes **Add to my calendar**
 to every participant. Requests/status are owner-scoped, API writes accept one
 account, and legacy group-wide dispatch is retired. Provider tests use mocks;

@@ -10,6 +10,11 @@ export function useHuddleTiming() {
   return ready ? rows[0] ?? null : undefined;
 }
 
+export function useMyTimePreference() {
+  const [rows, ready] = useTable(tables.myTimePreference);
+  return ready ? rows[0] ?? null : undefined;
+}
+
 // Find plans authorizes a free/busy check. Missing/failed calendar responses
 // never become a claim that everyone is free.
 export function useCalendarPlanning() {
@@ -18,7 +23,7 @@ export function useCalendarPlanning() {
   const calendars = useGroupConnectors();
   const schedule = useProcedure(procedures.scheduleHuddle);
   const find = useReducer(reducers.findAgentPlans);
-  const clearTime = useReducer(reducers.setHuddleTimePreference);
+  const clearTime = useReducer(reducers.clearHuddleWindow);
   const [notice, setNotice] = useState("");
   const ready = timing !== undefined && calendars !== undefined;
   async function findPlans() {
@@ -28,11 +33,11 @@ export function useCalendarPlanning() {
       if (connected) {
         setNotice("Finding a shared calendar opening…");
         try {
-          const response = await schedule(defaultCalendarSearch(timing.timeOfDay));
-          if (!response.ok) await clearTime({ timeOfDay: timing.timeOfDay });
+          const response = await schedule(defaultCalendarSearch());
+          if (!response.ok) await clearTime();
           setNotice(response.ok ? "A shared calendar opening was found." : "No shared time was chosen. Showing venue ideas with time unset.");
         } catch {
-          await clearTime({ timeOfDay: timing.timeOfDay });
+          await clearTime();
           setNotice("Calendars could not be checked. Showing venue ideas with time unset.");
         }
       } else setNotice("Time is flexible. Connect everyone’s calendar or choose a time to build an itinerary.");
