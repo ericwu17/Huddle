@@ -60,6 +60,12 @@ addressed invitation creates/reuses a durable membership and selects that group
 for this device. Selecting an old huddle changes no readiness, needs, votes or
 booking. Joining never implies readiness or acceptance of anyone else's limits.
 
+The membership view's `status` is a list label: `finished` means the current
+coordinator ballot has everyone's vote and a winner (including a resolved Spin),
+or the group is already booked. Incomplete/tied votes stay `voting`; changed
+preferences or a new planning run restore their current in-progress label.
+The stored group lifecycle is unchanged, so re-voting and Done still work.
+
 ## Explicit Huddle names
 
 Home's **Start a huddle** opens a themed naming dialog before the invitation/lobby

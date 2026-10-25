@@ -110,6 +110,41 @@ function setup() {
     intercept: (fn: (path: string, body: any) => void) => { intercept = fn; } };
 }
 
+describe("account list completion status", () => {
+  it("shows finished for both members after the current vote has a winner, without changing the group lifecycle", () => {
+    const s = setup(); const group = s.joined(); const plan = s.ballot(group.groupId, false);
+    const status = (index: number) => api.my_account_memberships(s.test.viewContext(s.users[index]))[0].status;
+    expect(status(0)).toBe("voting"); expect(status(1)).toBe("voting");
+    s.reduce(s.users[1], tx => api.castVote(tx, { runId: plan.runId, planId: plan.planId }));
+    expect(status(0)).toBe("finished"); expect(status(1)).toBe("finished");
+    expect(s.test.db.group.id.find(group.groupId)?.status).toBe("voting");
+    expect(api.my_votes(s.test.viewContext(s.users[0]))).toHaveLength(2);
+    s.prefs(1, 12);
+    expect(status(0)).toBe("eliciting"); expect(status(1)).toBe("eliciting");
+  });
+
+  it("keeps an unresolved tie as voting and marks it finished after Spin chooses a current winner", () => {
+    const s = setup(); const group = s.joined(); const plan = s.ballot(group.groupId);
+    s.reduce(internal, tx => {
+      const row = tx.db.plan_run.runId.find(plan.runId)!;
+      const result = JSON.parse(row.resultJson!);
+      result.plans.push({ ...result.plans[0], id: "another-current-plan" });
+      tx.db.plan_run.runId.update({ ...row, resultJson: JSON.stringify(result) });
+    });
+    s.reduce(s.users[1], tx => api.castVote(tx, { runId: plan.runId, planId: "another-current-plan" }));
+    expect(api.my_account_memberships(s.test.viewContext(s.users[0]))[0].status).toBe("voting");
+    api.doRoulette(s.proc(s.users[0]), { runId: plan.runId });
+    expect(api.my_account_memberships(s.test.viewContext(s.users[0]))[0].status).toBe("finished");
+  });
+
+  it("also displays finished for a booked Huddle without changing its stored status", () => {
+    const s = setup(); const group = s.joined(); s.ballot(group.groupId);
+    s.reduce(internal, tx => tx.db.group.id.update({ ...tx.db.group.id.find(group.groupId)!, status: "booked" }));
+    expect(api.my_account_memberships(s.test.viewContext(s.users[1]))[0].status).toBe("finished");
+    expect(s.test.db.group.id.find(group.groupId)?.status).toBe("booked");
+  });
+});
+
 describe("private invitation intent and atomic start", () => {
   it("supplies only the owner's contacts and replaces model prose with a fixed public summary", () => {
     const s = setup(); s.friend(); s.friend(1, 2);

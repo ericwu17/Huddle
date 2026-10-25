@@ -5,6 +5,7 @@ import { callApi } from "./lib/api";
 import { at, newId, nowMs } from "./lib/util";
 import { membershipKey, requireAccount } from "./lib/account-state";
 import type { Proc, Tx } from "./lib/types";
+import { agentBallot } from "./lib/agent-state";
 
 const DAY = 24 * 60 * 60 * 1000;
 const WINDOW = 10 * 60 * 1000;
@@ -136,7 +137,12 @@ export const my_account_memberships = spacetimedb.view({ name: "my_account_membe
   return Array.from(ctx.db.account_membership.accountId.filter(account.id)).flatMap(m => {
     const group = ctx.db.group.id.find(m.groupId);
     const member = ctx.db.member.id.find(m.memberId);
-    return group && member?.identity.isEqual(account.principal) ? [{ ...m, code: group.code,
-      name: member.name, status: group.status, date: group.date }] : [];
+    if (!group || !member?.identity.isEqual(account.principal)) return [];
+    // The account list describes the result, while the group lifecycle stays
+    // compatible with re-voting, Done, Calendar and booking.
+    const finished = group.status === "booked" || group.status === "voting" && !!group.latestRunId &&
+      !!agentBallot(ctx.db, group.id, group.latestRunId).winner;
+    return [{ ...m, code: group.code, name: member.name,
+      status: finished ? "finished" : group.status, date: group.date }];
   });
 });
