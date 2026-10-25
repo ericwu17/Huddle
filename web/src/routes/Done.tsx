@@ -11,7 +11,7 @@ import ShareResultAction from "../components/ShareResultAction";
 
 export default function Done() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
-  const { group, agent, session, isHost } = useGroup();
+  const { group, agent, session } = useGroup();
   const { runId, loading, current, complete, winner, winnerNumber } = useAgentBallot(group, agent, session.memberId);
   const orders = useAgentOrders(runId, session.memberId);
   if (loading) return <p className="card" role="status">Loading the group’s choice…</p>;
@@ -25,7 +25,7 @@ export default function Done() {
     <div><span className="sticker sticker-lime">Everyone has voted</span><PageHeading lead="It’s" accent="a plan!" /></div>
     <ChosenResult date={group.date} choice={winner} optionNumber={winnerNumber ?? undefined} order={orders.find(order => order.planId === winner.id)} />
     <Link className="btn" to={`/g/${group.id}/vote`}>Change my vote</Link>
-    {timed ? <><MeetupCalendarAction key={`${runId}:${winner.id}`} runId={runId} planId={winner.id} isHost={isHost} /><CalendarDownload key={`calendar:${runId}:${winner.id}`} date={group.date} plan={timed} runId={runId} /></> : null}
+    {timed ? <><MeetupCalendarAction key={`${runId}:${winner.id}`} runId={runId} planId={winner.id} /><CalendarDownload key={`calendar:${runId}:${winner.id}`} date={group.date} plan={timed} runId={runId} /></> : null}
     <ShareResultAction key={`${runId}:${winner.id}`} runId={runId} planId={winner.id} />
   </div>;
 }

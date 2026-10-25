@@ -48,7 +48,7 @@ export default function Home() {
     void run(async () => {
       await select({ groupId: member.groupId });
       saveSession({ groupId: member.groupId, memberId: member.memberId, code: member.code, name: member.name });
-      navigate(`/g/${member.groupId}/lobby`, { replace: true });
+      navigate(`/g/${member.groupId}/${["finished", "booked"].includes(member.status) ? "done" : "lobby"}`, { replace: true });
     });
   }, [requestedGroup, account, memberships, run, select, navigate]);
 
@@ -91,7 +91,7 @@ export default function Home() {
     void run(async () => {
       await select({ groupId: m.groupId });
       saveSession({ groupId: m.groupId, memberId: m.memberId, code: m.code, name: m.name });
-      navigate(`/g/${m.groupId}/lobby`);
+      navigate(`/g/${m.groupId}/${["finished", "booked"].includes(m.status) ? "done" : "lobby"}`);
     });
   }
 

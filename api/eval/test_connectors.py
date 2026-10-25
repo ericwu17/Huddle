@@ -242,6 +242,9 @@ class ConnectorTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(HTTPException) as error:
             await service.availability(availability([swapped]))
         self.assertEqual(error.exception.status_code, 409)
+        written = await service.create_events(meetup([swapped]))
+        self.assertEqual(written.created, [])
+        self.assertEqual(len(written.failed), 1)
 
     async def test_refresh_uses_google_credentials_and_returns_encrypted_updated_tokens(self):
         service = await self.service(lambda _request: httpx.Response(200, json={"calendars": {"primary": {"busy": []}}}))
@@ -295,19 +298,19 @@ class ConnectorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.created, [])
         self.assertIn("busy", result.failed[0].message)
 
-    async def test_partial_event_provider_failure_is_reported_per_account(self):
+    async def test_event_write_rejects_multiple_accounts_before_any_provider_request(self):
+        calls = []
         def handler(request):
-            if request.method == "GET": return httpx.Response(404)
-            if request.url.path.endswith("/freeBusy"):
-                return httpx.Response(200, json={"calendars": {"primary": {"busy": []}}})
-            event = json.loads(request.content)
-            if event["extendedProperties"]["private"]["huddleAccountId"] == "account-two":
-                return httpx.Response(503)
-            return httpx.Response(200, json=event)
+            calls.append(request)
+            return httpx.Response(503)
         service = await self.service(handler)
-        result = await service.create_events(meetup([connection(service), connection(service, "account-two")]))
-        self.assertEqual([value.accountId for value in result.created], ["account-one"])
-        self.assertEqual([value.accountId for value in result.failed], ["account-two"])
+        with self.assertRaises(ValueError):
+            meetup([connection(service), connection(service, "account-two")])
+        from api.scheduling import MeetupRequest
+        with self.assertRaises(ValueError):
+            MeetupRequest(meetingId="test", connections=[connection(service), connection(service, "account-two")],
+                summary="Huddle", location="Park", date="2026-10-24", startTime="17:00", endTime="19:00")
+        self.assertEqual(calls, [])
 
     async def test_concurrent_event_insert_conflict_recovers_the_same_event_without_a_second_write(self):
         stored, writes = {}, []

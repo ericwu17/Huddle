@@ -1,5 +1,12 @@
 # Connectors: Messages invitations and Google Calendar
 
+**Personal Calendar update (branch preview):** every participant, including a
+non-host, uses **Add to my calendar** on Done. Each request can write only the
+authenticated owner's connected primary calendar. The host cannot add events to
+another participant's account. Free/busy scheduling still checks the group's
+connected calendars; choosing the shared time remains host-owned. Shared release
+is pending. The original rollout narrative below is retained as history.
+
 October 24, 2026. The additive invitation, scheduling and connector backend is
 published only to isolated `huddle-account-max-check`. The branch is uncommitted/
 unpushed; shared `huddle-calhacks` and Vercel are unchanged. Google client settings
@@ -52,8 +59,8 @@ account ID to read/write someone else's connector.
 | `my_group_connectors` | Current group only: memberId, connected and eventConsent booleans. No busy intervals, titles, email or event IDs. |
 | `schedule_huddle` | Host-only searchStart/searchEnd, dayStart/dayEnd, durationMinutes and timeZone; require all current members' calendar connections before checking a common slot. |
 | `set_huddle_window` | Host-only date, windowStart/windowEnd and `America/Los_Angeles`; explicit manual fallback that makes no calendar-availability claim. |
-| `confirm_meetup` | Host-only runId, planId; require the current valid completed ballot and opted-in connected accounts before queuing calendar writes. |
-| `my_meetup` | Current huddle/run only: runId, planId, status and safe aggregate message; no individual event details. |
+| `confirm_meetup` | Any signed-in participant: runId, planId only. Require the current complete timed winner and the caller’s connected, opted-in calendar. Derive accountId from authentication; enqueue one owner-scoped request. |
+| `my_meetup` | Caller’s own current-huddle request only: runId, planId, status, message. Other participants’ requests and event details are hidden. |
 | `search_mac_contacts` | Designated Mac owner only; query of 2–80 characters returns bounded matching Contacts records, not the address book. |
 | `save_friend_contact` | Designated owner only; friendAccountId, contactId, contactName, destination; require an accepted Huddle friend and explicit address selection. |
 | `clear_friend_contact` | Designated owner only; friendAccountId; remove that mapping and suppress its queued dispatch. |
@@ -201,20 +208,26 @@ Berkeley's `America/Los_Angeles` timezone. Manual selection clears calendar-chec
 metadata and does not assert anyone is free. Both invalidate old planning results;
 neither creates calendar events.
 
-Event creation uses a stable meeting ID and only accounts that explicitly
-enabled event writes. It creates individual calendar events without external
-guest invitations. A simulated restaurant booking is not evidence of a real
-reservation or attendance. `confirm_meetup` queues the protected
-`/connectors/calendar/meetup` path only after current complete ballots, valid
-constraints and explicit calendar opt-ins. Before provider dispatch, the job
-rechecks the current plan, input revision and consent.
+Event creation uses a stable meeting ID plus account ID for provider deduplication.
+Every participant explicitly clicks **Add to my calendar** after the current ballot
+has a timed winner. That click enables only their own event consent if necessary,
+then calls `confirm_meetup`. Connecting alone never creates events. Both API write
+paths (`/connectors/calendar/events`, `/connectors/calendar/meetup`) now require
+exactly one connection; group availability still accepts multiple connections.
+Encrypted credentials remain bound to that account. No external guests are invited.
 
-A pending, sending, created, partially created or unknown calendar submission
-blocks another submission for that huddle, including after replanning. An
-ambiguous write must be checked manually rather than retried. Editing a plan or
-its date does not automatically update/delete existing Google events. Check
-existing entries before arranging a new meetup; the UI must not describe old
-calendar entries as silently synchronized with a revised plan.
+Private `personal_meetup` rows are keyed by run/account, and
+`personal_meetup_job` dispatches exactly that owner's connection. Before sending,
+it rechecks membership, current winner/revision, connection generation and event
+consent. A pending/sending/created/unknown prior personal submission blocks
+another for that owner/Huddle; it never prevents a friend adding their own copy.
+`my_meetup` exposes only the caller's status. Duplicate requests/jobs do not send
+twice, and ambiguous provider outcomes remain unknown rather than reporting success.
+
+Legacy `meetup`/`meetup_job` tables remain for history. Pending group-wide jobs are
+retired without sending; earlier provider events are not changed or deleted.
+Plan edits never silently update existing calendar entries. Provider writes are
+mocked in automated verification; the browser checks do not create real events.
 
 ## Configuration names, without values
 
@@ -267,3 +280,21 @@ External/Testing calendar refresh tokens can expire after seven days, so a demo
 account may need to reconnect later. See [Google's token-expiration guidance](https://developers.google.com/identity/protocols/oauth2).
 The current Google configuration flag is true and Max reports Calendar working;
 automated live availability/event-write confirmation remains a separate step.
+
+## Owner-only Calendar verification
+
+On `codex/multi-city-coverage`, 225 module tests passed (one opt-in external test
+skipped), 126 API tests passed, and module typecheck/web build/lint passed. The
+provider tests verify two independent owners, non-host additions, owner-private
+status, swapped-credential rejection, one-account API limits, consent/reconnect
+changes, stale plans, duplicate dispatch and retirement of legacy group-wide jobs.
+
+The isolated preview passed 39 connected browser checks, including both host and
+non-host Done actions, each account's connection requirement and `.ics` export,
+phone layout and reopening a finished Huddle. Two running API checks returned
+422 for multi-account `/events` and `/meetup` requests before provider dispatch.
+Google event creation remains mocked in tests; no real event was created.
+
+Release the updated module, API and UI together. The new private tables are
+additive; keep `--delete-data=never`. No OAuth scopes, keys, callback URLs, Eric's
+scraper or shared tunnel settings changed. Shared/main/Vercel release is pending.

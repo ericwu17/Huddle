@@ -61,8 +61,8 @@ function ConnectorForm({ initial, configuration }: { initial: ConnectorSettings 
         })}>Copy callback URL</button>
       </details> : null}
       {initial?.calendarError ? <p className="error" role="alert">{initial.calendarError}</p> : null}
-      <label className="check"><input type="checkbox" checked={initial?.calendarEventConsent ?? false} disabled={busy || (!calendarConnected && !initial?.calendarEventConsent)} onChange={e => run(() => eventConsent({ enabled: e.target.checked }))} />Allow Huddle to add an agreed meetup to my calendar</label>
-      <p className="muted">After voting, the host can add the meetup to opted-in calendars.</p>
+      <label className="check"><input type="checkbox" checked={initial?.calendarEventConsent ?? false} disabled={busy || (!calendarConnected && !initial?.calendarEventConsent)} onChange={e => run(() => eventConsent({ enabled: e.target.checked }))} />Allow additions I request to my calendar</label>
+      <p className="muted">After voting, choose “Add to my calendar” on the Done page. Only you can add it to your connected account.</p>
     </section>
     {notice ? <p className="card" role="status">{notice}</p> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}

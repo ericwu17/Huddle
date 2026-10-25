@@ -105,7 +105,8 @@ class CalendarAvailabilityResponse(Model):
 
 class CalendarEventsRequest(Model):
     meetingId: Identifier
-    connections: Annotated[list[CalendarConnection], Field(min_length=1, max_length=12)]
+    # Event writes are owner-scoped; free/busy may still span the group.
+    connections: Annotated[list[CalendarConnection], Field(min_length=1, max_length=1)]
     summary: Annotated[str, Field(min_length=1, max_length=200)]
     location: Annotated[str, Field(max_length=500)] = ""
     start: Time

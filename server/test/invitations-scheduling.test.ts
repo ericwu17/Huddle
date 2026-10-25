@@ -1,3 +1,4 @@
+import { at } from "../src/lib/util";
 import { readFileSync } from "node:fs";
 import { ingestCatalog } from "../src/lib/catalog";
 import { describe, expect, it } from "vitest";
@@ -457,127 +458,139 @@ describe("calendar scheduling snapshot and meetup authorization", () => {
     expect(s.test.db.group.id.find(group.groupId)).toEqual(before);
   });
 
-  it("requires a complete current ballot, host ownership and explicit calendar event consent", () => {
+  const requestRow = (s: ReturnType<typeof setup>, runId: string, owner = 0) =>
+    s.test.db.personal_meetup.id.find(`${runId}:${s.account(owner).accountId}`);
+  const jobFor = (s: ReturnType<typeof setup>, runId: string, owner = 0) =>
+    [...s.test.db.personal_meetup_job.iter()].find(job => job.requestId === `${runId}:${s.account(owner).accountId}`)!;
+
+  it("lets host and non-host each add only their own calendar after a complete current ballot", () => {
     const s = setup(); const group = s.joined(); s.calendars(); const plan = s.ballot(group.groupId, false);
     expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/Everyone must vote/);
     s.reduce(s.users[1], tx => api.castVote(tx, plan));
-    expect(() => s.reduce(s.users[1], tx => api.confirmMeetup(tx, plan))).toThrow(/host/);
-    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/allow agreed meetup/);
-    s.reduce(s.users[0], tx => api.setCalendarEventConsent(tx, { enabled: true }));
-    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("pending");
-    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/already/);
+    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/own Calendar/);
+    for (const owner of [0, 1]) {
+      s.reduce(s.users[owner], tx => api.setCalendarEventConsent(tx, { enabled: true }));
+      s.reduce(s.users[owner], tx => api.confirmMeetup(tx, plan));
+      expect(requestRow(s, plan.runId, owner)?.status).toBe("pending");
+    }
+    const jobs = [jobFor(s, plan.runId, 0), jobFor(s, plan.runId, 1)];
+    for (const job of jobs) { api.runPersonalMeetupJob(s.proc(), { job }); api.runPersonalMeetupJob(s.proc(), { job }); }
+    const calls = s.calls.filter(c => c.path === "/connectors/calendar/meetup");
+    expect(calls.map(c => c.body.connections.map((x: any) => x.accountId))).toEqual([[s.account(0).accountId], [s.account(1).accountId]]);
+    for (const owner of [0, 1]) {
+      expect(requestRow(s, plan.runId, owner)?.status).toBe("created");
+      expect(api.my_meetup(s.test.viewContext(s.users[owner]))).toMatchObject({ runId: plan.runId, status: "created" });
+      expect(() => s.reduce(s.users[owner], tx => api.confirmMeetup(tx, plan))).toThrow(/already/);
+    }
+    expect(api.my_meetup(s.test.viewContext(s.users[2]))).toBeUndefined();
   });
 
-  it("submits only opted-in calendars and claims duplicate jobs once", () => {
+  it("cannot use another participant's consent or expose their personal request status", () => {
     const s = setup(); const group = s.joined(); s.calendars(); const plan = s.ballot(group.groupId);
     s.reduce(s.users[1], tx => api.setCalendarEventConsent(tx, { enabled: true }));
-    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    const job = [...s.test.db.meetup_job.iter()][0];
-    api.runMeetupJob(s.proc(), { job }); api.runMeetupJob(s.proc(), { job });
-    const calls = s.calls.filter(call => call.path === "/connectors/calendar/meetup");
-    expect(calls).toHaveLength(1);
-    expect(calls[0].body.connections.map((connection: any) => connection.accountId)).toEqual([s.account(1).accountId]);
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("created");
+    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/own Calendar/);
+    s.reduce(s.users[1], tx => api.confirmMeetup(tx, plan));
+    expect(api.my_meetup(s.test.viewContext(s.users[0]))).toBeUndefined();
+    expect(api.my_meetup(s.test.viewContext(s.users[1]))?.status).toBe("pending");
+    expect(() => s.reduce(s.users[2], tx => api.confirmMeetup(tx, plan))).toThrow(/Open your Huddle/);
+    api.runPersonalMeetupJob(s.proc(), { job: jobFor(s, plan.runId, 1) });
+    expect(s.calls.at(-1)!.body.connections.map((x: any) => x.accountId)).toEqual([s.account(1).accountId]);
   });
 
-  it("adds an explicitly agreed provisional timed meetup only with consent, without allowing venue booking", () => {
-    const s = setup(); const group = s.joined(); s.calendars(); const plan = s.ballot(group.groupId);
+  it("adds an agreed provisional timed meetup to its owner without enabling venue booking", () => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
     s.reduce(internal, tx => {
       const run = tx.db.plan_run.runId.find(plan.runId)!, data = JSON.parse(run.resultJson!);
       data.plans[0].status = "provisional";
       tx.db.plan_run.runId.update({ ...run, resultJson: JSON.stringify(data) });
-      for (const pref of tx.db.private_prefs.iter())
-        tx.db.private_prefs.memberId.update({ ...pref, hardJson: JSON.stringify({ ...JSON.parse(pref.hardJson!), allergies: ["peanut"] }) });
+      for (const pref of tx.db.private_prefs.iter()) tx.db.private_prefs.memberId.update({ ...pref,
+        hardJson: JSON.stringify({ ...JSON.parse(pref.hardJson!), allergies: ["peanut"] }) });
     });
-    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/allow agreed meetup/);
     expect(() => s.reduce(s.users[0], tx => api.startBooking(tx, { ...plan, stopIndex: 0 }))).toThrow();
-    s.reduce(s.users[1], tx => api.setCalendarEventConsent(tx, { enabled: true }));
-    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/already/);
-    const job = [...s.test.db.meetup_job.iter()][0];
-    api.runMeetupJob(s.proc(), { job }); api.runMeetupJob(s.proc(), { job });
-    const calls = s.calls.filter(call => call.path === "/connectors/calendar/meetup");
-    expect(calls).toHaveLength(1);
-    expect(calls[0].body.connections.map((connection: any) => connection.accountId)).toEqual([s.account(1).accountId]);
-    expect(calls[0].body).toMatchObject({ summary: "Huddle meetup", startTime: "17:00", endTime: "19:00" });
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("created");
+    s.reduce(s.users[1], tx => api.confirmMeetup(tx, plan));
+    api.runPersonalMeetupJob(s.proc(), { job: jobFor(s, plan.runId, 1) });
+    expect(s.calls.at(-1)!.body).toMatchObject({ meetingId: plan.runId, summary: "Huddle meetup", startTime: "17:00", endTime: "19:00" });
+    expect(s.calls.at(-1)!.body.connections.map((c: any) => c.accountId)).toEqual([s.account(1).accountId]);
   });
 
-  it("never creates calendar events for a winning untimed suggestion even with consent", () => {
+  it("never creates events for a winning untimed suggestion", () => {
     const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
     s.reduce(internal, tx => {
       const run = tx.db.plan_run.runId.find(plan.runId)!, data = JSON.parse(run.resultJson!);
       data.plans = []; data.suggestions = [{ id: plan.planId, placeId: "p_002", summary: "Explore this venue", limitations: [] }];
       tx.db.plan_run.runId.update({ ...run, resultJson: JSON.stringify(data) });
     });
-    expect(api.my_votes(s.test.viewContext(s.users[0]))).toHaveLength(2);
-    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/timed plan/);
-    expect(s.test.db.meetup.count()).toBe(0n);
-    expect(s.calls.filter(call => call.path === "/connectors/calendar/meetup")).toEqual([]);
+    expect(() => s.reduce(s.users[1], tx => api.confirmMeetup(tx, plan))).toThrow(/timed plan/);
+    expect(s.test.db.personal_meetup.count()).toBe(0n);
   });
 
-  it("keeps an earlier calendar submission visible and does not create a duplicate after replanning", () => {
-    const s = setup(); const group = s.joined(); s.calendars([0, 1], true);
-    const original = s.ballot(group.groupId);
+  it("keeps prior submissions private and blocks revised duplicates only for that owner", () => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const original = s.ballot(group.groupId);
     s.reduce(s.users[0], tx => api.confirmMeetup(tx, original));
-    api.runMeetupJob(s.proc(), { job: [...s.test.db.meetup_job.iter()][0] });
-    expect(s.test.db.meetup.runId.find(original.runId)?.status).toBe("created");
-    s.prefs(1, 25);
-    const revised = s.ballot(group.groupId, true, "synthetic-revised-run");
+    api.runPersonalMeetupJob(s.proc(), { job: jobFor(s, original.runId) });
+    s.prefs(1, 25); const revised = s.ballot(group.groupId, true, "synthetic-revised-run");
     expect(api.my_meetup(s.test.viewContext(s.users[0]))?.runId).toBe(original.runId);
-    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, revised))).toThrow(/already has a calendar submission/);
-    expect(s.test.db.meetup.runId.find(revised.runId)).toBeNull();
-    expect(s.calls.filter(call => call.path === "/connectors/calendar/meetup")).toHaveLength(1);
+    expect(api.my_meetup(s.test.viewContext(s.users[1]))).toBeUndefined();
+    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, revised))).toThrow(/already have a calendar submission/);
+    s.reduce(s.users[1], tx => api.confirmMeetup(tx, revised));
+    expect(requestRow(s, revised.runId, 1)?.status).toBe("pending");
   });
 
-  it("sends no event when a budget changes after queueing but before dispatch", () => {
+  it("sends nothing after a budget changes between queueing and dispatch", () => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
+    s.reduce(s.users[1], tx => api.confirmMeetup(tx, plan)); const job = jobFor(s, plan.runId, 1); s.prefs(0, 0);
+    api.runPersonalMeetupJob(s.proc(), { job });
+    expect(s.calls.filter(c => c.path === "/connectors/calendar/meetup")).toEqual([]);
+    expect(requestRow(s, plan.runId, 1)?.status).toBe("stale");
+  });
+
+  it.each(["consent", "connection"])("respects the owner's changed %s before dispatch", reason => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
+    s.reduce(s.users[1], tx => api.confirmMeetup(tx, plan)); const job = jobFor(s, plan.runId, 1);
+    if (reason === "consent") s.reduce(s.users[1], tx => api.setCalendarEventConsent(tx, { enabled: false }));
+    else { const ownerId = s.account(1).accountId; s.reduce(internal, tx => { const row = tx.db.calendar_connection.accountId.find(ownerId)!;
+      tx.db.calendar_connection.accountId.update({ ...row, generation: "new-connection" }); }); }
+    api.runPersonalMeetupJob(s.proc(), { job });
+    expect(s.calls.filter(c => c.path === "/connectors/calendar/meetup")).toEqual([]);
+    expect(requestRow(s, plan.runId, 1)?.status).toBe("stale");
+  });
+
+  it("claims overlapping dispatch once and leaves uncertain outcomes for owner review", () => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
+    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan)); const job = jobFor(s, plan.runId);
+    s.intercept(path => { if (path === "/connectors/calendar/meetup") api.runPersonalMeetupJob(s.proc(), { job }); });
+    api.runPersonalMeetupJob(s.proc(), { job });
+    expect(s.calls.filter(c => c.path === "/connectors/calendar/meetup")).toHaveLength(1);
+    expect(requestRow(s, plan.runId)?.status).toBe("unknown");
+  });
+
+  it("rejects a provider reply for another account", () => {
     const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
     s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    const job = [...s.test.db.meetup_job.iter()][0]; s.prefs(1, 0);
-    api.runMeetupJob(s.proc(), { job });
-    expect(s.calls.filter(call => call.path === "/connectors/calendar/meetup")).toEqual([]);
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("stale");
+    s.events(() => ({ created: [{ accountId: s.account(1).accountId, eventId: "foreign", alreadyExisted: false }], failed: [], updatedConnections: [] }));
+    api.runPersonalMeetupJob(s.proc(), { job: jobFor(s, plan.runId) });
+    expect(requestRow(s, plan.runId)?.status).toBe("unknown");
   });
 
-  it("does not send after the last opted-in participant revokes event consent before dispatch", () => {
-    const s = setup(); const group = s.joined(); s.calendars(); const plan = s.ballot(group.groupId);
-    s.reduce(s.users[1], tx => api.setCalendarEventConsent(tx, { enabled: true }));
-    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    const job = [...s.test.db.meetup_job.iter()][0];
-    s.reduce(s.users[1], tx => api.setCalendarEventConsent(tx, { enabled: false }));
-    api.runMeetupJob(s.proc(), { job });
-    expect(s.calls.filter(call => call.path === "/connectors/calendar/meetup")).toEqual([]);
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("stale");
-  });
-
-  it("claims an overlapping duplicate dispatch once and leaves uncertain outcomes for review", () => {
-    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
-    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    const job = [...s.test.db.meetup_job.iter()][0];
-    s.intercept(path => { if (path === "/connectors/calendar/meetup") api.runMeetupJob(s.proc(), { job }); });
-    api.runMeetupJob(s.proc(), { job });
-    expect(s.calls.filter(call => call.path === "/connectors/calendar/meetup")).toHaveLength(1);
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("unknown");
-  });
-
-  it("treats unknown provider account IDs as unknown rather than claiming calendars were written", () => {
-    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
-    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-    s.events(() => ({ created: [{ accountId: "foreign-account", eventId: "fake-provider-id" },
-      { accountId: s.account(1).accountId, eventId: "fake-provider-id-2" }], failed: [], updatedConnections: [] }));
-    api.runMeetupJob(s.proc(), { job: [...s.test.db.meetup_job.iter()][0] });
-    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("unknown");
-  });
-
-  it("does not claim calendar creation from missing, empty, numeric or oversized provider event IDs", () => {
+  it("does not claim success for invalid provider event IDs", () => {
     for (const eventId of [undefined, "", 42, "a".repeat(2000)]) {
       const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
       s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
-      s.events(body => ({ created: body.connections.map((connection: any) => ({ accountId: connection.accountId,
-        ...(eventId === undefined ? {} : { eventId }), alreadyExisted: false })), failed: [], updatedConnections: [] }));
-      api.runMeetupJob(s.proc(), { job: [...s.test.db.meetup_job.iter()][0] });
-      expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("unknown");
+      s.events(body => ({ created: [{ accountId: body.connections[0].accountId, eventId, alreadyExisted: false }], failed: [], updatedConnections: [] }));
+      api.runPersonalMeetupJob(s.proc(), { job: jobFor(s, plan.runId) });
+      expect(requestRow(s, plan.runId)?.status).toBe("unknown");
     }
+  });
+
+  it("retires queued legacy group-wide calendar writes without sending", () => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
+    s.reduce(internal, tx => {
+      tx.db.meetup.insert({ runId: plan.runId, groupId: group.groupId, planId: plan.planId,
+        inputRevision: 1, status: "pending", message: "Legacy", createdAt: 0 });
+      tx.db.meetup_job.insert({ ...at(tx), runId: plan.runId });
+    });
+    api.runMeetupJob(s.proc(), { job: [...s.test.db.meetup_job.iter()][0] });
+    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("stale");
+    expect(s.calls.filter(c => c.path === "/connectors/calendar/meetup")).toEqual([]);
   });
 });

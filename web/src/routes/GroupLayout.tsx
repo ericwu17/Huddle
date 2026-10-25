@@ -67,7 +67,7 @@ export default function GroupLayout() {
       navigate(`/g/${session.groupId}/${step}`);
       return;
     }
-    if (agent === undefined) return;
+    if (agent === undefined || pathname.endsWith("/lobby") || pathname.endsWith("/done")) return;
     if (!group || group.id !== session.groupId || group.status === lastStatus.current) return;
     lastStatus.current = group.status;
     const key = `${group.latestRunId}:${group.status}`;

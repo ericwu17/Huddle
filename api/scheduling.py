@@ -188,7 +188,7 @@ Return only the selected slotId. This proposes the Huddle's time; no calendar ev
 
 class MeetupRequest(Model):
     meetingId: Identifier
-    connections: list[CalendarConnection]
+    connections: Annotated[list[CalendarConnection], Field(min_length=1, max_length=1)]
     summary: Annotated[str, Field(min_length=1, max_length=200)]
     location: Annotated[str, Field(max_length=500)]
     date: str

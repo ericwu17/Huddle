@@ -333,6 +333,13 @@ export const meetup = table({ name: "meetup" }, {
   inputRevision: t.u32(), status: t.string(), message: t.string(), createdAt: t.f64(),
 });
 export const meetup_job = job("meetup_job", { runId: t.string() });
+// Owner-scoped additions; retain the legacy group-level tables for history.
+export const personal_meetup = table({ name: "personal_meetup" }, {
+  id: t.string().primaryKey(), runId: t.string(), groupId: t.string().index("btree"),
+  accountId: t.string().index("btree"), planId: t.string(), connectionGeneration: t.string(),
+  inputRevision: t.u32(), status: t.string(), message: t.string(), createdAt: t.f64(),
+});
+export const personal_meetup_job = job("personal_meetup_job", { requestId: t.string() });
 export const group_schedule = table({ name: "group_schedule" }, {
   groupId: t.string().primaryKey(), timeZone: t.string(), start: t.string(), end: t.string(), checkedAt: t.f64(),
 });
@@ -350,7 +357,7 @@ const spacetimedb = schema(
     account, account_session, account_membership, account_auth_attempt, account_expiry_job,
     account_context, account_friend, friend_request, huddle_invitation, invitation_dismissal, invitation_expiry_job, invitation_start,
     message_connector, friend_contact_destination, calendar_connection, calendar_oauth_state, calendar_oauth_expiry_job, calendar_revoke_job, calendar_revocation,
-    invitation_delivery, invitation_delivery_job, meetup, meetup_job, group_schedule, huddle_timing,
+    invitation_delivery, invitation_delivery_job, meetup, meetup_job, personal_meetup, personal_meetup_job, group_schedule, huddle_timing,
     venue, catalog_state,
   },
   {

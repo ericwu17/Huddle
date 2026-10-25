@@ -44,7 +44,8 @@ the retained legacy endpoints where stated.
 messages or saves private needs. Short outings may return one meal stop; an extra activity/dessert is optional.
 The `/connectors/` endpoints implement Google
 OAuth, private free/busy, bounded Claude time choice, explicitly opted-in meetup
-events and an opt-in Mac Messages submission adapter. Only
+events and an opt-in Mac Messages submission adapter. Calendar event-write requests
+accept exactly one account connection; availability can still include the group. Only
 `GET /connectors/google/callback` is public; its one-use encrypted state must be
 claimed by Maincloud before any token exchange.
 

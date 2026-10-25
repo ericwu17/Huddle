@@ -907,6 +907,27 @@ export const ParseJob = __t.object("ParseJob", {
 });
 export type ParseJob = __Infer<typeof ParseJob>;
 
+export const PersonalMeetup = __t.object("PersonalMeetup", {
+  id: __t.string(),
+  runId: __t.string(),
+  groupId: __t.string(),
+  accountId: __t.string(),
+  planId: __t.string(),
+  connectionGeneration: __t.string(),
+  inputRevision: __t.u32(),
+  status: __t.string(),
+  message: __t.string(),
+  createdAt: __t.f64(),
+});
+export type PersonalMeetup = __Infer<typeof PersonalMeetup>;
+
+export const PersonalMeetupJob = __t.object("PersonalMeetupJob", {
+  scheduledId: __t.u64(),
+  scheduledAt: __t.scheduleAt(),
+  requestId: __t.string(),
+});
+export type PersonalMeetupJob = __Infer<typeof PersonalMeetupJob>;
+
 export const PlanJob = __t.object("PlanJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),

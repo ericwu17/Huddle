@@ -1,5 +1,10 @@
 # Huddle roadmap
 
+**Personal Calendar addition, branch preview:** Done exposes **Add to my calendar**
+to every participant. Requests/status are owner-scoped, API writes accept one
+account, and legacy group-wide dispatch is retired. Provider tests use mocks;
+real Google writes need an owner-triggered test. Shared release is pending.
+
 **Current city/location branch preview:** [CITY_COVERAGE.md](CITY_COVERAGE.md).
 SF/Oakland retrieval, the preserved 200-venue pilot, optional typed city picker,
 GPS city resolution, participant-city plurality/ties, hard city validation and

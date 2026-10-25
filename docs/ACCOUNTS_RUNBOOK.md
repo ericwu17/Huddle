@@ -216,16 +216,16 @@ decrypting. Keep client secrets and all token values out of browser config.
    the manual date/start/end controls. The current demo fixes timezone to
    `America/Los_Angeles`. This clears old calendar-check metadata and invalidates
    old plans, without claiming calendars were checked.
-4. Connecting does not authorize event creation. Each account separately enables
-   **Allow Huddle to add an agreed meetup to my calendar**. After the current
-   complete ballot chooses a valid plan, the host explicitly uses the calendar
-   meetup action (`confirm_meetup`). Only opted-in connected accounts get
-   individual events; no external guests are invited.
-5. Inspect the aggregate calendar request status. A pending/sending/created/
-   partial/unknown prior submission blocks another for the same huddle, even
-   after replanning. Plan edits do not automatically update/delete Google
-   entries. Check actual calendars before arranging replacements; never retry
-   an unknown write automatically. Restaurant simulation remains separate.
+4. Connecting alone does not create events. After a complete current ballot
+   selects a timed winner, each participant uses **Add to my calendar** on Done.
+   It enables that owner's event consent if needed and queues only their account;
+   non-hosts have the same action. Nobody can add to another person's calendar.
+   The `.ics` download remains available for other calendar apps.
+5. Each person sees only their own request status. Pending/sending/created/unknown
+   submissions block duplicates only for that owner and Huddle; friends can add
+   their own copies independently. Turning off consent or reconnecting before
+   dispatch makes that queued request stale. Plan edits do not update/delete
+   existing entries, and unknown writes are never automatically retried.
 
 Disconnect immediately removes Huddle's credential and event consent, then
 attempts provider revocation once. If that cannot be confirmed, Huddle stays

@@ -6,6 +6,12 @@ hosting proposals in the original build brief and task split. It describes the
 target separately from the code that exists today; it does not change a wire
 contract by itself.
 
+**Branch preview updates:** city selection/coverage is described in
+[CITY_COVERAGE.md](CITY_COVERAGE.md). Calendar addition is now personal: every
+participant can add the voted timed plan only to their own connected Google
+Calendar from Done. The host cannot trigger writes to friends' calendars.
+Shared release remains pending; see [connector contract](CONNECTORS_CONTRACT.md).
+
 **Current model:** both parsing and the outing coordinator use Claude Haiku 5.5
 (`claude-haiku-5-5`). The previous coordinator default was Sonnet 5.5. Both
 `CLAUDE_MODEL_FAST` and `CLAUDE_MODEL_SMART` now default to Haiku; configure them
