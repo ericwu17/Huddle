@@ -7,8 +7,8 @@ The original audit and proposal below are retained for context. The branch now
 adds a frontend-only Google Maps Embed directions preview with driving by default
 and walking/transit/biking controls. Google displays the route, distance and travel
 time; changing this local preview does not alter the saved outing schedule.
-Routes API integration into planning remains a follow-up. Shared release
-is pending; Eric Wu's scraper and shared API/tunnels remain untouched.
+Routes API integration into planning remains a follow-up. Shared release is active on Maincloud and Vercel after explicit approval.
+Eric Wu's scraper and existing API/tunnel configuration remain untouched.
 
 October 24, 2026. Keep the local FastAPI/tunnel, shared Maincloud state and Vercel
 frontend. This work adds comparison UI and map opening; it does not replace
@@ -96,7 +96,7 @@ booking. Feeding actual mode-specific travel times into feasibility checks is a
 separate planner contract change, still deferred. Google directions use Google's
 current routing context; the saved itinerary date/time remains Huddle's schedule.
 
-### Branch verification
+### Verification and shared release
 
 - Module/type checks and frontend build/lint pass; 234 automated tests pass,
   with one existing opt-in integration test skipped.
@@ -117,7 +117,17 @@ current routing context; the saved itinerary date/time remains Huddle's schedule
   Google can omit the time bubble. The preview header shows the straight-line
   distance instead; it never invents a Google time.
 - Main was synced without conflicts, retaining the new favicon and tie-reveal
-  animation. Backend activation is separate from this frontend-only map feature.
+  animation. The production Vercel bundle contains the configured browser key;
+  nine real `huddle.compare` read-only map checks pass on desktop/mobile,
+  including origin restrictions, mode changes, matching links and private-data
+  exclusion. The map feature itself needs no backend publish.
+- Max separately approved deploying the earlier SF/Oakland and personal Calendar
+  changes. Their additive Maincloud module and preserved 200-venue catalog are
+  now active. Existing records and Eric Wu's API/voice tunnel configuration survive.
+- Production write simulations were blocked by automatic approval review;
+  deployment verification used read-only catalog/result checks and response-only
+  coordinator calls. Owner/event-write behavior is covered by isolated tests; no
+  real Google event, external message or booking was created.
 
 ## Current option labels
 

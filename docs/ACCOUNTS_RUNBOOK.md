@@ -1,5 +1,32 @@
 # Accounts, invitations, preferences and connectors: operations
 
+## Maps, city coverage and personal Calendar release — October 24, 2026
+
+Main/Vercel and shared `huddle-calhacks` now include all three approved changes.
+Eric Wu's existing API pulled/restarted with `destinationCities` support; its
+API/voice URLs and Google redirect/encryption configuration were not replaced.
+The module publish used `--delete-data=never`, adding private city/personal-event
+state while preserving every pre-release group/member/plan/account identifier
+(97/170/65/57). The active catalog is
+`cities-4584c3a3ce4c-menu-4584c3a3ce4c`: 200 venues (120 Berkeley, 39 Oakland,
+30 SF, 9 Albany, 2 Emeryville), 950 menu items and 499 photos, exactly checked
+against the published menu/photo payload.
+
+The restricted browser Embed key is configured in Vercel Production and local
+`web/.env.local` under `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY`. It is absent from
+tracked source. Maps Embed displays route/time; backend Routes API is not used.
+Calendar event creation is owner-only and supports non-host members; users must
+connect and explicitly add only their own event. A live consent/event-write test
+remains an owner action; this release created no Google events or messages.
+
+Verification: 126 API tests, 234 module/UI tests (one optional integration skip),
+build/lint, 72 isolated connected browser checks and 9 production read-only map
+checks passed. Response-only calls against the deployed coordinator returned
+three timed SF plans and three timed Oakland plans with preserved city and
+budget rules. Automatic approval review blocked synthetic production-account/
+Huddle writes; production verification stayed read-only. Historical checkpoints
+below retain the earlier counts and hosts for context.
+
 ## Current menu release — October 24, 2026
 
 Later voting/card correction: provisional and untimed suggestions support group

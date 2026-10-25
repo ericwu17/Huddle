@@ -1,11 +1,13 @@
 # Connectors: Messages invitations and Google Calendar
 
-**Personal Calendar update (branch preview):** every participant, including a
+**Personal Calendar update (shared release active October 24):** every participant, including a
 non-host, uses **Add to my calendar** on Done. Each request can write only the
 authenticated owner's connected primary calendar. The host cannot add events to
 another participant's account. Free/busy scheduling still checks the group's
-connected calendars; choosing the shared time remains host-owned. Shared release
-is pending. The original rollout narrative below is retained as history.
+connected calendars; choosing the shared time remains host-owned. The additive
+module is deployed to shared Maincloud and the API accepts exactly one owner
+connection per event request. Real Google writes still need an owner-triggered
+test. The original rollout narrative below is retained as history.
 
 October 24, 2026. The additive invitation, scheduling and connector backend is
 published only to isolated `huddle-account-max-check`. The branch is uncommitted/

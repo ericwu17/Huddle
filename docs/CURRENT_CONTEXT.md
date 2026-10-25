@@ -6,11 +6,20 @@ hosting proposals in the original build brief and task split. It describes the
 target separately from the code that exists today; it does not change a wire
 contract by itself.
 
-**Branch preview updates:** city selection/coverage is described in
-[CITY_COVERAGE.md](CITY_COVERAGE.md). Calendar addition is now personal: every
-participant can add the voted timed plan only to their own connected Google
-Calendar from Done. The host cannot trigger writes to friends' calendars.
-Shared release remains pending; see [connector contract](CONNECTORS_CONTRACT.md).
+**Shared release active — October 24:** maps, city selection/coverage and personal
+Calendar addition are deployed on `huddle.compare`, Eric Wu's existing API and
+Maincloud `huddle-calhacks`. The active pool has 200 venues: 120 Berkeley,
+39 Oakland, 30 San Francisco, 9 Albany and 2 Emeryville, retaining 950 menu items
+and 499 photos. New-city menu enrichment remains incomplete. See
+[CITY_COVERAGE.md](CITY_COVERAGE.md) and [map setup](GOOGLE_MAPS_PLAN.md).
+
+The optional free Maps Embed preview displays directions with driving as its
+default and local walking/transit/biking controls. It does not replan saved times;
+feeding real routed times into planning remains a follow-up. Every participant
+can add the voted eligible timed plan only to their own connected Google Calendar
+from Done. The host cannot trigger writes to friends' calendars. Real event
+creation still needs the owner's explicit test click; provider-write tests are
+mocked. See [connector contract](CONNECTORS_CONTRACT.md).
 
 **Current model:** both parsing and the outing coordinator use Claude Haiku 5.5
 (`claude-haiku-5-5`). The previous coordinator default was Sonnet 5.5. Both
@@ -35,7 +44,7 @@ SpacetimeDB ingestion: a versioned venue snapshot (`POST /catalog`, `venue` and
 `catalog_state` tables) that the module sends to FastAPI with each coordinator
 request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). The merged
 implementation is active on shared Maincloud `huddle-calhacks` and Vercel,
-with the committed 130-venue snapshot. The separate `huddle-account-max-check`
+with the committed 200-venue city snapshot. The separate `huddle-account-max-check`
 preview remains available. See [operations](ACCOUNTS_RUNBOOK.md). Menus, prices and attributed
 photos now have a coordinated runtime contract; takeout/seating remain follow-ups.
 
@@ -62,7 +71,7 @@ source/confirmation boilerplate and unknown price estimates are hidden.
 
 Max authorized and completed the shared activation from `a029fb6` after its main
 push. Vercel (`https://huddle.compare`) now uses the updated shared
-module/API and 130 real venues. All original groups/members/plan identifiers
+module/API and the expanded 200-venue pool. All original groups/members/plan identifiers
 survived; the shared rollout passed 41 connected, 14 OAuth and 30 browser checks.
 Preview accounts remain separate in `huddle-account-max-check`/local port 5174. See
 [ACCOUNTS_CONTRACT.md](ACCOUNTS_CONTRACT.md),

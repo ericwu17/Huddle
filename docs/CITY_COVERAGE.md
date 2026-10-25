@@ -1,8 +1,17 @@
 # Multi-city coverage and location selection
 
-The branch preview adds SF/Oakland without editing Eric Wu's scraping code or
-existing discovery/menu/photo files. The shared release still requires the
-module publish, updated API and explicit catalog publication below.
+**Shared release active October 24, 2026.** Main/Vercel, the existing Eric Wu API
+and Maincloud `huddle-calhacks` now use the city-selection implementation and
+`cities-4584c3a3ce4c-menu-4584c3a3ce4c`: 200 venues, 950 menu items and 499 photos.
+Live SF-only and Oakland-only coordinator calls each returned three within-city
+timed plans with consistent stop totals and private outing caps. These were
+response-only checks and created no production Huddles or events.
+
+No scraping/discovery/menu/photo source file was changed. The additive module
+publish used `--delete-data=never`; all pre-release identifiers survived (97
+groups, 170 members, 65 plan runs, 57 accounts). Eric's existing API/voice tunnels
+and Google callback configuration were preserved. Instructions below also serve
+future republishing and recovery.
 
 ## Behavior
 
