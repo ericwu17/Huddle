@@ -11,6 +11,7 @@ import CancelHuddleInvitationReducer from "../cancel_huddle_invitation_reducer";
 import CastVoteReducer from "../cast_vote_reducer";
 import ClearAccountContextReducer from "../clear_account_context_reducer";
 import ClearFriendContactReducer from "../clear_friend_contact_reducer";
+import ClearInvitationsReducer from "../clear_invitations_reducer";
 import ConfirmAgentNeedsReducer from "../confirm_agent_needs_reducer";
 import ConfirmMeetupReducer from "../confirm_meetup_reducer";
 import DeclineOfferReducer from "../decline_offer_reducer";
@@ -46,6 +47,7 @@ export type CancelHuddleInvitationParams = __Infer<typeof CancelHuddleInvitation
 export type CastVoteParams = __Infer<typeof CastVoteReducer>;
 export type ClearAccountContextParams = __Infer<typeof ClearAccountContextReducer>;
 export type ClearFriendContactParams = __Infer<typeof ClearFriendContactReducer>;
+export type ClearInvitationsParams = __Infer<typeof ClearInvitationsReducer>;
 export type ConfirmAgentNeedsParams = __Infer<typeof ConfirmAgentNeedsReducer>;
 export type ConfirmMeetupParams = __Infer<typeof ConfirmMeetupReducer>;
 export type DeclineOfferParams = __Infer<typeof DeclineOfferReducer>;

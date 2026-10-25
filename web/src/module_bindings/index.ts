@@ -39,6 +39,7 @@ import CancelHuddleInvitationReducer from "./cancel_huddle_invitation_reducer";
 import CastVoteReducer from "./cast_vote_reducer";
 import ClearAccountContextReducer from "./clear_account_context_reducer";
 import ClearFriendContactReducer from "./clear_friend_contact_reducer";
+import ClearInvitationsReducer from "./clear_invitations_reducer";
 import ConfirmAgentNeedsReducer from "./confirm_agent_needs_reducer";
 import ConfirmMeetupReducer from "./confirm_meetup_reducer";
 import DeclineOfferReducer from "./decline_offer_reducer";
@@ -97,6 +98,7 @@ import MyBookingsRow from "./my_bookings_table";
 import MyCallEventsRow from "./my_call_events_table";
 import MyConnectorsRow from "./my_connectors_table";
 import MyCouncilMessagesRow from "./my_council_messages_table";
+import MyDismissedInvitationsRow from "./my_dismissed_invitations_table";
 import MyFriendContactDestinationsRow from "./my_friend_contact_destinations_table";
 import MyFriendRequestsRow from "./my_friend_requests_table";
 import MyFriendsRow from "./my_friends_table";
@@ -207,6 +209,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyCouncilMessagesRow),
+  myDismissedInvitations: __table({
+    name: 'my_dismissed_invitations',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyDismissedInvitationsRow),
   myFriendContactDestinations: __table({
     name: 'my_friend_contact_destinations',
     indexes: [
@@ -314,6 +323,7 @@ const reducersSchema = __reducers(
   __reducerSchema("vote", CastVoteReducer),
   __reducerSchema("clear_account_context", ClearAccountContextReducer),
   __reducerSchema("clear_friend_contact", ClearFriendContactReducer),
+  __reducerSchema("clear_invitations", ClearInvitationsReducer),
   __reducerSchema("confirm_agent_needs", ConfirmAgentNeedsReducer),
   __reducerSchema("confirm_meetup", ConfirmMeetupReducer),
   __reducerSchema("decline_offer", DeclineOfferReducer),
@@ -389,6 +399,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "my_connectors": Omit<typeof tablesSchema.schemaType.tables["myConnectors"], "accessorName"> & { readonly accessorName: "my_connectors" };
     /** @deprecated Use `myCouncilMessages` instead. This alias will be removed in the next major version. */
     readonly "my_council_messages": Omit<typeof tablesSchema.schemaType.tables["myCouncilMessages"], "accessorName"> & { readonly accessorName: "my_council_messages" };
+    /** @deprecated Use `myDismissedInvitations` instead. This alias will be removed in the next major version. */
+    readonly "my_dismissed_invitations": Omit<typeof tablesSchema.schemaType.tables["myDismissedInvitations"], "accessorName"> & { readonly accessorName: "my_dismissed_invitations" };
     /** @deprecated Use `myFriendContactDestinations` instead. This alias will be removed in the next major version. */
     readonly "my_friend_contact_destinations": Omit<typeof tablesSchema.schemaType.tables["myFriendContactDestinations"], "accessorName"> & { readonly accessorName: "my_friend_contact_destinations" };
     /** @deprecated Use `myFriendRequests` instead. This alias will be removed in the next major version. */
@@ -448,6 +460,7 @@ const tableAccessorAliases = {
   "my_call_events": "myCallEvents",
   "my_connectors": "myConnectors",
   "my_council_messages": "myCouncilMessages",
+  "my_dismissed_invitations": "myDismissedInvitations",
   "my_friend_contact_destinations": "myFriendContactDestinations",
   "my_friend_requests": "myFriendRequests",
   "my_friends": "myFriends",
@@ -508,6 +521,8 @@ export type DbView = __DbViewBase & {
   readonly "my_connectors": __DbViewBase["myConnectors"];
   /** @deprecated Use `myCouncilMessages` instead. This alias will be removed in the next major version. */
   readonly "my_council_messages": __DbViewBase["myCouncilMessages"];
+  /** @deprecated Use `myDismissedInvitations` instead. This alias will be removed in the next major version. */
+  readonly "my_dismissed_invitations": __DbViewBase["myDismissedInvitations"];
   /** @deprecated Use `myFriendContactDestinations` instead. This alias will be removed in the next major version. */
   readonly "my_friend_contact_destinations": __DbViewBase["myFriendContactDestinations"];
   /** @deprecated Use `myFriendRequests` instead. This alias will be removed in the next major version. */
@@ -566,6 +581,8 @@ export type Tables = __TablesBase & {
   readonly "my_connectors": __TablesBase["myConnectors"];
   /** @deprecated Use `myCouncilMessages` instead. This alias will be removed in the next major version. */
   readonly "my_council_messages": __TablesBase["myCouncilMessages"];
+  /** @deprecated Use `myDismissedInvitations` instead. This alias will be removed in the next major version. */
+  readonly "my_dismissed_invitations": __TablesBase["myDismissedInvitations"];
   /** @deprecated Use `myFriendContactDestinations` instead. This alias will be removed in the next major version. */
   readonly "my_friend_contact_destinations": __TablesBase["myFriendContactDestinations"];
   /** @deprecated Use `myFriendRequests` instead. This alias will be removed in the next major version. */

@@ -49,7 +49,7 @@ body {
 
 /* Personal pages share the illustrated world and make room for desktop forms. */
 .account-page { display: grid; grid-template-columns: 190px minmax(0, 760px); gap: 40px; max-width: 1060px; margin: 0 auto; padding: 32px 24px 140px; }
-.account-sidebar { align-self: start; position: sticky; top: calc(var(--lane) + 8px); display: flex; flex-direction: column; gap: 28px; }
+.account-sidebar { align-self: start; position: sticky; top: 28px; display: flex; flex-direction: column; gap: 28px; }
 .sidebar-buddy { text-align: center; }
 .account-nav { display: flex; flex-direction: column; gap: 12px; }
 .account-nav a { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; color: var(--ink); background: var(--paper); border: 2px solid var(--ink); border-radius: 16px; font-weight: 800; text-decoration: none; box-shadow: 2px 3px 0 var(--ink); }
@@ -223,6 +223,8 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 
 /* ---- Group shell ---- */
 .topbar { display: flex; align-items: center; gap: 12px; }
+.logo { font-family: var(--display); font-size: 42px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--ink); }
+@media (max-width: 560px) { .logo { font-size: 34px; } }
 .code-tag { padding: 2px 12px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; box-shadow: 3px 3px 0 var(--ink); }
 .me-tag { margin-left: auto; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
 .group-sidebar .me-tag { margin-left: 0; align-self: start; gap: 8px; padding: 6px 14px 4px 10px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 2px 3px 0 var(--ink); }
@@ -436,7 +438,7 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 /* Huddle screens as a web app: a vertical sidebar (you, steps, people)
    beside the current step. Below 860px it stacks: header, step list, screen. */
 .group-page { display: grid; grid-template-columns: 250px minmax(0, 720px); gap: 40px; max-width: 1060px; margin: 0 auto; padding: 28px 24px 160px; align-items: start; }
-.group-sidebar { position: sticky; top: calc(var(--lane) + 8px); display: flex; flex-direction: column; gap: 18px; max-height: calc(100vh - var(--lane) - 24px); overflow-y: auto; padding: 4px 6px 8px 2px; }
+.group-sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 18px; max-height: calc(100vh - 48px); overflow-y: auto; padding: 4px 6px 8px 2px; }
 .group-sidebar .me-tag { margin-left: 0; }
 .group-main { min-width: 0; }
 .step-rail { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -501,37 +503,3 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
   .planning-ring li { width: 104px; }
   .planning-bubble { width: 100px; height: 54px; font-size: 11.5px; }
 }
-
-
-/* The logo: a cloud that drifts toward the sun and gets blown back. The page
-   starts below its lane so the cloud never covers content while it travels. */
-:root { --lane: 108px; --cloud-w: 210px; }
-@media (max-width: 560px) { :root { --lane: 84px; --cloud-w: 160px; } }
-#root { padding-top: var(--lane); }
-.logo-root { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
-.logo-cloud { position: absolute; top: 8px; left: 12px; width: var(--cloud-w); pointer-events: auto; text-decoration: none; transform-origin: 50% 80%; animation: cloudDrift 28s linear infinite; }
-.logo-cloud-bob { position: relative; display: block; animation: cloudBob 3.4s ease-in-out infinite; }
-.logo-cloud svg { display: block; width: 100%; height: auto; overflow: visible; }
-.logo-cloud-word { position: absolute; inset: 0 0 12% 0; display: grid; place-items: center; font-family: var(--display); font-size: calc(var(--cloud-w) * 0.19); line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; color: var(--cobalt); text-shadow: 0 2px 0 rgb(20 35 143 / 0.22); }
-.logo-cloud:hover .logo-cloud-word { color: var(--deep); }
-.logo-cloud:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; border-radius: 24px; }
-.logo-wind { position: absolute; top: 20px; left: var(--wind-x, 50%); width: calc(var(--cloud-w) * 0.42); opacity: 0; animation: windBlow 28s linear infinite; }
-@keyframes cloudBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-/* Slow drift to the sun, a squish as the sun puffs, a whoosh back to the start, a settle. */
-@keyframes cloudDrift {
-  0% { transform: translate(0, 0); animation-timing-function: linear; }
-  76% { transform: translate(var(--travel, 300px), 0); animation-timing-function: ease-out; }
-  78% { transform: translate(calc(var(--travel, 300px) + 8px), 0) scale(0.92, 1.08); animation-timing-function: ease-in; }
-  80% { transform: translate(calc(var(--travel, 300px) - 10px), -4px) scale(1.12, 0.92) rotate(-2deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
-  85% { transform: translate(calc(var(--travel, 300px) * 0.35), -14px) scale(1.3, 0.78) rotate(-6deg); animation-timing-function: ease-out; }
-  89% { transform: translate(-6px, 0) scale(1.1, 0.94) rotate(-3deg); animation-timing-function: ease-in-out; }
-  92% { transform: translate(2px, 0) scale(0.96, 1.04) rotate(1.5deg); animation-timing-function: ease-in-out; }
-  95%, 100% { transform: translate(0, 0) scale(1) rotate(0); }
-}
-@keyframes windBlow {
-  0%, 76% { opacity: 0; transform: translateX(26px); }
-  79% { opacity: 1; transform: translateX(10px); }
-  86% { opacity: 0.9; transform: translateX(-34px); }
-  90%, 100% { opacity: 0; transform: translateX(-56px); }
-}
-@media (prefers-reduced-motion: reduce) { .logo-cloud, .logo-cloud-bob, .logo-wind { animation: none !important; } .logo-wind { display: none; } }

@@ -6,7 +6,6 @@ import { DbConnection } from "./module_bindings";
 import { router } from "./router";
 import MissingConfig from "./MissingConfig";
 import { DoodleWorld } from "./doodle/Doodle";
-import LogoCloud from "./components/LogoCloud";
 import { loadToken, saveToken } from "./session";
 import "./index.css";
 import AccountContextProvider from "./components/AccountContextProvider";
@@ -28,7 +27,6 @@ const connectionBuilder =
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <DoodleWorld />
-    <LogoCloud />
     {connectionBuilder ? (
       <SpacetimeDBProvider connectionBuilder={connectionBuilder}>
         <AccountContextProvider><RouterProvider router={router} /></AccountContextProvider>

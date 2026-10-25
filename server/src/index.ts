@@ -22,6 +22,7 @@ export { registerAccount, loginAccount, logoutAccount, selectHuddle, removeHuddl
 export { saveAccountContext, clearAccountContext, my_account_context,
   requestFriend, respondFriendRequest, removeFriend, my_friends, my_friend_requests,
   inviteFriends, respondHuddleInvitation, cancelHuddleInvitation, runInvitationExpiryJob,
+  clearInvitations, my_dismissed_invitations,
   my_huddle_invitations } from "./social";
 export { saveMessageConnector, setCalendarEventConsent, disconnectGoogleCalendar,
   startGoogleCalendar, connectorStatus, my_connectors, my_invitation_deliveries,

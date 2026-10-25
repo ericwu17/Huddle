@@ -409,6 +409,13 @@ export const InvitationDeliveryJob = __t.object("InvitationDeliveryJob", {
 });
 export type InvitationDeliveryJob = __Infer<typeof InvitationDeliveryJob>;
 
+export const InvitationDismissal = __t.object("InvitationDismissal", {
+  id: __t.string(),
+  accountId: __t.string(),
+  invitationId: __t.string(),
+});
+export type InvitationDismissal = __Infer<typeof InvitationDismissal>;
+
 export const InvitationExpiryJob = __t.object("InvitationExpiryJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),
@@ -622,6 +629,14 @@ export type MyCouncilMessageRow = __Infer<typeof MyCouncilMessageRow>;
 
 export const MyCouncilMessages = __t.object("MyCouncilMessages", {});
 export type MyCouncilMessages = __Infer<typeof MyCouncilMessages>;
+
+export const MyDismissedInvitationRow = __t.object("MyDismissedInvitationRow", {
+  invitationId: __t.string(),
+});
+export type MyDismissedInvitationRow = __Infer<typeof MyDismissedInvitationRow>;
+
+export const MyDismissedInvitations = __t.object("MyDismissedInvitations", {});
+export type MyDismissedInvitations = __Infer<typeof MyDismissedInvitations>;
 
 export const MyFriendContactDestinationRow = __t.object("MyFriendContactDestinationRow", {
   friendAccountId: __t.string(),

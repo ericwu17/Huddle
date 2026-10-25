@@ -278,6 +278,11 @@ export const huddle_invitation = table({ name: "huddle_invitation" }, {
   fromAccountId: t.string().index("btree"), toAccountId: t.string().index("btree"),
   status: t.string(), createdAt: t.f64(), expiresAt: t.f64(),
 });
+// Which invitations an account has cleared from its own Inbox. Hiding is per
+// person: the invitation, the other side's view and any membership stay intact.
+export const invitation_dismissal = table({ name: "invitation_dismissal" }, {
+  id: t.string().primaryKey(), accountId: t.string().index("btree"), invitationId: t.string(),
+});
 export const invitation_expiry_job = job("invitation_expiry_job", { invitationId: t.string() });
 export const invitation_start = table({ name: "invitation_start" }, {
   requestId: t.string().primaryKey(), accountId: t.string(), groupId: t.string(),
@@ -329,7 +334,7 @@ const spacetimedb = schema(
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,
     agent_session, agent_need, agent_preference_input, agent_order, agent_needs_job, agent_plan_job,
     account, account_session, account_membership, account_auth_attempt, account_expiry_job,
-    account_context, account_friend, friend_request, huddle_invitation, invitation_expiry_job, invitation_start,
+    account_context, account_friend, friend_request, huddle_invitation, invitation_dismissal, invitation_expiry_job, invitation_start,
     message_connector, friend_contact_destination, calendar_connection, calendar_oauth_state, calendar_oauth_expiry_job, calendar_revoke_job, calendar_revocation,
     invitation_delivery, invitation_delivery_job, meetup, meetup_job, group_schedule,
     venue, catalog_state,

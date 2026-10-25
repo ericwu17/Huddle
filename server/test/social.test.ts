@@ -141,6 +141,27 @@ describe("addressed friendships and invitations", () => {
     expect(api.my_huddle_invitations(s.view(1))[0].status).toBe("accepted");
   });
 
+  it("clears finished invitations per side, keeps pending ones and never changes anyone else's list", () => {
+    const s = setup(); const first = s.group(0); s.friends();
+    const accepted = s.invite(first.groupId);
+    s.reduce(1, tx => api.respondHuddleInvitation(tx, { invitationId: accepted.id, accept: true }));
+    const second = s.group(0); const pending = s.invite(second.groupId, 0, 1);
+    const dismissed = (i: number) => api.my_dismissed_invitations(s.view(i)).map(d => d.invitationId);
+    s.reduce(1, tx => api.clearInvitations(tx, { direction: "incoming" }));
+    expect(dismissed(1)).toEqual([accepted.id]);
+    expect(dismissed(0)).toEqual([]);
+    s.reduce(0, tx => api.clearInvitations(tx, { direction: "outgoing" }));
+    expect(dismissed(0)).toEqual([accepted.id]);
+    s.reduce(0, tx => api.clearInvitations(tx, { direction: "outgoing" }));
+    expect(dismissed(0)).toEqual([accepted.id]);
+    expect(dismissed(1)).not.toContain(pending.id);
+    expect(s.test.db.huddle_invitation.count()).toBe(2n);
+    expect(api.my_account_memberships(s.view(1)).map(m => m.groupId)).toContain(first.groupId);
+    expect(() => s.reduce(1, tx => api.clearInvitations(tx, { direction: "sideways" }))).toThrow();
+    expect(() => s.reduce(3, tx => api.clearInvitations(tx, { direction: "incoming" }))).toThrow();
+    expect(dismissed(3)).toEqual([]);
+  });
+
   it("does not let a foreign huddle member send invitations and validates whole friend batches", () => {
     const s = setup(); const g = s.group(0); s.friends();
     expect(() => s.reduce(1, tx => api.inviteFriends(tx, { groupId: g.groupId, friendAccountIds: ["account-alice"] }))).toThrow(/must be a member/);

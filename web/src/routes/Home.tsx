@@ -67,7 +67,7 @@ export default function Home() {
   }
 
   return <AccountShell>{account === undefined ? <p role="status" className="on-sky">Loading your Huddle…</p> : <>
-    <div className="home-intro"><div><h1 className="shout text-[56px]">What are<br />we doing?</h1>
+    <div className="home-intro"><div><h1 className="shout text-[56px]">Ready to<br />huddle?</h1>
       <p className="on-sky mt-4">{account ? `Hi ${account.displayName}. ` : ""}Start a huddle and invite your friends.</p></div>
       <div className="crowd" aria-hidden="true"><Buddy who={account?.displayName ?? "You"} pose="wave" size={116} crown /><Buddy who="Your people" pose="huddle" size={104} /></div></div>
 

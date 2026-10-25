@@ -224,6 +224,29 @@ export const cancelHuddleInvitation = spacetimedb.reducer({ invitationId: t.stri
   tx.db.huddle_invitation.id.update({ ...invitation, status: "cancelled" });
 });
 
+// Clear every finished invitation from this account's Inbox, either the ones
+// received or the ones sent. Pending ones stay: they still need an answer.
+export const clearInvitations = spacetimedb.reducer({ direction: t.string() }, (tx, { direction }) => {
+  const { account } = requireAccount(tx);
+  if (direction !== "incoming" && direction !== "outgoing") throw new SenderError("Choose received or sent invitations to clear.");
+  const rows = direction === "incoming"
+    ? Array.from(tx.db.huddle_invitation.toAccountId.filter(account.id))
+    : Array.from(tx.db.huddle_invitation.fromAccountId.filter(account.id));
+  for (const invitation of rows) {
+    if (invitation.status === "pending") continue;
+    const id = `${account.id}:${invitation.id}`;
+    if (!tx.db.invitation_dismissal.id.find(id))
+      tx.db.invitation_dismissal.insert({ id, accountId: account.id, invitationId: invitation.id });
+  }
+});
+
+export const my_dismissed_invitations = spacetimedb.view({ name: "my_dismissed_invitations", public: true },
+  t.array(t.row("MyDismissedInvitationRow", { invitationId: t.string().primaryKey() })), ctx => {
+    const account = accountFor(ctx.db, ctx.sender);
+    if (!account) return [];
+    return Array.from(ctx.db.invitation_dismissal.accountId.filter(account.id)).map(d => ({ invitationId: d.invitationId }));
+  });
+
 export const runInvitationExpiryJob = spacetimedb.procedure(
   { onSchedule: invitation_expiry_job }, { job: invitation_expiry_job.rowType }, t.unit(),
   (ctx, { job }) => {

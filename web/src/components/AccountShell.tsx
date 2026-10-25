@@ -17,6 +17,7 @@ export default function AccountShell({ children }: { children: ReactNode }) {
     + (invitations?.filter(i => i.direction === "incoming" && i.status === "pending").length ?? 0);
   return <main className="account-page">
     <aside className="account-sidebar">
+      <Link className="logo" to="/start">huddle</Link>
       <div className="sidebar-buddy" aria-hidden="true"><Buddy who={account?.displayName ?? "Huddle"} pose="wave" size={128} crown /></div>
       <nav className="account-nav" aria-label="Your Huddle">
         <NavLink to="/start">Home</NavLink>
