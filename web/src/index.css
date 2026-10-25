@@ -231,6 +231,14 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 .sticker-pink { background: var(--pink); color: #fff; }
 .sticker-red { background: #ffd0da; }
 
+/* The agreed date and time, shown as a tear-off calendar page */
+.when-card { display: flex; align-items: center; gap: 16px; }
+.when-tile { flex: none; display: flex; flex-direction: column; width: 72px; overflow: hidden; text-align: center; background: #fff; border: 3px solid var(--ink); border-radius: 14px; box-shadow: 2px 3px 0 var(--ink); }
+.when-tile span { background: var(--pink); color: #fff; border-bottom: 3px solid var(--ink); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; line-height: 1.6; }
+.when-tile strong { font-family: var(--display); font-weight: 400; font-size: 38px; line-height: 1.15; }
+.when-date { font-weight: 800; font-size: 15px; color: var(--ink-soft); }
+.when-time { font-family: var(--display); font-size: clamp(28px, 8vw, 36px); line-height: 1.1; color: var(--ink); }
+
 /* Raw JSON for testers, written on a scrap of paper */
 .scrap {
   overflow-x: auto;
