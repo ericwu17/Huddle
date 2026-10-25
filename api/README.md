@@ -102,7 +102,7 @@ run. Restart uvicorn after editing `api/.env`.
 | `HUDDLE_SHARED_SECRET` | Required, nonblank. Protected routes, `/health` included, need `X-Huddle-Secret`. The Google GET callback instead validates one-use encrypted OAuth state. Never browser-visible. |
 | `PLACES_PATH` | Optional catalog override; defaults to `data/places.json`. `synthetic_stub` places refuse startup. |
 | `ANTHROPIC_API_KEY` | Required for the coordinator endpoints. Without it they return 503; legacy parsing/council retain their labeled fallback behavior. |
-| `CLAUDE_MODEL_FAST`, `CLAUDE_MODEL_SMART` | Default `claude-haiku-5-5` (parser, advocates) and `claude-sonnet-5-5` (chair). |
+| `CLAUDE_MODEL_FAST`, `CLAUDE_MODEL_SMART` | Both default to `claude-haiku-5-5`; this includes preference parsing and the coordinator. Exported overrides still take precedence. |
 | `SPACETIMEDB_URI`, `SPACETIMEDB_DB` | Optional. When both are set, each validated council message is also POSTed to `/route/council-message` as it is produced, so the panel fills live. The response transcript is the source of truth either way; the module deduplicates. |
 | `FASTAPI_BASE_URL` | Read by the smoke check and the module, not by this service. |
 

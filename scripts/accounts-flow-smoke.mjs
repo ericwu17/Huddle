@@ -41,7 +41,7 @@ async function view(user, name) {
   const names = tables[0].schema.elements.map(c => c.name.some);
   return tables[0].rows.map(row => Object.fromEntries(names.map((name, i) => [name, unopt(row[i])])));
 }
-async function until(label, read, timeout = 50000) {
+async function until(label, read, timeout = 120000) {
   const start = Date.now();
   while (Date.now() - start < timeout) { const value = await read(); if (value) return value; await sleep(500); }
   throw new Error(`Timed out: ${label}`);
@@ -128,8 +128,19 @@ const bookable = plan.status !== "provisional";
 await call(host, "vote", [current.runId, plan.id]);
 const bookingArgs = [current.runId, plan.id, plan.stops.findIndex(s => s.category === "meal")];
 await rejects("Booking waits for every participant's vote", () => call(host, "start_booking", bookingArgs));
+await rejects("Sharing waits for the complete current vote", () => call(host, "create_result_share", [current.runId, plan.id]));
 await call(friend, "vote", [current.runId, plan.id]);
 check((await view(host, "my_votes")).length === 2, "Different food requirements can complete the same group vote");
+const shared = await call(host, "create_result_share", [current.runId, plan.id]);
+check(shared[0] === (await call(friend, "create_result_share", [current.runId, plan.id]))[0], "Participants reuse one explicit result link for the same winner");
+await rejects("Outsider cannot create a group result link", () => call(outsider, "create_result_share", [current.runId, plan.id]));
+const opened = await call(outsider, "get_result_share", [shared[0]]);
+check(opened[0] && typeof unopt(opened[1]) === "string", "Friend outside the Huddle can read the explicitly shared result");
+const projection = JSON.parse(unopt(opened[1]));
+check(Object.keys(projection).sort().join() === "choice,date,timeZone", "Public result contains only route/date/time fields");
+check(!/privateOrders|memberId|PRIVATE_|budgetMaxPerPerson|allergies|preferences/.test(JSON.stringify(projection)), "Public result never exposes private context, orders or caps");
+check(!(await view(outsider, "my_members")).length, "Reading the public result never joins the Huddle");
+await rejects("Raw share table cannot be listed", () => view(outsider, "result_share"));
 if (bookable) {
   await call(host, "start_booking", bookingArgs);
   await until("simulated booking", async () => (await view(host, "my_bookings")).some(b => b.run_id === current.runId && b.status === "confirmed"));
@@ -139,6 +150,7 @@ if (bookable) {
   await rejects("A provisional winner remains unbookable after the complete vote", () => call(host, "start_booking", bookingArgs));
 }
 await save(friend, structured(12, 240, { dietary: ["vegetarian"] }));
+check(!(await call(outsider, "get_result_share", [shared[0]]))[0], "Changing needs invalidates the previously shared result link");
 check(!(await view(host, "my_votes")).length, "Budget edit immediately clears usable old votes");
 await rejects("Old plan cannot receive a vote", () => call(host, "vote", [current.runId, plan.id]));
 await rejects("Old plan cannot be spun", () => call(host, "do_roulette", [current.runId]));
@@ -166,7 +178,7 @@ for (const choice of allergyChoices) {
   await call(friend, "vote", [allergyState.active_run_id, choice.id]);
   check((await view(host, "my_votes")).length === 2, "Both participants can vote on a current suggestion");
   await rejects("Unverified group choice cannot start booking", () => call(host, "start_booking", [allergyState.active_run_id, choice.id, 0]));
-  await rejects("Unverified group choice cannot create calendar events", () => call(host, "confirm_meetup", [allergyState.active_run_id, choice.id]));
+  await rejects("Calendar events still require explicit participant opt-in", () => call(host, "confirm_meetup", [allergyState.active_run_id, choice.id]));
 }
 if (allergyChoices.length >= 2) {
   await call(host, "vote", [allergyState.active_run_id, allergyChoices[0].id]);
@@ -190,6 +202,9 @@ const idea = untimed.result.suggestions[0];
 await call(host, "vote", [untimed.runId, idea.id]);
 await call(friend, "vote", [untimed.runId, idea.id]);
 check((await view(host, "my_votes")).length === 2, "Untimed venue choices remain open to a complete group vote");
+const untimedShare = await call(host, "create_result_share", [untimed.runId, idea.id]);
+const publicIdea = JSON.parse(unopt((await call(outsider, "get_result_share", [untimedShare[0]]))[1]));
+check(publicIdea.choice.placeId === idea.placeId && !("stops" in publicIdea.choice), "Untimed winner can be shared without fabricated visit times");
 await rejects("Untimed winning venue cannot be booked", () => call(host, "start_booking", [untimed.runId, idea.id, 0]));
 await call(host, "clear_account_context");
 check(!(await view(host, "my_account_context")).length, "Owner can clear saved context");

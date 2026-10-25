@@ -1,7 +1,14 @@
 # Current task: accounts, preferences and coordinator polish (in progress)
 
+New result flow: complete voting opens Done with the chosen route/date/time and
+owner-private menu order. Calendar actions and an explicit public result link
+live there; re-voting stays available. Shared links exclude all private orders
+and preferences. Both API model roles now default to Claude Haiku 5.5.
+
 Latest demo correction: current provisional and untimed suggestions remain
-votable, with separate strict eligibility for booking/calendar actions. Plan
+votable, with separate strict eligibility for booking actions. Current timed
+winners can be explicitly added to opted-in calendars, including provisional
+venue suggestions. Plan
 cards use route names and AM/PM times, omit source/confirmation boilerplate, and
 show only known menu prices. See MENU_RECOMMENDATIONS.md for the current contract.
 

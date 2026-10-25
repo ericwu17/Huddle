@@ -30,3 +30,4 @@ export { searchMacContacts, saveFriendContact, clearFriendContact, my_friend_con
 export { sendInvitationMessage } from "./connectors";
 export { parseHuddleIntent, createInvitationHuddle } from "./invitations";
 export { scheduleHuddle, setHuddleWindow, confirmMeetup, runMeetupJob, my_meetup } from "./scheduling";
+export { createResultShare, getResultShare } from "./sharing";

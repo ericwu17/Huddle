@@ -52,7 +52,7 @@ export function useAgentRun(runId: string | null) {
     if (!ready) return undefined;
     const row = rows.find(r => r.runId === runId);
     return row ? { ...row, result: row.resultJson ? JSON.parse(row.resultJson) as AgentResult : null,
-      roulette: row.rouletteJson ? JSON.parse(row.rouletteJson) as { planId: string } : null } : null;
+      roulette: row.rouletteJson ? JSON.parse(row.rouletteJson) as { planId: string; voteSignature?: string } : null } : null;
   }, [rows, ready, runId]);
 }
 

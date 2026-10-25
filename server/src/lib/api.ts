@@ -23,7 +23,7 @@ function post<T>(ctx: Proc, base: string, path: string, body: unknown, idempoten
           "X-Huddle-Secret": ctx.env.HUDDLE_SHARED_SECRET ?? "",
         },
         body: path === "/health" ? undefined : JSON.stringify(body),
-        timeout: TimeDuration.fromMillis(path === "/agent/plan" ? 50_000 : API_TIMEOUT_MS),
+        timeout: TimeDuration.fromMillis(path === "/agent/plan" ? 90_000 : API_TIMEOUT_MS),
       });
       if (res.status >= 200 && res.status < 300)
         return { ok: true, data: res.json() as T, stub: res.headers.get("x-huddle-stub") === "true" };

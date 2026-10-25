@@ -49,6 +49,24 @@ class FakeClient:
         return reply(result)
 
 
+class ModelRepairTests(unittest.IsolatedAsyncioTestCase):
+    async def test_validation_retry_gets_correction_without_corrupting_original_json(self):
+        original = json.dumps({"candidates": ["SYNTHETIC meal plus dessert"]})
+        client = FakeClient(lambda sent: {"complete": len(client.calls) > 1})
+
+        def validate(data):
+            if not data["complete"]:
+                raise ValueError("include every required food stop")
+
+        result = await LLM(client).call("test-coordinator", "Synthetic test only.", original,
+            {"type": "object", "properties": {"complete": {"type": "boolean"}},
+             "required": ["complete"], "additionalProperties": False}, "synthetic-test-model", 2, check=validate)
+        self.assertTrue(result["complete"])
+        self.assertEqual(len(client.calls), 2)
+        self.assertEqual(client.calls[1]["messages"][0]["content"], original)
+        self.assertIn("include every required food stop", client.calls[1]["messages"][1]["content"])
+
+
 def role(kwargs) -> str:
     system = kwargs["system"]
     return "parse" if system == PARSE_SYSTEM else "chair" if system == council.CHAIR_SYSTEM else "advocate"

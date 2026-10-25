@@ -28,8 +28,10 @@ cannot be raised/erased without the existing owner-only private offer acceptance
 
 All current suggestions can be voted on, including provisional timed plans.
 Complete tied ballots can use equal-chance Spin. Voting is an expression of
-group preference, independent of booking/calendar eligibility. Only a current
-ready timed winner can enter booking simulation or calendar creation. The module
+group preference, independent of booking eligibility. Only a current ready
+timed winner can enter booking simulation. Any current timed winner, including a
+provisional venue choice, can become an explicitly opted-in Calendar meetup;
+that event is not a reservation or venue verification. The module
 enforces that distinction and still rejects falsely ready results, unknown item
 IDs, incorrect totals, changed item prices and stale budgets. Missing allergy
 evidence, unknown/unpriced selections and unsupported dietary evidence still
@@ -88,7 +90,7 @@ Python still enumerates schedule-compatible venue sequences; Claude chooses
 options and personal menu orders. It does not yet construct/revise arbitrary
 sequences, combine separate takeout meals at public seating or verify live
 venue availability. Menu lookup is cached per member/venue within a request;
-the coordinator model call has a 35-second limit inside the module's 50-second
+the coordinator model call has a 60-second limit inside the module's 90-second
 HTTP timeout. No scoring/Bayesian/Monte Carlo decision layer was added.
 
 ## Publish and operate

@@ -17,9 +17,32 @@ blanket evidence blocks and uniform per-person cost checks for `own_orders`.
 It adds sourced menu/photo evidence, provisional status, untimed suggestions
 and owner-private menu selections/totals. Legacy shapes remain compatible.
 All current plan/suggestion IDs are valid voting choices, including provisional
-and untimed options. Votes/Spin use `availableVotingChoices`; booking and calendar
-writes retain strict `availablePlans`/`agentPlans` checks. A vote never converts an
-unverified or untimed suggestion into a bookable itinerary or raises a cap.
+and untimed options. Votes/Spin use `availableVotingChoices`; booking retains
+strict `availablePlans`/`agentPlans` checks. Calendar meetup creation accepts a
+current timed winner with explicit event consent, including provisional venues.
+A vote never converts an unverified or untimed suggestion into a bookable
+itinerary or raises a cap.
+
+## Done and shared result
+
+A complete ballot with a unique or Spin-resolved winner opens `/g/:groupId/done`.
+Members see the selected route, outing date/time, venues and their own private
+menu order. Untimed venue winners retain an unset time rather than an invented
+schedule. Voting remains available to change a choice; changed needs invalidate
+the old result. Calendar actions are explicit and preserve the existing opt-in,
+current-winner and duplicate-event checks. A calendar-file download contains only
+the public itinerary and uses a stable event UID and Berkeley timezone.
+
+`createResultShare({runId,planId}) -> {shareId}` requires a current member and the
+completed current winner; repeated creation reuses that result's link. The new
+private `result_share` table stores its group/run/revision association.
+`getResultShare({shareId}) -> {ok,resultJson?}` permits a nonmember to read an
+explicitly shared result at `/result/:shareId`. JSON is strictly
+`{date,timeZone,choice}` with whitelisted venue/route facts. It excludes orders,
+prompts, context, caps, member names/IDs and arbitrary model prose. Reading grants
+no membership. Unknown and stale links return the same unavailable result; needs,
+run or ballot changes are checked again on each read. These links publish a
+public itinerary; they are not account or invitation credentials.
 
 ## FastAPI
 
@@ -102,11 +125,14 @@ the feasible catalog; this does not guarantee a global preference optimum.
 
 Claude returns candidate IDs and public fact IDs only. Code renders those facts
 into public explanations. Arbitrary model prose is never published. Schema or
-selection errors allow one repair attempt within a 15-second model-call budget;
-missing credentials, timeout or invalid output yield explicit 503/502 errors,
-not synthetic recommendations. Missing evidence permits provisional suggestions. Missing timed feasibility permits
-untimed venue alternatives; provider failure has explicitly labeled catalog ideas. Each module HTTP call has a 20-second timeout and no extra
-agent-route HTTP retry.
+selection errors allow one repair attempt. The menu coordinator has a 60-second
+model-call budget inside a 90-second module HTTP timeout, with no extra HTTP
+retry. Parsing and other service calls retain their shorter deadlines. Missing
+evidence permits provisional suggestions; missing timed feasibility permits
+untimed alternatives. Provider failure returns explicitly labeled real-catalog
+ideas rather than synthetic recommendations. Validation feedback identifies a
+failed candidate/member without relaxing their budget or returning private
+context in the public result.
 
 ## SpacetimeDB
 

@@ -5,7 +5,7 @@ import { requireAccount, requireActor } from "./lib/account-state";
 import { currentGroup, currentMember, membersOf, nowMs, at, parse } from "./lib/util";
 import { authorizedCalendarSnapshots, persistCalendarRefresh } from "./connectors";
 import { callApi } from "./lib/api";
-import { invalidateAgent, agentBallot, agentPlans } from "./lib/agent-state";
+import { invalidateAgent, agentBallot, agentVotingChoices } from "./lib/agent-state";
 import { clockMinutes } from "./lib/agent-constraints";
 import type { ReadDb, Tx } from "./lib/types";
 
@@ -98,12 +98,15 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
 );
 
 function chosenPlan(db: ReadDb, groupId: string, runId: string, planId: string) {
-  return agentBallot(db, groupId, runId).winner === planId ? agentPlans(db, groupId, runId).find(p => p.id === planId) : null;
+  if (agentBallot(db, groupId, runId).winner !== planId) return null;
+  // Calendar records the agreed meetup time. A provisional venue does not
+  // certify a restaurant, and an untimed suggestion supplies no event window.
+  return agentVotingChoices(db, groupId, runId).find(p => p.id === planId && Array.isArray(p.stops) && p.stops.length > 0) ?? null;
 }
 
 export const confirmMeetup = spacetimedb.reducer({ runId: t.string(), planId: t.string() }, (tx, args) => {
   const group = hostGroup(tx), state = tx.db.agent_session.groupId.find(group.id)!;
-  if (!chosenPlan(tx.db, group.id, args.runId, args.planId)) throw new SenderError("Everyone must vote for a current valid plan before adding a meetup.");
+  if (!chosenPlan(tx.db, group.id, args.runId, args.planId)) throw new SenderError("Everyone must vote for a current timed plan before adding a meetup.");
   const connections = authorizedCalendarSnapshots(tx.db, group.id).filter(c => c.eventConsent);
   if (!connections.length) throw new SenderError("At least one participant must connect Calendar and allow agreed meetup events.");
   if (tx.db.meetup.runId.find(args.runId)) throw new SenderError("This run already has a calendar request. Check its status before creating another meetup.");

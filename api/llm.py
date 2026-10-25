@@ -21,7 +21,7 @@ def fast() -> str:
 
 
 def smart() -> str:
-    return os.getenv("CLAUDE_MODEL_SMART", "claude-sonnet-5-5")
+    return os.getenv("CLAUDE_MODEL_SMART", "claude-haiku-5-5")
 
 
 class LLMError(RuntimeError):
@@ -54,9 +54,12 @@ class LLM:
             if remaining <= 0.5:
                 break
             try:
+                messages = [{"role": "user", "content": user}]
+                if attempt > 1 and last.startswith("invalid reply:"):
+                    messages.append({"role": "user", "content": "The previous reply failed validation: " + last + ". Return a corrected complete response using the supplied schema and facts."})
                 response = await asyncio.wait_for(self.client.messages.create(
                     model=model, max_tokens=max_tokens, system=system,
-                    messages=[{"role": "user", "content": user}],
+                    messages=messages,
                     output_config={"effort": "low", "format": {"type": "json_schema", "schema": schema}},
                     timeout=remaining,
                 ), timeout=remaining)

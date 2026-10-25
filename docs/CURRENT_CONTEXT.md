@@ -6,6 +6,11 @@ hosting proposals in the original build brief and task split. It describes the
 target separately from the code that exists today; it does not change a wire
 contract by itself.
 
+**Current model:** both parsing and the outing coordinator use Claude Haiku 5.5
+(`claude-haiku-5-5`). The previous coordinator default was Sonnet 5.5. Both
+`CLAUDE_MODEL_FAST` and `CLAUDE_MODEL_SMART` now default to Haiku; configure them
+only on FastAPI, never in public frontend variables.
+
 The current hosting choice is local FastAPI + a tunnel + Maincloud. The
 [agent flow plan](AGENT_FLOW_PLAN.md) proposes the interaction and migration
 defaults approved by Max and now implemented. See the additive

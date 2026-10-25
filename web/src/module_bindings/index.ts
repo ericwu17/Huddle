@@ -74,7 +74,9 @@ import * as ConnectorStatusProcedure from "./connector_status_procedure";
 import * as CreateAgentGroupProcedure from "./create_agent_group_procedure";
 import * as CreateGroupProcedure from "./create_group_procedure";
 import * as CreateInvitationHuddleProcedure from "./create_invitation_huddle_procedure";
+import * as CreateResultShareProcedure from "./create_result_share_procedure";
 import * as DoRouletteProcedure from "./do_roulette_procedure";
+import * as GetResultShareProcedure from "./get_result_share_procedure";
 import * as JoinGroupProcedure from "./join_group_procedure";
 import * as LoginAccountProcedure from "./login_account_procedure";
 import * as ParseHuddleIntentProcedure from "./parse_huddle_intent_procedure";
@@ -351,7 +353,9 @@ const proceduresSchema = __procedures(
   __procedureSchema("create_agent_group", CreateAgentGroupProcedure.params, CreateAgentGroupProcedure.returnType),
   __procedureSchema("create_group", CreateGroupProcedure.params, CreateGroupProcedure.returnType),
   __procedureSchema("create_invitation_huddle", CreateInvitationHuddleProcedure.params, CreateInvitationHuddleProcedure.returnType),
+  __procedureSchema("create_result_share", CreateResultShareProcedure.params, CreateResultShareProcedure.returnType),
   __procedureSchema("do_roulette", DoRouletteProcedure.params, DoRouletteProcedure.returnType),
+  __procedureSchema("get_result_share", GetResultShareProcedure.params, GetResultShareProcedure.returnType),
   __procedureSchema("join_group", JoinGroupProcedure.params, JoinGroupProcedure.returnType),
   __procedureSchema("login_account", LoginAccountProcedure.params, LoginAccountProcedure.returnType),
   __procedureSchema("parse_huddle_intent", ParseHuddleIntentProcedure.params, ParseHuddleIntentProcedure.returnType),

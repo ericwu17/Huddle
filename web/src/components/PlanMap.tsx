@@ -4,7 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FeatureCollection } from "geojson";
-import type { Plan } from "../types";
+import type { PlanStop } from "../types";
 import { walkRoute, type WalkRoute } from "../walkRoute";
 import { displayTime } from "../venueFormatting";
 
@@ -12,7 +12,8 @@ const token = import.meta.env.NEXT_PUBLIC_MAPBOX_TOKEN as string | undefined;
 
 // `lines` are [lng, lat] polylines: Mapbox route legs when routeGeometry
 // returned, otherwise straight lines between stops.
-type Props = { plan: Pick<Plan, "stops">; lines: [number, number][][] };
+type MapStop = Pick<PlanStop, "placeId" | "name" | "lat" | "lng"> & Partial<Pick<PlanStop, "start" | "end">>;
+type Props = { plan: { stops: MapStop[] }; lines: [number, number][][] };
 
 export default function PlanMap(props: Props) {
   return token ? <MapboxMap {...props} /> : <StreetMap {...props} />;
@@ -154,7 +155,7 @@ function StreetMap({ plan, lines }: Props) {
         iconAnchor: [18, 18],
       });
       L.marker([s.lat, s.lng], { icon, title: `${i + 1}. ${s.name}` })
-        .bindPopup(`<b>${i + 1}. ${escapeHtml(s.name)}</b><br>${escapeHtml(displayTime(s.start))}–${escapeHtml(displayTime(s.end))}`)
+        .bindPopup(`<b>${i + 1}. ${escapeHtml(s.name)}</b><br>${s.start && s.end ? `${escapeHtml(displayTime(s.start))}–${escapeHtml(displayTime(s.end))}` : "Time not set"}`)
         .addTo(layer);
     });
     if (plan.stops.length > 0) {
@@ -180,7 +181,7 @@ function StreetMap({ plan, lines }: Props) {
             <span className="min-w-0">
               <b>{s.name}</b>
               <span className="muted block">
-                {displayTime(s.start)}–{displayTime(s.end)}
+                {s.start && s.end ? `${displayTime(s.start)}–${displayTime(s.end)}` : "Time not set"}
                 {route && i < route.legMinutes.length ? ` · then ~${route.legMinutes[i]} min walk` : ""}
               </span>
             </span>

@@ -1,13 +1,19 @@
 # Huddle roadmap
 
+Post-vote result: Done shows the chosen route/date/time and each owner's order,
+with Calendar download/opt-in creation and a public result link. Public shares
+contain venue facts only and are checked against the current winner. Parsing and
+the coordinator now default to Haiku 5.5; budgets and factual checks stay in code.
+
 Current menu extension: [MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md). Sourced menu orders, private personal totals, photos,
 provisional suggestions and untimed alternatives are implemented. The full
 Claude propose/revise loop and takeout/seating remain follow-ups. This update
 supersedes older blanket allergy-block and personal-cost deferral notes below.
 
 Voting correction: all current timed/provisional and untimed venue suggestions
-can receive votes and tie Spin. Booking/calendar actions remain limited to ready
-timed winners. The demo UI uses route names, AM/PM times and known menu prices,
+can receive votes and tie Spin. Booking remains limited to ready timed winners;
+Calendar meetup creation requires a current timed winner and explicit opt-in.
+The demo UI uses route names, AM/PM times and known menu prices,
 without source/confirmation boilerplate. Current budgets and stale-run checks
 still apply; exploratory voting never changes saved limits.
 

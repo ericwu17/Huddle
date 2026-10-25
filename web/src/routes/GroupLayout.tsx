@@ -14,6 +14,8 @@ import AgentPhaseNav from "../components/AgentPhaseNav";
 import PlanningHuddle from "../components/PlanningHuddle";
 import AccountStatus from "../components/AccountStatus";
 import { displayTime } from "../venueFormatting";
+import { useAgentBallot } from "../useAgentBallot";
+import { winnerTransition } from "../agentBallot";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -32,7 +34,9 @@ export default function GroupLayout() {
   const booking = useLatestBooking();
   const agent = useAgentState();
   const agentNeeds = useAgentNeeds();
+  const ballot = useAgentBallot(group?.id === session.groupId ? group : group === undefined ? undefined : null, agent, session.memberId);
   const lastAgentState = useRef<string | null>(null);
+  const lastWinner = useRef<{ groupId: string; key: string | null } | null>(null);
 
   // Follow the group to the next step whenever its status changes, but only the
   // first time each run reaches a status, so a repeated or flapping update never
@@ -47,7 +51,7 @@ export default function GroupLayout() {
       lastAgentState.current = key;
       // Vote stays navigable during subscription updates and after needs change.
       // AgentVote removes stale choices and shows its empty state until replanned.
-      if (pathname.endsWith("/vote")) return;
+      if (pathname.endsWith("/vote") || pathname.endsWith("/done")) return;
       const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "call"
         : agent.status === "needs" ? "prefs" : "plans";
       navigate(`/g/${session.groupId}/${step}`);
@@ -66,6 +70,14 @@ export default function GroupLayout() {
     if (group.status === "eliciting" && mine?.text) step = "swipe";
     navigate(`/g/${session.groupId}/${step}`);
   }, [group, agent, mine, navigate, pathname, session.groupId]);
+
+  useEffect(() => {
+    if (!agent || agent.groupId !== session.groupId || group?.id !== session.groupId || ballot.loading) return;
+    const key = ballot.winner ? `${ballot.runId}:${agent.revision}:${ballot.winner.id}` : null;
+    const transition = winnerTransition(lastWinner.current, group.id, key, pathname.endsWith("/vote"));
+    lastWinner.current = transition.state;
+    if (transition.follow) navigate(`/g/${session.groupId}/done`);
+  }, [agent, group, ballot.loading, ballot.runId, ballot.winner, navigate, pathname, session.groupId]);
 
   // Status only becomes "booked" once the call is confirmed, so follow a new
   // booking too: every phone watches the call live.

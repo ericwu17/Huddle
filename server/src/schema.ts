@@ -208,6 +208,12 @@ export const agent_order = table({ name: "agent_order" }, {
   id: t.string().primaryKey(), runId: t.string().index("btree"), memberId: t.string().index("btree"),
   planId: t.string(), itemsJson: t.string(), total: t.f64(),
 });
+// Explicitly shared public result snapshots are accessed through procedures;
+// the token table is private and never grants membership or private context.
+export const result_share = table({ name: "result_share" }, {
+  id: t.string().primaryKey(), groupId: t.string().index("btree"), runId: t.string(),
+  planId: t.string(), inputRevision: t.u32(), createdAt: t.f64(),
+});
 
 // Live venue catalog pushed by data/reviews/collect.py through POST /catalog (lib/catalog.ts).
 // placeJson is a contract Place (docs/CONTRACT.md S5.2); evidenceJson holds source URLs and
@@ -327,7 +333,7 @@ const spacetimedb = schema(
     council_message, scout_check, geo_cache,
     parse_job, swipe_job, preview_job, plan_job, offers_job, scout_job,
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,
-    agent_session, agent_need, agent_preference_input, agent_order, agent_needs_job, agent_plan_job,
+    agent_session, agent_need, agent_preference_input, agent_order, result_share, agent_needs_job, agent_plan_job,
     account, account_session, account_membership, account_auth_attempt, account_expiry_job,
     account_context, account_friend, friend_request, huddle_invitation, invitation_expiry_job, invitation_start,
     message_connector, friend_contact_destination, calendar_connection, calendar_oauth_state, calendar_oauth_expiry_job, calendar_revoke_job, calendar_revocation,

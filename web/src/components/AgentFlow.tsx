@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useProcedure, useReducer } from "spacetimedb/react";
 import { procedures, reducers } from "../module_bindings";
 import { useGroup } from "../groupContext";
@@ -8,13 +8,12 @@ import { isReadyAgentPlan, useAgentMessages, useAgentOrders, useAgentPreferences
 import { EMPTY_CONTEXT, useAccount, useAccountContext, type AccountContext } from "../accountData";
 import { PreferenceFields } from "./PreferenceFields";
 import { useCatalogListings } from "../catalogData";
-import { useVotes } from "../data";
 import PlanMap from "./PlanMap";
-import MeetupCalendarAction from "./MeetupCalendarAction";
 import AgentVenueDetails from "./AgentVenueDetails";
 import { displayTime } from "../venueFormatting";
 import PrivateOrderSummary from "./PrivateOrderSummary";
 import { VoteChoice, VoteStatus } from "./VoteTally";
+import { useAgentBallot } from "../useAgentBallot";
 
 export function AgentPrefs() {
   const { agentNeeds, group, session } = useGroup();
@@ -115,19 +114,19 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
 
 // Every option gets its own street map; straight segments are only the
 // fallback the map draws if the walking route can't be fetched.
-function OptionMap({ plan }: { plan: AgentPlan }) {
+export function OptionMap({ plan }: { plan: AgentPlan }) {
   const stops = plan.stops.filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lng));
   if (!stops.length) return null;
   const lines = stops.slice(1).map((s, i) => [[stops[i].lng, stops[i].lat], [s.lng, s.lat]] as [number, number][]);
   return <PlanMap plan={{ ...plan, stops }} lines={lines} />;
 }
 
-export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1 }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number }) {
+export function AgentPlanCard({ plan, order, recommended = false, optionNumber = 1, heading }: { plan: AgentPlan; order?: AgentOrder; recommended?: boolean; optionNumber?: number; heading?: string }) {
   const listings = useCatalogListings();
   const ready = isReadyAgentPlan(plan);
   return <section className="card space-y-3">
     {recommended && ready ? <span className="sticker sticker-sun">Coordinator's recommendation</span> : null}
-    <h2 className="card-title">Option {optionNumber}</h2>
+    <h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
     <p className="font-bold">{plan.stops.map(stop => stop.name).join(" → ")}</p>
     <PrivateOrderSummary order={order} listings={listings} stops={plan.stops} />
     <ol className="space-y-4">{plan.stops.map(stop => {
@@ -140,12 +139,12 @@ export function AgentPlanCard({ plan, order, recommended = false, optionNumber =
   </section>;
 }
 
-function AgentSuggestionCard({ suggestion, order, optionNumber }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber: number }) {
+export function AgentSuggestionCard({ suggestion, order, optionNumber = 1, heading }: { suggestion: AgentSuggestion; order?: AgentOrder; optionNumber?: number; heading?: string }) {
   const listings = useCatalogListings();
   const place = listings.get(suggestion.placeId);
-  if (!place) return <article className="card space-y-3" role="status"><h2 className="card-title">Option {optionNumber}</h2><p>Loading venue…</p></article>;
+  if (!place) return <article className="card space-y-3" role="status"><h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2><p>Loading venue…</p></article>;
   return <article className="card space-y-3">
-    <h2 className="card-title">Option {optionNumber}</h2>
+    <h2 className="card-title">{heading ?? `Option ${optionNumber}`}</h2>
     <p className="font-bold">{place.name}</p>
     <p className="muted">Time not set</p>
     <PrivateOrderSummary order={order} listings={listings} alternative />
@@ -203,33 +202,23 @@ export function AgentPlans() {
 }
 
 export function AgentVote() {
-  const { group, session, agent, isHost } = useGroup();
-  const navigate = useNavigate();
-  const runId = group.latestRunId;
-  const planRun = useAgentRun(runId);
+  const { group, session, agent } = useGroup();
+  const { runId, planRun, votes, loading, current, choices, complete, leaders, winner } = useAgentBallot(group, agent, session.memberId);
   const orders = useAgentOrders(runId, session.memberId);
   const listings = useCatalogListings();
-  const votes = useVotes(runId, session.memberId);
   const vote = useReducer(reducers.vote);
   const spin = useProcedure(procedures.doRoulette);
-  const book = useReducer(reducers.startBooking);
   const { run, busy, error } = useRun();
   const result = planRun?.result;
-  if (runId && planRun === undefined) return <p className="card" role="status">Loading the plans…</p>;
-  if (!runId || !agent || !["ready", "blocked"].includes(agent.status) || result?.inputRevision !== agent.revision) return <section className="card space-y-3"><p>There are no current options to vote on yet.</p><Link className="underline font-bold" to={`/g/${session.groupId}/plans`}>Open plans</Link></section>;
-  const choices = [...result.plans, ...(result.suggestions ?? [])];
-  const counts = votes?.counts ?? {};
-  const complete = votes?.total === group.members.length;
-  const top = Math.max(0, ...Object.values(counts));
-  const leaders = choices.filter(p => top > 0 && counts[p.id] === top);
-  const winner = complete ? leaders.length === 1 ? leaders[0] : leaders.find(p => p.id === planRun?.roulette?.planId) : null;
-  const bookingPlan = winner ? result.plans.find(plan => plan.id === winner.id && isReadyAgentPlan(plan)) : undefined;
+  if (loading) return <p className="card" role="status">Loading the plans…</p>;
+  if (!runId || !current || !result) return <section className="card space-y-3"><p>There are no current options to vote on yet.</p><Link className="underline font-bold" to={`/g/${session.groupId}/plans`}>Open plans</Link></section>;
   const titleFor = (id: string) => `Option ${choices.findIndex(choice => choice.id === id) + 1}`;
   return <div className="space-y-5">
     <h1 className="shout text-[48px]">Choose together</h1>
     {choices.length ? <VoteStatus votes={votes} members={group.members} winnerTitle={winner ? titleFor(winner.id) : undefined}
       tiedTitles={complete && !winner ? leaders.map(p => titleFor(p.id)) : undefined} /> : null}
     <Link className="btn" to={`/g/${session.groupId}/plans`}>Read plans and conversation</Link>
+    {winner ? <Link className="btn btn-sun" to={`/g/${session.groupId}/done`}>See the group’s choice</Link> : null}
     {!choices.length ? <p className="card">No options yet. The host can find plans after everyone saves their needs.</p> : null}
     {choices.map((choice, index) => <div key={choice.id} className={`vote-option ${votes?.myVote === choice.id ? "is-mine" : ""}`}>
       {"stops" in choice ? <><OptionMap plan={choice} /><AgentPlanCard plan={choice} optionNumber={index + 1} order={orders.find(order => order.planId === choice.id)} recommended={choice.id === result.recommendedPlanId} /></>
@@ -238,15 +227,9 @@ export function AgentVote() {
         busy={busy || !("stops" in choice) && !listings.has(choice.placeId)} onVote={() => run(() => vote({ runId, planId: choice.id }))} />
     </div>)}
     {choices.length ? <p className="on-sky muted">You can change your vote until the host starts booking.</p> : null}
-    {bookingPlan ? <MeetupCalendarAction runId={runId} planId={bookingPlan.id} isHost={isHost} /> : null}
-    {bookingPlan ? <p className="card card-note">Booking is a simulation. No restaurant will be called or reserved.</p> : null}
     {choices.length ? <div className="flex flex-wrap gap-3">
       <button className="btn" disabled={busy || !complete || leaders.length < 2 || !!winner}
         onClick={() => run(() => spin({ runId }))}>Resolve tie: equal-chance Spin</button>
-      {isHost && bookingPlan ? <button className="btn btn-primary" disabled={busy} onClick={() => run(async () => {
-        await book({ runId, planId: bookingPlan.id, stopIndex: bookingPlan.stops.findIndex(s => s.category === "meal") });
-        navigate(`/g/${session.groupId}/call`);
-      })}>Simulate booking {titleFor(bookingPlan.id)}</button> : null}
     </div> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;

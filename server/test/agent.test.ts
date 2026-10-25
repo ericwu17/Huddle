@@ -662,6 +662,79 @@ describe("menu proposals and private own orders", () => {
     deniesActions(s, runId);
   });
 
+  it("shares only an explicitly published public route, with no membership or private context", () => {
+    const s = setup(); push(s); s.ready();
+    own(s, data => {
+      Object.assign(data.plans[0], { title: "PRIVATE_TITLE", summary: "PRIVATE_SUMMARY", whyLine: "PRIVATE_WHY", limitations: ["PRIVATE_LIMIT"] });
+      data.privateOrders[0].items[0].rawPrompt = "PRIVATE_ORDER_EXTRA";
+    });
+    const runId = s.plan();
+    const outsider = TestAuth.fromJwtPayload('{"iss":"agent-test","sub":"public-reader"}', new ConnectionId(900n));
+    expect(s.test.db.result_share.count()).toBe(0n);
+    expect(() => api.createResultShare(s.proc(outsider), { runId, planId: "choice-1" })).toThrow();
+    expect(() => api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" })).toThrow();
+    s.vote(0, runId); s.vote(1, runId);
+    const share = api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" });
+    expect(share.shareId).toMatch(/^share_[0-9a-f]{64}$/);
+    expect(api.createResultShare(s.proc(s.users[1].auth), { runId, planId: "choice-1" })).toEqual(share);
+    expect(s.test.db.result_share.count()).toBe(1n);
+    const before = { members: s.test.db.member.count(), memberships: s.test.db.account_membership.count(), sessions: s.test.db.account_session.count() };
+    const read = api.getResultShare(s.proc(outsider), share);
+    expect(read.ok).toBe(true);
+    const shared = JSON.parse(read.resultJson!);
+    expect(Object.keys(shared).sort()).toEqual(["choice", "date", "timeZone"]);
+    expect(shared.choice).toMatchObject({ id: "choice-1", title: "Our Huddle", costPerPerson: 22, limitations: [], status: "ready" });
+    expect(shared.choice.summary).toBe(shared.choice.stops.map((stop: any) => stop.name).join(" → "));
+    expect(shared.choice.whyLine).toBe(shared.choice.summary);
+    for (const privateText of ["PRIVATE", "private-", "privateOrders", "memberId", "accountId", "budgetMaxPerPerson", "costRange", "itemsJson", "council", ...s.users.map(user => user.id)])
+      expect(read.resultJson).not.toContain(privateText);
+    expect({ members: s.test.db.member.count(), memberships: s.test.db.account_membership.count(), sessions: s.test.db.account_session.count() }).toEqual(before);
+    expect(api.my_agent_orders(s.test.viewContext(outsider))).toEqual([]);
+    expect(api.my_group(s.test.viewContext(outsider))).toBeUndefined();
+  });
+
+  it("publishes provisional and untimed winners without inventing verification or times", () => {
+    for (const kind of ["provisional", "untimed"]) {
+      const s = setup(); s.ready();
+      s.transform(data => {
+        if (kind === "provisional") data.plans[0].status = "provisional";
+        else {
+          data.plans = []; data.recommendedPlanId = null;
+          data.suggestions = [{ id: "choice-1", placeId: "p_002", summary: "PRIVATE_MODEL_PROSE", limitations: ["PRIVATE_DETAIL"] }];
+        }
+      });
+      const runId = s.plan(); s.vote(0, runId); s.vote(1, runId);
+      const share = api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" });
+      const read = api.getResultShare(s.proc(), share), choice = JSON.parse(read.resultJson!).choice;
+      expect(read.ok).toBe(true); expect(read.resultJson).not.toContain("PRIVATE");
+      if (kind === "provisional") expect(choice.status).toBe("provisional");
+      else expect(choice).toEqual({ id: "choice-1", placeId: "p_002", summary: LIVE_PLACES.find(place => place.id === "p_002")!.name, limitations: [] });
+    }
+  });
+
+  it.each(["preferences", "cap", "vote", "run", "confirmation"])("invalidates a shared link after current %s change", change => {
+    const s = setup(); s.ready(); const runId = s.plan(); s.vote(0, runId); s.vote(1, runId);
+    const share = api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" });
+    if (change === "preferences") s.save(1, { budgetMaxPerPerson: 20 });
+    else if (change === "vote") s.vote(1, runId, "choice-2");
+    else s.reduce(internal, tx => {
+      if (change === "cap") {
+        const pref = tx.db.private_prefs.memberId.find(s.users[0].id)!;
+        tx.db.private_prefs.memberId.update({ ...pref, hardJson: JSON.stringify({ ...JSON.parse(pref.hardJson!), budgetMaxPerPerson: 21 }) });
+      } else if (change === "run") {
+        const group = tx.db.group.id.find(s.group.groupId)!;
+        tx.db.group.id.update({ ...group, latestRunId: "new-run" });
+      } else {
+        const need = tx.db.agent_need.memberId.find(s.users[0].id)!;
+        tx.db.agent_need.memberId.update({ ...need, confirmed: false });
+      }
+    });
+    const missing = api.getResultShare(s.proc(), { shareId: "share_" + "0".repeat(64) });
+    expect(api.getResultShare(s.proc(), share)).toEqual(missing);
+    expect(missing).toEqual({ ok: false, resultJson: undefined });
+    expect(() => api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" })).toThrow();
+  });
+
   it("rejects malformed menu evidence before replacing any catalog rows", () => {
     const s = setup(); push(s);
     const original = s.test.db.venue.id.find("p_002")!.evidenceJson;

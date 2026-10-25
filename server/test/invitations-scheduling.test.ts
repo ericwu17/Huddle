@@ -308,6 +308,42 @@ describe("calendar scheduling snapshot and meetup authorization", () => {
     expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("created");
   });
 
+  it("adds an explicitly agreed provisional timed meetup only with consent, without allowing venue booking", () => {
+    const s = setup(); const group = s.joined(); s.calendars(); const plan = s.ballot(group.groupId);
+    s.reduce(internal, tx => {
+      const run = tx.db.plan_run.runId.find(plan.runId)!, data = JSON.parse(run.resultJson!);
+      data.plans[0].status = "provisional";
+      tx.db.plan_run.runId.update({ ...run, resultJson: JSON.stringify(data) });
+      for (const pref of tx.db.private_prefs.iter())
+        tx.db.private_prefs.memberId.update({ ...pref, hardJson: JSON.stringify({ ...JSON.parse(pref.hardJson!), allergies: ["peanut"] }) });
+    });
+    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/allow agreed meetup/);
+    expect(() => s.reduce(s.users[0], tx => api.startBooking(tx, { ...plan, stopIndex: 0 }))).toThrow();
+    s.reduce(s.users[1], tx => api.setCalendarEventConsent(tx, { enabled: true }));
+    s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan));
+    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/already/);
+    const job = [...s.test.db.meetup_job.iter()][0];
+    api.runMeetupJob(s.proc(), { job }); api.runMeetupJob(s.proc(), { job });
+    const calls = s.calls.filter(call => call.path === "/connectors/calendar/meetup");
+    expect(calls).toHaveLength(1);
+    expect(calls[0].body.connections.map((connection: any) => connection.accountId)).toEqual([s.account(1).accountId]);
+    expect(calls[0].body).toMatchObject({ summary: "Huddle meetup", startTime: "17:00", endTime: "19:00" });
+    expect(s.test.db.meetup.runId.find(plan.runId)?.status).toBe("created");
+  });
+
+  it("never creates calendar events for a winning untimed suggestion even with consent", () => {
+    const s = setup(); const group = s.joined(); s.calendars([0, 1], true); const plan = s.ballot(group.groupId);
+    s.reduce(internal, tx => {
+      const run = tx.db.plan_run.runId.find(plan.runId)!, data = JSON.parse(run.resultJson!);
+      data.plans = []; data.suggestions = [{ id: plan.planId, placeId: "p_002", summary: "Explore this venue", limitations: [] }];
+      tx.db.plan_run.runId.update({ ...run, resultJson: JSON.stringify(data) });
+    });
+    expect(api.my_votes(s.test.viewContext(s.users[0]))).toHaveLength(2);
+    expect(() => s.reduce(s.users[0], tx => api.confirmMeetup(tx, plan))).toThrow(/timed plan/);
+    expect(s.test.db.meetup.count()).toBe(0n);
+    expect(s.calls.filter(call => call.path === "/connectors/calendar/meetup")).toEqual([]);
+  });
+
   it("keeps an earlier calendar submission visible and does not create a duplicate after replanning", () => {
     const s = setup(); const group = s.joined(); s.calendars([0, 1], true);
     const original = s.ballot(group.groupId);

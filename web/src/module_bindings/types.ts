@@ -307,6 +307,11 @@ export const CreateInvitationHuddleResult = __t.object("CreateInvitationHuddleRe
 });
 export type CreateInvitationHuddleResult = __Infer<typeof CreateInvitationHuddleResult>;
 
+export const CreateResultShareResult = __t.object("CreateResultShareResult", {
+  shareId: __t.string(),
+});
+export type CreateResultShareResult = __Infer<typeof CreateResultShareResult>;
+
 export const FakeEventJob = __t.object("FakeEventJob", {
   scheduledId: __t.u64(),
   scheduledAt: __t.scheduleAt(),
@@ -341,6 +346,12 @@ export const GeoCache = __t.object("GeoCache", {
   createdAt: __t.f64(),
 });
 export type GeoCache = __Infer<typeof GeoCache>;
+
+export const GetResultShareResult = __t.object("GetResultShareResult", {
+  ok: __t.bool(),
+  resultJson: __t.option(__t.string()),
+});
+export type GetResultShareResult = __Infer<typeof GetResultShareResult>;
 
 export const Group = __t.object("Group", {
   id: __t.string(),
@@ -877,6 +888,16 @@ export const ReplanJob = __t.object("ReplanJob", {
   bookingId: __t.string(),
 });
 export type ReplanJob = __Infer<typeof ReplanJob>;
+
+export const ResultShare = __t.object("ResultShare", {
+  id: __t.string(),
+  groupId: __t.string(),
+  runId: __t.string(),
+  planId: __t.string(),
+  inputRevision: __t.u32(),
+  createdAt: __t.f64(),
+});
+export type ResultShare = __Infer<typeof ResultShare>;
 
 export const RouletteResult = __t.object("RouletteResult", {
   planId: __t.string(),
