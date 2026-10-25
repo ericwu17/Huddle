@@ -6,22 +6,31 @@
   --out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Staggered, slow passes reset beyond the edges of the SVG viewBox. */
-.sky-cloud { opacity: .75; transform: translateX(var(--cloud-rest)); animation: sky-drift var(--cloud-duration) linear var(--cloud-delay) infinite; }
-.sky-cloud-one { --cloud-rest: 180px; --cloud-duration: 88s; --cloud-delay: -17.6s; }
-.sky-cloud-two { --cloud-rest: 900px; --cloud-duration: 108s; --cloud-delay: -59.2s; }
-.sky-cloud-three { --cloud-rest: 1490px; --cloud-duration: 120s; --cloud-delay: -100s; }
-.sky-cloud-four { --cloud-rest: 610px; --cloud-duration: 96s; --cloud-delay: -39.2s; }
-.sky-cloud-five { --cloud-rest: 1150px; --cloud-duration: 104s; --cloud-delay: -70s; }
-.sky-cloud-six { --cloud-rest: 330px; --cloud-duration: 112s; --cloud-delay: -31s; }
-.sky-cloud-seven { --cloud-rest: 1430px; --cloud-duration: 92s; --cloud-delay: -74s; }
-@keyframes sky-drift { from { transform: translateX(-240px); } to { transform: translateX(1840px); } }
+/* Markup comes from world() in doodles.ts. The moving pieces sit on a stage
+   cropped like the still layers' xMidYMax slice: 1600 x 1000 units, 1cqw = 16. */
+.doodle-world { position: relative; overflow: hidden; container-type: size; }
+.doodle-still { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.doodle-stage { position: absolute; bottom: 0; left: calc(50% - max(50cqw, 80cqh)); width: max(100cqw, 160cqh); aspect-ratio: 8 / 5; container-type: inline-size; }
+.doodle-stage div { position: absolute; }
+.doodle-stage svg, .lay-sun div { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
 
-/* Small expressions on a long loop keep the sun playful without stealing focus. */
-.sun-rays { transform-box: fill-box; transform-origin: center; animation: sun-orbit 64s linear infinite; }
-.sun-face { transform-box: fill-box; transform-origin: center; animation: sun-nod 12s ease-in-out infinite; }
-.sun-eye { transform-box: fill-box; transform-origin: center; animation: sun-blink 6.8s ease-in-out infinite; }
-.sun-eye-right { animation-delay: .06s; }
+/* Staggered, slow passes reset beyond the edges of the stage. */
+.sky-cloud { opacity: .75; transform: translateX(var(--cloud-rest)); animation: sky-drift var(--cloud-duration) linear var(--cloud-delay) infinite; }
+.sky-cloud-one { --cloud-rest: 11.25cqw; --cloud-duration: 88s; --cloud-delay: -17.6s; }
+.sky-cloud-two { --cloud-rest: 56.25cqw; --cloud-duration: 108s; --cloud-delay: -59.2s; }
+.sky-cloud-three { --cloud-rest: 93.125cqw; --cloud-duration: 120s; --cloud-delay: -100s; }
+.sky-cloud-four { --cloud-rest: 38.125cqw; --cloud-duration: 96s; --cloud-delay: -39.2s; }
+.sky-cloud-five { --cloud-rest: 71.875cqw; --cloud-duration: 104s; --cloud-delay: -70s; }
+.sky-cloud-six { --cloud-rest: 20.625cqw; --cloud-duration: 112s; --cloud-delay: -31s; }
+.sky-cloud-seven { --cloud-rest: 89.375cqw; --cloud-duration: 92s; --cloud-delay: -74s; }
+@keyframes sky-drift { from { transform: translateX(-15cqw); } to { transform: translateX(115cqw); } }
+
+/* Small expressions on a long loop keep the sun playful without stealing focus.
+   Origins are in the sun's 300-unit box, whose centre is the sun's. */
+.sun-rays { animation: sun-orbit 64s linear infinite; }
+.sun-face { transform-origin: 50% 55.67%; animation: sun-nod 12s ease-in-out infinite; }
+.sun-eye { transform-origin: 41.33% 46.67%; animation: sun-blink 6.8s ease-in-out infinite; }
+.sun-eye-right { transform-origin: 58.67% 46.67%; animation-delay: .06s; }
 .sun-open-eyes, .sun-smile { animation: sun-smile 16s linear infinite; }
 .sun-happy-eyes, .sun-grin { opacity: 0; animation: sun-grin 16s linear infinite; }
 @keyframes sun-orbit { to { transform: rotate(360deg); } }
