@@ -10,6 +10,7 @@ import { catalogSnapshot, planningSnapshot } from "./lib/catalog";
 import { LIVE_PLACES } from "./lib/places";
 import { huddleLocation } from "./lib/location-state";
 import { postalCity } from "../../shared/geography";
+import { STOP_VISIT_MINUTES, preferredStopCount, suggestedOutingMinutes } from "../../shared/outingTiming";
 import { invalidateAgent, agentBallot, agentVotingChoices } from "./lib/agent-state";
 import { clockMinutes } from "./lib/agent-constraints";
 import type { ReadDb, Tx } from "./lib/types";
@@ -23,7 +24,7 @@ function schedulingVenues(db: ReadDb, excluded: string[], groupId: string): Sche
   const { destinationCities } = huddleLocation(db, groupId);
   const places = planningSnapshot(catalogSnapshot(db), destinationCities)?.places ?? LIVE_PLACES;
   return places.filter(place => !excluded.includes(place.id) && (!destinationCities.length || destinationCities.includes(postalCity(place.address)))).map(place => ({
-    placeId: place.id, name: place.name, category: place.category, dwellMinutes: place.dwellMinutes,
+    placeId: place.id, name: place.name, category: place.category, dwellMinutes: STOP_VISIT_MINUTES,
     hours: (place as typeof place & { hours?: Record<string, string[][]> }).hours ??
       { mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] },
   }));
@@ -123,7 +124,7 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
       const members = membersOf(tx.db, group.id), connections = authorizedCalendarSnapshots(tx.db, group.id);
       if (members.length < 2 || connections.length !== members.length) throw new SenderError("Every participant must connect their own Google Calendar before checking a common time.");
       return { groupId: group.id, revision: state.revision, accountId: account.id, sessionNonce: session.nonce,
-        timeOfDay: huddleTiming(tx.db, group.id).timeOfDay,
+        preferredStops: members.map(member => parse(tx.db.private_prefs.memberId.find(member.id)?.hardJson)?.preferredStops ?? null),
         venues: schedulingVenues(tx.db, group.excludedPlaceIds, group.id),
         connections, members: connections.map(connection => {
           const need = tx.db.agent_need.memberId.find(connection.memberId);
@@ -131,7 +132,8 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
           return { accountId: connection.accountId, timeOfDay: memberTimePreference(tx.db, group.id, connection.memberId), prompt: need?.text ?? "", maxOutingMinutes: hard?.maxOutingMinutes ?? null };
         }) };
     });
-    const duration = args.durationMinutes || Math.floor(Math.min(120, ...snapshot.members.map(member => member.maxOutingMinutes ?? 720)));
+    const desiredMinutes = suggestedOutingMinutes(preferredStopCount(snapshot.preferredStops) ?? 2);
+    const duration = args.durationMinutes || Math.floor(Math.min(desiredMinutes, ...snapshot.members.map(member => member.maxOutingMinutes ?? 720)));
     if (duration < 15 || snapshot.members.some(member => member.maxOutingMinutes != null && duration > member.maxOutingMinutes))
       return failed("The requested length exceeds a participant's private outing limit. Try a shorter outing; no limits were changed.");
     // Explicit search bounds are hard; each member's day-part choice is soft

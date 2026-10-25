@@ -1,4 +1,5 @@
 import { postalCity } from "../../../shared/geography";
+import { STOP_VISIT_MINUTES } from "../../../shared/outingTiming";
 // Validate a service proposal before persisting any public/private rows. The
 // public projection deliberately has no per-member orders, caps or raw prompts.
 import { LIVE_PLACES } from "./places";
@@ -68,7 +69,7 @@ function checkedResult(data: any, body: any) {
       const start = clockMinutes(stop.start), end = clockMinutes(stop.end);
       const hours: [string, string][] = place?.hours?.[weekday] ?? [];
       if (!allowedPlace(place) || place.name !== stop.name || place.category !== stop.category || place.lat !== stop.lat || place.lng !== stop.lng ||
-          place.costPerPerson !== stop.costPerPerson || end - start !== place.dwellMinutes || !hours.some(([lo, hi]) =>
+          place.costPerPerson !== stop.costPerPerson || (end - start !== STOP_VISIT_MINUTES && end - start !== place.dwellMinutes) || !hours.some(([lo, hi]) =>
             clockMinutes(lo) <= start && end <= (hi === "23:59" ? 1440 : clockMinutes(hi))) ||
           !own && plan.status !== "provisional" && place.category !== "activity" && body.members.some((member: any) =>
             !member.needs.hard.dietary.every((diet: string) => place.dietary.includes(diet)))) return null;

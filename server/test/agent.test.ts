@@ -127,6 +127,24 @@ describe("single coordinator flow", () => {
     expect(JSON.parse(published.resultJson!)).toMatchObject({ date: null, choice: { placeId: "p_002" } });
     expect(() => s.book(0, runId)).toThrow();
   });
+  it("accepts one-hour coordinator stays while retaining old catalog-duration results", () => {
+    const s = setup(); s.ready();
+    s.transform(data => { for (const plan of data.plans) {
+      plan.stops[0].end = "19:00"; plan.stops[1].end = "21:00";
+    } });
+    const id = s.plan();
+    expect(s.test.db.plan_run.runId.find(id)?.status).toBe("done");
+    const stored = JSON.parse(s.test.db.plan_run.runId.find(id)!.resultJson!);
+    expect(stored.plans[0].stops.map((stop: any) => stop.end)).toEqual(["19:00", "21:00"]);
+    expect(LIVE_PLACES.find(place => place.id === "p_002")!.dwellMinutes).toBe(75);
+  });
+
+  it("does not accept an arbitrary shortened stop to squeeze under time limits", () => {
+    const s = setup(); s.ready();
+    s.transform(data => { data.plans[0].stops[0].end = "18:45"; });
+    expect(s.test.db.plan_run.runId.find(s.plan())?.status).toBe("error");
+  });
+
   it("accepts a current one-meal outing within identical 40-dollar/90-minute limits through voting and booking", () => {
     const s = setup();
     for (let i = 0; i < 2; i++) s.save(i, { budgetMaxPerPerson: 40, maxOutingMinutes: 90 });

@@ -8,7 +8,7 @@ from pydantic import TypeAdapter
 
 from api.agent import candidates, coordinate, interpret, public_facts
 from api.agent_models import AgentCatalog, AgentHard, AgentNeeds, AgentNeedsRequest, AgentPlanRequest
-from api.catalog import Catalog, CatalogCache, minutes
+from api.catalog import Catalog, CatalogCache, minutes, COORDINATOR_VISIT_MINUTES
 from api.main import Settings, create_app
 from api.models import Place
 
@@ -149,13 +149,13 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(stop.name, venue.name)
             self.assertEqual(plan.costPerPerson, venue.costPerPerson)
             self.assertLessEqual(plan.costPerPerson, 30)
-            self.assertEqual(minutes(stop.end) - minutes(stop.start), venue.dwellMinutes)
+            self.assertEqual(minutes(stop.end) - minutes(stop.start), COORDINATOR_VISIT_MINUTES)
             self.assertLessEqual(minutes(stop.end) - minutes(stop.start), 90)
             self.assertEqual(plan.travelMinutes, 0)
         self.assertTrue(all(len(plan.stops) >= 2 for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
 
     async def test_impossible_limits_get_untimed_ideas_and_unknown_diets_get_provisional_plans(self):
-        for body in [meal_request(duration=60), meal_request(cap=0)]:
+        for body in [meal_request(duration=59), meal_request(cap=0)]:
             model = Model()
             result = await coordinate(model, self.catalog, body)
             self.assertFalse(result.plans)
@@ -234,17 +234,49 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(counts(None, None, start="12:00"), {1, 2, 3})  # Flexible never adds long routes
         self.assertEqual(counts(1, 1), {1})
         self.assertEqual(counts(3, None), {3})  # Flexible members are not averaged in
-        self.assertEqual(counts(2, 3), {2, 3})  # a half-way mean keeps both counts
-        self.assertEqual(counts(3, 4), {3, 4})
-        self.assertEqual(counts(1, 2), {1, 2})
+        self.assertEqual(counts(2, 3), {3})  # a halfway choice first tries the fuller outing
+        self.assertEqual(counts(3, 4), {4})
+        self.assertEqual(counts(1, 2), {2})
         self.assertEqual(counts(4, 4), {4})
         self.assertEqual(counts(5, 5, start="12:00"), {5})
         self.assertEqual(counts(5, 1), {3})
         # Soft: when a count does not fit the window or time limit, the nearest feasible count remains.
-        self.assertEqual(counts(5, 5), {4})  # five stops need more than six hours
+        self.assertEqual(counts(5, 5), {5})  # one-hour visits can now fit with nearby travel
         self.assertEqual(counts(5, 5, duration=240, start="12:00"), {3})
         self.assertEqual(counts(3, 3, duration=180), {2})
         self.assertEqual(counts(3, 3, duration=90), {1})
+
+    def test_one_hour_visits_preserve_catalog_evidence_and_legacy_templates(self):
+        before = [place.dwellMinutes for place in self.catalog.places]
+        view = self.catalog.coordinator_view
+        self.assertIs(view, self.catalog.coordinator_view)
+        self.assertTrue(all(place.dwellMinutes == 60 for place in view.places))
+        self.assertEqual([place.dwellMinutes for place in self.catalog.places], before)
+        self.assertTrue(any(duration != 60 for duration in before))
+        body = meal_request(duration=180, preferredStops=2)
+        plans = candidates(self.catalog, body)
+        self.assertTrue(plans)
+        self.assertEqual({len(plan.stops) for plan in plans.values()}, {2})
+        self.assertTrue(all(minutes(stop.end) - minutes(stop.start) == 60
+                            for plan in plans.values() for stop in plan.stops))
+
+    async def test_a_shorter_outing_explains_the_requested_count_without_raising_limits(self):
+        body = meal_request(duration=90, preferredStops=2)
+        result = await coordinate(Model(), self.catalog, body)
+        self.assertTrue(result.plans)
+        self.assertEqual({len(plan.stops) for plan in result.plans}, {1})
+        self.assertIn("2 stops", result.conflicts[0])
+        self.assertIn("1-stop alternative", result.conflicts[0])
+        self.assertTrue(all(member.needs.hard.maxOutingMinutes == 90 for member in body.members))
+        self.assertTrue(all(member.needs.hard.budgetMaxPerPerson == 30 for member in body.members))
+
+    async def test_requested_multi_stop_count_is_explained_when_time_is_unset(self):
+        body = meal_request(duration=180, preferredStops=2).model_copy(update={"date": None, "window": None})
+        result = await coordinate(Model(), self.catalog, body)
+        self.assertFalse(result.plans)
+        self.assertTrue(result.suggestions)
+        self.assertIn("2-stop outing", result.conflicts[0])
+        self.assertIn("individual place ideas", result.conflicts[0])
 
     def test_long_routes_keep_one_meal_distinct_venues_and_every_limit(self):
         body = request(window={"start": "12:00", "end": "23:00"})
@@ -380,7 +412,7 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
             "hours": meal.hours})
         catalog = Catalog([meal, activity])
         body = request()
-        body.members[0].needs.hard.maxOutingMinutes = 105
+        body.members[0].needs.hard.maxOutingMinutes = 135
         body.members[0].needs.hard.maxTravelMinutes = None  # outing slider needs no starting location
         plans = candidates(catalog, body)
         self.assertTrue(plans)
@@ -388,9 +420,9 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(multi_stop)
         for plan in multi_stop:
             self.assertEqual(sum(s.costPerPerson for s in plan.stops), 17)
-            self.assertEqual(minutes(plan.stops[-1].end) - minutes(plan.stops[0].start), 105)
-            self.assertLess(sum(minutes(s.end) - minutes(s.start) for s in plan.stops), 105)
-        body.members[0].needs.hard.maxOutingMinutes = 104
+            self.assertEqual(minutes(plan.stops[-1].end) - minutes(plan.stops[0].start), 135)
+            self.assertLess(sum(minutes(s.end) - minutes(s.start) for s in plan.stops), 135)
+        body.members[0].needs.hard.maxOutingMinutes = 134
         shorter = candidates(catalog, body)
         self.assertTrue(shorter)
         self.assertTrue(all(len(plan.stops) == 1 for plan in shorter.values()))

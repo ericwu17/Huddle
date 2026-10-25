@@ -37,7 +37,8 @@ def context_items(catalog, place, members):
 
 
 async def coordinate_menu(llm, catalog, body):
-    from .agent import candidates, eligible, public_facts, rating_observation, sum_cost
+    from .agent import candidates, eligible, public_facts, rating_observation, sum_cost, stop_counts
+    catalog = catalog.coordinator_view
     timed = body.date is not None and body.window is not None and not any(m.needs.questions or m.needs.hard.maxTravelMinutes is not None and m.origin is None for m in body.members)
     all_plans = await asyncio.to_thread(candidates, catalog, body) if timed else {}
     offered = balanced_candidates(all_plans, catalog)
@@ -124,7 +125,7 @@ async def coordinate_menu(llm, catalog, body):
                     member = next(m for m in body.members if m.memberId == order["memberId"])
                     total = own_total(catalog, offered[key].stops, {i["placeId"]: i["itemId"] for i in items})
                     if member.needs.hard.budgetMaxPerPerson is not None and total > Decimal(str(member.needs.hard.budgetMaxPerPerson)):
-                        raise ValueError(f"candidate {key}, member {member.memberId}: own order exceeds their cap; choose cheaper eligible items or an affordable meal-only candidate")
+                        raise ValueError(f"candidate {key}, member {member.memberId}: own order exceeds their cap; choose cheaper eligible items or another affordable supplied candidate")
 
     context = {"members": [m.model_dump() for m in body.members], "discussion": body.discussion,
         "destinationCities": body.destinationCities, "reasonTypes": reason_types, "catalogVersion": body.catalog.version if body.catalog else "bundled",
@@ -213,9 +214,21 @@ The group votes and explicitly creates meetup events. Suggestions never reserve 
             "Dietary context is a suggestion; allergy handling and live availability are unverified."]
         assert sum_cost(plan.stops) == Decimal(str(plan.costPerPerson))
         selected.append(plan)
+    explicit_count = any(m.needs.hard.preferredStops is not None for m in body.members)
+    target = next(iter(stop_counts(body.members)[0])) if explicit_count else None
+    notices = []
+    if selected and target is not None and any(len(plan.stops) != target for plan in selected):
+        actual = len(selected[0].stops)
+        notices.append(f"We couldn’t fit {target} stops into the current outing window and limits. Showing a {actual}-stop alternative.")
+    elif not selected:
+        notices.append((f"Choose a shared date and time to build a {target}-stop outing. These are individual place ideas."
+                        if body.date is None and target is not None and target > 1 else
+                        "Time is not set. Connect calendars or choose a time to build an itinerary."
+                        if body.date is None else
+                        "We couldn’t build a timed outing within the current limits. These are individual place ideas."))
     return AgentPlanResponse(runId=body.runId, inputRevision=body.inputRevision, plans=selected,
         recommendedPlanId=selected[0].id if selected else None,
         rationale=selected[0].summary if selected else ("Here are venue ideas while your group finds a shared calendar opening." if body.date is None else "Here are other venues to explore; no exact timed itinerary fits the current inputs."),
-        conflicts=[] if selected else (["Time is not set. Connect calendars or choose a time to build an itinerary."] if body.date is None else ["These are untimed alternatives, not confirmed plans. Existing limits were kept."]),
+        conflicts=notices,
         warnings=["Claude considered the supplied prompts and menu evidence. Voting does not verify a venue or reserve it."],
         suggestions=suggestions, privateOrders=private)

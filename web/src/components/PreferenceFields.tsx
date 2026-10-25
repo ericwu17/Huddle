@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { DEFAULT_PREFERENCES, type AccountContext } from "../accountContextState";
+import { stopTimeWarning } from "../../../shared/outingTiming";
 
 const DIETARY_CHOICES = [
   ["vegetarian", "Vegetarian"], ["vegan", "Vegan"], ["halal", "Halal"], ["gluten_free", "Gluten-free"], ["kosher", "Kosher"],
@@ -21,6 +22,8 @@ export function PreferenceFields({ value, onChange, prefix = "needs", budgetCeil
   const update = (patch: Partial<AccountContext>) => onChange({ ...value, ...patch });
   const flexibleBudget = value.budgetMaxPerPerson === null;
   const flexibleTime = value.maxOutingMinutes === null;
+  const timeWarning = stopTimeWarning(value.preferredStops, value.maxOutingMinutes);
+  const warningId = `${prefix}-time-warning`;
   return <div className="preference-grid">
     <fieldset className="preference-field">
       <legend className={`font-bold${flexibleBudget ? "" : " required-label"}`}>Outing budget{!flexibleBudget ? <><span aria-hidden="true"> *</span><span className="sr-only"> (required)</span></> : null}</legend>
@@ -42,9 +45,13 @@ export function PreferenceFields({ value, onChange, prefix = "needs", budgetCeil
         onChange={e => update({ maxOutingMinutes: e.target.checked ? null : DEFAULT_PREFERENCES.maxOutingMinutes })} />I'm down for whatever</label>
         <div className="preference-slider-row">
         <input id={`${prefix}-duration`} className="range-input" type="range" min="0" max={Math.max(480, value.maxOutingMinutes ?? 180)} step="15" disabled={flexibleTime}
-          aria-label="Maximum outing duration" value={value.maxOutingMinutes ?? 180} onChange={e => update({ maxOutingMinutes: Number(e.target.value) })} />
+          aria-label="Maximum outing duration" aria-describedby={timeWarning ? warningId : undefined} value={value.maxOutingMinutes ?? 180} onChange={e => update({ maxOutingMinutes: Number(e.target.value) })} />
         <label className="preference-number"><input id={`${prefix}-duration-number`} className="input" aria-label="Exact duration in minutes" type="number" min="0" max="1440" step="1"
-            disabled={flexibleTime} required={!flexibleTime} placeholder="—" value={value.maxOutingMinutes ?? ""} onChange={e => update({ maxOutingMinutes: Math.max(0, Number(e.target.value)) })} />min</label></div>
+            disabled={flexibleTime} required={!flexibleTime} aria-describedby={timeWarning ? warningId : undefined} placeholder="—" value={value.maxOutingMinutes ?? ""} onChange={e => update({ maxOutingMinutes: Math.max(0, Number(e.target.value)) })} />min</label></div>
+      {timeWarning ? <p id={warningId} className="outing-time-warning" role="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m10.3 3.9-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3.1l-8-14a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4m0 4h.01" /></svg>
+        <span>{timeWarning}</span>
+      </p> : null}
     </fieldset>
     <fieldset className="preference-field">
       <legend className="font-bold">Stops</legend>

@@ -245,6 +245,7 @@ export function AgentVote() {
       <div className="page-actions"><Link className="btn" to={`/g/${session.groupId}/plans`}>Plans & chat</Link>
       {winner ? <Link className="btn btn-sun" to={`/g/${session.groupId}/done`}>See the group’s choice →</Link> : null}</div>
     </div>
+    {result.conflicts.map(notice => <p className="card card-note" role="status" key={notice}>{notice}</p>)}
     {choices.length ? <VoteStatus votes={votes} members={group.members} winnerTitle={winner ? titleFor(winner.id) : undefined}
       tiedTitles={complete && !winner ? leaders.map(p => titleFor(p.id)) : undefined} /> : null}
     {!choices.length ? <p className="card">No options yet. The host can find plans after everyone saves their needs.</p> : null}

@@ -1,5 +1,15 @@
 # Huddle current product and architecture
 
+**Stop-count and timing update:** coordinator visits are proposed as one hour per
+stop. Explicit stop preferences take priority over shorter routes; halfway group
+ties favor the fuller outing. Automatic Calendar search allows travel between
+visits and stays inside every private duration cap. Time available shows a red
+warning triangle and “Time may be tight: stopping 2 times usually needs about
+2 hours, plus travel.” when the selected stops need more time. Options and Vote
+explain a necessary shorter alternative or missing outing time. Scraped menus,
+photos, venue estimates and legacy solver behavior are preserved. For rehearsal,
+use two stops with a three-hour allowance; see [demo script](DEMO_CHECKLIST.md).
+
 **Participant time preferences — October 24:** the tested extension lets every
 joined participant, including non-hosts, save their own optional Any time,
 Morning, Afternoon or Evening choice per Huddle. Claude receives all choices

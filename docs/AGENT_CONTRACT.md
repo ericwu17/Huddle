@@ -33,8 +33,10 @@ host preference `flexible|morning|afternoon|evening`. The host changes it with
 Find plans checks the current participants' connected Google calendars when
 available. Flexible searches the full day; selected day parts bound the search.
 The default search spans the next seven days, not an assigned outing date.
-`schedule_huddle.durationMinutes=0` means automatic length: at most two hours and
-within every saved private duration cap. Explicit lengths remain compatible.
+`schedule_huddle.durationMinutes=0` means automatic length: one hour per preferred
+stop plus a 15-minute allowance per transfer, capped by every saved private
+duration limit. Flexible groups start from two stops (135 minutes). Explicit
+lengths remain compatible; no member's time limit is raised automatically.
 The module supplies the active venues' weekday opening/closing hours and visit
 lengths to `/connectors/calendar/schedule`. Calendar candidates must contain a
 complete meal visit inside one opening interval, not merely an arrival before
@@ -143,20 +145,29 @@ Response:
 
 Each plan contains `id`, `title`, `stops`, `costPerPerson`, `whyLine`,
 `limitations`, `travelMinutes`. Stops retain the known place ID/name/category,
-start/end, coordinates and catalog cost. A coordinator plan has one to five
-stops. Four- and five-stop plans add distinct activities around one meal and at
+start/end, coordinates and catalog cost. Proposed coordinator visits are 60 minutes
+each, without changing the stored venue estimates or the legacy solver. The
+module accepts both 60-minute proposals and original catalog visit lengths during
+rollout, while still validating every stop against hours, travel and outing limits.
+A coordinator plan has one to five stops. Four- and five-stop plans add distinct activities around one meal and at
 most one dessert, so a private order is still one meal item plus at most one
 dessert item. A single-stop plan must be a meal venue: a dinner can fit a short outing
 without forcing an activity or dessert. Both API and module validate this
 additive count change; retained legacy templates/shapes are unchanged.
 When members state `preferredStops`, timed candidates keep only the feasible
 stop count nearest the mean of the stated values (Flexible members are not
-averaged; a half-way mean keeps both counts). If the nearest count has no
+averaged; a halfway mean favors the fuller outing). If the nearest count has no
 feasible itinerary, the next nearest feasible count is used. Flexible-only
 groups get one to three stops. Four- and five-stop routes come from a bounded
 search (nearest feasible next stops, a per-template cap) instead of every
 combination, so they are a strong sample, not an exhaustive list. Five stops
-usually need a longer shared opening than the automatic two-hour search length.
+need five hours of visits plus travel; the automatic Calendar search now scales
+with the chosen count. A shorter feasible route or untimed venue ideas explain
+the missing stops in `conflicts`, shown on both Options and Vote. A private
+Time available warning says “Time may be tight: stopping 2 times usually needs
+about 2 hours, plus travel.” The count and hour text follow the selected stops;
+Flexible inputs do not trigger the warning. The red text and warning triangle
+are guidance, not permission to exceed a cap.
 The legacy public baseline equals the sum of every stop. For `own_orders`,
 private menu totals govern individual caps; see the extension above.
 Prices and travel are explicitly estimates. There is no score or posterior.

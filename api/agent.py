@@ -166,6 +166,7 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
     """
     if body.date is None or body.window is None:
         return {}
+    catalog = catalog.coordinator_view
     allowed = eligible(catalog, body)
     menu_places = {i for i, p in enumerate(catalog.places) if menu_items(catalog, p.id)}
     cost = [Decimal(str(p.costPerPerson)) for p in catalog.places]
@@ -215,13 +216,12 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
 
 
 def stop_counts(members) -> list[set[int]]:
-    """Stop counts to try, nearest the stated preferences' mean first; ties stay together."""
+    """Try the requested group count first; a halfway tie favors the fuller outing."""
     wanted = [m.needs.hard.preferredStops for m in members if m.needs.hard.preferredStops is not None]
     if not wanted:
         return [{1, 2, 3}]  # Flexible: long routes only when someone asks for them
     mean = sum(wanted) / len(wanted)
-    distances = sorted({abs(n - mean) for n in range(1, 6)})
-    return [{n for n in range(1, 6) if abs(n - mean) == d} for d in distances]
+    return [{n} for n in sorted(range(1, 6), key=lambda n: (abs(n - mean), -n))]
 
 
 def build_plans(catalog: Catalog, body: AgentPlanRequest, itineraries, menu_places: set[int]) -> dict[str, AgentPlan]:
@@ -317,6 +317,7 @@ def empty_explanation(catalog: Catalog, body: AgentPlanRequest) -> str:
     """
     if body.date is None or body.window is None:
         return "The outing time is not set. Use connected calendars to find a shared opening, or choose a time."
+    catalog = catalog.coordinator_view
     meals = [catalog.places[index] for index in eligible(catalog, body) if catalog.places[index].category == "meal"]
     if not meals:
         return "No catalog meal matches the remaining venue choices and private hard requirements. Add suitable venue data or review a mistaken restriction privately; no requirement was relaxed."

@@ -1,158 +1,123 @@
-# Demo and submission checklist
+# Huddle demo checklist and rehearsed script
 
-Owners: Haydn leads narration; Max explains the solver and evaluation; Eric Wu
-owns voice; Eric Chen is submission captain, with Max covering backend work.
-Confirm coverage if anyone is away. This checklist records readiness, not a claim
-that future features already work. Current integration details: [HANDOFF.md](HANDOFF.md).
+Use a controlled live rehearsal with familiar food. This is a prepared demo,
+not a promise of identical Claude output on every run. Keep a completed rehearsal
+Huddle as a disclosed backup. Current hosting remains Vercel + Maincloud + Eric
+Wu’s local FastAPI/tunnel; no cloud migration is needed for this demo.
 
-## Ready now
+## Before the audience arrives
 
-- [x] SpacetimeDB is live and Max/Eric Wu have Admin access.
-- [x] Separate FastAPI and voice stubs passed live synthetic confirm/full tests.
-- [x] Full failure excluded the restaurant, reopened voting and did not auto-call.
-- [x] Shared-secret, privacy, deterministic fixture and cumulative-budget checks passed.
-- [x] Eric Wu reports the deployed Vercel frontend works; this is a teammate report,
-  not a new browser test performed by Max.
-- [x] Experiment cumulative-budget bug fixed; old chart/numbers withdrawn.
-- [x] Corrected baseline CSVs/chart regenerated; no implemented-solver result claimed.
+- [ ] Eric Wu keeps his API host awake, plugged in and the tunnel running. Verify
+  the deployed API health and that Maincloud still points to that tunnel.
+- [ ] Open [huddle.compare](https://huddle.compare) on two phones or separate
+  browser profiles. Tabs in the same profile share identity.
+- [ ] Sign into the two Huddle accounts and add each other in Friends beforehand.
+  Keep the accounts’ Google Calendars connected if demonstrating availability.
+- [ ] Confirm the current tunnel callback is allowlisted on the Google OAuth Web
+  client, and both demo Google accounts are permitted testers.
+- [ ] Check a common three-hour opening against both calendars and the venues’
+  published hours. Avoid a midnight, closing-time or very early morning demo.
+- [ ] Rehearse once on the exact deployed build with the inputs below. Check two
+  stops, menu orders, photos, both private totals, Maps, votes and Done.
+- [ ] Save that completed Huddle under **Your huddles**, and record a short backup
+  clip. Keep the invite inbox ready for a fresh live Huddle.
 
-## Before the rehearsal
+## Predictable inputs
 
-- [ ] Agree on the exact build to demo on the deployed site, `https://huddle.compare`.
-- [ ] Eric Wu confirms which API features are real and which remain stubs.
-- [ ] Record that status in [HONESTY.md](HONESTY.md) and keep visible demo labels accurate.
-- [ ] Verify API/voice health, current tunnel URLs and shared-secret matching.
-- [ ] Keep both service laptops awake; name who will restart each service/tunnel.
-- [ ] Use four phones or four isolated browser profiles, so identities are distinct.
-  Separate tabs in one profile share the same token and are not four people.
-  One-phone alternative: start a huddle on your phone, then run
-  `node scripts/demo-friends.mjs <CODE>` on a laptop. Sam, Jordan and Riley join,
-  write their own private preferences, swipe, answer offers and vote; you play Alex.
-  Say on stage that the other three are simulated (see HONESTY.md).
-- [ ] Agree on test preferences supported by the current parser, including a
-  vegetarian and different private whole-outing budgets.
-- [ ] Prepare a teammate restaurant phone and verify consent/demo-only dialing
-  before any real voice test. The existing stub needs no phone call.
-- [ ] Decide live voice versus a labeled recording; check the chosen path end to end.
-- [ ] Coordinate deployment of Eric Chen's demo-mode safety net (`059292a`), then
-  verify a dead-service fallback and its visible label in an isolated test setup.
-  This code was merged; Max has not published the new module to Maincloud.
+| Person | Private controls | Optional prompt |
+| --- | --- | --- |
+| Max | Berkeley; $40 total; 180 minutes; 2 stops; Vegetarian; no allergy field unless there is an actual allergy | “A proper vegetarian burger or pizza, then coffee or ice cream. Familiar casual places please.” |
+| Eric | Berkeley; $50 total; 180 minutes; 2 stops; no dietary restriction | “A familiar casual burger or pizza, then coffee or ice cream.” |
 
-## Full-flow acceptance test (four users)
+Use a name such as **Burger night**. The Start prompt is invitation intent:
+“Dinner with Eric”; it is not a private food-preference submission. Review the
+friend picker before sending in-app invitations.
 
-- [ ] Host creates a new group; three other phones join by code/QR.
-- [ ] All four see the same member list and ready-state updates without reloading.
-- [ ] Each user submits preferences; each phone sees only its own private inputs.
-- [ ] Swipes advance and the confidence display agrees with the current implementation
-  (label canned confidence if still synthetic).
-- [ ] Plans appear with readable stops, times, map and the sum of all stop costs.
-- [ ] Every plan respects every user's non-null cumulative budget, vetoes and dietary needs.
-  Include a case where each stop is individually affordable but their sum is not.
-- [ ] Council text stays readable and Plans can be reopened after voting begins.
-- [ ] Voting updates all phones; changing a vote replaces the previous vote.
-- [ ] Booking displays a single ordered event sequence and a clear final result.
-- [ ] Run the synthetic full scenario: replacement plans exclude the restaurant,
-  voting reopens, and booking another place requires an explicit action.
-- [ ] Restore voice to `STUB_SCENARIO=confirm`; rerun the normal synthetic check.
-- [ ] Reload one phone and verify it retains its identity/group membership.
-- [ ] Check a phone-sized viewport for clipped controls and unreadable text.
+The prepared budgets are each person’s own meal plus their own later stops;
+they are not pooled. Two hour-long visits need travel time as well: use a
+three-hour allowance. If Calendar cannot find that shared opening, explicitly
+select the rehearsed date and window (for example, 5–8 PM when both venues are
+open). Describe this as manual selection, not a successful Calendar check.
 
-Use the repeatable backend smoke command in [api/README.md](../api/README.md#check-the-live-deployment).
-It creates disposable synthetic groups; it does not replace the browser rehearsal.
+These prompts favor familiar food without inventing dishes or forbidding useful
+alternatives. Claude may select different supported venues. Never alter a real
+allergy, budget or dietary requirement just to make the demo succeed.
 
-## Three-minute script (coordinator flow; rehearse with a clock)
+## Five-minute live script
 
-This script follows the current account → invite → private needs → coordinator
-plans → vote → booking simulation flow on [huddle.compare](https://huddle.compare/start)
-and shared Maincloud `huddle-calhacks`. Owners are carried over from the earlier
-draft; confirm them at rehearsal. Screen names in quotes are the UI's own labels.
+1. **Accounts and contacts (30 seconds).** Show two signed-in people. Start a named
+   Huddle, select Eric under Invite friends and send the invitation. Eric opens
+   it from his Huddle inbox. Show both people arriving without a QR code.
+   Say: “We keep reusable context, but each person controls their own needs.”
+2. **Private needs (45 seconds).** Each person enters the inputs above and selects
+   **Save & ready**. Briefly set 90 minutes with 2 stops to show the red triangle:
+   “Time may be tight: stopping 2 times usually needs about 2 hours, plus travel.”
+   Return to 180 minutes before saving. Show **Remember for next time** if useful.
+   Say: “The budget covers my own order at every stop. My private prompt and cap
+   are not shown to my friend.”
+3. **Calendar context (30 seconds).** With both calendars connected, choose an
+   optional shared daypart and **Find plans**. Show the selected common opening.
+   This checks free/busy and venue hours; it does not create an event. Use the
+   explicit manual-window fallback above if no suitable opening exists.
+4. **Claude + real venue data (60 seconds).** Open the options. Show two visits of
+   about an hour each, familiar route names, photos, ratings, comparison labels
+   and each person’s suggested menu item/private total. Switch briefly between
+   the phones to show different orders at the same venue. Say: “Claude compares
+   everyone’s needs with our Bright Data catalog and menus. Python and the
+   database check the proposal’s facts, prices, times and each private cap.”
+5. **Google Maps (30 seconds).** Open **Map & details** and the embedded route.
+   Show the driving estimate; optionally toggle walking to demonstrate the
+   difference. **Click here to see the map!** opens the route in Google Maps.
+   Explain that display-mode changes do not recalculate the saved itinerary.
+6. **Realtime voting (30 seconds).** Open Vote on both phones. Vote for the same
+   option and show the tally syncing through SpacetimeDB. A tie can demonstrate
+   equal-chance Spin if rehearsed, but matching votes keep the main path short.
+7. **Done, personal Calendar and sharing (45 seconds).** Open Done. Show the route,
+   date/time and private order, plus the Finished status on Your huddles. Each
+   participant can add to **their own** connected Google Calendar; one person
+   cannot add to someone else’s. An owner may click this during the live demo if
+   they want an actual event, or show the action without creating one. Share the
+   final result link and open it in a logged-out browser: venue facts are public,
+   private prompts and personal orders are not.
+8. **Reusable context (15 seconds).** Return to Start/Friends and show the retained
+   contact and saved preferences ready for the next outing.
 
-### Stage setup
+## What is real, and what to say accurately
 
-Pick one path and rehearse it on the demo build:
+| Integration | What this demo shows |
+| --- | --- |
+| Claude API | One coordinator comparing confirmed private inputs with supplied catalog/menu choices; responses can vary |
+| SpacetimeDB Maincloud | Accounts, owner-scoped context, contacts, invitations, shared Huddle state and live votes |
+| Bright Data | A previously scraped, published catalog with menus/photos; not a fresh scrape or live restaurant availability check |
+| Google Calendar | Connected owners’ free/busy context; a separate owner-triggered action adds only that person’s event |
+| Google Maps Embed | Real directions and displayed travel estimate; changing display mode does not reschedule the plan |
+| Messages / restaurant reservations | Do not claim working automatic SMS, iMessage delivery or a real reservation; these are outside the main demo |
 
-- **Two phones (preferred).** Register a host account and one friend account
-  beforehand and make them friends in **Friends**. Clear both inboxes. The host
-  phone is the one on the projector.
-- **One phone.** The host starts the huddle and reads its code from "Your huddles"
-  on the Start screen. A laptop runs `node scripts/demo-friends.mjs <CODE>`. Sam
-  ("no sushi"), Jordan ("nothing over $20, outdoors") and Riley ("romantic, price
-  no object") join by code, save seeded private needs and vote for the
-  coordinator's recommendation. They are simulated people: say so on stage. A
-  seeded friend whose needs come back with a clarifying question will not
-  confirm, so check that all three reach "ready ✓" during rehearsal.
+Do not call the planning animation independent agents negotiating live. There is
+one coordinator. Do not claim numerical fairness results, guaranteed allergen
+safety, exact live bills or live seating. Venue data is cached; an unknown menu
+price must not be described as an observed item price.
 
-Host's private needs for the demo: **Vegetarian**, **$30** whole-outing budget,
-**2 stops**, prompt "somewhere quiet". 4 stops fit the default 17:00–23:00
-window; 5 stops usually need a longer window and otherwise fall back to 4.
+## If something goes wrong
 
-Before going on: API health and tunnel are up, the 130-venue catalog is active,
-and one complete huddle from rehearsal is saved under "Your huddles" as a backup.
+- **One stop instead of two:** read the displayed compromise. Check both people
+  saved 2 stops, at least 180 minutes, and a shared window covering both visits
+  plus travel while venues are open. Unset time shows individual place ideas.
+  A 90-minute limit is deliberately not stretched into a two-hour plan.
+- **Different venues:** use another suitable option. Claude is not deterministic;
+  this is normal when the menu, budget and opening-hour checks still pass.
+- **No Calendar opening:** choose the rehearsed manual window and say so.
+- **API/tunnel outage:** open the saved completed rehearsal Huddle or play the
+  recorded clip. Say it is the rehearsal result; do not present it as a live call.
+- **Missing map:** use the blue underlined external Maps action. Do not claim the
+  iframe passed if the key/referrer configuration has failed.
 
-### Script
+## Final submission checks
 
-| Time | Owner | Show | Say |
-| --- | --- | --- | --- |
-| 0:00–0:20 | Haydn | Signed-in Start screen, "Ready to huddle?" | “Every group chat picks a plan while someone quietly can't afford it or can't eat there. Huddle lets each person say what they need privately, and a Claude coordinator finds an outing that works for all of them.” |
-| 0:20–0:50 | Haydn + phone driver | **Start a huddle** → "Get everyone in". Pick the friend under "Invite Huddle friends" → **Send invitations**. Second phone: inbox → **Open Huddle →** → **Open Huddle**. (One phone: the simulated friends appear under "Who's here".) | “Friends get an invitation in their Huddle inbox. Everyone joins from their own phone.” |
-| 0:50–1:25 | Max | **Start huddle** → "Your kind of outing": budget and time sliders, stops, dietary chips, optional prompt → **Save & ready**. Show "Your private summary". | “This screen is private. The sliders are hard limits; the prompt is for Claude. Nobody else sees my $30 or what I wrote.” |
-| 1:25–2:05 | Max (Eric Wu on the data line) | Host taps **Find plans** → "Your coordinator is planning" → "Your group’s plans": option cards with route names, times, walking map, ratings, photos, menu items and my private total. Point to the "Coordinator's recommendation" sticker. | “Claude reads everyone's needs, but it only picks from itineraries our code has already checked: every person's budget across all stops, dietary needs and opening hours. The venues are 130 Berkeley places we scraped with Bright Data, with menus read from their own websites. My total is just my meal plus the later stops, and only I see it.” |
-| 2:05–2:35 | Eric Wu | **Go to vote** → each phone votes; the tally updates live. (Tie: **Resolve tie: equal-chance Spin**.) Host taps **Simulate booking**. | “Votes sync in real time through SpacetimeDB. Booking here is a simulation; no restaurant is called.” |
-| 2:35–3:00 | Eric Wu | Booking simulation screen, then back to the chosen plan. | State what is real and what is simulated (below), give one next step (real restaurant calls, or takeout and seating data in the planner) and end on the group's plan. |
-
-### Say out loud
-
-- If the one-phone path is used, the other members are scripted, not real people.
-- Booking is a simulation. No phone call or reservation is made.
-- Venue data is a one-time snapshot from October 24, not live availability.
-- An option the code cannot fully verify (for example, an allergy with no venue
-  evidence) can still be voted on but cannot be booked.
-
-### Do not show or claim
-
-- A live restaurant phone call, or a "we're full" re-plan: coordinator bookings
-  always confirm unless an operator changes the module's scenario setting.
-- Google Calendar events or texted invitations: neither has passed a real-provider test.
-- The experiment chart, solver numbers, swipes or confidence scores: they belong
-  to the legacy flow, not this one.
-- Multiple agents negotiating: there is one coordinator.
-
-### If something fails
-
-New huddles have no cached fallback: if the API or tunnel is down, planning
-shows a retryable error. Open the saved rehearsal huddle from "Your huddles" and
-continue from its plans, or play the recorded clip. Check in rehearsal that the
-saved huddle still opens with its plans.
-
-Thirty-second backup: Start a huddle → invite (or simulated friends) → private
-needs, **Save & ready** → **Find plans** → one option on the map with my private
-total → vote → labeled booking simulation. Never describe a planned feature as working.
-
-## Evaluation release checks (Max)
-
-- [x] Budget, feasibility, malformed-output and stub-rejection regression checks pass.
-- [x] Baseline run has zero recorded selected-plan budget violations.
-- [x] Simulation README describes redraws, placeholder features and metric limitations.
-- [ ] When Eric confirms the real API is ready, run the opt-in comparison described
-  in [experiments/README.md](experiments/README.md#reproduce), using separate outputs.
-- [ ] Report API failures/empty or invalid plans alongside success-only utility;
-  use matched-group paired comparisons.
-- [ ] Rerun after place features change; review the method and exact headline claim
-  before putting a number on a slide. Do not assume richer data makes the gap larger.
-
-## Submission (Eric Chen captain; confirm a backup)
-
-The team's internal target in the brief is Sunday 7:30 AM Pacific. Confirm the
-official deadline, check-in and pitch format with organizers before relying on
-the schedule. Sponsor requirements remain subject to booth confirmation.
-
-- [ ] All four teammates are added to the submission.
-- [ ] Project title, description, image and working public demo URL are included.
-- [ ] GitHub link works in a logged-out browser; final README matches the demo build.
-- [ ] Demo video is attached, readable and backed up locally.
-- [ ] Tracks are selected only after confirming eligibility and extra submission steps.
-- [ ] Actual libraries/services and AI coding tools are disclosed in [DISCLOSURE.md](DISCLOSURE.md).
-- [ ] Cached, seeded, simulated, scripted and recorded parts are disclosed in [HONESTY.md](HONESTY.md).
-- [ ] Scan the files/history being published for secrets; verify private env files remain ignored.
-- [ ] Agree on a code freeze, sync main before pushing, and rerun the final acceptance test.
-- [ ] Submission saved, preview checked and confirmation recorded before the deadline.
+- [ ] Both Erics can open the deployed build, log in and join an invitation.
+- [ ] Current main commit and Vercel deployment are green; no last-minute schema
+  reset, catalog rebuild or tunnel replacement during the pitch.
+- [ ] Public result sharing exposes no private needs, orders, caps or credentials.
+- [ ] Team members, repository, public demo URL and video are on the submission.
+- [ ] Confirm the official deadline and pitch format with organizers. Update
+  [DISCLOSURE.md](DISCLOSURE.md) / [HONESTY.md](HONESTY.md) if the demo setup changes.

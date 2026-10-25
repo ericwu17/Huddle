@@ -7,7 +7,7 @@ coordinator request (CatalogCache). Everything here is group-independent.
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import date
-from functools import lru_cache
+from functools import cached_property, lru_cache
 import hashlib
 import json
 from itertools import product
@@ -30,6 +30,7 @@ LONG_TEMPLATES = {
         ("activity", "activity", "meal", "activity", "dessert")),
 }
 WEEKDAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
+COORDINATOR_VISIT_MINUTES = 60  # proposed stays; never overwrite scraped venue evidence
 GRID = 15  # minutes between candidate start times
 BRANCH = 6  # long routes: nearest feasible next stops tried from each stop
 ROUTE_CAP = 3000  # long routes kept per template; Claude sees at most 120 candidates
@@ -96,6 +97,14 @@ class Catalog:
         self.legs = travel_minutes(haversine_km(self.lat[:, None], self.lng[:, None],
                                                 self.lat[None, :], self.lng[None, :]))
         self._enumerate = lru_cache(maxsize=32)(self._enumerate_uncached)
+
+    @cached_property
+    def coordinator_view(self):
+        """One-hour proposed visits, cached separately from legacy/catalog stay estimates."""
+        if all(place.dwellMinutes == COORDINATOR_VISIT_MINUTES for place in self.places):
+            return self
+        return Catalog([place.model_copy(update={"dwellMinutes": COORDINATOR_VISIT_MINUTES})
+                        for place in self.places], evidence=self.evidence)
 
     def open_for(self, i: int, weekday: str, start: int) -> bool:
         end = start + self.places[i].dwellMinutes
