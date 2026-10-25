@@ -28,7 +28,7 @@ function contextJson(text: string) {
   if (text.length > 8000) throw new SenderError("Saved context is too long.");
   let value: any;
   try { value = JSON.parse(text); } catch { throw new SenderError("Saved context must be valid JSON."); }
-  const fields = new Set(["version", "preferences", "dietary", "allergies", "budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes"]);
+  const fields = new Set(["version", "preferences", "dietary", "allergies", "budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes", "preferredStops"]);
   if (!value || Array.isArray(value) || typeof value !== "object" || value.version !== 1 ||
       Object.keys(value).some(k => !fields.has(k)) || typeof value.preferences !== "string" || value.preferences.length > 4000)
     throw new SenderError("Invalid saved context.");
@@ -41,9 +41,13 @@ function contextJson(text: string) {
     if (n !== null && (typeof n !== "number" || !Number.isFinite(n) || n < 0 || n > (field === "budgetMaxPerPerson" ? 10000 : 1440)))
       throw new SenderError(`Invalid ${field}.`);
   }
+  const stops = value.preferredStops;
+  if (stops !== undefined && stops !== null && !(Number.isInteger(stops) && stops >= 1 && stops <= 3))
+    throw new SenderError("Invalid preferredStops.");
   return JSON.stringify({ version: 1, preferences: value.preferences.trim(), dietary, allergies,
     budgetMaxPerPerson: value.budgetMaxPerPerson, maxOutingMinutes: value.maxOutingMinutes,
-    ...(value.maxTravelMinutes !== undefined ? { maxTravelMinutes: value.maxTravelMinutes } : {}) });
+    ...(value.maxTravelMinutes !== undefined ? { maxTravelMinutes: value.maxTravelMinutes } : {}),
+    ...(stops !== undefined ? { preferredStops: stops } : {}) });
 }
 
 export const saveAccountContext = spacetimedb.reducer({ contextJson: t.string() }, (tx, args) => {

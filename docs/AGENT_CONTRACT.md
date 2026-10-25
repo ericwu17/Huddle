@@ -47,6 +47,7 @@ aspects receive limitations rather than invented scores.
 | `vetoCategories` | Array of refused stop categories |
 | `rejectedTerms` | Array checked against catalog names/category/cuisine labels; not ingredient verification |
 | `maxTravelMinutes` | Nonnegative first-leg travel limit or null; requires an origin to verify |
+| `preferredStops` | Integer 1–3 or null (Flexible); a soft preference, not a hard limit |
 
 Lists of preferences, questions and warnings contain bounded plain strings.
 Neither interpretation nor confirmation can raise/remove an established cap.
@@ -89,6 +90,10 @@ start/end, coordinates and catalog cost. A coordinator plan has one to three
 stops. A single-stop plan must be a meal venue: a dinner can fit a short outing
 without forcing an activity or dessert. Both API and module validate this
 additive count change; retained legacy templates/shapes are unchanged.
+When members state `preferredStops`, timed candidates keep only the feasible
+stop count nearest the mean of the stated values (Flexible members are not
+averaged; a half-way mean keeps both counts). If the nearest count has no
+feasible itinerary, the next nearest feasible count is used.
 The legacy public baseline equals the sum of every stop. For `own_orders`,
 private menu totals govern individual caps; see the extension above.
 Prices and travel are explicitly estimates. There is no score or posterior.

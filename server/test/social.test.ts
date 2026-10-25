@@ -44,7 +44,7 @@ function setup() {
 
 describe("private saved context", () => {
   const defaults = { version: 1, preferences: "Alice private defaults", dietary: ["vegetarian"], allergies: [],
-    budgetMaxPerPerson: 20, maxOutingMinutes: 120, maxTravelMinutes: null };
+    budgetMaxPerPerson: 20, maxOutingMinutes: 120, maxTravelMinutes: null, preferredStops: 2 };
 
   it("persists only the owner's explicitly edited defaults without applying them to an outing", () => {
     const s = setup(); const group = s.group(0);
@@ -65,6 +65,7 @@ describe("private saved context", () => {
     const s = setup();
     for (const value of [{ ...defaults, budgetMaxPerPerson: -1 }, { ...defaults, dietary: ["made-up"] },
       { ...defaults, extraAccountId: "account-bob" }, { ...defaults, maxOutingMinutes: 1441 },
+      { ...defaults, preferredStops: 4 }, { ...defaults, preferredStops: 1.5 },
       { ...defaults, allergies: Array.from({ length: 13 }, (_, i) => `allergy-${i}`) }])
       expect(() => s.reduce(0, tx => api.saveAccountContext(tx, { contextJson: JSON.stringify(value) }))).toThrow();
     s.reduce(0, tx => api.logoutAccount(tx, {}));

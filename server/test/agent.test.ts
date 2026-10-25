@@ -215,16 +215,28 @@ describe("single coordinator flow", () => {
     }
   });
 
+  it("saves a 1–3 stop preference and rejects other stop counts", () => {
+    const s = setup();
+    expect(JSON.parse(s.save(0).resultJson!).hard.preferredStops).toBeNull();
+    const saved = s.save(0, { preferredStops: 2 });
+    expect(JSON.parse(saved.resultJson!).hard.preferredStops).toBe(2);
+    for (const preferredStops of [0, 4, 1.5, "2"]) {
+      const structuredJson = JSON.stringify({ budgetMaxPerPerson: null, maxOutingMinutes: null, dietary: [], allergies: [], preferredStops });
+      expect(() => s.reduce(s.users[0].auth, tx => api.saveAgentPreferences(tx, { text: "", structuredJson }))).toThrow();
+      expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.revision).toBe(saved.revision);
+    }
+  });
+
   it("automatically becomes ready after text interpretation while preserving controls the service drops", () => {
     const s = setup();
-    s.save(0, { budgetMaxPerPerson: 20, maxOutingMinutes: 180, dietary: ["vegetarian"], allergies: ["peanuts"] }, "quiet please");
+    s.save(0, { budgetMaxPerPerson: 20, maxOutingMinutes: 180, preferredStops: 3, dietary: ["vegetarian"], allergies: ["peanuts"] }, "quiet please");
     expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(false);
     const job = [...s.test.db.agent_needs_job.iter()].at(-1)!;
     s.extraction(needs(50));
     api.runAgentNeedsJob(s.proc(), { job });
     const saved = s.test.db.agent_need.memberId.find(s.users[0].id)!;
     expect(saved.confirmed).toBe(true);
-    expect(JSON.parse(saved.resultJson!).hard).toMatchObject({ budgetMaxPerPerson: 20, maxOutingMinutes: 180,
+    expect(JSON.parse(saved.resultJson!).hard).toMatchObject({ budgetMaxPerPerson: 20, maxOutingMinutes: 180, preferredStops: 3,
       dietary: ["vegetarian"], allergies: ["peanuts"] });
     expect(s.test.db.member.id.find(s.users[0].id)?.ready).toBe(true);
   });

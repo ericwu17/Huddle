@@ -13,7 +13,7 @@ export default function AccountContextProvider({ children }: { children: ReactNo
     if (account === undefined || !ready) return undefined;
     if (!account) return null;
     const row = rows.find(r => r.accountId === account.accountId);
-    return row ? { ...row, context: JSON.parse(row.contextJson) as AccountContext } : null;
+    return row ? { ...row, context: { preferredStops: null, ...JSON.parse(row.contextJson) } as AccountContext } : null;
   }, [account, rows, ready]);
   return <AccountContextState.Provider value={value}>{children}</AccountContextState.Provider>;
 }
