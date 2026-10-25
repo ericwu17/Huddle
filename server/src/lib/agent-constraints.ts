@@ -25,7 +25,7 @@ export function planFitsAgentRequirements(plan: any, members: MemberRequirement[
   // independently validated private totals for the current members' caps.
   const own = plan?.costModel === "own_orders";
   if (!planFitsBudgets(plan, own ? members.map(m => ({ hard: m.hard ? { budgetMaxPerPerson: null } : null })) : members) ||
-      plan.stops.length < 1 || plan.stops.length > 3) return false;
+      plan.stops.length < 1 || plan.stops.length > 5) return false;
   if (own && members.some(m => !m.memberId || !options.personalTotals?.has(m.memberId) ||
       !planFitsBudgets({ costPerPerson: options.personalTotals.get(m.memberId)!,
         stops: [{ costPerPerson: options.personalTotals.get(m.memberId)! }] }, [m]))) return false;

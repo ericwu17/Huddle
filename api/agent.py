@@ -17,7 +17,7 @@ from fastapi import HTTPException
 
 from .agent_models import (AgentHard, AgentNeeds, AgentNeedsRequest, AgentPlan, AgentPlanRequest,
                            AgentPlanResponse, AgentSuggestion, PrivateOrder, OrderItem)
-from .catalog import Catalog, TEMPLATES, clock, minutes
+from .catalog import Catalog, LONG_TEMPLATES, SHORT_TEMPLATES, clock, minutes
 from .llm import LLM, LLMError, fast, smart
 from .models import Stop
 from .parse import stated_budget
@@ -157,46 +157,82 @@ def eligible(catalog: Catalog, body: AgentPlanRequest) -> set[int]:
 
 
 def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]:
+    """Feasible plans at the stop count nearest the stated preferences' mean.
+
+    A soft preference: Flexible members are left out, and when the nearest
+    count has no feasible itinerary the next nearest feasible count is kept.
+    Counts are tried nearest first, so long routes are searched only when wanted.
+    """
     if body.date is None or body.window is None:
         return {}
     allowed = eligible(catalog, body)
-    plans = {}
-    menu_places = {p.id for p in catalog.places if menu_items(catalog, p.id)}
+    menu_places = {i for i, p in enumerate(catalog.places) if menu_items(catalog, p.id)}
+    cost = [Decimal(str(p.costPerPerson)) for p in catalog.places]
     # Resolve menu/ingredient lower bounds once per person/venue. Repeating
     # that work for every meal x activity x dessert combination is expensive.
-    minimum_prices = {(m.memberId, p.id): min(
-        [item_cost(p, item) for item in allowed_items(catalog, p.id, m)] + [Decimal(str(p.costPerPerson))])
-        for m in body.members for p in catalog.places}
-    # A meal can be the entire outing; dessert does not require an activity.
-    # The legacy solver retains its documented templates unchanged.
-    for itinerary in catalog.itineraries(body.date, body.window.start, body.window.end,
-                                          templates=(*TEMPLATES, ("meal", "dessert"), ("meal",))):
-        if any(i not in allowed for i in itinerary.stops):
-            continue
-        first = itinerary.stops[0]
-        if any(m.needs.hard.maxTravelMinutes is not None and
-               (m.origin is None or catalog.first_leg_minutes(m.origin, first) > m.needs.hard.maxTravelMinutes)
-               for m in body.members):
-            continue
+    minimum_prices = {m.memberId: [min([item_cost(p, item) for item in allowed_items(catalog, p.id, m)] + [cost[i]])
+                                   for i, p in enumerate(catalog.places)] for m in body.members}
+    capped = [(m, Decimal(str(m.needs.hard.budgetMaxPerPerson))) for m in body.members
+              if m.needs.hard.budgetMaxPerPerson is not None]
+    limits = [m.needs.hard.maxOutingMinutes for m in body.members if m.needs.hard.maxOutingMinutes is not None]
+    max_elapsed = min(limits) if limits else None
+
+    def first_ok(i):
+        return not any(m.needs.hard.maxTravelMinutes is not None and
+                       (m.origin is None or catalog.first_leg_minutes(m.origin, i) > m.needs.hard.maxTravelMinutes)
+                       for m in body.members)
+
+    def fits(itinerary):
+        # Numeric checks run before any pydantic model is built.
+        if any(i not in allowed for i in itinerary.stops) or not first_ok(itinerary.stops[0]):
+            return False
+        has_menu = any(i in menu_places for i in itinerary.stops)
+        total = sum((cost[i] for i in itinerary.stops), Decimal(0))
+        # Menu-aware lower bounds keep an affordable personal order in the
+        # candidate pool even when a venue's generic meal estimate is higher.
+        if any((sum((minimum_prices[m.memberId][i] for i in itinerary.stops), Decimal(0)) if has_menu else total) > limit
+               for m, limit in capped):
+            return False
+        last = itinerary.stops[-1]
+        elapsed = itinerary.starts[-1] + catalog.places[last].dwellMinutes - itinerary.starts[0]
+        return max_elapsed is None or elapsed <= max_elapsed
+
+    budgets = [(float(limit), [float(p) for p in minimum_prices[m.memberId]]) for m, limit in capped]
+    for counts in stop_counts(body.members):
+        pool = []
+        if min(counts) <= 3:
+            # Cached and group-independent. The legacy solver keeps its documented templates.
+            pool = [it for it in catalog.itineraries(body.date, body.window.start, body.window.end,
+                                                     templates=SHORT_TEMPLATES) if len(it.stops) in counts]
+        for count in sorted(c for c in counts if c > 3):
+            pool += catalog.routes(body.date, body.window.start, body.window.end, LONG_TEMPLATES[count],
+                                   allowed, first_ok, budgets, max_elapsed)
+        plans = build_plans(catalog, body, [it for it in pool if fits(it)], menu_places)
+        if plans:
+            return plans
+    return {}
+
+
+def stop_counts(members) -> list[set[int]]:
+    """Stop counts to try, nearest the stated preferences' mean first; ties stay together."""
+    wanted = [m.needs.hard.preferredStops for m in members if m.needs.hard.preferredStops is not None]
+    if not wanted:
+        return [{1, 2, 3}]  # Flexible: long routes only when someone asks for them
+    mean = sum(wanted) / len(wanted)
+    distances = sorted({abs(n - mean) for n in range(1, 6)})
+    return [{n for n in range(1, 6) if abs(n - mean) == d} for d in distances]
+
+
+def build_plans(catalog: Catalog, body: AgentPlanRequest, itineraries, menu_places: set[int]) -> dict[str, AgentPlan]:
+    plans = {}
+    for itinerary in itineraries:
         stops = [Stop(placeId=catalog.places[i].id, name=catalog.places[i].name,
                       category=catalog.places[i].category, lat=catalog.places[i].lat, lng=catalog.places[i].lng,
                       start=clock(start), end=clock(start + catalog.places[i].dwellMinutes),
                       costPerPerson=catalog.places[i].costPerPerson)
                  for i, start in zip(itinerary.stops, itinerary.starts)]
         total = sum_cost(stops)
-        has_menu = any(stop.placeId in menu_places for stop in stops)
-        # Menu-aware lower bounds keep an affordable personal order in the
-        # candidate pool even when a venue's generic meal estimate is higher.
-        def minimum(member):
-            return sum((minimum_prices[member.memberId, s.placeId] for s in stops), Decimal(0))
-        if any(m.needs.hard.budgetMaxPerPerson is not None and
-               (minimum(m) if has_menu else total) > Decimal(str(m.needs.hard.budgetMaxPerPerson))
-               for m in body.members):
-            continue
-        elapsed = minutes(stops[-1].end) - minutes(stops[0].start)
-        if any(m.needs.hard.maxOutingMinutes is not None and elapsed > m.needs.hard.maxOutingMinutes
-               for m in body.members):
-            continue
+        has_menu = any(i in menu_places for i in itinerary.stops)
         key = hashlib.sha256((body.runId + ":" + ":".join(s.placeId for s in stops)).encode()).hexdigest()[:16]
         travel = float(sum(catalog.legs[a, b] for a, b in zip(itinerary.stops, itinerary.stops[1:])))
         plans[key] = AgentPlan(id=f"agent_{key}", title="Option", stops=stops, costPerPerson=float(total),
@@ -211,21 +247,7 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
                not set(m.needs.hard.dietary).issubset(catalog.places[catalog.index[s.placeId]].dietary)
                for s in stops) for m in body.members):
             plan.status = "provisional"
-    return nearest_stop_count(plans, body.members)
-
-
-def nearest_stop_count(plans: dict[str, AgentPlan], members) -> dict[str, AgentPlan]:
-    """Keep feasible plans whose stop count is nearest the stated preferences' mean.
-
-    A soft preference: Flexible members are left out, and when the nearest
-    count has no feasible itinerary the next nearest feasible count is kept.
-    """
-    wanted = [m.needs.hard.preferredStops for m in members if m.needs.hard.preferredStops is not None]
-    if not wanted or not plans:
-        return plans
-    mean = sum(wanted) / len(wanted)
-    best = min(abs(len(plan.stops) - mean) for plan in plans.values())
-    return {key: plan for key, plan in plans.items() if abs(len(plan.stops) - mean) == best}
+    return plans
 
 
 def public_facts(catalog: Catalog, plan: AgentPlan) -> dict[str, str]:

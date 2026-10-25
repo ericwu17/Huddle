@@ -97,7 +97,7 @@ aspects receive limitations rather than invented scores.
 | `vetoCategories` | Array of refused stop categories |
 | `rejectedTerms` | Array checked against catalog names/category/cuisine labels; not ingredient verification |
 | `maxTravelMinutes` | Nonnegative first-leg travel limit or null; requires an origin to verify |
-| `preferredStops` | Integer 1–5 or null (Flexible); a soft preference, not a hard limit. Plans still have at most 3 stops, so 4–5 resolve to the longest feasible count |
+| `preferredStops` | Integer 1–5 or null (Flexible); a soft preference, not a hard limit. Plans have 1–5 stops; a count that does not fit resolves to the nearest feasible count |
 
 Lists of preferences, questions and warnings contain bounded plain strings.
 Neither interpretation nor confirmation can raise/remove an established cap.
@@ -137,14 +137,20 @@ Response:
 
 Each plan contains `id`, `title`, `stops`, `costPerPerson`, `whyLine`,
 `limitations`, `travelMinutes`. Stops retain the known place ID/name/category,
-start/end, coordinates and catalog cost. A coordinator plan has one to three
-stops. A single-stop plan must be a meal venue: a dinner can fit a short outing
+start/end, coordinates and catalog cost. A coordinator plan has one to five
+stops. Four- and five-stop plans add distinct activities around one meal and at
+most one dessert, so a private order is still one meal item plus at most one
+dessert item. A single-stop plan must be a meal venue: a dinner can fit a short outing
 without forcing an activity or dessert. Both API and module validate this
 additive count change; retained legacy templates/shapes are unchanged.
 When members state `preferredStops`, timed candidates keep only the feasible
 stop count nearest the mean of the stated values (Flexible members are not
 averaged; a half-way mean keeps both counts). If the nearest count has no
-feasible itinerary, the next nearest feasible count is used.
+feasible itinerary, the next nearest feasible count is used. Flexible-only
+groups get one to three stops. Four- and five-stop routes come from a bounded
+search (nearest feasible next stops, a per-template cap) instead of every
+combination, so they are a strong sample, not an exhaustive list. Five stops
+usually need a longer shared opening than the automatic two-hour search length.
 The legacy public baseline equals the sum of every stop. For `own_orders`,
 private menu totals govern individual caps; see the extension above.
 Prices and travel are explicitly estimates. There is no score or posterior.

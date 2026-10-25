@@ -20,8 +20,19 @@ from .models import FEATURES, Place
 CUISINES = ("asian", "latin", "mediterranean", "american", "cafe_dessert")
 CATEGORIES = ("meal", "activity", "dessert")
 TEMPLATES = (("meal", "activity", "dessert"), ("activity", "meal"))
+# Coordinator only: a meal can be the whole outing; dessert does not require an activity.
+SHORT_TEMPLATES = (*TEMPLATES, ("meal", "dessert"), ("meal",))
+# Coordinator only: longer outings add distinct activities, never a second meal or dessert,
+# so every private order stays one meal item plus at most one dessert item.
+LONG_TEMPLATES = {
+    4: (("activity", "meal", "activity", "dessert"), ("meal", "activity", "dessert", "activity")),
+    5: (("activity", "meal", "activity", "dessert", "activity"),
+        ("activity", "activity", "meal", "activity", "dessert")),
+}
 WEEKDAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
 GRID = 15  # minutes between candidate start times
+BRANCH = 6  # long routes: nearest feasible next stops tried from each stop
+ROUTE_CAP = 3000  # long routes kept per template; Claude sees at most 120 candidates
 DIETARY_CATEGORIES = ("meal", "dessert")  # S5.1: activities never need dietary tags
 
 
@@ -126,6 +137,81 @@ class Catalog:
                     else:
                         result.append(Itinerary(tuple(combo), tuple(starts)))
                         break
+        return result
+
+    def routes(self, day: str, window_start: str, window_end: str, templates: tuple[tuple[str, ...], ...],
+               allowed: set[int], first_ok=lambda i: True, budgets=(), max_elapsed: float | None = None,
+               branch: int = BRANCH, cap: int = ROUTE_CAP) -> list[Itinerary]:
+        """Bounded search for long templates, where a full product would be hundreds of millions.
+
+        Group-specific, so uncached. Opening hours, window, distinct venues, outing time and
+        budgets (each `(cap, lower-bound price per place)`) prune prefixes exactly. Only the
+        `branch` nearest feasible next stops are tried, and at most `cap` routes per template are
+        kept, spread across first stops. Earliest feasible start per stop sequence, as itineraries().
+        """
+        weekday = WEEKDAYS[date.fromisoformat(day).weekday()]
+        lo, hi = minutes(window_start), minutes(window_end)
+        legs = self.legs.tolist()
+        dwell = [p.dwellMinutes for p in self.places]
+        by_cat = {c: [i for i in sorted(allowed) if self.category[i] == c] for c in CATEGORIES}
+        nearest = {c: {i: sorted(by_cat[c], key=legs[i].__getitem__) for i in sorted(allowed)} for c in CATEGORIES}
+        opened = {}
+
+        def is_open(i, t):
+            if (i, t) not in opened:
+                opened[i, t] = self.open_for(i, weekday, t)
+            return opened[i, t]
+
+        result = []
+        for template in templates:
+            if not all(by_cat[c] for c in template):
+                continue
+            n = len(template)
+            # Lower bounds for the stops from position k onward.
+            rest = [sum(min(dwell[i] for i in by_cat[c]) for c in template[k:]) for k in range(n + 1)]
+            rest_cost = [[sum(min(price[i] for i in by_cat[c]) for c in template[k:]) for k in range(n + 1)]
+                         for _, price in budgets]
+            if max_elapsed is not None and rest[0] > max_elapsed:
+                continue
+            firsts = [i for i in by_cat[template[0]] if first_ok(i)]
+            per_first = max(1, cap // max(1, len(firsts)))
+            seen = set()
+
+            def fits(k, i, start, first_start, spent):
+                end = start + dwell[i]
+                return (is_open(i, start) and end + rest[k + 1] <= hi and
+                        (max_elapsed is None or end + rest[k + 1] - first_start <= max_elapsed) and
+                        all(s + price[i] + rc[k + 1] <= limit + 1e-9
+                            for s, (limit, price), rc in zip(spent, budgets, rest_cost)))
+
+            def extend(k, route, starts, first_start, spent, found):
+                if k == n:
+                    if route not in seen:
+                        seen.add(route)
+                        result.append(Itinerary(route, starts))
+                        found.append(route)
+                    return
+                prev = route[-1]
+                end = starts[-1] + dwell[prev]
+                tried = 0
+                for i in nearest[template[k]][prev]:
+                    if tried == branch or len(found) >= per_first:
+                        return
+                    if i in route:
+                        continue
+                    start = lo + ceil((end + legs[prev][i] - lo) / GRID) * GRID
+                    if fits(k, i, start, first_start, spent):
+                        tried += 1
+                        extend(k + 1, route + (i,), starts + (start,), first_start,
+                               [s + price[i] for s, (_, price) in zip(spent, budgets)], found)
+
+            for first in firsts:
+                found = []
+                for start in range(lo, hi + 1, GRID):
+                    if start + rest[0] > hi or len(found) >= per_first:
+                        break
+                    if fits(0, first, start, start, [0.0] * len(budgets)):
+                        extend(1, (first,), (start,), start, [price[first] for _, price in budgets], found)
         return result
 
     def first_leg_minutes(self, origin, i: int) -> float:
