@@ -144,8 +144,8 @@ class AgentCatalog(Model):
 class AgentPlanRequest(Model):
     runId: Identifier
     inputRevision: Annotated[int, Field(ge=0)]
-    date: str
-    window: Window
+    date: str | None = None
+    window: Window | None = None
     members: Annotated[list[AgentMember], Field(min_length=2, max_length=12)]
     excludePlaceIds: list[Identifier] = Field(default_factory=list, max_length=100)
     discussion: list[Text] = Field(default_factory=list, max_length=20)
@@ -154,7 +154,10 @@ class AgentPlanRequest(Model):
     @model_validator(mode="after")
     def unique_members_and_date(self):
         from datetime import date
-        date.fromisoformat(self.date)
+        if (self.date is None) != (self.window is None):
+            raise ValueError("supply both date and window, or leave both unset")
+        if self.date is not None:
+            date.fromisoformat(self.date)
         if len({m.memberId for m in self.members}) != len(self.members):
             raise ValueError("duplicate member IDs")
         return self

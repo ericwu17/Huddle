@@ -32,5 +32,26 @@ export function berkeleyMidnight(date: string) {
     if (!delta) return new Date(candidate).toISOString();
     candidate += delta;
   }
-  throw new Error("Could not resolve this date in Berkeley time. Choose another date.");
+  throw new Error("Could not resolve this date in the venue's time zone. Choose another date.");
+}
+
+export type TimeOfDay = "flexible" | "morning" | "afternoon" | "evening";
+export const TIME_OF_DAY_OPTIONS = [
+  { value: "flexible", label: "Any time" }, { value: "morning", label: "Morning" },
+  { value: "afternoon", label: "Afternoon" }, { value: "evening", label: "Evening" },
+] as const;
+
+export function dayBounds(timeOfDay: string) {
+  switch (timeOfDay) {
+    case "morning": return { dayStart: "06:00", dayEnd: "12:00" };
+    case "afternoon": return { dayStart: "12:00", dayEnd: "17:00" };
+    case "evening": return { dayStart: "17:00", dayEnd: "23:59" };
+    default: return { dayStart: "00:00", dayEnd: "23:59" };
+  }
+}
+
+export function defaultCalendarSearch(timeOfDay = "flexible") {
+  const today = berkeleyToday();
+  return { searchStart: berkeleyMidnight(today), searchEnd: berkeleyMidnight(dateAfter(today, 7)),
+    ...dayBounds(timeOfDay), durationMinutes: 0, timeZone: OUTING_TIME_ZONE };
 }

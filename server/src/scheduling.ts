@@ -5,13 +5,29 @@ import { requireAccount, requireActor } from "./lib/account-state";
 import { currentGroup, currentMember, membersOf, nowMs, at, parse } from "./lib/util";
 import { authorizedCalendarSnapshots, persistCalendarRefresh } from "./connectors";
 import { callApi } from "./lib/api";
+import { activePlaces } from "./lib/catalog";
 import { invalidateAgent, agentBallot, agentVotingChoices } from "./lib/agent-state";
 import { clockMinutes } from "./lib/agent-constraints";
 import type { ReadDb, Tx } from "./lib/types";
+import { huddleTiming, saveHuddleTiming, TIME_OF_DAY, TIME_OF_DAY_WINDOWS } from "./lib/huddle-timing";
 
 const result = t.object("ScheduleHuddleResult", { ok: t.bool(), message: t.string(), date: t.option(t.string()), windowStart: t.option(t.string()), windowEnd: t.option(t.string()) });
 const failed = (message: string) => ({ ok: false, message, date: undefined, windowStart: undefined, windowEnd: undefined });
 const venueTimeZone = "America/Los_Angeles";
+type SchedulingVenue = { placeId: string; name: string; category: string; dwellMinutes: number; hours: Record<string, string[][]> };
+function schedulingVenues(db: ReadDb, excluded: string[]): SchedulingVenue[] {
+  return activePlaces(db).filter(place => !excluded.includes(place.id)).map(place => ({
+    placeId: place.id, name: place.name, category: place.category, dwellMinutes: place.dwellMinutes,
+    hours: (place as typeof place & { hours?: Record<string, string[][]> }).hours ??
+      { mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] },
+  }));
+}
+function mealFitsWindow(venues: SchedulingVenue[], chosen: { date: string; windowStart: string; windowEnd: string }) {
+  const day = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(`${chosen.date}T12:00:00Z`).getUTCDay()];
+  return venues.some(venue => venue.category === "meal" && (venue.hours[day] ?? []).some(([opening, closing]) =>
+    Math.min(clockMinutes(closing), clockMinutes(chosen.windowEnd)) -
+      Math.max(clockMinutes(opening), clockMinutes(chosen.windowStart)) >= venue.dwellMinutes));
+}
 function validDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const parsed = new Date(`${value}T12:00:00Z`);
@@ -29,14 +45,35 @@ export const setHuddleWindow = spacetimedb.reducer({ date: t.string(), windowSta
   const group = hostGroup(tx), state = tx.db.agent_session.groupId.find(group.id)!;
   if (!validDate(args.date) || !Number.isFinite(clockMinutes(args.windowStart)) ||
       !Number.isFinite(clockMinutes(args.windowEnd)) || args.windowStart >= args.windowEnd || args.timeZone !== venueTimeZone)
-    throw new SenderError("Choose a valid date and ordered start/end times in Berkeley time.");
+    throw new SenderError("Choose a valid date and ordered start/end times.");
   if (state.status === "planning") throw new SenderError("Wait for the current planning run before changing its time.");
-  if (group.date === args.date && group.windowStart === args.windowStart && group.windowEnd === args.windowEnd) return;
+  if (group.date === args.date && group.windowStart === args.windowStart && group.windowEnd === args.windowEnd && huddleTiming(tx.db, group.id).source !== "pending") return;
   invalidateAgent(tx, group.id);
   const fresh = tx.db.group.id.find(group.id)!;
   tx.db.group.id.update({ ...fresh, date: args.date, windowStart: args.windowStart, windowEnd: args.windowEnd });
   // A manually chosen time carries no claim that calendars were checked.
   tx.db.group_schedule.groupId.delete(group.id);
+  saveHuddleTiming(tx, group.id, "manual");
+});
+
+export const setHuddleTimePreference = spacetimedb.reducer({ timeOfDay: t.string() }, (tx, { timeOfDay }) => {
+  const group = hostGroup(tx), state = tx.db.agent_session.groupId.find(group.id)!;
+  if (!TIME_OF_DAY.has(timeOfDay)) throw new SenderError("Choose Flexible, Morning, Afternoon or Evening.");
+  if (state.status === "planning") throw new SenderError("Wait for the current planning run before changing its time.");
+  const current = huddleTiming(tx.db, group.id);
+  if (current.timeOfDay === timeOfDay && current.source === "pending") return;
+  invalidateAgent(tx, group.id);
+  const fresh = tx.db.group.id.find(group.id)!;
+  tx.db.group.id.update({ ...fresh, date: "", windowStart: "", windowEnd: "" });
+  tx.db.group_schedule.groupId.delete(group.id);
+  saveHuddleTiming(tx, group.id, "pending", timeOfDay);
+});
+
+export const my_huddle_timing = spacetimedb.view({ name: "my_huddle_timing", public: true }, t.option(t.row("MyHuddleTimingRow", {
+  groupId: t.string().primaryKey(), timeOfDay: t.string(), source: t.string(),
+})), ctx => {
+  const group = currentGroup(ctx.db, ctx.sender);
+  return group && ctx.db.agent_session.groupId.find(group.id) ? { groupId: group.id, ...huddleTiming(ctx.db, group.id) } : undefined;
 });
 
 export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), searchEnd: t.string(), dayStart: t.string(), dayEnd: t.string(), durationMinutes: t.u32(), timeZone: t.string() }, result,
@@ -44,8 +81,8 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
     const from = Date.parse(args.searchStart), until = Date.parse(args.searchEnd);
     if (!Number.isFinite(from) || !Number.isFinite(until) || until <= from || until - from > 14 * 86400_000 ||
         !Number.isFinite(clockMinutes(args.dayStart)) || !Number.isFinite(clockMinutes(args.dayEnd)) || args.dayStart >= args.dayEnd ||
-        args.durationMinutes < 15 || args.durationMinutes > 720 || args.timeZone !== venueTimeZone)
-      throw new SenderError("Use a date range up to 14 days, a daytime window and an outing length of 15–720 minutes in Berkeley time.");
+        args.durationMinutes !== 0 && args.durationMinutes < 15 || args.durationMinutes > 720 || args.timeZone !== venueTimeZone)
+      throw new SenderError("Use a date range up to 14 days, a daytime window and an outing length of 15–720 minutes, or Automatic.");
     const snapshot = ctx.withTx(tx => {
       const group = hostGroup(tx), state = tx.db.agent_session.groupId.find(group.id)!;
       const { account, session } = requireAccount(tx);
@@ -53,18 +90,25 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
       const members = membersOf(tx.db, group.id), connections = authorizedCalendarSnapshots(tx.db, group.id);
       if (members.length < 2 || connections.length !== members.length) throw new SenderError("Every participant must connect their own Google Calendar before checking a common time.");
       return { groupId: group.id, revision: state.revision, accountId: account.id, sessionNonce: session.nonce,
+        timeOfDay: huddleTiming(tx.db, group.id).timeOfDay,
+        venues: schedulingVenues(tx.db, group.excludedPlaceIds),
         connections, members: connections.map(connection => {
           const need = tx.db.agent_need.memberId.find(connection.memberId);
           const hard = parse(tx.db.private_prefs.memberId.find(connection.memberId)?.hardJson);
           return { accountId: connection.accountId, prompt: need?.text ?? "", maxOutingMinutes: hard?.maxOutingMinutes ?? null };
         }) };
     });
-    if (snapshot.members.some(member => member.maxOutingMinutes != null && args.durationMinutes > member.maxOutingMinutes))
+    const duration = args.durationMinutes || Math.floor(Math.min(120, ...snapshot.members.map(member => member.maxOutingMinutes ?? 720)));
+    if (duration < 15 || snapshot.members.some(member => member.maxOutingMinutes != null && duration > member.maxOutingMinutes))
       return failed("The requested length exceeds a participant's private outing limit. Try a shorter outing; no limits were changed.");
+    const [earliest, latest] = TIME_OF_DAY_WINDOWS[snapshot.timeOfDay] ?? TIME_OF_DAY_WINDOWS.flexible;
+    const dayStart = args.dayStart > earliest ? args.dayStart : earliest;
+    const dayEnd = args.dayEnd < latest ? args.dayEnd : latest;
+    if (dayStart >= dayEnd) return failed("The search window does not overlap the selected time of day. Choose another search window or Any time.");
     const response = callApi(ctx, "/connectors/calendar/schedule", {
       connections: snapshot.connections.map(({ accountId, tokenCiphertext }) => ({ accountId, tokenCiphertext })),
       members: snapshot.members, timeMin: args.searchStart, timeMax: args.searchEnd,
-      dayStart: args.dayStart, dayEnd: args.dayEnd, durationMinutes: args.durationMinutes, timeZone: args.timeZone,
+      dayStart, dayEnd, durationMinutes: duration, timeZone: args.timeZone, venues: snapshot.venues,
     });
     return ctx.withTx(tx => {
       const group = hostGroup(tx), { account, session } = requireAccount(tx);
@@ -76,22 +120,25 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
         return failed("Could not check every calendar or choose a time. Connections are saved; retry after setup.");
       if (!persistCalendarRefresh(tx, data.updatedConnections, snapshot.connections))
         return failed("A calendar connection changed. Check availability again; no date was changed.");
-      if (!data.ok) return failed("No common opening fits this date range and everyone's private outing-length limits. Try other dates or a shorter outing.");
+      if (!data.ok) return failed("No common opening fits this date range, everyone's outing-length limits and meal opening hours. Try other dates or a shorter outing.");
       const chosen = data.chosen;
       const start = Date.parse(chosen?.start), end = Date.parse(chosen?.end);
       if (!chosen || typeof chosen.start !== "string" || typeof chosen.end !== "string" ||
           typeof chosen.date !== "string" || !validDate(chosen.date) || !Number.isFinite(start) || !Number.isFinite(end) || start < Math.max(from, nowMs(tx)) || end > until ||
-          end - start !== args.durationMinutes * 60000 || chosen.timeZone !== args.timeZone ||
+          end - start !== duration * 60000 || chosen.timeZone !== args.timeZone ||
           !/^\d{4}-\d{2}-\d{2}$/.test(chosen.date) || chosen.start.slice(0, 10) !== chosen.date || chosen.end.slice(0, 10) !== chosen.date ||
           chosen.start.slice(11, 16) !== chosen.windowStart || chosen.end.slice(11, 16) !== chosen.windowEnd ||
-          chosen.windowStart < args.dayStart || chosen.windowEnd > args.dayEnd ||
+          chosen.windowStart < dayStart || chosen.windowEnd > dayEnd ||
           !Number.isFinite(clockMinutes(chosen.windowStart)) || !Number.isFinite(clockMinutes(chosen.windowEnd)) || chosen.windowStart >= chosen.windowEnd)
         return failed("The proposed calendar window could not be validated. No date was changed.");
+      if (!mealFitsWindow(snapshot.venues, chosen) || !mealFitsWindow(schedulingVenues(tx.db, group.excludedPlaceIds), chosen))
+        return failed("Meal opening hours do not fit that calendar window. Request another time; no date was changed.");
       invalidateAgent(tx, group.id);
       const fresh = tx.db.group.id.find(group.id)!;
       tx.db.group.id.update({ ...fresh, date: chosen.date, windowStart: chosen.windowStart, windowEnd: chosen.windowEnd });
       const metadata = { groupId: group.id, timeZone: chosen.timeZone, start: chosen.start, end: chosen.end, checkedAt: nowMs(tx) };
       if (tx.db.group_schedule.groupId.find(group.id)) tx.db.group_schedule.groupId.update(metadata); else tx.db.group_schedule.insert(metadata);
+      saveHuddleTiming(tx, group.id, "calendar");
       return { ok: true, message: "A common primary-calendar opening is now the Huddle's date and time. Review it before finding plans; no calendar event was created.", date: chosen.date, windowStart: chosen.windowStart, windowEnd: chosen.windowEnd };
     });
   },

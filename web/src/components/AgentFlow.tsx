@@ -14,6 +14,8 @@ import { displayTime } from "../venueFormatting";
 import PrivateOrderSummary from "./PrivateOrderSummary";
 import { VoteChoice, VoteStatus } from "./VoteTally";
 import { useAgentBallot } from "../useAgentBallot";
+import { useCalendarPlanning } from "../huddleTiming";
+import CalendarTimeSelector from "./CalendarTimeSelector";
 
 export function AgentPrefs() {
   const { agentNeeds, group, session } = useGroup();
@@ -29,7 +31,7 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
   const account = useAccount();
   const submit = useReducer(reducers.saveAgentPreferences);
   const saveContext = useReducer(reducers.saveAccountContext);
-  const find = useReducer(reducers.findAgentPlans);
+  const { findPlans: find, ready: timingReady } = useCalendarPlanning();
   const { run, busy, error } = useRun();
   const [draft, setDraft] = useState<AccountContext>(() => {
     const hard = agentNeeds?.result?.hard;
@@ -107,9 +109,10 @@ function AgentPrefsForm({ initialProfile, initialStructured }: { initialProfile:
       {needs.questions.length ? <div className="card-note p-3 space-y-2" role="status"><h3 className="font-bold">One thing to clarify privately</h3><ul>{needs.questions.map(q => <li key={q}>{q}</li>)}</ul><p className="muted">Update the relevant choice or your optional prompt above, then Save & ready again.</p></div> : null}
       {needs.warnings.map(w => <p className="muted" key={w}>{w}</p>)}
     </section> : null}
+    <CalendarTimeSelector />
     <section className="card space-y-3"><h2 className="card-title">Your people</h2>
       <ul className="space-y-2">{group.members.map(m => <li key={m.id}>{m.name}{m.id === session.memberId ? " (you)" : ""}: {agent?.confirmedMemberIds.includes(m.id) ? "ready ✓" : "choosing private needs"}</li>)}</ul>
-      {isHost ? <button className="btn btn-sun w-full" disabled={busy || !saved || !allReady || agent?.status === "planning" || group.status === "lobby"} onClick={() => run(() => find())}>Find plans</button> : <p className="muted">The host can find plans when everyone has saved their needs.</p>}
+      {isHost ? <button className="btn btn-sun w-full" disabled={busy || !timingReady || !saved || !allReady || agent?.status === "planning" || group.status === "lobby"} onClick={() => run(() => find())}>Find plans</button> : <p className="muted">The host can find plans when everyone has saved their needs.</p>}
       {!allReady ? <p className="muted">Waiting for at least two people, each with saved needs.</p> : null}
     </section>
     {error ? <p className="error" role="alert">{error}</p> : null}
@@ -174,7 +177,7 @@ export function AgentPlans() {
   const planRun = useAgentRun(group.latestRunId);
   const orders = useAgentOrders(group.latestRunId, session.memberId);
   const messages = useAgentMessages(group.latestRunId);
-  const find = useReducer(reducers.findAgentPlans);
+  const { findPlans: find, ready: timingReady } = useCalendarPlanning();
   const post = useReducer(reducers.postAgentDiscussion);
   const { run, busy, error } = useRun();
   const [message, setMessage] = useState("");
@@ -204,7 +207,7 @@ export function AgentPlans() {
     <div className="flex flex-wrap gap-3">
       <Link className="btn" to={`/g/${session.groupId}/prefs`}>Edit my private needs</Link>
       {hasChoices ? <Link className="btn btn-primary" to={`/g/${session.groupId}/vote`}>Go to vote</Link> : null}
-      {isHost && agent?.status !== "needs" ? <button className="btn" disabled={busy} onClick={() => run(() => find())}>Find plans again</button> : null}
+      {isHost && agent?.status !== "needs" ? <button className="btn" disabled={busy || !timingReady} onClick={() => run(() => find())}>Find plans again</button> : null}
     </div>
     {error ? <p className="error" role="alert">{error}</p> : null}
   </div>;

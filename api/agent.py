@@ -157,6 +157,8 @@ def eligible(catalog: Catalog, body: AgentPlanRequest) -> set[int]:
 
 
 def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]:
+    if body.date is None or body.window is None:
+        return {}
     allowed = eligible(catalog, body)
     plans = {}
     menu_places = {p.id for p in catalog.places if menu_items(catalog, p.id)}
@@ -290,6 +292,8 @@ def empty_explanation(catalog: Catalog, body: AgentPlanRequest) -> str:
     These lower bounds diagnose failure only. They never create an itinerary
     outside a hard requirement, shorten a catalog visit or change an input.
     """
+    if body.date is None or body.window is None:
+        return "The outing time is not set. Use connected calendars to find a shared opening, or choose a time."
     meals = [catalog.places[index] for index in eligible(catalog, body) if catalog.places[index].category == "meal"]
     if not meals:
         return "No catalog meal matches the remaining venue choices and private hard requirements. Add suitable venue data or review a mistaken restriction privately; no requirement was relaxed."

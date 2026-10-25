@@ -8,6 +8,7 @@ import { catalogSnapshot } from "./lib/catalog";
 import { LIVE_PLACES } from "./lib/places";
 import { nowMs } from "./lib/util";
 import type { ReadDb, Tx } from "./lib/types";
+import { huddleTiming } from "./lib/huddle-timing";
 
 const unavailable = () => ({ ok: false, resultJson: undefined });
 const SHARE_ID = /^share_[0-9a-f]{64}$/;
@@ -23,7 +24,8 @@ function publicResult(db: ReadDb, groupId: string, runId: string, planId: string
   if (!Array.isArray(choice.stops)) {
     const place = places.find(place => place.id === choice.placeId);
     if (!place) return null;
-    return { date: group.date, timeZone, choice: { id: choice.id, placeId: place.id, summary: place.name, limitations: [] } };
+    return { date: huddleTiming(db, group.id).source === "pending" ? null : group.date, timeZone,
+      choice: { id: choice.id, placeId: place.id, summary: place.name, limitations: [] } };
   }
   if (!choice.stops.length || typeof choice.travelMinutes !== "number" || !Number.isFinite(choice.travelMinutes) || choice.travelMinutes < 0) return null;
   const stops = choice.stops.map((stop: any) => ({ placeId: stop.placeId, name: stop.name, category: stop.category,

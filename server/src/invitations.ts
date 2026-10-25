@@ -6,6 +6,7 @@ import { requireAccount, membershipKey } from "./lib/account-state";
 import { callApi } from "./lib/api";
 import { newId, nowMs } from "./lib/util";
 import { inviteFriends } from "./social";
+import { saveHuddleTiming } from "./lib/huddle-timing";
 
 const summaries: Record<string, string> = { meal: "A meal together", dessert: "Dessert together", activity: "An activity together", hangout: "A Huddle with friends" };
 const intent = t.object("HuddleInviteIntentResult", { friendAccountIds: t.array(t.string()), ambiguousNames: t.array(t.string()), unknownNames: t.array(t.string()), outingKind: t.string(), summary: t.string() });
@@ -53,6 +54,9 @@ export const createInvitationHuddle = spacetimedb.procedure(
     }
     const group = createGroupInTx(tx, summaries[args.outingKind]);
     tx.db.agent_session.insert({ groupId: group.groupId, revision: 0, status: "needs", activeRunId: undefined, error: undefined });
+    const created = tx.db.group.id.find(group.groupId)!;
+    tx.db.group.id.update({ ...created, date: "", windowStart: "", windowEnd: "" });
+    saveHuddleTiming(tx, group.groupId, "pending");
     const memberId = newId(tx, "m", id => !!tx.db.member.id.find(id));
     tx.db.member.insert({ id: memberId, groupId: group.groupId, identity: account.principal, name: account.displayName,
       originLat: undefined, originLng: undefined, ready: false, swipeCount: 0, joinedAt: nowMs(tx) });

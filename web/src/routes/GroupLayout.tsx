@@ -18,6 +18,7 @@ import { displayTime } from "../venueFormatting";
 import { useAgentBallot } from "../useAgentBallot";
 import { winnerTransition } from "../agentBallot";
 import HuddleLoading from "../components/HuddleLoading";
+import { useHuddleTiming } from "../huddleTiming";
 
 const STEP_FOR_STATUS: Record<GroupStatus, string> = {
   lobby: "lobby",
@@ -36,6 +37,7 @@ export default function GroupLayout() {
   const booking = useLatestBooking();
   const agent = useAgentState();
   const agentNeeds = useAgentNeeds();
+  const timing = useHuddleTiming();
   const ballot = useAgentBallot(group?.id === session.groupId ? group : group === undefined ? undefined : null, agent, session.memberId);
   const lastAgentState = useRef<string | null>(null);
   const lastWinner = useRef<{ groupId: string; key: string | null } | null>(null);
@@ -53,7 +55,8 @@ export default function GroupLayout() {
       lastAgentState.current = key;
       // Vote stays navigable during subscription updates and after needs change.
       // AgentVote removes stale choices and shows its empty state until replanned.
-      if (pathname.endsWith("/vote") || pathname.endsWith("/done")) return;
+      if (pathname.endsWith("/vote") || pathname.endsWith("/done") ||
+          pathname.endsWith("/prefs") && ["needs", "ready", "blocked"].includes(agent.status)) return;
       const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "call"
         : agent.status === "needs" ? "prefs" : "plans";
       navigate(`/g/${session.groupId}/${step}`);
@@ -76,7 +79,7 @@ export default function GroupLayout() {
   useEffect(() => {
     if (!agent || agent.groupId !== session.groupId || group?.id !== session.groupId || ballot.loading) return;
     const key = ballot.winner ? `${ballot.runId}:${agent.revision}:${ballot.winner.id}` : null;
-    const transition = winnerTransition(lastWinner.current, group.id, key, pathname.endsWith("/vote"));
+    const transition = winnerTransition(lastWinner.current, group.id, key, pathname.endsWith("/vote") || pathname.endsWith("/prefs"));
     lastWinner.current = transition.state;
     if (transition.follow) navigate(`/g/${session.groupId}/done`);
   }, [agent, group, ballot.loading, ballot.runId, ballot.winner, navigate, pathname, session.groupId]);
@@ -152,7 +155,9 @@ export default function GroupLayout() {
       </aside>
       <div className="group-main space-y-4">
       <AccountStatus />
-      <p className="on-sky text-sm">Outing: {group.date} · {displayTime(group.window.start)}–{displayTime(group.window.end)} · Berkeley time</p>
+      <p className="on-sky text-sm">{timing?.groupId === group.id && timing.source !== "pending"
+        ? `${group.date} · ${displayTime(group.window.start)}–${displayTime(group.window.end)}`
+        : "Date and time to be decided"}</p>
       <DemoBanner on={group.demoMode} />
       {!agent ? <ReplanBanner ctx={ctx} /> : group.replanFor ? <p className="card card-note">The simulated venue was unavailable. Review the replacement plans and vote again before starting another simulation.</p> : null}
       {!agent ? <OffersInbox ctx={ctx} /> : null}

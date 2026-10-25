@@ -39,7 +39,7 @@ def context_items(catalog, place, members):
 
 async def coordinate_menu(llm, catalog, body):
     from .agent import candidates, eligible, public_facts, rating_observation, sum_cost
-    timed = not any(m.needs.questions or m.needs.hard.maxTravelMinutes is not None and m.origin is None for m in body.members)
+    timed = body.date is not None and body.window is not None and not any(m.needs.questions or m.needs.hard.maxTravelMinutes is not None and m.origin is None for m in body.members)
     all_plans = await asyncio.to_thread(candidates, catalog, body) if timed else {}
     ordered = sorted(all_plans, key=lambda k: (all_plans[k].costPerPerson, k))
     keys = ordered[:min(8, len(ordered))]
@@ -206,7 +206,7 @@ The group votes and explicitly creates meetup events. Suggestions never reserve 
         selected.append(plan)
     return AgentPlanResponse(runId=body.runId, inputRevision=body.inputRevision, plans=selected,
         recommendedPlanId=selected[0].id if selected else None,
-        rationale=selected[0].summary if selected else "Here are other venues to explore; no exact timed itinerary fits the current inputs.",
-        conflicts=[] if selected else ["These are untimed alternatives, not confirmed plans. Existing limits were kept."],
+        rationale=selected[0].summary if selected else ("Here are venue ideas while your group finds a shared calendar opening." if body.date is None else "Here are other venues to explore; no exact timed itinerary fits the current inputs."),
+        conflicts=[] if selected else (["Time is not set. Connect calendars or choose a time to build an itinerary."] if body.date is None else ["These are untimed alternatives, not confirmed plans. Existing limits were kept."]),
         warnings=["Claude considered the supplied prompts and menu evidence. Voting does not verify a venue or reserve it."],
         suggestions=suggestions, privateOrders=private)

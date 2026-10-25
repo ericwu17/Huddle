@@ -81,6 +81,7 @@ check((await view(host, "my_friends")).some(f => f.account_id === friend.account
 check(!(await view(outsider, "my_friends")).length && !(await view(outsider, "my_friend_requests")).length, "Friend network is account-scoped");
 const [groupId, code] = await call(host, "create_agent_group", [null]);
 await call(host, "join_group", [code, "Untrusted display name"]);
+check((await view(host, "my_group"))[0].date === "", "New coordinator Huddles do not assume an outing date");
 await rejects("Account cannot select a huddle without membership", () => call(outsider, "select_huddle", [groupId]));
 await call(host, "invite_friends", [groupId, [friend.account.account_id]]);
 await call(host, "invite_friends", [groupId, [friend.account.account_id]]);
@@ -103,6 +104,9 @@ check(JSON.parse((await view(host, "my_private"))[0].hard_json).budgetMaxPerPers
 check(!JSON.stringify(await view(host, "my_agent_session")).includes("budgetMaxPerPerson"), "Shared readiness does not expose budgets");
 check((await view(host, "my_agent_needs"))[0].member_id !== (await view(friend, "my_agent_needs"))[0].member_id, "Each participant sees only own private submission");
 await rejects("Non-host cannot start planning", () => call(friend, "find_agent_plans"));
+// Timed acceptance uses an explicit test selection, never a production default.
+await call(host, "set_huddle_window", ["2026-10-24", "17:00", "23:00", "America/Los_Angeles"]);
+check((await view(host, "my_huddle_timing"))[0].source === "manual", "Explicit time selection is recorded independently of calendar availability");
 await call(host, "find_agent_plans");
 const current = await until("Claude plans", async () => {
   const state = (await view(host, "my_agent_session"))[0];

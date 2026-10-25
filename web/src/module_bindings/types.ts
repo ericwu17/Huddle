@@ -403,6 +403,13 @@ export const HuddleInviteIntentResult = __t.object("HuddleInviteIntentResult", {
 });
 export type HuddleInviteIntentResult = __Infer<typeof HuddleInviteIntentResult>;
 
+export const HuddleTiming = __t.object("HuddleTiming", {
+  groupId: __t.string(),
+  timeOfDay: __t.string(),
+  source: __t.string(),
+});
+export type HuddleTiming = __Infer<typeof HuddleTiming>;
+
 export const InvitationDelivery = __t.object("InvitationDelivery", {
   invitationId: __t.string(),
   status: __t.string(),
@@ -737,6 +744,16 @@ export type MyHuddleInvitationRow = __Infer<typeof MyHuddleInvitationRow>;
 
 export const MyHuddleInvitations = __t.object("MyHuddleInvitations", {});
 export type MyHuddleInvitations = __Infer<typeof MyHuddleInvitations>;
+
+export const MyHuddleTiming = __t.object("MyHuddleTiming", {});
+export type MyHuddleTiming = __Infer<typeof MyHuddleTiming>;
+
+export const MyHuddleTimingRow = __t.object("MyHuddleTimingRow", {
+  groupId: __t.string(),
+  timeOfDay: __t.string(),
+  source: __t.string(),
+});
+export type MyHuddleTimingRow = __Infer<typeof MyHuddleTimingRow>;
 
 export const MyInvitationDeliveries = __t.object("MyInvitationDeliveries", {});
 export type MyInvitationDeliveries = __Infer<typeof MyInvitationDeliveries>;

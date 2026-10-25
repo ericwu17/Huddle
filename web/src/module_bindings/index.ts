@@ -61,6 +61,7 @@ import SelectHuddleReducer from "./select_huddle_reducer";
 import SendInvitationMessageReducer from "./send_invitation_message_reducer";
 import SetCalendarEventConsentReducer from "./set_calendar_event_consent_reducer";
 import SetDemoModeReducer from "./set_demo_mode_reducer";
+import SetHuddleTimePreferenceReducer from "./set_huddle_time_preference_reducer";
 import SetHuddleWindowReducer from "./set_huddle_window_reducer";
 import SetOriginReducer from "./set_origin_reducer";
 import SetReadyReducer from "./set_ready_reducer";
@@ -107,6 +108,7 @@ import MyFriendsRow from "./my_friends_table";
 import MyGroupRow from "./my_group_table";
 import MyGroupConnectorsRow from "./my_group_connectors_table";
 import MyHuddleInvitationsRow from "./my_huddle_invitations_table";
+import MyHuddleTimingRow from "./my_huddle_timing_table";
 import MyInvitationDeliveriesRow from "./my_invitation_deliveries_table";
 import MyMeetupRow from "./my_meetup_table";
 import MyMembersRow from "./my_members_table";
@@ -260,6 +262,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyHuddleInvitationsRow),
+  myHuddleTiming: __table({
+    name: 'my_huddle_timing',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyHuddleTimingRow),
   myInvitationDeliveries: __table({
     name: 'my_invitation_deliveries',
     indexes: [
@@ -347,6 +356,7 @@ const reducersSchema = __reducers(
   __reducerSchema("send_invitation_message", SendInvitationMessageReducer),
   __reducerSchema("set_calendar_event_consent", SetCalendarEventConsentReducer),
   __reducerSchema("set_demo_mode", SetDemoModeReducer),
+  __reducerSchema("set_huddle_time_preference", SetHuddleTimePreferenceReducer),
   __reducerSchema("set_huddle_window", SetHuddleWindowReducer),
   __reducerSchema("set_origin", SetOriginReducer),
   __reducerSchema("set_ready", SetReadyReducer),
@@ -417,6 +427,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "my_group_connectors": Omit<typeof tablesSchema.schemaType.tables["myGroupConnectors"], "accessorName"> & { readonly accessorName: "my_group_connectors" };
     /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
     readonly "my_huddle_invitations": Omit<typeof tablesSchema.schemaType.tables["myHuddleInvitations"], "accessorName"> & { readonly accessorName: "my_huddle_invitations" };
+    /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
+    readonly "my_huddle_timing": Omit<typeof tablesSchema.schemaType.tables["myHuddleTiming"], "accessorName"> & { readonly accessorName: "my_huddle_timing" };
     /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
     readonly "my_invitation_deliveries": Omit<typeof tablesSchema.schemaType.tables["myInvitationDeliveries"], "accessorName"> & { readonly accessorName: "my_invitation_deliveries" };
     /** @deprecated Use `myMeetup` instead. This alias will be removed in the next major version. */
@@ -471,6 +483,7 @@ const tableAccessorAliases = {
   "my_group": "myGroup",
   "my_group_connectors": "myGroupConnectors",
   "my_huddle_invitations": "myHuddleInvitations",
+  "my_huddle_timing": "myHuddleTiming",
   "my_invitation_deliveries": "myInvitationDeliveries",
   "my_meetup": "myMeetup",
   "my_members": "myMembers",
@@ -539,6 +552,8 @@ export type DbView = __DbViewBase & {
   readonly "my_group_connectors": __DbViewBase["myGroupConnectors"];
   /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_invitations": __DbViewBase["myHuddleInvitations"];
+  /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_timing": __DbViewBase["myHuddleTiming"];
   /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
   readonly "my_invitation_deliveries": __DbViewBase["myInvitationDeliveries"];
   /** @deprecated Use `myMeetup` instead. This alias will be removed in the next major version. */
@@ -599,6 +614,8 @@ export type Tables = __TablesBase & {
   readonly "my_group_connectors": __TablesBase["myGroupConnectors"];
   /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_invitations": __TablesBase["myHuddleInvitations"];
+  /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_timing": __TablesBase["myHuddleTiming"];
   /** @deprecated Use `myInvitationDeliveries` instead. This alias will be removed in the next major version. */
   readonly "my_invitation_deliveries": __TablesBase["myInvitationDeliveries"];
   /** @deprecated Use `myMeetup` instead. This alias will be removed in the next major version. */

@@ -331,6 +331,9 @@ export const meetup_job = job("meetup_job", { runId: t.string() });
 export const group_schedule = table({ name: "group_schedule" }, {
   groupId: t.string().primaryKey(), timeZone: t.string(), start: t.string(), end: t.string(), checkedAt: t.f64(),
 });
+export const huddle_timing = table({ name: "huddle_timing" }, {
+  groupId: t.string().primaryKey(), timeOfDay: t.string(), source: t.string(), membersKey: t.string(),
+});
 
 const spacetimedb = schema(
   {
@@ -342,7 +345,7 @@ const spacetimedb = schema(
     account, account_session, account_membership, account_auth_attempt, account_expiry_job,
     account_context, account_friend, friend_request, huddle_invitation, invitation_dismissal, invitation_expiry_job, invitation_start,
     message_connector, friend_contact_destination, calendar_connection, calendar_oauth_state, calendar_oauth_expiry_job, calendar_revoke_job, calendar_revocation,
-    invitation_delivery, invitation_delivery_job, meetup, meetup_job, group_schedule,
+    invitation_delivery, invitation_delivery_job, meetup, meetup_job, group_schedule, huddle_timing,
     venue, catalog_state,
   },
   {

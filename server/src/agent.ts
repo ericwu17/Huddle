@@ -10,13 +10,18 @@ import { validateAgentResult } from "./lib/agent-result";
 import { catalogSnapshot } from "./lib/catalog";
 import type { ReadDb, Tx } from "./lib/types";
 import { requireActor } from "./lib/account-state";
+import { huddleTiming, saveHuddleTiming } from "./lib/huddle-timing";
 
 export const createAgentGroup = spacetimedb.procedure(
   { name: t.option(t.string()) }, t.object("CreateAgentGroupResult", { groupId: t.string(), code: t.string() }),
   (ctx, args) => {
     const group = createGroup(ctx, args);
-    ctx.withTx(tx => tx.db.agent_session.insert({ groupId: group.groupId, revision: 0, status: "needs",
-      activeRunId: undefined, error: undefined }));
+    ctx.withTx(tx => {
+      tx.db.agent_session.insert({ groupId: group.groupId, revision: 0, status: "needs", activeRunId: undefined, error: undefined });
+      const created = tx.db.group.id.find(group.groupId)!;
+      tx.db.group.id.update({ ...created, date: "", windowStart: "", windowEnd: "" });
+      saveHuddleTiming(tx, group.groupId, "pending");
+    });
     return group;
   },
 );
@@ -227,8 +232,9 @@ export const runAgentPlanJob = spacetimedb.procedure(
       const discussion = priorRuns.flatMap(r => Array.from(tx.db.council_message.runId.filter(r.runId)))
         .filter(m => m.speaker === "participant").slice(-20).map(m => m.text);
       const catalog = catalogSnapshot(tx.db);
-      return { runId: job.runId, inputRevision: job.revision, date: group.date, ...(catalog ? { catalog } : {}),
-        window: { start: group.windowStart, end: group.windowEnd }, excludePlaceIds: group.excludedPlaceIds, discussion,
+      const scheduled = huddleTiming(tx.db, group.id).source !== "pending";
+      return { runId: job.runId, inputRevision: job.revision, date: scheduled ? group.date : null, ...(catalog ? { catalog } : {}),
+        window: scheduled ? { start: group.windowStart, end: group.windowEnd } : null, excludePlaceIds: group.excludedPlaceIds, discussion,
         members: membersOf(tx.db, group.id).map(m => {
           const need = tx.db.agent_need.memberId.find(m.id)!;
           return { memberId: m.id, prompt: need.text, needs: parse(need.resultJson),

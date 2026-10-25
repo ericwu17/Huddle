@@ -33,6 +33,7 @@ function checkedResult(data: any, body: any) {
       !hard.rejectedTerms.some((term: string) => label.includes(term.toLocaleLowerCase()));
   });
   const plans: any[] = [];
+  if (data.plans.length && (!body.date || !body.window)) return null;
   for (const plan of data.plans) {
     if (!plan || !bounded(plan.id, 200) || ids.has(plan.id) || !bounded(plan.title, 2000) ||
         !bounded(plan.whyLine, 2000) || !texts(plan.limitations, 20) ||

@@ -66,6 +66,23 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls):
         cls.catalog = Catalog(TypeAdapter(list[Place]).validate_json(Path("data/places.json").read_text()))
 
+    async def test_unset_calendar_time_returns_only_real_untimed_ideas_without_assuming_a_date(self):
+        body = request(date=None, window=None)
+        model = Model()
+        result = await coordinate(model, self.catalog, body)
+        self.assertEqual(candidates(self.catalog, body), {})
+        self.assertFalse(result.plans)
+        self.assertTrue(result.suggestions)
+        self.assertTrue(model.context["alternativesOnly"])
+        self.assertTrue(all(idea.placeId in self.catalog.index for idea in result.suggestions))
+        self.assertIn("calendar", result.rationale)
+        self.assertNotIn("17:00", result.model_dump_json())
+
+    def test_time_contract_requires_a_complete_window_or_an_explicitly_unscheduled_outing(self):
+        for change in ({"date": None}, {"window": None}, {"date": "2026-02-30"}):
+            with self.assertRaises(ValueError):
+                request(**change)
+
     async def test_every_prompt_reaches_one_coordinator_and_private_text_cannot_be_published(self):
         model = Model()
         result = await coordinate(model, self.catalog, request())

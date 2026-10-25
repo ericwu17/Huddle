@@ -30,6 +30,11 @@ def schedule(**changes):
           'dayStart':'09:00','dayEnd':'20:00','durationMinutes':60,'timeZone':'America/Los_Angeles'}
     return CalendarScheduleRequest.model_validate({**data,**changes})
 
+def venue(category="meal", minutes=60, intervals=None):
+    return dict(placeId=f"synthetic-{category}",name=f"Synthetic {category}",category=category,dwellMinutes=minutes,
+                hours={day: (intervals if intervals is not None else [["11:00","12:00"]])
+                       for day in ["mon","tue","wed","thu","fri","sat","sun"]})
+
 def availability(): return [{'accountId':'a','busy':[]},{'accountId':'b','busy':[]}]
 
 class InviteTests(unittest.IsolatedAsyncioTestCase):
@@ -50,6 +55,28 @@ class InviteTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.ambiguousNames,['Alex']);self.assertFalse(result.friendAccountIds)
 
 class ScheduleTests(unittest.IsolatedAsyncioTestCase):
+    def test_flexible_week_search_keeps_daytime_and_evening_openings_for_claude(self):
+        body = schedule(timeMin='2030-01-01T08:00:00Z',timeMax='2030-01-08T08:00:00Z',dayStart='00:00',dayEnd='23:59',durationMinutes=90)
+        rows = CalendarAvailabilityResponse.model_validate({'availability':availability(),'updatedConnections':[]}).availability
+        slots = free_slots(body, rows, datetime(2029,12,31,tzinfo=timezone.utc))
+        self.assertLessEqual(len(slots),56)
+        self.assertEqual(len({slot.date for slot in slots}),7)
+        for day in {slot.date for slot in slots}:
+            starts = [slot.windowStart for slot in slots if slot.date == day]
+            self.assertTrue(any('06:00' <= start < '12:00' for start in starts))
+            self.assertTrue(any(start >= '17:00' for start in starts))
+    def test_flexible_time_of_day_uses_calendar_openings_outside_the_old_evening_default(self):
+        data = schedule().model_dump()
+        data.pop("dayStart"); data.pop("dayEnd")
+        body = CalendarScheduleRequest.model_validate(data)
+        self.assertEqual((body.dayStart, body.dayEnd), ("00:00", "23:59"))
+        rows = CalendarAvailabilityResponse.model_validate({'availability':availability(),'updatedConnections':[]}).availability
+        slots = free_slots(body, rows, datetime(2029,12,31,tzinfo=timezone.utc))
+        self.assertTrue(any(slot.windowStart < "12:00" for slot in slots))
+        body.dayStart, body.dayEnd = "12:00", "17:00"
+        slots = free_slots(body, rows, datetime(2029,12,31,tzinfo=timezone.utc))
+        self.assertTrue(slots)
+        self.assertTrue(all("12:00" <= slot.windowStart < slot.windowEnd <= "17:00" for slot in slots))
     async def test_half_open_busy_intervals_and_no_private_details_to_model(self):
         busy=availability();busy[0]['busy']=[{'start':'2030-01-01T17:00:00Z','end':'2030-01-01T19:00:00Z'}]
         model=Model(); result=await choose_time(Calendar(busy),model,schedule())
@@ -65,6 +92,35 @@ class ScheduleTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result.ok);self.assertEqual(model.calls,0)
         busy=[{'accountId':a,'busy':[{'start':'2030-01-01T00:00:00Z','end':'2030-01-03T00:00:00Z'}]}for a in ['a','b']]
         self.assertFalse((await choose_time(Calendar(busy),model,schedule())).ok)
+    async def test_meal_visit_fits_before_closing_and_dessert_hours_reach_claude(self):
+        meal, dessert = venue(), venue("dessert", 30, [["12:00","14:00"]])
+        model = Model()
+        result = await choose_time(Calendar(availability()), model, schedule(venues=[meal, dessert]))
+        self.assertTrue(result.ok)
+        self.assertEqual((result.chosen.windowStart,result.chosen.windowEnd),("11:00","12:00"))
+        self.assertTrue(all(slot["windowStart"] == "11:00" for slot in model.context["openings"].values()))
+        # A later closing time can influence Claude's choice without inventing a visit.
+        result = await choose_time(Calendar(availability()), model, schedule(venues=[meal, dessert],durationMinutes=120))
+        self.assertTrue(result.ok)
+        self.assertEqual(model.context["venues"][1]["hours"], {"tue":[["12:00","14:00"]]})
+        self.assertEqual(model.context["venues"][1]["dwellMinutes"],30)
+
+    async def test_closed_or_too_short_or_split_meal_hours_never_select_a_time(self):
+        for meal in [venue(minutes=61),venue(intervals=[]),venue(intervals=[["11:00","11:30"],["12:00","12:30"]])]:
+            model = Model()
+            result = await choose_time(Calendar(availability()),model,schedule(venues=[meal,venue("dessert")]))
+            self.assertFalse(result.ok)
+            self.assertEqual(model.calls,0)
+        meal = venue(); meal["hours"]["tue"] = []
+        model = Model()
+        self.assertFalse((await choose_time(Calendar(availability()),model,schedule(venues=[meal]))).ok)
+        self.assertEqual(model.calls,0)
+        self.assertFalse((await choose_time(Calendar(availability()),model,schedule(venues=[]))).ok)
+
+    def test_scheduling_hours_require_valid_complete_weekdays(self):
+        for hours in [{"tue":[["11:00","12:00"]]}, {day:[["12:00","11:00"]] for day in venue()["hours"]}]:
+            with self.assertRaises(ValidationError): schedule(venues=[{**venue(),"hours":hours}])
+
     def test_dst_slots_use_real_utc_intervals(self):
         body=schedule(timeMin='2030-03-10T08:00:00Z',timeMax='2030-03-11T07:00:00Z',dayStart='01:00',dayEnd='04:00')
         rows=CalendarAvailabilityResponse.model_validate({'availability':availability(),'updatedConnections':[]}).availability

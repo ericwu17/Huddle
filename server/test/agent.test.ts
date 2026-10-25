@@ -25,7 +25,7 @@ function result(body: any) {
     recommendedPlanId: "choice-1", rationale: "A validated catalog itinerary.", conflicts: [], warnings: [] };
 }
 
-function setup() {
+function setup(scheduled = true) {
   const test = createModuleTestHarness(schema, api, { rngSeed: 61n });
   test.clock.set(Timestamp.fromDate(new Date("2026-10-24T00:00:00Z")));
   const users = [0, 1].map(i => ({ auth: TestAuth.fromJwtPayload(JSON.stringify({ iss: "agent-test", sub: `user-${i}` }), new ConnectionId(BigInt(i + 1))), id: "" }));
@@ -53,6 +53,12 @@ function setup() {
     return response(data);
   }).build());
   const group = api.createAgentGroup(proc(users[0].auth), { name: "Agent test" });
+  if (scheduled) reduce(internal, tx => {
+    // Tests of timed plans explicitly arrange an outing; creation has no date.
+    const row = tx.db.group.id.find(group.groupId)!;
+    tx.db.group.id.update({ ...row, date: "2026-10-24", windowStart: "17:00", windowEnd: "23:00" });
+    tx.db.huddle_timing.groupId.update({ groupId: group.groupId, timeOfDay: "flexible", source: "manual", membersKey: "" });
+  });
   for (const user of users) {
     user.id = api.joinGroup(proc(user.auth), { code: group.code, name: `Name-${users.indexOf(user)}` }).memberId;
     reduce(user.auth, tx => api.setReady(tx, {}));
@@ -96,6 +102,30 @@ function setup() {
 }
 
 describe("single coordinator flow", () => {
+  it("creates no outing date and rejects a service-invented timed itinerary before calendars or manual selection", () => {
+    const s = setup(false);
+    expect(s.test.db.group.id.find(s.group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "" });
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[0].auth))).toMatchObject({ source: "pending", timeOfDay: "flexible" });
+    s.ready();
+    const runId = s.plan();
+    expect(s.captured()).toMatchObject({ date: null, window: null });
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+  });
+
+  it("allows an unscheduled group to choose and share real venue ideas with no invented outing date", () => {
+    const s = setup(false); s.ready();
+    s.transform(data => {
+      data.plans = []; data.recommendedPlanId = null;
+      data.suggestions = [{ id: "idea", placeId: "p_002", summary: "A venue idea while calendars are disconnected.", limitations: [] }];
+    });
+    const runId = s.plan();
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    s.vote(0, runId, "idea"); s.vote(1, runId, "idea");
+    const share = api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "idea" });
+    const published = api.getResultShare(s.proc(s.users[1].auth), share);
+    expect(JSON.parse(published.resultJson!)).toMatchObject({ date: null, choice: { placeId: "p_002" } });
+    expect(() => s.book(0, runId)).toThrow();
+  });
   it("accepts a current one-meal outing within identical 40-dollar/90-minute limits through voting and booking", () => {
     const s = setup();
     for (let i = 0; i < 2; i++) s.save(i, { budgetMaxPerPerson: 40, maxOutingMinutes: 90 });

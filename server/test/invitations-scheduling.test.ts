@@ -84,6 +84,9 @@ function setup() {
   }
   function ballot(groupId: string, complete = true, runId = "synthetic-agreed-run") {
     prefs(0); prefs(1);
+    if (!test.db.group.id.find(groupId)?.date) reduce(users[0], tx => api.setHuddleWindow(tx, {
+      date: "2026-10-24", windowStart: "17:00", windowEnd: "23:00", timeZone: "America/Los_Angeles",
+    }));
     const planId = "synthetic-agreed-plan";
     const venues = [LIVE_PLACES.find(place => place.id === "p_002")!, LIVE_PLACES.find(place => place.category === "dessert")!];
     const stops = venues.map((place, index) => ({ placeId: place.id, name: place.name, category: place.category,
@@ -173,6 +176,45 @@ describe("private invitation intent and atomic start", () => {
 });
 
 describe("calendar scheduling snapshot and meetup authorization", () => {
+  it("starts invitation Huddles unscheduled and keeps optional time preferences host-owned", () => {
+    const s = setup(), group = s.joined();
+    expect(s.test.db.group.id.find(group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "" });
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[0]))).toMatchObject({ timeOfDay: "flexible", source: "pending" });
+    expect(() => s.reduce(s.users[1], tx => api.setHuddleTimePreference(tx, { timeOfDay: "morning" }))).toThrow(/host/);
+    expect(() => s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "invented" }))).toThrow();
+    s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "afternoon" }));
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[1]))).toMatchObject({ timeOfDay: "afternoon", source: "pending" });
+    expect(s.calls).toEqual([]);
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[2]))).toBeUndefined();
+  });
+
+  it("chooses automatic calendar duration within every participant's limit and never creates an event", () => {
+    const s = setup(), group = s.joined(); s.calendars(); s.prefs(0, 30, 90); s.prefs(1, 30, 180);
+    s.schedule({ ok: true, chosen: { ...chosen, end: "2026-10-25T18:30:00-07:00", windowEnd: "18:30" }, updatedConnections: [] });
+    expect(api.scheduleHuddle(s.proc(s.users[0]), { ...scheduleArgs, durationMinutes: 0 }).ok).toBe(true);
+    expect(s.calls[0].body.durationMinutes).toBe(90);
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[0]))).toMatchObject({ source: "calendar" });
+    expect(s.test.db.meetup.count()).toBe(0n);
+    s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "morning" }));
+    expect(s.test.db.group.id.find(group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "" });
+    expect(s.test.db.group_schedule.groupId.find(group.groupId)).toBeNull();
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[0]))).toMatchObject({ source: "pending", timeOfDay: "morning" });
+  });
+
+  it("rejects an in-flight calendar choice after the host changes the time-of-day preference", () => {
+    const s = setup(), group = s.joined(); s.calendars();
+    s.intercept(() => s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "afternoon" })));
+    expect(api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs).ok).toBe(false);
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
+  });
+
+  it("enforces the saved day part against a service reply even when the caller supplies a full-day search", () => {
+    const s = setup(), group = s.joined(); s.calendars();
+    s.reduce(s.users[0], tx => api.setHuddleTimePreference(tx, { timeOfDay: "morning" }));
+    expect(api.scheduleHuddle(s.proc(s.users[0]), { ...scheduleArgs, dayStart: "00:00", dayEnd: "23:59" }).ok).toBe(false);
+    expect(s.calls[0].body).toMatchObject({ dayStart: "06:00", dayEnd: "12:00" });
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
+  });
   it("requires the current host and every participant's own connected calendar", () => {
     const s = setup(); s.joined(); s.calendars([0]);
     expect(() => api.scheduleHuddle(s.proc(s.users[1]), scheduleArgs)).toThrow(/host/);
@@ -187,6 +229,33 @@ describe("calendar scheduling snapshot and meetup authorization", () => {
     expect(s.test.db.group.id.find(group.groupId)).toMatchObject({ date: chosen.date, windowStart: "17:00", windowEnd: "19:00" });
     expect(s.calls.map(call => call.path)).toEqual(["/connectors/calendar/schedule"]);
     expect(s.test.db.meetup.count()).toBe(0n);
+  });
+
+  it("sends active venue hours to Claude and rejects a meal visit that would overrun closing", () => {
+    const s = setup(), group = s.joined(); s.calendars();
+    const place = { ...LIVE_PLACES.find(p => p.category === "meal")!, dwellMinutes: 75,
+      hours: Object.fromEntries(["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map(day => [day, [["17:00", "18:14"]]])) };
+    s.reduce(internal, tx => tx.db.venue.insert({ id: place.id, active: true, placeJson: JSON.stringify(place),
+      evidenceJson: JSON.stringify({ sources: [] }), version: "synthetic-hours", updatedAt: 0 }));
+    expect(api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs).ok).toBe(false);
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
+    expect(s.calls[0].body.venues).toEqual([{ placeId: place.id, name: place.name, category: "meal", dwellMinutes: 75, hours: place.hours }]);
+    // Finishing exactly at closing is allowed; arriving one minute too late is not.
+    place.hours.sun = [["17:00", "18:15"]];
+    s.reduce(internal, tx => tx.db.venue.id.update({ ...tx.db.venue.id.find(place.id)!, placeJson: JSON.stringify(place) }));
+    expect(api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs).ok).toBe(true);
+  });
+
+  it("rechecks changed catalog hours before applying the chosen time", () => {
+    const s = setup(), group = s.joined(); s.calendars();
+    s.intercept(path => {
+      if (path !== "/connectors/calendar/schedule") return;
+      const place = { ...LIVE_PLACES.find(p => p.category === "meal")!, hours: { mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] } };
+      s.reduce(internal, tx => tx.db.venue.insert({ id: place.id, active: true, placeJson: JSON.stringify(place),
+        evidenceJson: JSON.stringify({ sources: [] }), version: "synthetic-now-closed", updatedAt: 0 }));
+    });
+    expect(api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs).ok).toBe(false);
+    expect(s.test.db.group.id.find(group.groupId)?.date).toBe("");
   });
 
   it("supports a host-only manual fallback, retaining verification on no-op and invalidating it on actual changes", () => {
@@ -213,9 +282,9 @@ describe("calendar scheduling snapshot and meetup authorization", () => {
     expect(s.calls.map(call => call.path)).toEqual(["/connectors/calendar/schedule"]);
   });
 
-  it("rejects invalid search ranges, clock values and zero outing duration before HTTP", () => {
+  it("rejects invalid search ranges, clock values and too-short explicit duration before HTTP", () => {
     const s = setup(); s.joined(); s.calendars();
-    for (const change of [{ searchStart: "invalid" }, { searchEnd: scheduleArgs.searchStart }, { durationMinutes: 0 },
+    for (const change of [{ searchStart: "invalid" }, { searchEnd: scheduleArgs.searchStart }, { durationMinutes: 14 },
       { searchEnd: "2027-01-01T00:00:00Z" }, { dayStart: "25:00" }, { dayEnd: "15:00" }, { timeZone: "" }])
       expect(() => api.scheduleHuddle(s.proc(s.users[0]), { ...scheduleArgs, ...change })).toThrow();
     expect(s.calls).toEqual([]);

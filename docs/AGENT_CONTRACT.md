@@ -22,6 +22,34 @@ current timed winner with explicit event consent, including provisional venues.
 A vote never converts an unverified or untimed suggestion into a bookable
 itinerary or raises a cap.
 
+## Optional outing time (October 24)
+
+New coordinator Huddles start without a date or window; legacy seed dates are
+not used as calendar availability. The private `huddle_timing` table and scoped
+`my_huddle_timing` view record `pending|calendar|manual` and an optional shared
+host preference `flexible|morning|afternoon|evening`. The host changes it with
+`set_huddle_time_preference`; changes clear the time and invalidate old choices.
+
+Find plans checks the current participants' connected Google calendars when
+available. Flexible searches the full day; selected day parts bound the search.
+The default search spans the next seven days, not an assigned outing date.
+`schedule_huddle.durationMinutes=0` means automatic length: at most two hours and
+within every saved private duration cap. Explicit lengths remain compatible.
+The module supplies the active venues' weekday opening/closing hours and visit
+lengths to `/connectors/calendar/schedule`. Calendar candidates must contain a
+complete meal visit inside one opening interval, not merely an arrival before
+closing. Claude sees the supplied hours for later stops such as dessert; the
+final itinerary independently validates every stop, travel and closing time.
+Calendar errors/missing connections leave time unset; venue ideas remain votable.
+The optional manual selection is explicit. No calendar event is created by
+finding a time, and the venue's IANA timezone remains in data for correct hours,
+DST and calendar writes without the old fixed location label in the interface.
+
+`/agent/plan` now accepts `date:null, window:null` together. Timed requests keep
+their existing shapes. Unscheduled requests can produce only untimed suggestions;
+the module rejects timed responses without an established window. Shared untimed
+results use `date:null`; timed public results still require a date.
+
 ## Done and shared result
 
 A complete ballot with a unique or Spin-resolved winner opens `/g/:groupId/done`.
@@ -79,7 +107,8 @@ permitted increase path; generating new agent trade offers is deferred.
 
 ### POST /agent/plan
 
-Request: `runId`, `inputRevision`, ISO `date`, `window` with `start`/`end`,
+Request: `runId`, `inputRevision`, ISO `date` and `window` with `start`/`end`
+(or both null for an unscheduled outing),
 `members`, `excludePlaceIds`, and optional public `discussion` strings.
 Each member supplies `memberId`, private `prompt`, confirmed `needs` from the
 needs endpoint, and optional `origin` (`lat`, `lng`). Two or more members are
