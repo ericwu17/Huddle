@@ -105,9 +105,19 @@ current routing context; the saved itinerary date/time remains Huddle's schedule
   private data exclusion and desktop/mobile distance fallback.
 - All four embed modes, matching external links and unchanged votes were tested
   with an explicitly synthetic iframe response. No Google route was fetched.
-- Live Google rendering remains pending a configured Embed key and allowed
-  website origins. No shared API, module, scraper, tunnel or Vercel deployment
-  was changed by this display update.
+- Live Google rendering now passes with the configured Embed key on the local
+  review site: 55 connected checks pass, including every transport mode,
+  synchronized external links, unchanged votes, owner-only Calendar controls,
+  Done/reopening and public sharing. Another 17 real three-stop checks pass,
+  including both transit legs, intermediate venues and phone layout.
+  Visual checks confirmed route/time bubbles
+  for driving, walking, biking and transit. Google draws these labels within
+  map imagery, so DOM text alone is not evidence of a missing estimate.
+- For very short/co-located venue sequences (at most 100 m total straight-line),
+  Google can omit the time bubble. The preview header shows the straight-line
+  distance instead; it never invents a Google time.
+- Main was synced without conflicts, retaining the new favicon and tie-reveal
+  animation. Backend activation is separate from this frontend-only map feature.
 
 ## Current option labels
 

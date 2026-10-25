@@ -78,8 +78,9 @@ After verification, release in order without resetting data:
 5. Verify the shared UI receives SF/Oakland choices, retains menus/photos, and
    passes manual city, GPS, majority/tie, stale-vote and budget scenarios.
 
-No Routes API was added. Travel remains the existing estimate; walking map links
-are unchanged. Real transport modes and routed timings remain a follow-up in
+No Routes API was added. Planner travel remains the existing estimate. The
+frontend now offers free embedded directions with driving as its default and
+local walking/transit/biking previews. Saved mode-aware routed timings remain a follow-up in
 [GOOGLE_MAPS_PLAN.md](GOOGLE_MAPS_PLAN.md).
 
 ## Verification on this branch

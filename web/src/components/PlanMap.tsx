@@ -21,12 +21,13 @@ function GoogleRouteMap({ plan }: Props) {
   const [mode, setMode] = useDirectionsMode(plan.stops);
   const [leg, setLeg] = useState(0);
   const segments = mapsSegments(plan.stops, mode);
+  const distance = plan.stops.slice(1).reduce((sum, stop, index) => sum + distanceKm(plan.stops[index], stop), 0);
   const selected = Math.min(leg, segments.length - 1);
   const url = googleMapsEmbedUrl(segments[selected] ?? [], listings, mode, embedKey!);
   if (!url) return <p className="muted">Map unavailable for these stops.</p>;
   return <section className="card map-card" aria-label="Route directions">
     {plan.stops.length > 1 ? <div className="directions-controls">
-      <div className="directions-heading"><strong>Preview your route</strong><span className="muted text-sm">Travel time shown on the map</span></div>
+      <div className="directions-heading"><strong>Preview your route</strong><span className="muted text-sm">{distance <= .1 ? `${displayDistance(distance)} apart · straight-line` : "Google Maps directions"}</span></div>
       <div className="directions-modes" role="group" aria-label="Travel mode">{DIRECTIONS_MODES.map(value =>
         <button key={value} type="button" className="directions-mode" aria-pressed={mode === value} onClick={() => { setMode(value); setLeg(0); }}>{directionsLabels[value]}</button>)}</div>
       {segments.length > 1 ? <div className="directions-legs" role="group" aria-label="Transit legs">{segments.map((_, index) =>
