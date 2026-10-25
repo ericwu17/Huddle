@@ -97,20 +97,21 @@ class MenuPlannerTests(unittest.IsolatedAsyncioTestCase):
     async def test_invented_item_never_becomes_an_order(self):
         snapshot, body = scenario()
         result = await coordinate(MenuModel(bad_item=True), CatalogCache().get(snapshot), body)
-        self.assertFalse(result.plans)
-        self.assertFalse(result.privateOrders)
-        self.assertTrue(result.suggestions)
+        self.assertTrue(result.plans)
+        self.assertTrue(result.privateOrders)
+        self.assertFalse(result.suggestions)
         self.assertNotIn("invented-item", result.model_dump_json())
         self.assertIn("Claude could not complete", result.warnings[0])
 
-    async def test_zero_cap_and_tiny_window_get_untimed_alternatives_without_relaxation(self):
+    async def test_zero_cap_and_tiny_limit_get_explicit_provisional_timed_alternatives(self):
         snapshot, body = scenario(budgetMaxPerPerson=0, maxOutingMinutes=1)
         result = await coordinate(MenuModel(), CatalogCache().get(snapshot), body)
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
-        self.assertIsNone(result.recommendedPlanId)
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
+        self.assertEqual(result.recommendedPlanId, result.plans[0].id)
         self.assertEqual(body.members[0].needs.hard.budgetMaxPerPerson, 0)
-        self.assertNotIn("stops", result.suggestions[0].model_dump())
+        self.assertEqual(body.members[0].needs.hard.maxOutingMinutes, 1)
+        self.assertTrue(all(p.status == "provisional" and {"budget", "duration"}.issubset(p.relaxed) for p in result.plans))
 
     async def test_missing_price_is_estimated_and_provisional(self):
         snapshot, body = scenario()
@@ -124,9 +125,10 @@ class MenuPlannerTests(unittest.IsolatedAsyncioTestCase):
     async def test_provider_outage_still_shows_labeled_real_catalog_venues(self):
         snapshot, body = scenario()
         result = await coordinate(MenuModel(unavailable=True), CatalogCache().get(snapshot), body)
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
-        self.assertIn("catalog suggestions", result.warnings[0])
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
+        self.assertIn("not Claude's choices", result.warnings[0])
+        self.assertTrue(all(row.total <= (30 if row.memberId == "max" else 50) for row in result.privateOrders))
 
 
 class RealMenuSidecarTests(unittest.TestCase):

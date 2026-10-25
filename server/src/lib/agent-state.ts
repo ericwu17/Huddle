@@ -2,10 +2,11 @@
 import { SenderError } from "spacetimedb/server";
 import type { ReadDb, Tx } from "./types";
 import { at, membersOf, nowMs, parse } from "./util";
-import { planFitsAgentRequirements } from "./agent-constraints";
+import { planFitsAgentRequirements, relaxedLimits } from "./agent-constraints";
 import { validateOrders } from "./agent-orders";
 import { catalogSnapshot } from "./catalog";
 import { LIVE_PLACES } from "./places";
+import { ensureOutingWindow } from "./huddle-timing";
 
 export const isAgent = (db: ReadDb, groupId: string) => !!db.agent_session.groupId.find(groupId);
 
@@ -30,10 +31,11 @@ export function allAgentNeedsConfirmed(db: ReadDb, groupId: string): boolean {
 
 export function startAgentRun(tx: Tx, groupId: string): string {
   const state = tx.db.agent_session.groupId.find(groupId);
-  const group = tx.db.group.id.find(groupId);
-  if (!state || !group || !allAgentNeedsConfirmed(tx.db, groupId))
+  if (!state || !tx.db.group.id.find(groupId) || !allAgentNeedsConfirmed(tx.db, groupId))
     throw new SenderError("Everyone must save their preferences and answer any private clarification first.");
   if (state.status === "planning") throw new SenderError("The coordinator is already planning.");
+  ensureOutingWindow(tx, groupId, nowMs(tx));
+  const group = tx.db.group.id.find(groupId)!;
   const runId = `run_${group.code}_${group.runCounter + 1}`;
   const revision = state.revision + 1;
   tx.db.agent_session.groupId.update({ ...state, revision, status: "planning", activeRunId: runId, error: undefined });
@@ -66,7 +68,7 @@ function currentAgentChoices(db: ReadDb, groupId: string, runId: string, mode: "
     const rows = privateRows.filter(row => row.planId === plan.id);
     const verified = plan.costModel === "own_orders" ? validateOrders(plan, rows,
       members.map(member => ({ memberId: member.memberId, needs: { hard: member.hard } })),
-      places, evidence, true) : null;
+      places, evidence, !(mode === "proposal" && relaxedLimits(plan)?.has("budget"))) : null;
     if (plan.costModel === "own_orders" && (!verified || verified.requiresProvisional && plan.status !== "provisional")) return false;
     return planFitsAgentRequirements(plan, members, { mode, personalTotals: verified?.totals });
   }) : [];
@@ -79,8 +81,8 @@ export function agentPlans(db: ReadDb, groupId: string, runId: string): any[] {
   return currentAgentChoices(db, groupId, runId, "selectable")?.plans ?? [];
 }
 
-// A vote expresses interest, not verification of an outing. Suggestions retain
-// their original untimed shape; no schedule, affordability or booking is implied.
+// A vote expresses interest, not verification of an outing. New results carry
+// only timed plans; untimed suggestions remain only in results stored earlier.
 export function agentVotingChoices(db: ReadDb, groupId: string, runId: string): any[] {
   const current = currentAgentChoices(db, groupId, runId, "proposal");
   if (!current) return [];

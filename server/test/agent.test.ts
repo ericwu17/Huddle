@@ -36,6 +36,7 @@ function setup(scheduled = true) {
   let bad = false;
   let transform: ((data: any) => void) | null = null;
   let captured: any;
+  let offered: any;
   const withEnv = (ctx: any): any => new Proxy(Object.create(null), { get(_target, key) {
     if (key === "env") return env;
     if (key === "withTx") return (fn: any) => ctx.withTx((tx: any) => fn(withEnv(tx)));
@@ -51,6 +52,7 @@ function setup(scheduled = true) {
     const data = result(body);
     if (bad) data.plans[0].costPerPerson = 1;
     transform?.(data);
+    offered = data;
     return response(data);
   }).build());
   const group = api.createAgentGroup(proc(users[0].auth), { name: "Agent test" });
@@ -90,42 +92,60 @@ function setup(scheduled = true) {
     return [...test.db.agent_plan_job.iter()].at(-1)!;
   }
   function plan() { const job = start(); api.runAgentPlanJob(proc(), { job }); return job.runId; }
+  // Explicit historical fixture: the current service no longer publishes untimed
+  // suggestions, but existing stored results must retain votes, privacy and invalidation.
+  function legacyPlan() {
+    const runId = plan();
+    reduce(internal, tx => {
+      const row = tx.db.plan_run.runId.find(runId)!;
+      const { privateOrders = [], ...publicResult } = offered;
+      tx.db.plan_run.runId.update({ ...row, status: "done", resultJson: JSON.stringify(publicResult) });
+      const session = tx.db.agent_session.groupId.find(group.groupId)!;
+      tx.db.agent_session.groupId.update({ ...session, status: "ready" });
+      const current = tx.db.group.id.find(group.groupId)!;
+      tx.db.group.id.update({ ...current, status: "voting" });
+      for (const order of privateOrders) tx.db.agent_order.insert({
+        id: `${runId}:${order.planId}:${order.memberId}`, runId, memberId: order.memberId,
+        planId: order.planId, itemsJson: JSON.stringify(order.items), total: order.total,
+      });
+    });
+    return runId;
+  }
   function vote(index: number, runId: string, planId = "choice-1") {
     reduce(users[index].auth, tx => api.castVote(tx, { runId, planId }));
   }
   function book(index: number, runId: string) {
     return reduce(users[index].auth, tx => api.startBooking(tx, { runId, planId: "choice-1", stopIndex: 1 }));
   }
-  return { test, users, group, reduce, proc, submit, review, save, confirm, ready, start, plan, vote, book,
+  return { test, users, group, reduce, proc, submit, review, save, confirm, ready, start, plan, legacyPlan, vote, book,
     extraction: (value: typeof extracted) => { extracted = value; },
     intercept: (fn: typeof intercept) => { intercept = fn; }, bad: () => { bad = true; }, captured: () => captured,
     transform: (fn: (data: any) => void) => { transform = fn; } };
 }
 
 describe("single coordinator flow", () => {
-  it("creates no outing date and rejects a service-invented timed itinerary before calendars or manual selection", () => {
+  it("starts without a date and establishes an automatic timed window before planning", () => {
     const s = setup(false);
     expect(s.test.db.group.id.find(s.group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "" });
     expect(api.my_huddle_timing(s.test.viewContext(s.users[0].auth))).toMatchObject({ source: "pending", timeOfDay: "flexible" });
     s.ready();
     const runId = s.plan();
-    expect(s.captured()).toMatchObject({ date: null, window: null });
-    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+    expect(s.captured()).toMatchObject({ date: "2026-10-24", window: { start: "17:00", end: "22:00" } });
+    expect(api.my_huddle_timing(s.test.viewContext(s.users[0].auth))).toMatchObject({ source: "auto" });
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
   });
 
-  it("allows an unscheduled group to choose and share real venue ideas with no invented outing date", () => {
+  it("drops untimed suggestions from an older service before voting or sharing", () => {
     const s = setup(false); s.ready();
     s.transform(data => {
       data.plans = []; data.recommendedPlanId = null;
-      data.suggestions = [{ id: "idea", placeId: "p_002", summary: "A venue idea while calendars are disconnected.", limitations: [] }];
+      data.suggestions = [{ id: "idea", placeId: "p_002", summary: "Old venue idea.", limitations: [] }];
     });
     const runId = s.plan();
     expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
-    s.vote(0, runId, "idea"); s.vote(1, runId, "idea");
-    const share = api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "idea" });
-    const published = api.getResultShare(s.proc(s.users[1].auth), share);
-    expect(JSON.parse(published.resultJson!)).toMatchObject({ date: null, choice: { placeId: "p_002" } });
-    expect(() => s.book(0, runId)).toThrow();
+    expect(JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!)).not.toHaveProperty("suggestions");
+    expect(() => s.vote(0, runId, "idea")).toThrow();
+    expect(() => api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "idea" })).toThrow();
   });
   it("accepts one-hour coordinator stays while retaining old catalog-duration results", () => {
     const s = setup(); s.ready();
@@ -632,14 +652,14 @@ describe("menu proposals and private own orders", () => {
     expect(api.my_agent_orders(s.test.viewContext(s.users[1].auth))).toEqual([]); deniesActions(s, runId);
   });
 
-  it("allows exploratory votes for untimed suggestions above a cap without booking permission", () => {
+  it("legacy stored result: allows exploratory votes for untimed suggestions above a cap without booking permission", () => {
     const s = setup(); push(s); s.save(0, { budgetMaxPerPerson: 5 }); s.save(1, { budgetMaxPerPerson: 5 });
     s.transform(data => {
       data.plans = []; data.recommendedPlanId = null;
       data.suggestions = [{ id: "untimed", placeId: "p_002", summary: "A place to discuss after reviewing cost.", limitations: ["Over the current cap."] }];
       data.privateOrders = s.users.map(user => ({ memberId: user.id, planId: "untimed", items: [{ placeId: "p_002", itemId: "beans" }], total: 10 }));
     });
-    const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    const runId = s.legacyPlan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
     expect(JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!).suggestions).toHaveLength(1);
     expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))[0].total).toBe(10);
     expect(s.test.db.agent_session.groupId.find(s.group.groupId)?.status).toBe("ready");
@@ -675,13 +695,13 @@ describe("menu proposals and private own orders", () => {
     expect(() => s.vote(0, runId)).not.toThrow();
   });
 
-  it("accepts provider-outage catalog suggestions without inventing a private order or price", () => {
+  it("legacy stored result: accepts provider-outage catalog suggestions without inventing a private order or price", () => {
     const s = setup(); s.ready();
     s.transform(data => {
       data.plans = []; data.recommendedPlanId = null; data.privateOrders = [];
       data.suggestions = [{ id: "offline-idea", placeId: "p_002", summary: "A catalog venue to explore.", limitations: ["Coordinator unavailable."] }];
     });
-    const runId = s.plan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    const runId = s.legacyPlan(); expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
     expect(api.my_agent_orders(s.test.viewContext(s.users[0].auth))).toEqual([]);
     s.vote(0, runId, "offline-idea"); s.vote(1, runId, "offline-idea");
     deniesBooking(s, runId, "offline-idea");
@@ -694,7 +714,7 @@ describe("menu proposals and private own orders", () => {
       data.suggestions = ["p_002", "p_003"].map((placeId, i) => ({ id: `idea-${i}`, placeId,
         summary: "Explore this venue.", limitations: ["No timed plan is verified."] }));
     });
-    const runId = s.plan();
+    const runId = s.legacyPlan();
     // Previously saved suggestion-only runs were marked blocked. Their current
     // revision and confirmations remain sufficient for an exploratory ballot.
     s.reduce(internal, tx => {
@@ -737,14 +757,14 @@ describe("menu proposals and private own orders", () => {
     deniesActions(s, runId);
   });
 
-  it("invalidates exploratory suggestion votes after a normal saved budget edit", () => {
+  it("legacy stored result: invalidates exploratory suggestion votes after a normal saved budget edit", () => {
     const s = setup(); s.ready();
     s.transform(data => {
       data.plans = []; data.recommendedPlanId = null;
       data.suggestions = ["p_002", "p_003"].map((placeId, i) => ({ id: `idea-${i}`, placeId,
         summary: "Explore this venue.", limitations: ["Affordability is unverified."] }));
     });
-    const runId = s.plan(); s.vote(0, runId, "idea-0"); s.vote(1, runId, "idea-1");
+    const runId = s.legacyPlan(); s.vote(0, runId, "idea-0"); s.vote(1, runId, "idea-1");
     api.doRoulette(s.proc(s.users[0].auth), { runId });
     s.save(0, { budgetMaxPerPerson: 5 });
     expect(api.my_votes(s.test.viewContext(s.users[0].auth))).toEqual([]);
@@ -803,7 +823,7 @@ describe("menu proposals and private own orders", () => {
           data.suggestions = [{ id: "choice-1", placeId: "p_002", summary: "PRIVATE_MODEL_PROSE", limitations: ["PRIVATE_DETAIL"] }];
         }
       });
-      const runId = s.plan(); s.vote(0, runId); s.vote(1, runId);
+      const runId = kind === "untimed" ? s.legacyPlan() : s.plan(); s.vote(0, runId); s.vote(1, runId);
       const share = api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" });
       const read = api.getResultShare(s.proc(), share), choice = JSON.parse(read.resultJson!).choice;
       expect(read.ok).toBe(true); expect(read.resultJson).not.toContain("PRIVATE");
@@ -900,6 +920,8 @@ describe("shared destination cities", () => {
     s.ready(); s.transform(data => { data.plans = []; data.recommendedPlanId = null;
       data.suggestions = [{ id: "outside", placeId: "p_002", summary: "Berkeley venue", limitations: [] }]; });
     const runId = s.plan();
-    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    expect(JSON.parse(s.test.db.plan_run.runId.find(runId)!.resultJson!)).not.toHaveProperty("suggestions");
+    expect(() => s.vote(0, runId, "outside")).toThrow();
   });
 });

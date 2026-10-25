@@ -36,14 +36,15 @@ IDs, incorrect totals, changed item prices and stale budgets. Missing allergy
 evidence, unknown/unpriced selections and unsupported dietary evidence still
 require provisional status internally.
 
-If no timed itinerary fits the current budget, duration, hours or travel limits,
-the coordinator can suggest up to three **untimed venues to explore**. These
-have no fabricated visit times and are not claimed to fit those limits. They
-can enter an exploratory group vote and Spin, but cannot be booked or added to
-calendars. Voting does not raise budgets or claim these venues fit the outing.
-If Claude fails, clearly labeled real-catalog
-ideas keep the screen useful; they are not represented as Claude decisions or
-synthetic venues. An empty/excluded catalog cannot produce invented places.
+If no timed itinerary fits the current window, the coordinator searches later the
+same day and then the whole day. If none fits the budget, duration or travel
+limits, it still schedules the closest timed itineraries within opening hours.
+These are **provisional**, list the limits they fall outside of (`relaxed`) and
+cannot be booked. Voting does not raise budgets or claim these plans fit.
+(Untimed venue ideas are no longer offered.)
+If Claude fails, the first validated timed candidates keep the screen useful with
+clearly labeled cheapest eligible orders; they are not represented as Claude
+decisions. An empty/excluded catalog cannot produce invented places.
 
 Specific source labels such as **Pizza restaurant** supersede the coarse cuisine
 family in explanations and venue cards. Eric Wu's optional `Place.label` is

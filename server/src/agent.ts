@@ -266,7 +266,7 @@ export const runAgentPlanJob = spacetimedb.procedure(
         tx.db.agent_order.insert({ id, runId: job.runId, memberId: order.memberId, planId: order.planId, itemsJson: JSON.stringify(order.items), total: order.total });
       }
       tx.db.plan_run.runId.update({ ...run, status: "done", resultJson: JSON.stringify(data), stub: false });
-      const hasChoices = data.plans.length > 0 || !!data.suggestions?.length;
+      const hasChoices = data.plans.length > 0;
       tx.db.agent_session.groupId.update({ ...state, status: hasChoices ? "ready" : "blocked", error: undefined });
       tx.db.group.id.update({ ...group, status: hasChoices ? "voting" : "planned" });
       if (hasChoices) tx.db.council_message.insert({ id: 0n, runId: job.runId, round: 1,

@@ -57,7 +57,8 @@ allergy, budget or dietary requirement just to make the demo succeed.
    are not shown to my friend.”
 3. **Calendar context (30 seconds).** With both calendars connected, choose an
    optional shared daypart and **Find plans**. Show the selected common opening.
-   This checks free/busy and venue hours; it does not create an event. Use the
+   This checks free/busy and venue hours; it does not create an event. An automatic
+   suggested time alone is not a successful Calendar check. Use the
    explicit manual-window fallback above if no suitable opening exists.
 4. **Claude + real venue data (60 seconds).** Open the options. Show two visits of
    about an hour each, familiar route names, photos, ratings, comparison labels
@@ -82,6 +83,19 @@ allergy, budget or dietary requirement just to make the demo succeed.
 8. **Reusable context (15 seconds).** Return to Start/Friends and show the retained
    contact and saved preferences ready for the next outing.
 
+## Rehearsal evidence
+
+The isolated two-account browser rehearsal with real Claude returned three
+2-stop routes: Artichoke Basille’s Pizza → Caravaggio Gelato Lab,
+Jupiter → U :Dessert Story, and Artichoke Basille’s Pizza → Belmo Café.
+Each proposed visit was 60 minutes, with travel between visits. Both owners’
+private totals stayed within $40/$50. The same flow with 90 minutes returned
+one-stop alternatives and explained the reduction on Options and Vote.
+All 32 connected browser checks passed, including desktop/mobile red-warning
+updates, independent private inputs, directions iframe, completed votes and Done.
+No Google event or invitation message was sent during these automated checks.
+The exact restaurants can change on a new Claude call.
+
 ## What is real, and what to say accurately
 
 | Integration | What this demo shows |
@@ -102,8 +116,12 @@ price must not be described as an observed item price.
 
 - **One stop instead of two:** read the displayed compromise. Check both people
   saved 2 stops, at least 180 minutes, and a shared window covering both visits
-  plus travel while venues are open. Unset time shows individual place ideas.
-  A 90-minute limit is deliberately not stretched into a two-hour plan.
+  plus travel while venues are open. Without a Calendar/manual time, the current flow chooses
+  an automatic outing time; this is not proof of calendar availability.
+  With a feasible one-hour meal, the 90-minute example stays within that limit.
+  If no itinerary fits at all, the merged timed fallback can show explicitly
+  provisional options outside requested limits; it does not change saved caps
+  or permit booking. Rehearse the fully fitting path above.
 - **Different venues:** use another suitable option. Claude is not deterministic;
   this is normal when the menu, budget and opening-hour checks still pass.
 - **No Calendar opening:** choose the rehearsed manual window and say so.

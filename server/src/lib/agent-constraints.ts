@@ -15,18 +15,35 @@ export function estimatedTravelMinutes(a: { lat: number; lng: number }, b: { lat
   return km / (km <= 1.2 ? 4.5 : 18) * 60;
 }
 
+export const RELAXABLE_LIMITS = new Set(["window", "budget", "duration", "travel"]);
+
+// Limits a provisional proposal declares it was scheduled outside of because no
+// itinerary fit them all. Anything malformed returns null and fails validation.
+export function relaxedLimits(plan: any): Set<string> | null {
+  const relaxed = plan?.relaxed ?? [];
+  if (!Array.isArray(relaxed) || relaxed.length > RELAXABLE_LIMITS.size || new Set(relaxed).size !== relaxed.length ||
+      relaxed.some(limit => !RELAXABLE_LIMITS.has(limit)) || relaxed.length && plan.status !== "provisional") return null;
+  return new Set(relaxed);
+}
+
 type MemberRequirement = { memberId?: string; hard: any };
 export function planFitsAgentRequirements(plan: any, members: MemberRequirement[], options: {
   mode?: "proposal" | "selectable"; personalTotals?: Map<string, number>;
 } = {}): boolean {
   if (options.mode !== "proposal" && plan?.status === "provisional") return false;
   if (plan?.status !== undefined && !["ready", "provisional"].includes(plan.status)) return false;
+  // Only a provisional proposal may fall outside declared limits; booking and
+  // other selectable checks never accept one.
+  const relaxed = relaxedLimits(plan);
+  if (!relaxed || relaxed.size && options.mode !== "proposal") return false;
+  const uncapped = (m: MemberRequirement) => ({ ...m, hard: m.hard ? { ...m.hard, budgetMaxPerPerson: null } : null });
+  const capped = relaxed.has("budget") ? members.map(uncapped) : members;
   // The public cost remains the sum of catalog estimates. Own-order plans use
   // independently validated private totals for the current members' caps.
   const own = plan?.costModel === "own_orders";
-  if (!planFitsBudgets(plan, own ? members.map(m => ({ hard: m.hard ? { budgetMaxPerPerson: null } : null })) : members) ||
+  if (!planFitsBudgets(plan, own ? members.map(uncapped) : capped) ||
       plan.stops.length < 1 || plan.stops.length > 5) return false;
-  if (own && members.some(m => !m.memberId || !options.personalTotals?.has(m.memberId) ||
+  if (own && capped.some(m => !m.memberId || !options.personalTotals?.has(m.memberId) ||
       !planFitsBudgets({ costPerPerson: options.personalTotals.get(m.memberId)!,
         stops: [{ costPerPerson: options.personalTotals.get(m.memberId)! }] }, [m]))) return false;
   // A short dinner can be complete at one meal venue. A tagless activity alone
@@ -46,6 +63,6 @@ export function planFitsAgentRequirements(plan: any, members: MemberRequirement[
     if (hard?.allergies?.length && plan.stops.some((stop: any) => stop.category !== "activity") &&
         !(options.mode === "proposal" && plan.status === "provisional")) return false;
     const limit = hard?.maxOutingMinutes;
-    return limit == null || typeof limit === "number" && Number.isFinite(limit) && limit >= duration;
+    return limit == null || relaxed.has("duration") || typeof limit === "number" && Number.isFinite(limit) && limit >= duration;
   });
 }

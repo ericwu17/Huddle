@@ -6,7 +6,9 @@ ties favor the fuller outing. Automatic Calendar search allows travel between
 visits and stays inside every private duration cap. Time available shows a red
 warning triangle and “Time may be tight: stopping 2 times usually needs about
 2 hours, plus travel.” when the selected stops need more time. Options and Vote
-explain a necessary shorter alternative or missing outing time. Scraped menus,
+explain a necessary shorter alternative. Eric Wu’s merged update chooses an
+automatic time when Calendar/manual time is absent and labels provisional
+plans outside requested limits; saved private caps remain unchanged. Scraped menus,
 photos, venue estimates and legacy solver behavior are preserved. For rehearsal,
 use two stops with a three-hour allowance; see [demo script](DEMO_CHECKLIST.md).
 

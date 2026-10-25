@@ -19,7 +19,7 @@ from .agent_models import (AgentHard, AgentNeeds, AgentNeedsRequest, AgentPlan, 
                            AgentPlanResponse, AgentSuggestion, PrivateOrder, OrderItem)
 from .catalog import Catalog, LONG_TEMPLATES, SHORT_TEMPLATES, clock, minutes
 from .llm import LLM, LLMError, fast, smart
-from .models import Stop
+from .models import Stop, Window
 from .parse import stated_budget
 from .menu_context import allowed_items, menu_items, item_cost
 from .menu_planner import food_style
@@ -157,16 +157,79 @@ def eligible(catalog: Catalog, body: AgentPlanRequest) -> set[int]:
     return result
 
 
-def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]:
+VENUE_TIME_ZONE = "America/Los_Angeles"
+DEFAULT_WINDOW = ("17:00", "22:00")
+DAY_WINDOW = ("08:00", "23:00")
+RELAXED_POOL = 2000
+
+
+def with_outing_time(body: AgentPlanRequest) -> AgentPlanRequest:
+    """Unscheduled requests get the next evening in the venues' time zone, so every plan is timed."""
+    if body.date is not None and body.window is not None:
+        return body
+    from datetime import timedelta
+    from zoneinfo import ZoneInfo
+    now = datetime.now(ZoneInfo(VENUE_TIME_ZONE))
+    day = now.date() if now.hour * 60 + now.minute + 60 <= minutes(DEFAULT_WINDOW[0]) else now.date() + timedelta(days=1)
+    return body.model_copy(update={"date": day.isoformat(),
+                                   "window": Window(start=DEFAULT_WINDOW[0], end=DEFAULT_WINDOW[1])})
+
+
+def search_windows(body: AgentPlanRequest) -> list[tuple[str, str]]:
+    """The requested window, then later the same day, then the whole day."""
+    start, end = body.window.start, body.window.end
+    return list(dict.fromkeys([(start, end), (start, max(end, DAY_WINDOW[1])),
+                               (min(start, DAY_WINDOW[0]), max(end, DAY_WINDOW[1]))]))
+
+
+RELAXED_NOTES = {
+    "window": "Scheduled outside the group's chosen time because nothing fit inside it.",
+    "budget": "May cost more than someone's outing budget; no itinerary fit every budget.",
+    "duration": "Runs longer than someone's outing-time limit; no itinerary fit every limit.",
+    "travel": "The first stop may be farther than someone's travel limit allows.",
+}
+
+
+def relaxed_limits(catalog: Catalog, body: AgentPlanRequest, plan: AgentPlan, totals: dict | None = None) -> list[str]:
+    """Limits a scheduled plan falls outside of; empty when it fits every one.
+
+    `totals` holds each member's own-order total; without it the shared venue
+    baseline is compared with each cap, as the module does.
+    """
+    first, last = plan.stops[0], plan.stops[-1]
+    relaxed = []
+    if minutes(first.start) < minutes(body.window.start) or minutes(last.end) > minutes(body.window.end):
+        relaxed.append("window")
+    if any(m.needs.hard.budgetMaxPerPerson is not None and
+           Decimal(str(totals[m.memberId] if totals else plan.costPerPerson)) > Decimal(str(m.needs.hard.budgetMaxPerPerson))
+           for m in body.members):
+        relaxed.append("budget")
+    elapsed = minutes(last.end) - minutes(first.start)
+    if any(m.needs.hard.maxOutingMinutes is not None and elapsed > m.needs.hard.maxOutingMinutes for m in body.members):
+        relaxed.append("duration")
+    if any(m.needs.hard.maxTravelMinutes is not None and
+           (m.origin is None or catalog.first_leg_minutes(m.origin, catalog.index[first.placeId]) > m.needs.hard.maxTravelMinutes)
+           for m in body.members):
+        relaxed.append("travel")
+    return relaxed
+
+
+def candidates(catalog: Catalog, body: AgentPlanRequest, window: tuple[str, str] | None = None,
+               strict: bool = True) -> dict[str, AgentPlan]:
     """Feasible plans at the stop count nearest the stated preferences' mean.
 
     A soft preference: Flexible members are left out, and when the nearest
     count has no feasible itinerary the next nearest feasible count is kept.
     Counts are tried nearest first, so long routes are searched only when wanted.
+
+    `window` overrides the request window. `strict=False` still keeps venue
+    facts, opening hours, exclusions and vetoes but ignores budgets, outing
+    length and first-leg travel, for when no itinerary fits every limit.
     """
     if body.date is None or body.window is None:
         return {}
     catalog = catalog.coordinator_view
+    start, end = window or (body.window.start, body.window.end)
     allowed = eligible(catalog, body)
     menu_places = {i for i, p in enumerate(catalog.places) if menu_items(catalog, p.id)}
     cost = [Decimal(str(p.costPerPerson)) for p in catalog.places]
@@ -186,7 +249,11 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
 
     def fits(itinerary):
         # Numeric checks run before any pydantic model is built.
-        if any(i not in allowed for i in itinerary.stops) or not first_ok(itinerary.stops[0]):
+        if any(i not in allowed for i in itinerary.stops):
+            return False
+        if not strict:
+            return True
+        if not first_ok(itinerary.stops[0]):
             return False
         has_menu = any(i in menu_places for i in itinerary.stops)
         total = sum((cost[i] for i in itinerary.stops), Decimal(0))
@@ -199,17 +266,24 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
         elapsed = itinerary.starts[-1] + catalog.places[last].dwellMinutes - itinerary.starts[0]
         return max_elapsed is None or elapsed <= max_elapsed
 
-    budgets = [(float(limit), [float(p) for p in minimum_prices[m.memberId]]) for m, limit in capped]
+    budgets = [(float(limit), [float(p) for p in minimum_prices[m.memberId]]) for m, limit in capped] if strict else []
     for counts in stop_counts(body.members):
         pool = []
         if min(counts) <= 3:
             # Cached and group-independent. The legacy solver keeps its documented templates.
-            pool = [it for it in catalog.itineraries(body.date, body.window.start, body.window.end,
+            pool = [it for it in catalog.itineraries(body.date, start, end,
                                                      templates=SHORT_TEMPLATES) if len(it.stops) in counts]
         for count in sorted(c for c in counts if c > 3):
-            pool += catalog.routes(body.date, body.window.start, body.window.end, LONG_TEMPLATES[count],
-                                   allowed, first_ok, budgets, max_elapsed)
-        plans = build_plans(catalog, body, [it for it in pool if fits(it)], menu_places)
+            pool += catalog.routes(body.date, start, end, LONG_TEMPLATES[count], allowed,
+                                   first_ok if strict else (lambda i: True), budgets, max_elapsed if strict else None)
+        feasible = [it for it in pool if fits(it)]
+        if not strict and len(feasible) > RELAXED_POOL:
+            # Without limits nearly every combination fits: keep the cheapest
+            # (closest to the budgets) plus an even sample of the rest.
+            feasible.sort(key=lambda it: (sum(cost[i] for i in it.stops), it.stops))
+            head = RELAXED_POOL // 4
+            feasible = feasible[:head] + feasible[head::ceil((len(feasible) - head) / (RELAXED_POOL - head))]
+        plans = build_plans(catalog, body, feasible, menu_places)
         if plans:
             return plans
     return {}

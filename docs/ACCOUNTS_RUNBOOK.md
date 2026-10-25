@@ -530,3 +530,24 @@ new source dates; displayed rating/count/date now come from one observation,
 and Claude receives that same sourced rating/count. Screenshots are local QA
 artifacts outside the repository. Physical-phone/provider-write checks remain
 separate.
+
+
+## Stop-count timing verification (October 24)
+
+Merged Eric Wu’s `2b6260e` timed-flow update before release. One-hour coordinator
+visits preserve stored catalog estimates; the module accepts both lengths for
+rollout compatibility. The automatic Calendar search scales with requested stops
+plus travel and every private duration cap. Options/Vote explain a reduced count.
+Time available shows the requested red text and warning triangle on desktop and
+390px mobile. Unit checks: 132 API tests; 244 module tests passed with one optional
+integration test skipped; module typecheck and frontend build/lint passed. The
+isolated `huddle-account-max-check` browser run passed 32 checks using real Claude,
+including two-stop 60-minute visits, private cumulative totals, a 90-minute
+one-stop compromise, votes and Done. No Calendar/message sends were triggered.
+Legacy untimed-result tests use explicit historical fixtures; new API proposals
+follow the merged timed-flow policy. No scraping or catalog data changed.
+
+For release, publish the compatible module first with `--delete-data=never` and
+no environment overrides, then push API/UI to main. This avoids a new API’s
+one-hour proposals reaching a validator that still requires original catalog
+visit lengths. See [the complete demo script](DEMO_CHECKLIST.md).

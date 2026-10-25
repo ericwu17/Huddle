@@ -66,17 +66,15 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls):
         cls.catalog = Catalog(TypeAdapter(list[Place]).validate_json(Path("data/places.json").read_text()))
 
-    async def test_unset_calendar_time_returns_only_real_untimed_ideas_without_assuming_a_date(self):
+    async def test_unset_time_gets_an_automatic_timed_outing_without_mutating_the_request(self):
         body = request(date=None, window=None)
-        model = Model()
-        result = await coordinate(model, self.catalog, body)
+        result = await coordinate(Model(), self.catalog, body)
         self.assertEqual(candidates(self.catalog, body), {})
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
-        self.assertTrue(model.context["alternativesOnly"])
-        self.assertTrue(all(idea.placeId in self.catalog.index for idea in result.suggestions))
-        self.assertIn("calendar", result.rationale)
-        self.assertNotIn("17:00", result.model_dump_json())
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
+        self.assertIsNone(body.date)
+        self.assertIsNone(body.window)
+        self.assertTrue(all(stop.placeId in self.catalog.index for plan in result.plans for stop in plan.stops))
 
     def test_time_contract_requires_a_complete_window_or_an_explicitly_unscheduled_outing(self):
         for change in ({"date": None}, {"window": None}, {"date": "2026-02-30"}):
@@ -154,13 +152,12 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(plan.travelMinutes, 0)
         self.assertTrue(all(len(plan.stops) >= 2 for plan in self.catalog.itineraries(body.date, body.window.start, body.window.end)))
 
-    async def test_impossible_limits_get_untimed_ideas_and_unknown_diets_get_provisional_plans(self):
-        for body in [meal_request(duration=59), meal_request(cap=0)]:
-            model = Model()
-            result = await coordinate(model, self.catalog, body)
-            self.assertFalse(result.plans)
-            self.assertTrue(result.suggestions)
-            self.assertEqual(model.calls, 1)
+    async def test_impossible_limits_are_declared_provisional_and_unknown_diets_remain_provisional(self):
+        for body, limit in [(meal_request(duration=59), "duration"), (meal_request(cap=0), "budget")]:
+            result = await coordinate(Model(), self.catalog, body)
+            self.assertTrue(result.plans)
+            self.assertFalse(result.suggestions)
+            self.assertTrue(all(plan.status == "provisional" and limit in plan.relaxed for plan in result.plans))
         for body in [meal_request(dietary=["vegan"]), meal_request(allergies=["peanut"])]:
             result = await coordinate(Model(), self.catalog, body)
             self.assertTrue(result.plans)
@@ -174,14 +171,15 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(model.calls, 1)
         self.assertIn("cached", result.plans[0].whyLine)
 
-    async def test_zero_budget_keeps_cap_and_shows_only_untimed_ideas(self):
+    async def test_zero_budget_stays_zero_when_an_over_budget_alternative_is_declared(self):
         body = request()
         body.members[0].needs.hard.budgetMaxPerPerson = 0
         result = await coordinate(Model(), self.catalog, body)
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
         self.assertEqual(body.members[0].needs.hard.budgetMaxPerPerson, 0)
-        self.assertTrue(all("not verified" in idea.limitations[0] for idea in result.suggestions))
+        self.assertTrue(all(plan.status == "provisional" and "budget" in plan.relaxed for plan in result.plans))
+        self.assertTrue(result.conflicts)
 
     async def test_null_cap_and_whole_outing_change(self):
         body = request()
@@ -270,13 +268,13 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(member.needs.hard.maxOutingMinutes == 90 for member in body.members))
         self.assertTrue(all(member.needs.hard.budgetMaxPerPerson == 30 for member in body.members))
 
-    async def test_requested_multi_stop_count_is_explained_when_time_is_unset(self):
+    async def test_requested_multi_stop_count_is_retained_in_automatic_time(self):
         body = meal_request(duration=180, preferredStops=2).model_copy(update={"date": None, "window": None})
         result = await coordinate(Model(), self.catalog, body)
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
-        self.assertIn("2-stop outing", result.conflicts[0])
-        self.assertIn("individual place ideas", result.conflicts[0])
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
+        self.assertEqual({len(plan.stops) for plan in result.plans}, {2})
+        self.assertIsNone(body.date)
 
     def test_long_routes_keep_one_meal_distinct_venues_and_every_limit(self):
         body = request(window={"start": "12:00", "end": "23:00"})
@@ -335,10 +333,10 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_invalid_model_id_gets_only_labeled_real_catalog_ideas(self):
         result = await coordinate(Model(bad=True), self.catalog, request())
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
-        self.assertTrue(all(idea.placeId in self.catalog.index for idea in result.suggestions))
-        self.assertIn("Claude could not complete", result.warnings[0])
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
+        self.assertTrue(all(stop.placeId in self.catalog.index for plan in result.plans for stop in plan.stops))
+        self.assertIn("not Claude's choices", result.warnings[0])
 
     async def test_private_interpretation_cannot_raise_or_remove_prior_cap(self):
         for cap in [None, 50]:
@@ -436,9 +434,10 @@ class CoordinatorTests(unittest.IsolatedAsyncioTestCase):
         model = Model()
         model.available = False
         result = await coordinate(model, self.catalog, request())
-        self.assertFalse(result.plans)
-        self.assertTrue(result.suggestions)
-        self.assertIn("Claude could not complete", result.warnings[0])
+        self.assertTrue(result.plans)
+        self.assertFalse(result.suggestions)
+        self.assertTrue(all(stop.placeId in self.catalog.index for plan in result.plans for stop in plan.stops))
+        self.assertIn("not Claude's choices", result.warnings[0])
 
     def test_excluded_ids_and_hard_rejections(self):
         body = request()
