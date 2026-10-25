@@ -144,13 +144,17 @@ function AgentSuggestionCard({ suggestion, order, optionNumber }: { suggestion: 
   const listings = useCatalogListings();
   const place = listings.get(suggestion.placeId);
   if (!place) return <article className="card space-y-3" role="status"><h2 className="card-title">Option {optionNumber}</h2><p>Loading venue…</p></article>;
-  return <article className="card space-y-3">
+  const pin = Number.isFinite(place.lat) && Number.isFinite(place.lng)
+    ? { stops: [{ placeId: place.id, name: place.name, category: "activity" as const, start: "", end: "", lat: place.lat as number, lng: place.lng as number, costPerPerson: 0 }] } : null;
+  return <div className="space-y-3">
+    {pin ? <PlanMap plan={pin} lines={[]} /> : null}
+  <article className="card space-y-3">
     <h2 className="card-title">Option {optionNumber}</h2>
     <p className="font-bold">{place.name}</p>
     <p className="muted">Time not set</p>
     <PrivateOrderSummary order={order} listings={listings} alternative />
     <AgentVenueDetails place={place} name={place.name} />
-  </article>;
+  </article></div>;
 }
 
 function OtherOptions({ suggestions, orders, startAt }: { suggestions: AgentSuggestion[]; orders: AgentOrder[]; startAt: number }) {

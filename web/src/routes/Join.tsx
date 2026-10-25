@@ -27,9 +27,6 @@ export default function Join() {
 
   return (
     <main className="page space-y-6">
-      <a className="logo" href="/">
-        huddle
-      </a>
       <div className="flex items-end gap-4 pt-4">
         <h1 className="shout text-[56px]">
           You're invited to <span className="code-tag inline-block align-middle text-[34px]">{code}</span>
@@ -37,7 +34,7 @@ export default function Join() {
       </div>
 
       <div className="flex items-end gap-3">
-        <Buddy who={name.trim() || code} pose="wave" size={110} boil />
+        <Buddy who={name.trim() || code} pose="wave" size={110} boil crown />
         <p className="bubble hand mb-16 text-2xl">{name.trim() ? `Hi ${name.trim()}!` : "What's your name?"}</p>
       </div>
 

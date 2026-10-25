@@ -23,8 +23,7 @@ export default function Login() {
   const requestedReturn = params.get("returnTo") ?? "";
   const returnTo = /^\/invite\/[A-Za-z0-9_-]+$/.test(requestedReturn) ? requestedReturn : "/start";
   return <main className="page space-y-5">
-    <Link className="logo" to="/start">huddle</Link>
-    <div className="flex items-center gap-4"><Buddy who={displayName || username || "Welcome"} pose="wave" size={100} />
+    <div className="flex items-center gap-4"><Buddy who={displayName || username || "Welcome"} pose="wave" size={100} crown />
       <h1 className="shout text-[48px]">Your people.<br />Your huddles.</h1></div>
     {account ? <><AccountStatus />{returnTo !== "/start" ? <Link className="btn btn-sun" to={returnTo}>Continue to your invitation</Link> : null}<p className="on-sky">Sign out before switching accounts.</p></> :
       <section className="card space-y-4">

@@ -154,7 +154,7 @@ function StreetMap({ plan, lines }: Props) {
         iconAnchor: [18, 18],
       });
       L.marker([s.lat, s.lng], { icon, title: `${i + 1}. ${s.name}` })
-        .bindPopup(`<b>${i + 1}. ${escapeHtml(s.name)}</b><br>${escapeHtml(displayTime(s.start))}–${escapeHtml(displayTime(s.end))}`)
+        .bindPopup(`<b>${i + 1}. ${escapeHtml(s.name)}</b>${s.start && s.end ? `<br>${escapeHtml(displayTime(s.start))}–${escapeHtml(displayTime(s.end))}` : ""}`)
         .addTo(layer);
     });
     if (plan.stops.length > 0) {
@@ -180,7 +180,7 @@ function StreetMap({ plan, lines }: Props) {
             <span className="min-w-0">
               <b>{s.name}</b>
               <span className="muted block">
-                {displayTime(s.start)}–{displayTime(s.end)}
+                {s.start && s.end ? `${displayTime(s.start)}–${displayTime(s.end)}` : "Time not set"}
                 {route && i < route.legMinutes.length ? ` · then ~${route.legMinutes[i]} min walk` : ""}
               </span>
             </span>

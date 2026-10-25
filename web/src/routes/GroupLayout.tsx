@@ -85,9 +85,6 @@ export default function GroupLayout() {
   if (group === null || group.id !== session.groupId) {
     return (
       <main className="page space-y-4">
-        <a className="logo" href="/">
-          huddle
-        </a>
         <section className="card space-y-3">
           <p>This phone isn't in huddle {session.code} anymore.</p>
           {group ? (
@@ -122,13 +119,8 @@ export default function GroupLayout() {
   return (
     <main className="group-page">
       <aside className="group-sidebar">
-        <header className="topbar">
-          <a className="logo" href="/">
-            huddle
-          </a>
-        </header>
-        <span className="me-tag on-sky">
-          <Buddy who={session.name} size={40} />
+        <span className="me-tag">
+          <Buddy who={session.name} size={56} crown />
           <span>
             {session.name}
             {ctx.isHost && <span className="sticker sticker-sun ml-1.5">host</span>}
