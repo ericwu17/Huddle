@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-25T02:00:25Z-e73d83f6",
-  "generatedAt": "2026-10-25T02:00:25Z",
+  "version": "2026-10-25T02:08:31Z-b14f5646",
+  "generatedAt": "2026-10-25T02:08:31Z",
   "venues": [
     {
       "place": {
@@ -110,7 +110,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Imm%20Thai%20Street%20Food/data=!4m7!3m6!1s0x80857e9eec4f1e63:0x5f54d96f0dccdb72!8m2!3d37.8718993!4d-122.2691148!16s%2Fg%2F11b6v96hv5!19sChIJYx5P7J5-hYARctvMDW_ZVF8",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 1625
           }
@@ -225,9 +225,9 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/La%20Mission/data=!4m7!3m6!1s0x80857ebffecc39c7:0x557d3ee62c243981!8m2!3d37.8698641!4d-122.2879270!16s%2Fg%2F1tgywyh7!19sChIJxznM_r9-hYARgTkkLOY-fVU",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
-            "reviewCount": 1989
+            "reviewCount": 1990
           }
         ]
       }
@@ -564,8 +564,8 @@
         "sources": [
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Jupiter/data=!4m7!3m6!1s0x80857e9db8220537:0x22d5e5896c286396!8m2!3d37.8697958!4d-122.2675820!16s%2Fm%2F01zbwvr!19sChIJNwUiuJ1-hYARlmMobInl1SI",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Jupiter/@37.8697958,-122.267582,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e9db8220537:0x22d5e5896c286396!8m2!3d37.8697958!4d-122.267582!16s%2Fm%2F01zbwvr",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
             "reviewCount": 4025
           }
@@ -681,7 +681,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Butcher%E2%80%99s%20Son%20Vegan%20Delicatessen%20%26%20Bakery/data=!4m7!3m6!1s0x80857e992731c87b:0xe91171496c4ce681!8m2!3d37.8715746!4d-122.2716294!16s%2Fg%2F11clvc15f_!19sChIJe8gxJ5l-hYARgeZMbElxEek",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 2083
           }
@@ -1025,7 +1025,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/House%20of%20Curries/data=!4m7!3m6!1s0x80857dce09d82185:0x2d33ddb49669d40c!8m2!3d37.8563839!4d-122.2532030!16s%2Fg%2F1tdq677k!19sChIJhSHYCc59hYARDNRplrTdMy0",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.1,
             "reviewCount": 462
           }
@@ -1140,7 +1140,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Gypsy's%20Trattoria%20Italiana/data=!4m7!3m6!1s0x80857c2f6ba1fc31:0x66be74dc48f642b3!8m2!3d37.8680755!4d-122.2581506!16s%2Fm%2F01zbwcw!19sChIJMfyhay98hYARs0L2SNx0vmY",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 2056
           }
@@ -1651,8 +1651,8 @@
         "sources": [
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Las%20Caba%C3%B1as%20Mexican%20Grill%20%26%20Taqueria/data=!4m7!3m6!1s0x80857f2321e9b617:0x514b74a0fce069bf!8m2!3d37.8728811!4d-122.2734305!16s%2Fg%2F11jfqnttn4!19sChIJF7bpISN_hYARv2ng_KB0S1E",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Las+Caba%C3%B1as+Mexican+Grill+%26+Taqueria/@37.8728811,-122.2734305,17z/data=!3m1!4b1!4m6!3m5!1s0x80857f2321e9b617:0x514b74a0fce069bf!8m2!3d37.8728811!4d-122.2734305!16s%2Fg%2F11jfqnttn4",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 1051
           }
@@ -1867,7 +1867,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Italian%20Homemade%20Company%20(Berkeley)/data=!4m7!3m6!1s0x80857dcd97300961:0x3e4c9a51ea124da!8m2!3d37.8581897!4d-122.2529509!16s%2Fg%2F11hbhfdc5y!19sChIJYQkwl819hYAR2iShHqXJ5AM",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.3,
             "reviewCount": 690
           }
@@ -2249,8 +2249,8 @@
         "sources": [
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Little%20Plearn%20Thai%20Kitchen/data=!4m7!3m6!1s0x80857e9d1b0443dd:0xeae15bcf37b40f56!8m2!3d37.8679447!4d-122.2675212!16s%2Fg%2F1wt3nn26!19sChIJ3UMEG51-hYARVg-0N89b4eo",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Little+Plearn+Thai+Kitchen/@37.8679447,-122.2675212,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e9d1b0443dd:0xeae15bcf37b40f56!8m2!3d37.8679447!4d-122.2675212!16s%2Fg%2F1wt3nn26",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 436
           }
@@ -2468,7 +2468,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Berkeley%20Art%20Museum%20and%20Pacific%20Film%20Archive/data=!4m7!3m6!1s0x80857e9d892bc107:0xea2b8511aef1a078!8m2!3d37.8707356!4d-122.2664841!16s%2Fm%2F026stfv!19sChIJB8EriZ1-hYAReKDxrhGFK-o",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
             "reviewCount": 931
           }
@@ -2585,7 +2585,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20UC%20Theatre%20Taube%20Family%20Music%20Hall/data=!4m7!3m6!1s0x80857e9ec19ce729:0x6ee06f026df50cf1!8m2!3d37.8718053!4d-122.2698086!16s%2Fm%2F0fss67!19sChIJKeecwZ5-hYAR8Qz1bQJv4G4",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 1366
           }
@@ -2688,7 +2688,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Black%20Repertory%20Group%20Inc/data=!4m7!3m6!1s0x80857e794570b131:0xe9eea6b2f215434!8m2!3d37.8505568!4d-122.2703069!16s%2Fg%2F1tg6qbf4!19sChIJMbFwRXl-hYARNFQhL2vqng4",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.0,
             "reviewCount": 164
           }
@@ -2899,7 +2899,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Lawrence%20Hall%20of%20Science/data=!4m7!3m6!1s0x80857c3eefdd5655:0x8d8c4ef47aeec69a!8m2!3d37.8792050!4d-122.2465170!16s%2Fm%2F02z20x!19sChIJVVbd7z58hYARmsbuevROjI0",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 591
           }
@@ -3331,7 +3331,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Lacis%20Museum%20of%20Lace%20and%20Textiles/data=!4m7!3m6!1s0x80857e7e46c9f88b:0xbd81c3841fa7b924!8m2!3d37.8549494!4d-122.2695127!16s%2Fg%2F1tfst2_v!19sChIJi_jJRn5-hYARJLmnH4TDgb0",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.9,
             "reviewCount": 157
           }
@@ -3645,7 +3645,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Art%20House%20Gallery%20and%20Cultural%20Center/data=!4m7!3m6!1s0x80857e7fef1d96cf:0xa731a1fb763c23d2!8m2!3d37.8564181!4d-122.2662276!16s%2Fg%2F1q6jhvd0v!19sChIJz5Yd739-hYAR0iM8dvuhMac",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.9,
             "reviewCount": 117
           }
@@ -3851,7 +3851,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Strawberry%20Creek%20Park/data=!4m7!3m6!1s0x80857e94e8b947db:0xfbb7925796c5307b!8m2!3d37.8670771!4d-122.2862145!16s%2Fg%2F1trc55fp!19sChIJ20e56JR-hYARezDFlleSt_s",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.7,
             "reviewCount": 795
           }
@@ -4260,7 +4260,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Asha%20Tea%20House/data=!4m7!3m6!1s0x80857e9ef30ee2c5:0x3988b1281282871f!8m2!3d37.8719520!4d-122.2688530!16s%2Fg%2F11gzt43bh!19sChIJxeIO855-hYARH4eCEiixiDk",
-            "fetchedAt": "2026-10-25T01:30:39Z",
+            "fetchedAt": "2026-10-25T01:52:27Z",
             "rating": 4.5,
             "reviewCount": 808
           }
@@ -4704,9 +4704,9 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/ChaHalo%20%E8%8C%B6%E8%AF%9D%E5%BC%84%20-%20Berkeley/data=!4m7!3m6!1s0x80857f5ab3c9a547:0x8214fdaf5efbb2d5!8m2!3d37.8721399!4d-122.2696186!16s%2Fg%2F11z7qn1dfc!19sChIJR6XJs1p_hYAR1bL7Xq_9FII",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.9,
-            "reviewCount": 488
+            "reviewCount": 489
           }
         ]
       }
@@ -5133,7 +5133,7 @@
             "sd": 0.25
           }
         },
-        "reviewCount": 4460,
+        "reviewCount": 4462,
         "rating": 4.1,
         "sources": [
           "brightdata"
@@ -5152,9 +5152,9 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Viks%20Chaat/data=!4m7!3m6!1s0x80857ee873ccbc7d:0x155df5665e04771b!8m2!3d37.8613889!4d-122.2980556!16s%2Fm%2F01zbz33!19sChIJfbzMc-h-hYARG3cEXmb1XRU",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.1,
-            "reviewCount": 4460
+            "reviewCount": 4462
           }
         ]
       }
@@ -5510,7 +5510,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Zachary's%20Chicago%20Pizza/data=!4m7!3m6!1s0x80857dc36c49b6f5:0xf79d8ff0c0467267!8m2!3d37.8462961!4d-122.2521527!16s%2Fm%2F01zbz7n!19sChIJ9bZJbMN9hYARZ3JGwPCPnfc",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.7,
             "reviewCount": 2946
           }
@@ -6001,7 +6001,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Los%20Moles/data=!4m7!3m6!1s0x80857e5efd048685:0xcf144c4a59c7c1ea!8m2!3d37.8469973!4d-122.2913654!16s%2Fg%2F1263mk8v3!19sChIJhYYE_V5-hYAR6sHHWUpMFM8",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 1899
           }
@@ -6119,8 +6119,8 @@
           },
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Cornerstone+Craft+Beer+%26+Live+Music/@37.8663201,-122.2673229,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e82cc99a8ef:0x5733765594852cd!8m2!3d37.8663201!4d-122.2673229!16s%2Fg%2F11c2kjsdg0",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Cornerstone%20Craft%20Beer%20%26%20Live%20Music/data=!4m7!3m6!1s0x80857e82cc99a8ef:0x5733765594852cd!8m2!3d37.8663201!4d-122.2673229!16s%2Fg%2F11c2kjsdg0!19sChIJ76iZzIJ-hYARzVJIWWU3cwU",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
             "reviewCount": 1807
           }
@@ -6239,7 +6239,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Smokehouse/data=!4m7!3m6!1s0x80857dd6cb0871ef:0x95af650fab615f5f!8m2!3d37.8531738!4d-122.2598685!16s%2Fg%2F1tgf7_x1!19sChIJ73EIy9Z9hYARX19hqw9lr5U",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 1772
           }
@@ -6361,7 +6361,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Great%20China/data=!4m7!3m6!1s0x80857e9d0ba3811b:0x8eb009586964780e!8m2!3d37.8676762!4d-122.2661728!16s%2Fg%2F1ptvy88sx!19sChIJG4GjC51-hYARDnhkaVgJsI4",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 1637
           }
@@ -7250,7 +7250,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Forge%20Rockridge/data=!4m7!3m6!1s0x808f80c889f4ff25:0xd84c668f23044814!8m2!3d37.8472911!4d-122.2518918!16s%2Fg%2F1hhmlkx6s!19sChIJJf_0iciAj4ARFEgEI49mTNg",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.3,
             "reviewCount": 1220
           }
@@ -7369,7 +7369,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/IB's/data=!4m7!3m6!1s0x80857c2f40fa1689:0xfcab32c78bdca371!8m2!3d37.8680432!4d-122.2584815!16s%2Fm%2F01zbwnk!19sChIJiRb6QC98hYARcaPci8cyq_w",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 1202
           }
@@ -7480,8 +7480,8 @@
         "sources": [
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/San%20Pablo%20Park/data=!4m7!3m6!1s0x80857e8b93abadc9:0xcdfa5c74854e3c2!8m2!3d37.8558502!4d-122.2839784!16s%2Fg%2F1vzn5snw!19sChIJya2rk4t-hYARwuNUSMel3ww",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/San+Pablo+Park/@37.8558502,-122.2839784,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e8b93abadc9:0xcdfa5c74854e3c2!8m2!3d37.8558502!4d-122.2839784!16s%2Fg%2F1vzn5snw",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
             "reviewCount": 1199
           }
@@ -7838,7 +7838,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Ramen%20Shop/data=!4m7!3m6!1s0x80857dc372123eab:0xb09a84cb2ea24603!8m2!3d37.8463681!4d-122.2518071!16s%2Fg%2F1233b5x9c!19sChIJqz4ScsN9hYARA0aiLsuEmrA",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.3,
             "reviewCount": 1174
           }
@@ -8900,8 +8900,8 @@
           },
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Juan's%20Place/data=!4m7!3m6!1s0x80857ef25edb21c7:0x4d338323cff15578!8m2!3d37.8576573!4d-122.2911292!16s%2Fm%2F01zbwt1!19sChIJxyHbXvJ-hYAReFXxzyODM00",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Juan's+Place/@37.8576573,-122.2911292,17z/data=!3m1!4b1!4m6!3m5!1s0x80857ef25edb21c7:0x4d338323cff15578!8m2!3d37.8576573!4d-122.2911292!16s%2Fm%2F01zbwt1",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 992
           }
@@ -9005,7 +9005,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Homemade%20Cafe/data=!4m7!3m6!1s0x80857e91e3d2e30f:0xa5fcac29bde9ff07!8m2!3d37.8622769!4d-122.2814496!16s%2Fm%2F01zbwj0!19sChIJD-PS45F-hYARB__pvSms_KU",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 977
           }
@@ -9138,8 +9138,8 @@
           },
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/900+Grayson/@37.8551575,-122.2922999,17z/data=!3m1!4b1!4m6!3m5!1s0x80857ef3bffc35e5:0x130a30ffbb947e60!8m2!3d37.8551575!4d-122.2922999!16s%2Fg%2F1w0sd2n6",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/900%20Grayson/data=!4m7!3m6!1s0x80857ef3bffc35e5:0x130a30ffbb947e60!8m2!3d37.8551575!4d-122.2922999!16s%2Fg%2F1w0sd2n6!19sChIJ5TX8v_N-hYARYH6Uu_8wChM",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 959
           }
@@ -9258,7 +9258,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Victory%20Point%20Cafe/data=!4m7!3m6!1s0x80857e9f793e8573:0x12a4d9e6777828e6!8m2!3d37.8751742!4d-122.2684613!16s%2Fg%2F11bw150bdm!19sChIJc4U-eZ9-hYAR5ih4d-bZpBI",
-            "fetchedAt": "2026-10-25T01:30:39Z",
+            "fetchedAt": "2026-10-25T01:52:27Z",
             "rating": 4.7,
             "reviewCount": 951
           }
@@ -9396,7 +9396,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Jot%20Mahal%20Palace%20of%20Indian%20Cuisine/data=!4m7!3m6!1s0x80857ea1198b306f:0x7b48f6781fffb306!8m2!3d37.8787439!4d-122.2688422!16s%2Fg%2F11c2lz33s2!19sChIJbzCLGaF-hYARBrP_H3j2SHs",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 937
           }
@@ -9753,7 +9753,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Gordo%20Taqueria/data=!4m7!3m6!1s0x80857dce0bdc4801:0x265918e4a435a690!8m2!3d37.8564102!4d-122.2528907!16s%2Fg%2F1thnn_kr!19sChIJAUjcC859hYARkKY1pOQYWSY",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.2,
             "reviewCount": 916
           }
@@ -9872,7 +9872,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/A%2B%20Burger/data=!4m7!3m6!1s0x80857d927e270445:0x25fe760c23a9b66e!8m2!3d37.8484525!4d-122.2604819!16s%2Fg%2F11g0hxmlzm!19sChIJRQQnfpJ9hYARbrapIwx2_iU",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
             "reviewCount": 913
           }
@@ -9986,7 +9986,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Wood%20Tavern/data=!4m7!3m6!1s0x80857de8fb64ee77:0x6dc1df83d0df0cbc!8m2!3d37.8506259!4d-122.2526224!16s%2Fg%2F11b6_gd8my!19sChIJd-5k--h9hYARvAzf0IPfwW0",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 875
           }
@@ -10105,7 +10105,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Starry%20Plough%20Pub/data=!4m7!3m6!1s0x80857e8239698059:0xeeadcc7353a9cf1c!8m2!3d37.8529903!4d-122.2659426!16s%2Fm%2F0k1c2pq!19sChIJWYBpOYJ-hYARHM-pU3PMre4",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 836
           }
@@ -10462,7 +10462,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Chengdu%20Style%20Restaurant/data=!4m7!3m6!1s0x80857c2f9eae56cb:0xb481df8c03563140!8m2!3d37.8688140!4d-122.2566216!16s%2Fg%2F1ptww0frd!19sChIJy1auni98hYARQDFWA4zfgbQ",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.3,
             "reviewCount": 815
           }
@@ -10814,7 +10814,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Prizefighter/data=!4m7!3m6!1s0x80857e5f61380f41:0x423898339ada707f!8m2!3d37.8491309!4d-122.2921237!16s%2Fg%2F1hc0yz0z3!19sChIJQQ84YV9-hYARf3DamjOYOEI",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 770
           }
@@ -11170,8 +11170,8 @@
           },
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Paradise+Park+Cafe/@37.8468426,-122.28468,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e612d3a9645:0x50a9397cc272582a!8m2!3d37.8468426!4d-122.28468!16s%2Fg%2F11c71_l3lv",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Paradise%20Park%20Cafe/data=!4m7!3m6!1s0x80857e612d3a9645:0x50a9397cc272582a!8m2!3d37.8468426!4d-122.2846800!16s%2Fg%2F11c71_l3lv!19sChIJRZY6LWF-hYARKlhywnw5qVA",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 695
           }
@@ -11990,7 +11990,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Missouri%20Lounge%20%26%20Cafe/data=!4m7!3m6!1s0x80857ef2a48beb39:0x6258db8c4ccf8202!8m2!3d37.8591472!4d-122.2891778!16s%2Fg%2F1tfp2p9v!19sChIJOeuLpPJ-hYARAoLPTIzbWGI",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 623
           }
@@ -12102,7 +12102,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Willard%20Park/data=!4m7!3m6!1s0x80857c2cdfb5971b:0xc4953ebf2abe2ab7!8m2!3d37.8610841!4d-122.2566194!16s%2Fg%2F1v5_9nkg!19sChIJG5e13yx8hYARtyq-Kr8-lcQ",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.5,
             "reviewCount": 614
           }
@@ -12220,8 +12220,8 @@
           },
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Tupper+%26+Reed/@37.8681444,-122.2675583,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e9d0fe4b989:0xad545714a6bfa5e8!8m2!3d37.8681444!4d-122.2675583!16s%2Fg%2F11b768_54r",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Tupper%20%26%20Reed/data=!4m7!3m6!1s0x80857e9d0fe4b989:0xad545714a6bfa5e8!8m2!3d37.8681444!4d-122.2675583!16s%2Fg%2F11b768_54r!19sChIJibnkD51-hYAR6KW_phRXVK0",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 613
           }
@@ -12445,7 +12445,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Ivy%20Room/data=!4m7!3m6!1s0x80857931f8ac7e37:0xe624e39c4f3cb1ca!8m2!3d37.8904760!4d-122.2992610!16s%2Fm%2F0ll2tvf!19sChIJN36s-DF5hYARyrE8T5zjJOY",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 588
           }
@@ -13254,7 +13254,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Aquatic%20Park/data=!4m7!3m6!1s0x80857eeff3f8c189:0x1b38b9d941ebe723!8m2!3d37.8596806!4d-122.2987565!16s%2Fm%2F0d98q6!19sChIJicH48-9-hYARI-frQdm5OBs",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.3,
             "reviewCount": 509
           }
@@ -13590,7 +13590,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Bushrod%20Park/data=!4m7!3m6!1s0x80857dd8f0d75be5:0x35d0429da9098390!8m2!3d37.8455947!4d-122.2636542!16s%2Fm%2F02z82gm!19sChIJ5VvX8Nh9hYARkIMJqZ1C0DU",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 489
           }
@@ -13928,7 +13928,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/The%20Hidden%20Cafe/data=!4m7!3m6!1s0x80857f99c1a87305:0x2d8a50b1feb72a97!8m2!3d37.8684254!4d-122.2869747!16s%2Fg%2F11fn9cp6fg!19sChIJBXOowZl_hYARlyq3_rFQii0",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.6,
             "reviewCount": 459
           }
@@ -14271,7 +14271,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Baker%20%26%20Commons/data=!4m7!3m6!1s0x80857d6a6b601ad5:0x6992252931736982!8m2!3d37.8583396!4d-122.2533577!16s%2Fg%2F11f61fcj2l!19sChIJ1Rpga2p9hYARgmlzMSklkmk",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 434
           }
@@ -14723,7 +14723,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Chicha%20San%20Chen%20%E5%90%83%E8%8C%B6%E4%B8%89%E5%8D%83/data=!4m7!3m6!1s0x80857d0037c92a0b:0xd45b41d315b41ff1!8m2!3d37.8683082!4d-122.2612332!16s%2Fg%2F11wwh8zx5c!19sChIJCyrJNwB9hYAR8R-0FdNBW9Q",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.7,
             "reviewCount": 377
           }
@@ -14835,7 +14835,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Berkeley%20Bowl%20West%20Cafe/data=!4m7!3m6!1s0x80857ef493b4cb63:0x199b0633c921426e!8m2!3d37.8537039!4d-122.2900213!16s%2Fg%2F11dxhbn8hn!19sChIJY8u0k_R-hYARbkIhyTMGmxk",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 376
           }
@@ -15061,7 +15061,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/White%20Horse%20Inn/data=!4m7!3m6!1s0x80857dd72846c45f:0x21a324bd7e535f35!8m2!3d37.8518352!4d-122.2606209!16s%2Fg%2F11dxl22qsz!19sChIJX8RGKNd9hYARNV9Tfr0koyE",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.2,
             "reviewCount": 316
           }
@@ -15292,7 +15292,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Acme%20Bar%20%26%20Company/data=!4m7!3m6!1s0x80857eea700fa4d5:0xb74e408b4ae0ba05!8m2!3d37.8676861!4d-122.2914694!16s%2Fg%2F1tcxpx6h!19sChIJ1aQPcOp-hYARBbrgSotATrc",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 300
           }
@@ -15403,8 +15403,8 @@
         "sources": [
           {
             "source": "gmaps",
-            "url": "https://www.google.com/maps/place/Grove%20Park/data=!4m7!3m6!1s0x80857e87407ac5d5:0xe56b914281f52cb7!8m2!3d37.8563865!4d-122.2723007!16s%2Fg%2F1vlzblfy!19sChIJ1cV6QId-hYARtyz1gUKRa-U",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "url": "https://www.google.com/maps/place/Grove+Park/@37.8563865,-122.2723007,17z/data=!3m1!4b1!4m6!3m5!1s0x80857e87407ac5d5:0xe56b914281f52cb7!8m2!3d37.8563865!4d-122.2723007!16s%2Fg%2F1vlzblfy",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.4,
             "reviewCount": 285
           }
@@ -16199,7 +16199,7 @@
           {
             "source": "gmaps",
             "url": "https://www.google.com/maps/place/Redfield%20Cider%20Bar%20%26%20Bottle%20Shop/data=!4m7!3m6!1s0x80857d3e0b84aae5:0x7b4604f0c950f37d!8m2!3d37.8464598!4d-122.2521569!16s%2Fg%2F11gzmtzd95!19sChIJ5aqECz59hYARffNQyfAERns",
-            "fetchedAt": "2026-10-24T19:38:32Z",
+            "fetchedAt": "2026-10-25T01:52:26Z",
             "rating": 4.9,
             "reviewCount": 169
           }
