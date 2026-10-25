@@ -176,7 +176,7 @@ When no time preference is supplied, favor plausible social/meal hours over over
 calendar free/busy alone does not imply a desire to meet overnight.
 Return only the selected slotId. This proposes the Huddle's time; no calendar event is created.""",
                 json.dumps(context),
-                schema, fast(), 8, check=validate, max_tokens=100)
+                schema, fast(), 8, check=validate, max_tokens=1024)
             validate(value)
             return CalendarScheduleResponse(ok=True, chosen=offered[value["slotId"]],
                 message="The connected primary calendars have a common opening for this outing. Review the proposed time; adding a meetup is a separate action.",
