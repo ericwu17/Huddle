@@ -5,7 +5,10 @@ import { requireAccount, requireActor } from "./lib/account-state";
 import { currentGroup, currentMember, membersOf, nowMs, at, parse } from "./lib/util";
 import { authorizedCalendarSnapshots, persistCalendarRefresh } from "./connectors";
 import { callApi } from "./lib/api";
-import { activePlaces } from "./lib/catalog";
+import { catalogSnapshot, planningSnapshot } from "./lib/catalog";
+import { LIVE_PLACES } from "./lib/places";
+import { huddleLocation } from "./lib/location-state";
+import { postalCity } from "../../shared/geography";
 import { invalidateAgent, agentBallot, agentVotingChoices } from "./lib/agent-state";
 import { clockMinutes } from "./lib/agent-constraints";
 import type { ReadDb, Tx } from "./lib/types";
@@ -15,8 +18,10 @@ const result = t.object("ScheduleHuddleResult", { ok: t.bool(), message: t.strin
 const failed = (message: string) => ({ ok: false, message, date: undefined, windowStart: undefined, windowEnd: undefined });
 const venueTimeZone = "America/Los_Angeles";
 type SchedulingVenue = { placeId: string; name: string; category: string; dwellMinutes: number; hours: Record<string, string[][]> };
-function schedulingVenues(db: ReadDb, excluded: string[]): SchedulingVenue[] {
-  return activePlaces(db).filter(place => !excluded.includes(place.id)).map(place => ({
+function schedulingVenues(db: ReadDb, excluded: string[], groupId: string): SchedulingVenue[] {
+  const { destinationCities } = huddleLocation(db, groupId);
+  const places = planningSnapshot(catalogSnapshot(db), destinationCities)?.places ?? LIVE_PLACES;
+  return places.filter(place => !excluded.includes(place.id) && (!destinationCities.length || destinationCities.includes(postalCity(place.address)))).map(place => ({
     placeId: place.id, name: place.name, category: place.category, dwellMinutes: place.dwellMinutes,
     hours: (place as typeof place & { hours?: Record<string, string[][]> }).hours ??
       { mon: [], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] },
@@ -91,7 +96,7 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
       if (members.length < 2 || connections.length !== members.length) throw new SenderError("Every participant must connect their own Google Calendar before checking a common time.");
       return { groupId: group.id, revision: state.revision, accountId: account.id, sessionNonce: session.nonce,
         timeOfDay: huddleTiming(tx.db, group.id).timeOfDay,
-        venues: schedulingVenues(tx.db, group.excludedPlaceIds),
+        venues: schedulingVenues(tx.db, group.excludedPlaceIds, group.id),
         connections, members: connections.map(connection => {
           const need = tx.db.agent_need.memberId.find(connection.memberId);
           const hard = parse(tx.db.private_prefs.memberId.find(connection.memberId)?.hardJson);
@@ -131,7 +136,7 @@ export const scheduleHuddle = spacetimedb.procedure({ searchStart: t.string(), s
           chosen.windowStart < dayStart || chosen.windowEnd > dayEnd ||
           !Number.isFinite(clockMinutes(chosen.windowStart)) || !Number.isFinite(clockMinutes(chosen.windowEnd)) || chosen.windowStart >= chosen.windowEnd)
         return failed("The proposed calendar window could not be validated. No date was changed.");
-      if (!mealFitsWindow(snapshot.venues, chosen) || !mealFitsWindow(schedulingVenues(tx.db, group.excludedPlaceIds), chosen))
+      if (!mealFitsWindow(snapshot.venues, chosen) || !mealFitsWindow(schedulingVenues(tx.db, group.excludedPlaceIds, group.id), chosen))
         return failed("Meal opening hours do not fit that calendar window. Request another time; no date was changed.");
       invalidateAgent(tx, group.id);
       const fresh = tx.db.group.id.find(group.id)!;

@@ -1,3 +1,4 @@
+import { postalCity } from "../../../shared/geography";
 // Validate a service proposal before persisting any public/private rows. The
 // public projection deliberately has no per-member orders, caps or raw prompts.
 import { LIVE_PLACES } from "./places";
@@ -26,7 +27,8 @@ function checkedResult(data: any, body: any) {
         !body.members.some((member: any) => member.memberId === row.memberId))) return null;
   const ids = new Set<string>(), validOrders: PrivateOrder[] = [], selectablePlanIds: string[] = [];
   const weekday = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(`${body.date}T12:00:00Z`).getUTCDay()];
-  const allowedPlace = (place: any) => place && !body.excludePlaceIds.includes(place.id) && body.members.every((member: any) => {
+  const allowedPlace = (place: any) => place &&
+    (!body.destinationCities?.length || body.destinationCities.includes(postalCity(place.address))) && !body.excludePlaceIds.includes(place.id) && body.members.every((member: any) => {
     const hard = member.needs.hard;
     const label = `${place.name} ${place.cuisine} ${place.category}`.toLocaleLowerCase();
     return !hard.vetoCategories.includes(place.category) && !hard.vetoCuisines.includes(place.cuisine) &&
@@ -59,6 +61,7 @@ function checkedResult(data: any, body: any) {
         (!member.origin || estimatedTravelMinutes(member.origin, plan.stops[0]) > member.needs.hard.maxTravelMinutes))) return null;
     if (plan.stops.some((stop: any, index: number) => index > 0 &&
         clockMinutes(stop.start) - clockMinutes(plan.stops[index - 1].end) + 1e-9 < estimatedTravelMinutes(plan.stops[index - 1], stop))) return null;
+    if (body.destinationCities?.length && new Set(plan.stops.map((stop: any) => postalCity(catalog.find(place => place.id === stop.placeId)?.address))).size !== 1) return null;
     const stops: any[] = [];
     for (const stop of plan.stops) {
       const place = catalog.find(place => place.id === stop.placeId);

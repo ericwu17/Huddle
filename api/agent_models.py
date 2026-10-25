@@ -141,6 +141,19 @@ class AgentCatalog(Model):
         return self
 
 
+class PublishedCatalog(AgentCatalog):
+    """Stored venue pool; coordinator requests still use AgentCatalog's 160 limit."""
+    places: Annotated[list[Place], Field(min_length=3, max_length=320)]
+
+    @model_validator(mode="after")
+    def pool_limits(self):
+        limits = {"meal": 160, "activity": 100, "dessert": 60}
+        for category, limit in limits.items():
+            if sum(place.category == category for place in self.places) > limit:
+                raise ValueError(f"too many {category} venues in published pool")
+        return self
+
+
 class AgentPlanRequest(Model):
     runId: Identifier
     inputRevision: Annotated[int, Field(ge=0)]
@@ -148,6 +161,7 @@ class AgentPlanRequest(Model):
     window: Window | None = None
     members: Annotated[list[AgentMember], Field(min_length=2, max_length=12)]
     excludePlaceIds: list[Identifier] = Field(default_factory=list, max_length=100)
+    destinationCities: list[Literal["Berkeley", "Oakland", "San Francisco", "Albany", "Emeryville"]] = Field(default_factory=list, max_length=5)
     discussion: list[Text] = Field(default_factory=list, max_length=20)
     catalog: AgentCatalog | None = None  # absent: the catalog this service loaded at startup
 

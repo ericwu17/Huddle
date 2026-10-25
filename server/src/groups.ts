@@ -1,3 +1,5 @@
+import { SUPPORTED_CITIES } from "../../shared/cities";
+import { cityForPoint } from "../../shared/geography";
 // Groups and members (docs/CONTRACT.md S5.5).
 // createGroup/joinGroup are procedures so they can return ids; the rest are reducers that
 // act on the caller's own membership (identity replaces the old memberId + secret).
@@ -128,7 +130,37 @@ export const setOrigin = spacetimedb.reducer({ lat: t.f64(), lng: t.f64() }, (tx
   const me = requireMember(tx);
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180)
     throw new SenderError("invalid location");
+  const city = cityForPoint(lat, lng);
+  if (!city) throw new SenderError("Your location is outside the supported cities: Berkeley, Oakland, San Francisco, Albany and Emeryville.");
   tx.db.member.id.update({ ...me, originLat: lat, originLng: lng });
+  const preference = { memberId: me.id, city, source: "device" };
+  if (tx.db.member_location.memberId.find(me.id)) tx.db.member_location.memberId.update(preference);
+  else tx.db.member_location.insert(preference);
+  if (isAgent(tx.db, me.groupId)) {
+    const need = tx.db.agent_need.memberId.find(me.id);
+    if (need) tx.db.agent_need.memberId.update({ ...need, confirmed: false });
+    invalidateAgent(tx, me.groupId);
+  }
+});
+
+// Clearing a city preference invalidates the previous shared destination and votes.
+export const clearOrigin = spacetimedb.reducer({}, tx => {
+  const me = requireMember(tx);
+  tx.db.member.id.update({ ...me, originLat: undefined, originLng: undefined });
+  tx.db.member_location.memberId.delete(me.id);
+  if (isAgent(tx.db, me.groupId)) {
+    const need = tx.db.agent_need.memberId.find(me.id);
+    if (need) tx.db.agent_need.memberId.update({ ...need, confirmed: false });
+    invalidateAgent(tx, me.groupId);
+  }
+});
+
+export const setLocationCity = spacetimedb.reducer({ city: t.string() }, (tx, { city }) => {
+  const me = requireMember(tx);
+  if (!(SUPPORTED_CITIES as readonly string[]).includes(city)) throw new SenderError("Choose a supported city from the list.");
+  const preference = { memberId: me.id, city, source: "chosen" };
+  if (tx.db.member_location.memberId.find(me.id)) tx.db.member_location.memberId.update(preference);
+  else tx.db.member_location.insert(preference);
   if (isAgent(tx.db, me.groupId)) {
     const need = tx.db.agent_need.memberId.find(me.id);
     if (need) tx.db.agent_need.memberId.update({ ...need, confirmed: false });

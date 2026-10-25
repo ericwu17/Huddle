@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 from urllib.parse import urlsplit
 
-from .agent_models import AgentCatalog
+from .agent_models import PublishedCatalog
 
 
 def web_url(value):
@@ -47,7 +47,9 @@ def enrich_catalog(snapshot, details):
             item["id"] = "menu_" + digest
             if not any(existing["id"] == item["id"] for existing in items):
                 items.append(item)
-        evidence["menu"] = {"status": str(menu.get("status") or "unknown")[:80], "items": items}
+        # A missing/empty sidecar must never erase already published evidence.
+        if items or "menu" not in evidence:
+            evidence["menu"] = {"status": str(menu.get("status") or "unknown")[:80], "items": items}
         # Preserve the broad legacy cuisine family/13-feature contract; display
         # the source listing's specific pizza identity instead of Mediterranean.
         if place.get("label"):
@@ -63,9 +65,10 @@ def enrich_catalog(snapshot, details):
             photos.append({"url": url, "sourceUrl": source, "attribution": (attribution or str(photo.get("attributionNote") or photo.get("source") or ""))[:500]})
             if len(photos) == 3:
                 break
-        evidence["photos"] = photos
+        if photos or "photos" not in evidence:
+            evidence["photos"] = photos
     digest = hashlib.sha256(json.dumps(body["venues"], sort_keys=True, separators=(",", ":")).encode()).hexdigest()[:12]
     body["version"] = snapshot["version"][:70] + "-menu-" + digest
-    AgentCatalog.model_validate({"version": body["version"], "places": [v["place"] for v in body["venues"]],
+    PublishedCatalog.model_validate({"version": body["version"], "places": [v["place"] for v in body["venues"]],
                                  "evidence": {v["place"]["id"]: v["evidence"] for v in body["venues"]}})
     return body

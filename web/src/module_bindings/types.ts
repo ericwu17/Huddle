@@ -383,6 +383,12 @@ export const GroupSchedule = __t.object("GroupSchedule", {
 });
 export type GroupSchedule = __Infer<typeof GroupSchedule>;
 
+export const HuddleCityCount = __t.object("HuddleCityCount", {
+  city: __t.string(),
+  count: __t.u32(),
+});
+export type HuddleCityCount = __Infer<typeof HuddleCityCount>;
+
 export const HuddleInvitation = __t.object("HuddleInvitation", {
   id: __t.string(),
   groupId: __t.string(),
@@ -514,6 +520,13 @@ export const Member = __t.object("Member", {
   joinedAt: __t.f64(),
 });
 export type Member = __Infer<typeof Member>;
+
+export const MemberLocation = __t.object("MemberLocation", {
+  memberId: __t.string(),
+  city: __t.string(),
+  source: __t.string(),
+});
+export type MemberLocation = __Infer<typeof MemberLocation>;
 
 export const MessageConnector = __t.object("MessageConnector", {
   accountId: __t.string(),
@@ -745,6 +758,20 @@ export type MyHuddleInvitationRow = __Infer<typeof MyHuddleInvitationRow>;
 
 export const MyHuddleInvitations = __t.object("MyHuddleInvitations", {});
 export type MyHuddleInvitations = __Infer<typeof MyHuddleInvitations>;
+
+export const MyHuddleLocation = __t.object("MyHuddleLocation", {});
+export type MyHuddleLocation = __Infer<typeof MyHuddleLocation>;
+
+export const MyHuddleLocationRow = __t.object("MyHuddleLocationRow", {
+  groupId: __t.string(),
+  destinationCities: __t.array(__t.string()),
+  get cityCounts() {
+    return __t.array(HuddleCityCount);
+  },
+  myCity: __t.option(__t.string()),
+  mySource: __t.option(__t.string()),
+});
+export type MyHuddleLocationRow = __Infer<typeof MyHuddleLocationRow>;
 
 export const MyHuddleNameRow = __t.object("MyHuddleNameRow", {
   groupId: __t.string(),

@@ -1,3 +1,4 @@
+import { useHuddleLocation } from "../huddleLocation";
 import { useEffect, useRef } from "react";
 import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
 import { useGroupState, useLatestBooking, useMyPrivate, useVotes } from "../data";
@@ -41,6 +42,7 @@ export default function GroupLayout() {
   const agent = useAgentState();
   const agentNeeds = useAgentNeeds();
   const timing = useHuddleTiming();
+  const huddleLocation = useHuddleLocation();
   const ballot = useAgentBallot(group?.id === session.groupId ? group : group === undefined ? undefined : null, agent, session.memberId);
   const lastAgentState = useRef<string | null>(null);
   const lastWinner = useRef<{ groupId: string; key: string | null } | null>(null);
@@ -58,7 +60,7 @@ export default function GroupLayout() {
       lastAgentState.current = key;
       // Vote stays navigable during subscription updates and after needs change.
       // AgentVote removes stale choices and shows its empty state until replanned.
-      if (pathname.endsWith("/vote") || pathname.endsWith("/done") ||
+      if (pathname.endsWith("/lobby") || pathname.endsWith("/vote") || pathname.endsWith("/done") ||
           pathname.endsWith("/prefs") && ["needs", "ready", "blocked"].includes(agent.status)) return;
       const step = group.status === "lobby" ? "lobby" : group.status === "booked" ? "done"
         : agent.status === "needs" ? "prefs" : "plans";
@@ -160,6 +162,7 @@ export default function GroupLayout() {
       <p className="on-sky text-sm">{timing?.groupId === group.id && timing.source !== "pending"
         ? `${group.date} · ${displayTime(group.window.start)}–${displayTime(group.window.end)}`
         : "Date and time to be decided"}</p>
+      {huddleLocation?.groupId === group.id && huddleLocation.destinationCities.length ? <p className="on-sky text-sm">Planning in {huddleLocation.destinationCities.join(" or ")}{huddleLocation.destinationCities.length > 1 ? " · tied city preferences" : ""}</p> : null}
       <DemoBanner on={group.demoMode} />
       {!agent ? <ReplanBanner ctx={ctx} /> : null}
       {!agent ? <OffersInbox ctx={ctx} /> : null}

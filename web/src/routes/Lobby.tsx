@@ -1,3 +1,6 @@
+import CityPicker from "../components/CityPicker";
+import { chosenCity } from "../../../shared/cities";
+import { useHuddleLocation } from "../huddleLocation";
 import PageHeading from "../components/PageHeading";
 import { useState } from "react";
 import { Link } from "react-router";
@@ -17,6 +20,9 @@ export default function Lobby() {
   const { group, session, isHost, agent } = ctx;
   const setReady = useReducer(reducers.setReady);
   const setOrigin = useReducer(reducers.setOrigin);
+  const clearOrigin = useReducer(reducers.clearOrigin);
+  const setLocationCity = useReducer(reducers.setLocationCity);
+  const location = useHuddleLocation();
   const setDemoMode = useReducer(reducers.setDemoMode);
   const setShowWho = useReducer(reducers.setShowWhoCompromised);
   const invite = useReducer(reducers.inviteFriends);
@@ -31,11 +37,13 @@ export default function Lobby() {
   const sent = invitations?.filter(i => i.groupId === group.id && i.direction === "outgoing") ?? [];
 
   function shareLocation() {
-    navigator.geolocation.getCurrentPosition(
-      (pos) =>
-        run(() => setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude })),
-      (err) => run(() => Promise.reject(new Error(`Location unavailable: ${err.message}`))),
-    );
+    run(async () => {
+      if (!navigator.geolocation) throw new Error("Location is unavailable in this browser.");
+      const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, () => reject(new Error("Location unavailable. Allow location in your browser and try again.")),
+          { timeout: 10000, maximumAge: 60000 }));
+      await setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+    });
   }
 
   return (
@@ -64,11 +72,23 @@ export default function Lobby() {
         </ul>
       </section>
 
-      <div className="grid grid-cols-2 gap-3">
+      <section className="card space-y-3" aria-label="Huddle location">
+        <h2 className="card-title">Where should we go?</h2>
+        <p>{location?.myCity ? `Your shared city: ${location.myCity}` : "Your location is optional."}</p>
+        <p role="status">{location?.destinationCities.length
+          ? `Planning in ${location.destinationCities.join(" or ")}${location.destinationCities.length > 1 ? " — the cities are tied." : "."}`
+          : "No city selected yet. Places across the catalog are available."}</p>
+        <p className="muted">The most common shared city sets the destination. Tied cities get separate options. Exact starting points stay private.</p>
+        <div className="flex flex-wrap gap-3">
+          <button className="btn" disabled={busy || location === undefined} onClick={shareLocation}>{location?.myCity ? "Update my location" : "Use my location"}</button>
+          {location?.myCity ? <button className="btn" disabled={busy} onClick={() => run(() => clearOrigin())}>Clear my location</button> : null}
+        </div>
+        <CitySelection key={location?.myCity ?? "flexible"} initial={location?.myCity ?? ""} disabled={busy || location === undefined}
+          onSave={value => run(() => value ? setLocationCity({ city: value }) : clearOrigin())} />
+        <p className="muted text-sm">After changing location, save your preferences again to get ready.</p>
+      </section>
+      <div className="flex gap-3">
         {agent ? <Link className="btn btn-sun" to={`/g/${session.groupId}/prefs`}>{agent.confirmedMemberIds.includes(session.memberId) ? "Edit preferences" : "Start huddle"}</Link> : <button className="btn btn-primary" disabled={busy || me?.ready} onClick={() => run(() => setReady())}>{me?.ready ? "Ready ✓" : "I'm ready"}</button>}
-        <button className="btn" disabled={busy} onClick={shareLocation}>
-          Use my location
-        </button>
       </div>
       <p className="card !py-3 text-sm">Once two people are ready, you can find plans.</p>
 
@@ -97,4 +117,12 @@ export default function Lobby() {
       {error && <p className="error">{error}</p>}
     </div>
   );
+}
+
+function CitySelection({ initial, disabled, onSave }: { initial: string; disabled: boolean; onSave: (city: string | null) => unknown }) {
+  const [value, setValue] = useState(initial);
+  const city = chosenCity(value);
+  return <div className="space-y-3"><CityPicker value={value} onChange={setValue} disabled={disabled} />
+    <button className="btn" disabled={disabled || city === undefined || city === (initial || null)} onClick={() => city !== undefined && onSave(city)}>Use this city</button>
+  </div>;
 }

@@ -40,6 +40,7 @@ import CastVoteReducer from "./cast_vote_reducer";
 import ClearAccountContextReducer from "./clear_account_context_reducer";
 import ClearFriendContactReducer from "./clear_friend_contact_reducer";
 import ClearInvitationsReducer from "./clear_invitations_reducer";
+import ClearOriginReducer from "./clear_origin_reducer";
 import ConfirmAgentNeedsReducer from "./confirm_agent_needs_reducer";
 import ConfirmMeetupReducer from "./confirm_meetup_reducer";
 import DeclineOfferReducer from "./decline_offer_reducer";
@@ -63,6 +64,7 @@ import SetCalendarEventConsentReducer from "./set_calendar_event_consent_reducer
 import SetDemoModeReducer from "./set_demo_mode_reducer";
 import SetHuddleTimePreferenceReducer from "./set_huddle_time_preference_reducer";
 import SetHuddleWindowReducer from "./set_huddle_window_reducer";
+import SetLocationCityReducer from "./set_location_city_reducer";
 import SetOriginReducer from "./set_origin_reducer";
 import SetReadyReducer from "./set_ready_reducer";
 import SetShowWhoCompromisedReducer from "./set_show_who_compromised_reducer";
@@ -109,6 +111,7 @@ import MyFriendsRow from "./my_friends_table";
 import MyGroupRow from "./my_group_table";
 import MyGroupConnectorsRow from "./my_group_connectors_table";
 import MyHuddleInvitationsRow from "./my_huddle_invitations_table";
+import MyHuddleLocationRow from "./my_huddle_location_table";
 import MyHuddleNamesRow from "./my_huddle_names_table";
 import MyHuddleTimingRow from "./my_huddle_timing_table";
 import MyInvitationDeliveriesRow from "./my_invitation_deliveries_table";
@@ -264,6 +267,13 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyHuddleInvitationsRow),
+  myHuddleLocation: __table({
+    name: 'my_huddle_location',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyHuddleLocationRow),
   myHuddleNames: __table({
     name: 'my_huddle_names',
     indexes: [
@@ -344,6 +354,7 @@ const reducersSchema = __reducers(
   __reducerSchema("clear_account_context", ClearAccountContextReducer),
   __reducerSchema("clear_friend_contact", ClearFriendContactReducer),
   __reducerSchema("clear_invitations", ClearInvitationsReducer),
+  __reducerSchema("clear_origin", ClearOriginReducer),
   __reducerSchema("confirm_agent_needs", ConfirmAgentNeedsReducer),
   __reducerSchema("confirm_meetup", ConfirmMeetupReducer),
   __reducerSchema("decline_offer", DeclineOfferReducer),
@@ -367,6 +378,7 @@ const reducersSchema = __reducers(
   __reducerSchema("set_demo_mode", SetDemoModeReducer),
   __reducerSchema("set_huddle_time_preference", SetHuddleTimePreferenceReducer),
   __reducerSchema("set_huddle_window", SetHuddleWindowReducer),
+  __reducerSchema("set_location_city", SetLocationCityReducer),
   __reducerSchema("set_origin", SetOriginReducer),
   __reducerSchema("set_ready", SetReadyReducer),
   __reducerSchema("set_show_who_compromised", SetShowWhoCompromisedReducer),
@@ -437,6 +449,8 @@ type __SchemaWithTableAccessorAliases = Omit<typeof tablesSchema.schemaType, "ta
     readonly "my_group_connectors": Omit<typeof tablesSchema.schemaType.tables["myGroupConnectors"], "accessorName"> & { readonly accessorName: "my_group_connectors" };
     /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
     readonly "my_huddle_invitations": Omit<typeof tablesSchema.schemaType.tables["myHuddleInvitations"], "accessorName"> & { readonly accessorName: "my_huddle_invitations" };
+    /** @deprecated Use `myHuddleLocation` instead. This alias will be removed in the next major version. */
+    readonly "my_huddle_location": Omit<typeof tablesSchema.schemaType.tables["myHuddleLocation"], "accessorName"> & { readonly accessorName: "my_huddle_location" };
     /** @deprecated Use `myHuddleNames` instead. This alias will be removed in the next major version. */
     readonly "my_huddle_names": Omit<typeof tablesSchema.schemaType.tables["myHuddleNames"], "accessorName"> & { readonly accessorName: "my_huddle_names" };
     /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
@@ -495,6 +509,7 @@ const tableAccessorAliases = {
   "my_group": "myGroup",
   "my_group_connectors": "myGroupConnectors",
   "my_huddle_invitations": "myHuddleInvitations",
+  "my_huddle_location": "myHuddleLocation",
   "my_huddle_names": "myHuddleNames",
   "my_huddle_timing": "myHuddleTiming",
   "my_invitation_deliveries": "myInvitationDeliveries",
@@ -565,6 +580,8 @@ export type DbView = __DbViewBase & {
   readonly "my_group_connectors": __DbViewBase["myGroupConnectors"];
   /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_invitations": __DbViewBase["myHuddleInvitations"];
+  /** @deprecated Use `myHuddleLocation` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_location": __DbViewBase["myHuddleLocation"];
   /** @deprecated Use `myHuddleNames` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_names": __DbViewBase["myHuddleNames"];
   /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */
@@ -629,6 +646,8 @@ export type Tables = __TablesBase & {
   readonly "my_group_connectors": __TablesBase["myGroupConnectors"];
   /** @deprecated Use `myHuddleInvitations` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_invitations": __TablesBase["myHuddleInvitations"];
+  /** @deprecated Use `myHuddleLocation` instead. This alias will be removed in the next major version. */
+  readonly "my_huddle_location": __TablesBase["myHuddleLocation"];
   /** @deprecated Use `myHuddleNames` instead. This alias will be removed in the next major version. */
   readonly "my_huddle_names": __TablesBase["myHuddleNames"];
   /** @deprecated Use `myHuddleTiming` instead. This alias will be removed in the next major version. */

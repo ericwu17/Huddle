@@ -1,3 +1,5 @@
+import CityPicker from "../components/CityPicker";
+import { chosenCity } from "../../../shared/cities";
 import PageHeading from "../components/PageHeading";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
@@ -20,6 +22,9 @@ export default function Home() {
   const joinGroup = useProcedure(procedures.joinGroup);
   const select = useReducer(reducers.selectHuddle);
   const remove = useReducer(reducers.removeHuddle);
+  const setLocationCity = useReducer(reducers.setLocationCity);
+  const [city, setCity] = useState("");
+  const selectedCity = chosenCity(city);
   const account = useAccount();
   const memberships = useAccountMemberships();
   const huddleNames = useHuddleNames();
@@ -58,11 +63,13 @@ export default function Home() {
     submitting.current = true;
     try {
       await run(async () => {
+        if (selectedCity === undefined) throw new Error("Choose a city from the list or leave it flexible.");
         if (account) {
           // One request id per click, so a double tap cannot create two huddles.
           request.current ??= crypto.randomUUID();
           const args = { requestId: request.current, summary: "", outingKind: "hangout", friendAccountIds: [] };
           const session = huddleName ? await createNamedForAccount({ ...args, name: huddleName }) : await createForAccount(args);
+          if (selectedCity) await setLocationCity({ city: selectedCity });
           request.current = null;
           saveSession({ ...session, name: account.displayName });
           navigate(`/g/${session.groupId}/lobby`);
@@ -70,6 +77,7 @@ export default function Home() {
           guestDraft.current ??= await createAsGuest({ name: huddleName });
           const { code } = guestDraft.current;
           const joined = await joinGroup({ code, name });
+          if (selectedCity) await setLocationCity({ city: selectedCity });
           saveSession({ ...joined, code, name });
           navigate(`/g/${joined.groupId}/lobby`);
         }
@@ -101,7 +109,9 @@ export default function Home() {
       <h2 className="card-title">Start a huddle</h2>
       {account ? null : <input className="input" placeholder="Your first name" autoComplete="given-name" maxLength={24}
         aria-label="Your first name" value={name} onChange={e => setName(e.target.value)} />}
-      <button className="btn btn-sun w-full" disabled={busy || !isActive || (!account && !name.trim())} onClick={showNaming}>
+      <CityPicker value={city} onChange={setCity} disabled={busy} />
+      <p className="muted text-sm">Choose a city without sharing GPS. The group’s most common city wins; ties get options in each city.</p>
+      <button className="btn btn-sun w-full" disabled={busy || !isActive || selectedCity === undefined || (!account && !name.trim())} onClick={showNaming}>
         {busy ? "Starting…" : "Start a huddle"}
       </button>
       {!isActive ? <p role="status" className="muted">Connecting to Huddle…</p> : null}

@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { ingestCatalog } from "../src/lib/catalog";
 import { describe, expect, it } from "vitest";
 import { ConnectionId, Timestamp } from "spacetimedb";
 import { createModuleTestHarness, TestAuth } from "spacetimedb/server/test-utils";
@@ -265,6 +267,19 @@ describe("private invitation intent and atomic start", () => {
 });
 
 describe("calendar scheduling snapshot and meetup authorization", () => {
+  it("keeps calendar venue input bounded and honors the participant destination city", () => {
+    const s = setup(); s.joined(); s.calendars();
+    const pool = JSON.parse(readFileSync(new URL("../../data/catalog/cities.json", import.meta.url), "utf8"));
+    s.reduce(internal, tx => ingestCatalog(tx, pool));
+    api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs);
+    expect(s.calls.at(-1)!.body.venues.length).toBeLessThanOrEqual(160);
+    s.reduce(s.users[0], tx => api.setLocationCity(tx, { city: "Oakland" }));
+    api.scheduleHuddle(s.proc(s.users[0]), scheduleArgs);
+    const venues = s.calls.at(-1)!.body.venues;
+    expect(venues.length).toBeGreaterThan(0);
+    expect(venues.every((venue: any) => pool.venues.find((v: any) => v.place.id === venue.placeId).place.address.includes(", Oakland,"))).toBe(true);
+  });
+
   it("starts invitation Huddles unscheduled and keeps optional time preferences host-owned", () => {
     const s = setup(), group = s.joined();
     expect(s.test.db.group.id.find(group.groupId)).toMatchObject({ date: "", windowStart: "", windowEnd: "" });

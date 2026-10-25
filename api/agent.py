@@ -142,10 +142,11 @@ def sum_cost(stops) -> Decimal:
 
 
 def eligible(catalog: Catalog, body: AgentPlanRequest) -> set[int]:
+    from .geography import city
     result = set()
     excluded = set(body.excludePlaceIds)
     for i, place in enumerate(catalog.places):
-        if place.id in excluded:
+        if place.id in excluded or body.destinationCities and city(place) not in body.destinationCities:
             continue
         text = f"{place.name} {place.cuisine} {place.category}".casefold()
         if any(place.cuisine in m.needs.hard.vetoCuisines or place.category in m.needs.hard.vetoCategories or

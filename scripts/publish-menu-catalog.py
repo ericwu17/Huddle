@@ -12,7 +12,7 @@ from api.menu_catalog import enrich_catalog
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--catalog", type=Path, default=ROOT / "data/brightdata/catalog.json")
+    parser.add_argument("--catalog", type=Path, default=ROOT / "data/catalog/cities.json")
     parser.add_argument("--details", type=Path, default=ROOT / "data/brightdata/details.json")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--publish", action="store_true")

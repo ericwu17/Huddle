@@ -1,10 +1,17 @@
 # Huddle roadmap
 
+**Current city/location branch preview:** [CITY_COVERAGE.md](CITY_COVERAGE.md).
+SF/Oakland retrieval, the preserved 200-venue pilot, optional typed city picker,
+GPS city resolution, participant-city plurality/ties, hard city validation and
+stale-action invalidation are implemented in the isolated preview. Shared rollout
+is pending. Existing menus/photos remain intact; new city menu enrichment and
+real transport routing remain Eric Wu/Max follow-ups.
+
 Option comparison and map update: Plans/Vote label evidence-backed differences
 in ratings, owner-private total cost, inter-stop travel and variety. Options,
 Done and shared results open Google Maps with the blue underlined **Click here
-to see the map!** action. The key-free URL phase is implemented; paid routing,
-embedded Google Maps and context-based adventurousness remain follow-ups in
+to see the map!** action. The key-free URL phase is implemented. The October 24 city audit and proposed
+Routes API/embedded-map rollout are follow-ups in
 [GOOGLE_MAPS_PLAN.md](GOOGLE_MAPS_PLAN.md).
 
 Post-vote result: Done shows the chosen route/date/time and each owner's order,
@@ -24,7 +31,47 @@ The demo UI uses route names, AM/PM times and known menu prices,
 without source/confirmation boilerplate. Current budgets and stale-run checks
 still apply; exploratory voting never changes saved limits.
 
-## Current priorities October 24
+## Next work after the local-backend handoff
+
+**Operating baseline:** Eric Wu's script hosts API/voice locally and preserves
+its tunnels across service restarts after pulled commits. The shared database
+is Maincloud and the frontend runs separately. Max's old shared API on port
+8000 and its tunnel are stopped. The new host passed a read of Max's saved
+Calendar connection, callback/client checks and signed-out Google preflight;
+25 connected app checks passed after that shutdown. The current launcher passed
+21 isolated checks, including service restart without tunnel replacement.
+Fresh consent for another account and actual Calendar event creation still need
+an opted-in participant test. Hosting still depends on Eric's laptop.
+
+The read-only city audit found 140 active venues: **120 Berkeley, 9 Oakland,
+9 Albany, 2 Emeryville and no SF**. The committed discovery pool has 5,932 rows,
+including 3,197 SF-area and 1,494 Oakland-area rows, but the merge/publish default
+is still the Berkeley rectangle. Current detailed evidence supplies 950 menu
+items/386 photos; new city rows are not yet equivalent to fully enriched menus.
+See [Google Maps and multi-city plan](GOOGLE_MAPS_PLAN.md) for the exact audit,
+limits, proposed contracts and acceptance tests. This paragraph records the original read-only audit. The branch implementation
+and preview status supersede it in [CITY_COVERAGE.md](CITY_COVERAGE.md); shared
+catalog activation remains pending.
+
+| Priority | Work | Proposed owner | Completion check |
+| --- | --- | --- | --- |
+| P0 | Preview a useful three-city catalog; make publish area-aware; enrich chosen SF/Oakland menus/photos while preserving existing evidence/history | Eric Wu, Max verifies contracts | SF-only and Oakland scenarios use the requested city's real venues; prior Huddles still resolve |
+| P0 | Add optional destination-area and explicit travel-mode controls; pass geographic facts to Claude and validate them | Eric Chen UI, Max/API coordination | Flexible has no hidden Berkeley default; city/mode edits invalidate stale results |
+| P1 | Add bounded Routes API facts and opening-hour/time validation; remove always-walking navigation for new mode-aware options | Max, Eric Wu integration | Coherent walking/driving/transit timings, including cross-Bay travel, match Maps links |
+| P1 | Add lazy Google map views to Options and Done, retaining the external map action | Eric Chen | Phone/desktop preserve ordered stops, selected option and private data boundaries |
+| P1 | Finish the approved Claude proposal/revision flow and short grounded compromise explanations | Max with Eric Wu, Eric Chen presentation | Claude proposes/revises sequences from a bounded catalog; Python validates; owners see useful meals rather than sides or invented dishes |
+| P1 | Test a fresh Google consent and explicitly opted-in agreed meetup event | Max plus two consenting participants | Availability, event details, single creation and Done work on the shared host |
+| P1 | Audit menu/category fit and unknown-price fallbacks in all three areas | Eric Wu data, Max scenarios | Vegan/$30 + steak/$50 + dessert/time scenarios retain correct personal totals and meaningful alternatives |
+| P2 | Feed evidenced takeout/shared seating; improve Most daring/Best fit; improve invitations beyond in-app delivery | Joint after core demo | No invented pickup/seating, privacy leaks or false message-delivery claims |
+| P2 | Stabilize the public API hostname and document restart/recovery; revisit hosted API only if needed | Eric Wu + project/domain owner | Restarts retain a valid Calendar callback and the team has one tested operator/runbook |
+
+Do not upload the whole discovery file or just raise the 160-place request cap.
+Plan a bounded per-area shortlist and the coordinated catalog contract first.
+Map transport charges do not change the own-meal-plus-later-stops budget rule
+without a separate explicit decision. Implementations and shared activation
+remain follow-ups to this plan.
+
+## Earlier release checkpoints, retained for history
 
 [CURRENT_CONTEXT.md](CURRENT_CONTEXT.md) is the current source of product and
 architecture direction. The historical math-based milestones below do not

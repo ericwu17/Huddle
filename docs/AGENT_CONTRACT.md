@@ -109,14 +109,20 @@ permitted increase path; generating new agent trade offers is deferred.
 
 Request: `runId`, `inputRevision`, ISO `date` and `window` with `start`/`end`
 (or both null for an unscheduled outing),
-`members`, `excludePlaceIds`, and optional public `discussion` strings.
+`members`, `excludePlaceIds`, optional public `discussion` strings, and optional
+`destinationCities` (supported city names; empty/omitted means flexible). The module
+derives destination cities from participant location preferences: a unique most
+frequent city wins; equal most-frequent cities remain alternatives. GPS and typed
+city preferences each count once per participant. Python and the module both reject
+out-of-city stops; a tied-city itinerary cannot cross between cities.
 Each member supplies `memberId`, private `prompt`, confirmed `needs` from the
 needs endpoint, and optional `origin` (`lat`, `lng`). Two or more members are
 required. The module controls membership and confirmation, not model output.
 
 Optional `catalog` (sent whenever the module holds a live venue snapshot, see
 CONTRACT.md S5.5 "Live venue catalog"): `{version, places, evidence}`. `places`
-is 3–160 contract Places with unique IDs and every stop category present.
+is 3–160 contract Places with unique IDs and every stop category present. This bounded request is selected from the larger published pool (up to 320 stored venues); it includes all three areas when available and keeps menu-rich venues within each area. API responses must use only the IDs in this request, never arbitrary IDs from the stored pool.
+The coordinator receives each venue's postal city, address and coordinates; destination requests in member prompts inform Claude's selection. Offered multi-stop candidates stay within one retrieval area. The city picker/GPS plurality rule now supplies the hard destination control. Real route timings remain a follow-up.
 `evidence` maps place IDs to `{sources: [{source: gmaps|yelp|google_places,
 url (https or null), fetchedAt, rating, reviewCount}]}`. When present, the API
 plans from those places only and the module validates the reply against the

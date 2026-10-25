@@ -3,13 +3,15 @@
 // changes nothing and the last good snapshot stays live. Each coordinator request carries
 // the active snapshot to FastAPI and its answer is checked against that same snapshot, so
 // the module and the API always agree on venue ids, names and costs.
+import { postalCity } from "../../../shared/geography";
 import type { ReadDb, Tx } from "./types";
 import { LIVE_PLACES, placeById, type Place } from "./places";
 import { nowMs, parse } from "./util";
 
-// FastAPI enumerates meal x activity x dessert itineraries; at these caps that takes
-// about 0.4 s (measured 2026-10-24 on 13k candidates).
-export const MAX_ACTIVE: Record<string, number> = { meal: 80, activity: 50, dessert: 30 };
+// Preserve a broader stored pool without increasing the bounded solver input.
+// These limits match PublishedCatalog; MAX_PLANNING matches AgentCatalog.
+export const MAX_ACTIVE: Record<string, number> = { meal: 160, activity: 100, dessert: 60 };
+export const MAX_PLANNING: Record<string, number> = { meal: 80, activity: 50, dessert: 30 };
 
 const CUISINES = ["asian", "latin", "mediterranean", "american", "cafe_dessert", "none"];
 const DIETS = ["vegetarian", "vegan", "gluten_free", "halal", "kosher"];
@@ -167,6 +169,44 @@ export function catalogSnapshot(db: ReadDb): CatalogSnapshot | null {
   return { version: db.catalog_state.id.find(0)?.version ?? "unknown",
     places: rows.map((r) => JSON.parse(r.placeJson)),
     evidence: Object.fromEntries(rows.map((r) => [r.id, parse(r.evidenceJson) ?? { sources: [] }])) };
+}
+
+// Postal city facts remain unmodified. Adjacent East Bay addresses share the
+// Berkeley retrieval bucket, rather than losing coverage to dozens of buckets.
+export function catalogArea(place: Pick<Place, "address">): string {
+  const city = postalCity(place.address).toLowerCase();
+  if (city === "san francisco") return "sf";
+  if (city === "oakland") return "oakland";
+  return "berkeley";
+}
+
+export function planningSnapshot(snapshot: CatalogSnapshot | null, destinationCities: string[] = []): CatalogSnapshot | null {
+  if (!snapshot || snapshot.places.length <= 160) return snapshot;
+  const selected: Place[] = [];
+  for (const [category, limit] of Object.entries(MAX_PLANNING)) {
+    const groups = new Map<string, Place[]>();
+    for (const place of snapshot.places.filter(p => p.category === category)) {
+      const area = catalogArea(place);
+      if (!groups.has(area)) groups.set(area, []);
+      groups.get(area)!.push(place);
+    }
+    const quality = (place: Place) => Number(!!snapshot.evidence[place.id]?.menu?.items.length);
+    for (const places of groups.values()) places.sort((a, b) => Number(destinationCities.includes(postalCity(b.address))) - Number(destinationCities.includes(postalCity(a.address))) || quality(b) - quality(a) || (b.rating ?? 0) - (a.rating ?? 0) || (b.reviewCount ?? 0) - (a.reviewCount ?? 0) || a.id.localeCompare(b.id));
+    const areas = [...groups.keys()].sort();
+    let count = 0;
+    while (count < limit) {
+      let added = false;
+      for (const area of areas) {
+        const place = groups.get(area)!.shift();
+        if (!place) continue;
+        selected.push(place); count++; added = true;
+        if (count === limit) break;
+      }
+      if (!added) break;
+    }
+  }
+  return { version: snapshot.version, places: selected,
+    evidence: Object.fromEntries(selected.map(place => [place.id, snapshot.evidence[place.id] ?? { sources: [] }])) };
 }
 
 export const activePlaces = (db: ReadDb): Place[] => catalogSnapshot(db)?.places ?? LIVE_PLACES;

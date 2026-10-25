@@ -9,6 +9,9 @@ export type Place = {
   name: string;
   category: "meal" | "activity" | "dessert";
   cuisine: string;
+  address?: string;
+  rating?: number;
+  reviewCount?: number;
   lat: number;
   lng: number;
   costPerPerson: number;

@@ -1,3 +1,5 @@
+import { cityForPoint } from "../../shared/geography";
+import { huddleLocation } from "./lib/location-state";
 // What phones can read. Every view is scoped to the caller's own group (via ctx.sender),
 // and the privacy rules from build-brief B1 are enforced here:
 // - private prefs and offers only to their owner;
@@ -66,6 +68,19 @@ export const my_huddle_names = spacetimedb.view(pub("my_huddle_names"), t.array(
   });
   const group = !session && myGroup(ctx);
   return group ? [{ groupId: group.id, name: group.name }] : [];
+});
+
+// Coarse city counts only. Exact starting coordinates stay private.
+export const my_huddle_location = spacetimedb.view(pub("my_huddle_location"), t.option(t.row("MyHuddleLocationRow", {
+  groupId: t.string().primaryKey(), destinationCities: t.array(t.string()),
+  cityCounts: t.array(t.object("HuddleCityCount", { city: t.string(), count: t.u32() })),
+  myCity: t.option(t.string()), mySource: t.option(t.string()),
+})), ctx => {
+  const group = myGroup(ctx), me = currentMember(ctx.db, ctx.sender);
+  if (!group || !me) return undefined;
+  const preference = ctx.db.member_location.memberId.find(me.id);
+  const myCity = preference?.city ?? (me.originLat !== undefined && me.originLng !== undefined ? cityForPoint(me.originLat, me.originLng) : undefined);
+  return { groupId: group.id, ...huddleLocation(ctx.db, group.id), myCity, mySource: preference?.source ?? (myCity ? "device" : undefined) };
 });
 
 export const my_members = spacetimedb.view(

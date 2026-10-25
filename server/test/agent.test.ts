@@ -842,3 +842,46 @@ describe("menu proposals and private own orders", () => {
       { dietary: ["vegetarian"], allergies: [] })).toBe(false);
   });
 });
+
+describe("shared destination cities", () => {
+  it("counts manual/device cities, keeps exact origins private, and clears one owner's preference", () => {
+    const s = setup();
+    s.reduce(s.users[0].auth, tx => api.setLocationCity(tx, { city: "Oakland" }));
+    expect(s.test.db.member.id.find(s.users[0].id)?.originLat).toBeUndefined();
+    s.reduce(s.users[1].auth, tx => api.setOrigin(tx, { lat: 37.7749, lng: -122.4194 }));
+    const visible = api.my_huddle_location(s.test.viewContext(s.users[0].auth))!;
+    expect(visible).toMatchObject({ destinationCities: ["Oakland", "San Francisco"], myCity: "Oakland", mySource: "chosen" });
+    expect(JSON.stringify(visible)).not.toMatch(/originLat|originLng|37\.7749|-122\.4194/);
+    s.ready(); s.plan();
+    expect(s.captured().destinationCities).toEqual(["Oakland", "San Francisco"]);
+    s.reduce(s.users[1].auth, tx => api.setLocationCity(tx, { city: "Oakland" }));
+    expect(api.my_huddle_location(s.test.viewContext(s.users[0].auth))!.cityCounts).toEqual([{ city: "Oakland", count: 2 }]);
+    s.reduce(s.users[0].auth, tx => api.clearOrigin(tx, {}));
+    expect(api.my_huddle_location(s.test.viewContext(s.users[0].auth))).toMatchObject({ myCity: undefined, destinationCities: ["Oakland"] });
+    expect(s.test.db.member_location.memberId.find(s.users[1].id)?.city).toBe("Oakland");
+  });
+
+  it("a city change invalidates plans, votes, roulette and booking until ready again", () => {
+    const s = setup(); s.ready(); const runId = s.plan(); s.vote(0, runId);
+    s.reduce(s.users[0].auth, tx => api.setLocationCity(tx, { city: "San Francisco" }));
+    expect(s.test.db.agent_session.groupId.find(s.group.groupId)?.activeRunId).toBeUndefined();
+    expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(false);
+    expect(() => s.vote(1, runId)).toThrow();
+    expect(() => api.doRoulette(s.proc(), { runId })).toThrow();
+    expect(() => s.book(0, runId)).toThrow();
+    s.ready(); const next = s.plan(); // fake API still returns Berkeley; reject it.
+    expect(s.test.db.plan_run.runId.find(next)?.status).toBe("error");
+    expect(s.captured().destinationCities).toEqual(["San Francisco"]);
+  });
+
+  it("rejects unrecognized locations and out-of-city exploratory suggestions", () => {
+    const s = setup();
+    expect(() => s.reduce(s.users[0].auth, tx => api.setOrigin(tx, { lat: 0, lng: 0 }))).toThrow(/supported cities/);
+    expect(() => s.reduce(s.users[0].auth, tx => api.setLocationCity(tx, { city: "Los Angeles" }))).toThrow(/supported city/);
+    s.reduce(s.users[0].auth, tx => api.setLocationCity(tx, { city: "Oakland" }));
+    s.ready(); s.transform(data => { data.plans = []; data.recommendedPlanId = null;
+      data.suggestions = [{ id: "outside", placeId: "p_002", summary: "Berkeley venue", limitations: [] }]; });
+    const runId = s.plan();
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("error");
+  });
+});

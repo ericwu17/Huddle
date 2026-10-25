@@ -42,6 +42,11 @@ export const member = table(
   },
 );
 
+// A chosen city is separate from a real GPS origin; never fabricate a city-center starting point.
+export const member_location = table({ name: "member_location" }, {
+  memberId: t.string().primaryKey(), city: t.string(), source: t.string(),
+});
+
 // Readable only by the owner, through the my_private view.
 export const private_prefs = table(
   { name: "private_prefs" },
@@ -337,7 +342,7 @@ export const huddle_timing = table({ name: "huddle_timing" }, {
 
 const spacetimedb = schema(
   {
-    group, member, private_prefs, swipe, plan_run, offer, vote, booking, call_event,
+    group, member, member_location, private_prefs, swipe, plan_run, offer, vote, booking, call_event,
     council_message, scout_check, geo_cache,
     parse_job, swipe_job, preview_job, plan_job, offers_job, scout_job,
     council_job, voting_cap_job, call_job, fake_event_job, replan_job,
