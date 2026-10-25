@@ -4,6 +4,16 @@ Code: [`data/reviews/`](../data/reviews/). Source note for the Google Maps route
 
 **Status (2026-10-24):**
 - **Full Google Maps discovery has run:** 360 inputs (12 grid points × 30 keywords) returned 1,023 records, 3 of them errors, covering 1,009 distinct places. 936 of those classify as a stop: 524 restaurants, 380 hangouts and 32 boba shops. Stores, markets and other non-stops are dropped. 41 of the 45 bundled places were found again.
+- **Oakland and San Francisco discovery has run (2026-10-25):** two 1,890-input jobs (63 points × 30 keywords each) ran in parallel in about 17 minutes. Oakland returned 2,517 records (11 errors) and SF 3,730 (18 errors). Together with an earlier 60-input trial run at each city's center (953 records), that's about 7,200 records, roughly $11 at $1.5 per 1,000. `data/brightdata/places.json` now has 5,932 places:
+
+  | Area | Places | Restaurants | Boba | Hangouts |
+  |---|---|---|---|---|
+  | Berkeley | 645 | 389 | 25 | 231 |
+  | Oakland | 1,494 | 915 | 27 | 552 |
+  | SF | 3,197 | 1,885 | 103 | 1,209 |
+  | Outside all three | 596 | 341 | 25 | 230 |
+
+  The file is 33 MB, mostly Google top reviews (15 MB). Oakland and SF places don't reach the app. Berkeley gained 4 places found from the Oakland grid. A future `publish --add` could therefore pick slightly different new venues than the live snapshot.
 - **Yelp discovery returned nothing** on two input types (see the Yelp row below), so all of the data is from Google Maps.
 - **The 140-venue catalog snapshot is live on shared `huddle-calhacks` and the isolated preview.** `data/brightdata/catalog.json` has 60 meals, 50 activities and 30 desserts. The October 24 refresh retains all 130 previously active venue IDs and adds ten Berkeley venues from the expanded scrape. The first activation used the committed version `2026-10-24T20:17:52Z-a182c74b`, after an additive module publish and API restart from `a029fb6`, without resetting data. The actual Vercel flow selected two new scraped IDs and passed 30 desktop/mobile checks. The live snapshot is now the menu-enriched `2026-10-25T02:00:25Z-e73d83f6-menu-70fd1361f328`, built from the committed `catalog.json` plus `details.json` (route `/health` reports it with 140 venues). All 950 existing menu items and 386 photos, including their stable IDs and attribution, are retained unchanged. The new scrape also refreshes available source observations; Oakland/SF discoveries remain outside the active Berkeley catalog. [Operations](ACCOUNTS_RUNBOOK.md) records the shared targets and verification. To refresh the data, see [Go live](#go-live).
 - **Venue details remain available for the original 130 venues** (`details.json`; the ten added venues have no menu/photo sidecar yet; see [Venue details](#venue-details-menus-takeout-seating-photos-dietary-evidence)). `scripts/publish-menu-catalog.py` adds their menu items and photos to the published catalog ([MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md)). Takeout and seating aren't used yet.
