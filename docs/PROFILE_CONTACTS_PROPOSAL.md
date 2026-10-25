@@ -146,8 +146,7 @@ prices do not verify vegan/allergen claims or actual hard-cap compliance. Max
 has approved each person paying for their own meal plus subsequent stops, such
 as dessert; nobody pays for another person's meal. Participant assignments and
 item-price representation require a coordinated contract follow-up, so the
-current shared-stop cost implementation remains unchanged. See
-[CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+current shared-stop cost implementation remains unchanged.
 
 Prove the small account → invite → accept journey before broad memory inference,
 address-book sync or background agents. The optional host-Mac delivery and
@@ -160,5 +159,4 @@ context rules and verification. Max implements account/membership/invitation per
 diverting Eric Wu from active ingestion without coordination.
 
 See [interface proposal](INTERFACE_PROPOSAL.md),
-[preference scenarios](PREFERENCE_ACCEPTANCE_PLAN.md),
-[planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) and [open tasks](NEXT_TASKS.md).
+[preference scenarios](PREFERENCE_ACCEPTANCE_PLAN.md) and [open tasks](NEXT_TASKS.md).

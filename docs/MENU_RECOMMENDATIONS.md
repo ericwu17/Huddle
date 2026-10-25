@@ -1,8 +1,7 @@
 # Menu recommendations and provisional options
 
 October 24, 2026. This supersedes the earlier blanket allergy/dietary planning
-block and the deferred personal-meal-cost notes. The full Claude
-propose/validate/revise planner is still a separate follow-up.
+block and the deferred personal-meal-cost notes.
 
 ## Behavior
 
@@ -142,8 +141,7 @@ Changing a tunnel hostname requires updating the allowlist again.
 
 ## Next work
 
-1. Max: finish the bounded Claude propose → validate → revise follow-up and
-   useful explanations of compromises, especially separate takeout meals plus
+1. Max: finish useful explanations of compromises, especially separate takeout meals plus
    evidenced public seating. Keep current cap/privacy/action validation.
 2. Eric Wu: close menu coverage gaps (complete vegan meals, real steak/fries,
    desserts, item prices), explicit dietary evidence, takeout and sourced

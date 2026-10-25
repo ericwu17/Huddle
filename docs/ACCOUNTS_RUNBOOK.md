@@ -280,12 +280,11 @@ actual item purchase fits.
 takeout/seating attributes and explicit/inferred dietary evidence for 130 venues.
 Those richer records still need a reviewed bounded integration; this release
 does not claim the coordinator or UI consumes them. Allergy/cross-contact safety
-is still unverified. Claude still selects validated candidates; full proposal/
-revision and participant-specific meal costs remain follow-ups.
+is still unverified. Claude selects validated candidates; participant-specific
+meal costs remain a follow-up.
 
-Max's vegan/$30 + Eric's steak/fries/$50 + Eric Chen's dessert/three-hour example
-is recorded in [the planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md). This catalog
-cannot verify it, so a dietary-evidence state is the expected result, not a
+This catalog cannot verify Max's vegan/$30 + Eric's steak/fries/$50 + Eric
+Chen's dessert/three-hour example, so a dietary-evidence state is the expected result, not a
 fabricated match. The approved future split-meal rule is **each person's own meal
 plus subsequent stops**. Current shared-stop plans still sum the same stop costs
 for each member; participant-specific meals/item prices need a coordinated

@@ -6,8 +6,8 @@ contain venue facts only and are checked against the current winner. Parsing and
 the coordinator now default to Haiku 5.5; budgets and factual checks stay in code.
 
 Current menu extension: [MENU_RECOMMENDATIONS.md](MENU_RECOMMENDATIONS.md). Sourced menu orders, private personal totals, photos,
-provisional suggestions and untimed alternatives are implemented. The full
-Claude propose/revise loop and takeout/seating remain follow-ups. This update
+provisional suggestions and untimed alternatives are implemented. Takeout/seating
+remain follow-ups. This update
 supersedes older blanket allergy-block and personal-cost deferral notes below.
 
 Voting correction: all current timed/provisional and untimed venue suggestions
@@ -71,8 +71,6 @@ are still open. See [operations](ACCOUNTS_RUNBOOK.md).
 - [x] Feed bounded sourced menus/prices and attributed photos through Maincloud,
   Claude and private order cards.
 - [ ] Feed evidenced takeout and suitable shared seating into the coordinator.
-- [ ] Deferred follow-up: Claude constructs/revises plans, Python validates hard
-  constraints and factual consistency. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
 - [x] Implement optional budget/time sliders, optional prompt, flexible defaults,
   Save & ready and targeted clarifications on the isolated branch. Known allergies
   can finish input; verified venue evidence remains required for final food plans.

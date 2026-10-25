@@ -4,8 +4,7 @@ Approved by Max for implementation, October 24, 2026. Optional inputs, private
 structured limits and Save & ready are implemented on the isolated review branch;
 verification is recorded in [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md). The full
 P01–P30 table remains an acceptance specification, not a claim that every later
-planner/data scenario is implemented. Eric Wu owns Bright Data → SpacetimeDB. The
-[Claude planner rewrite](CLAUDE_PLANNER_FOLLOWUP.md) stays a deferred follow-up.
+planner/data scenario is implemented. Eric Wu owns Bright Data → SpacetimeDB.
 
 ## Proposed input experience
 
@@ -206,8 +205,7 @@ P01–P30 all complete from the account/preference verification.
    field to these scenarios; do not edit his ingestion files concurrently.
 4. Coordinate API/schema/view/binding changes for optional prompts, structured
    duration and targeted clarification. No live shapes change in this planning step.
-5. Implement the input UX separately from the deferred Claude planner rewrite.
-   Then implement the bounded propose → validate → revise/conditional-compromise
-   follow-up against the agreed database snapshot, preserving privacy and cap rules.
+5. Implement the input UX, then conditional compromise against the agreed
+   database snapshot, preserving privacy and cap rules.
 6. Verify isolated fixtures, real Claude with sourced data, connected groups,
    solo testing and physical phones before shared rollout. Keep calls simulated.

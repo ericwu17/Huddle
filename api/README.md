@@ -1,8 +1,8 @@
 # Huddle Python API
 
 Current menu extension: [MENU_RECOMMENDATIONS.md](../docs/MENU_RECOMMENDATIONS.md). Sourced menu orders, private personal totals, photos,
-provisional suggestions and untimed alternatives are implemented. The full
-Claude propose/revise loop and takeout/seating remain follow-ups. This update
+provisional suggestions and untimed alternatives are implemented. Takeout/seating
+remain follow-ups. This update
 supersedes older blanket allergy-block and personal-cost deferral notes below.
 
 The stateless FastAPI service for the new single-Claude coordinator and the

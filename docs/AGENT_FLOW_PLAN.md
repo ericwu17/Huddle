@@ -5,10 +5,10 @@ Approved by Max and implemented October 24, 2026, after syncing main through
 [contract](AGENT_CONTRACT.md), [runbook](AGENT_RUNBOOK.md) and
 [verification](AGENT_VERIFICATION.md) describe the resulting implementation.
 
-Max's subsequent [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) plans
-Claude-built itineraries and bounded revision from Python validation feedback,
-using Eric Wu's SpacetimeDB venue catalog. That work is deferred. The body below
-records the current first version, where Python enumerates candidate itineraries.
+The body below records the current version, where Python enumerates candidate
+itineraries and Claude chooses among them. A later proposal for Claude-built
+itineraries with revision from Python validation feedback was dropped in favor
+of keeping this design.
 
 The newer [preference acceptance proposal](PREFERENCE_ACCEPTANCE_PLAN.md) plans
 optional sliders/prompt, flexible defaults and one Save & ready action with

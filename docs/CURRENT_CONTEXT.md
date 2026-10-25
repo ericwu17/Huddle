@@ -31,7 +31,7 @@ request (`docs/CONTRACT.md` S5.5, `catalog` in `AGENT_CONTRACT.md`). The merged
 implementation is active on shared Maincloud `huddle-calhacks` and Vercel,
 with the committed 130-venue snapshot. The separate `huddle-account-max-check`
 preview remains available. See [operations](ACCOUNTS_RUNBOOK.md). Menus, prices and attributed
-photos now have a coordinated runtime contract; takeout/seating remain follow-ups. See [CLAUDE_PLANNER_FOLLOWUP.md](CLAUDE_PLANNER_FOLLOWUP.md).
+photos now have a coordinated runtime contract; takeout/seating remain follow-ups.
 
 **Account and preference expansion: shared release active October 24.**
 Max approved username/password accounts, private saved context, reciprocal friends,
@@ -78,7 +78,7 @@ Messages, which reported Not Delivered. Max also reports ordinary sending and
 phone-history syncing fail there. OS submission is not recipient delivery; do
 not automatically resend an ambiguous submission. See
 [CONNECTORS_CONTRACT.md](CONNECTORS_CONTRACT.md). General SMS/email/push, voice
-prompts, model-inferred memory and the Claude propose/revise planner remain
+prompts and model-inferred memory remain
 follow-ups. Coordinator plans now support a one-meal outing for short time limits; the
 old two-stop minimum incorrectly rejected matching $40/90-minute food requests.
 Both API and module enforce the expanded one-to-three-stop contract, with only

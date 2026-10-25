@@ -58,8 +58,6 @@ full proposal/revision loop remain follow-ups. See its owner checklist.
 See [ACCOUNTS_RUNBOOK.md](ACCOUNTS_RUNBOOK.md) for preview operation/evidence,
 [ACCOUNTS_CONTRACT.md](ACCOUNTS_CONTRACT.md) for ownership and
 [PREFERENCE_ACCEPTANCE_PLAN.md](PREFERENCE_ACCEPTANCE_PLAN.md) for scenarios.
-The [Claude planner follow-up](CLAUDE_PLANNER_FOLLOWUP.md) records the still
-deferred propose → validate → revise design and catalog handoff.
 
 ## Invitation and calendar expansion
 
@@ -107,7 +105,6 @@ messages were created by the automated acceptance checks.
 | Branch review and UI finish | Max + Eric Chen | Review the verified account, friend-picker, inbox, private-input, plan and mobile flow with Max; the map-fix browser rerun passed. Keep accessible controls and the illustrated theme from Design.md. | Max can complete the two-account flow without guidance; refresh/re-entry and maps work without console errors. |
 | Rich venue evidence | Max + Eric Wu | The basic catalog handoff is reviewed. Wire the separately collected menu items/prices, takeout, seating and attributed photos through a bounded contract; keep Eric's scraping pipeline separate. | Evidence distinguishes menu labels, inferred tags, estimates and unknowns; source URLs/fetch times survive the runtime path. |
 | Shared release rehearsal | Max + Eric Wu | Shared account/catalog activation is complete. Test real participants on phones and rehearse API/tunnel recovery while preserving shared settings. | Participants can re-enter their own shared accounts and recover cleanly after an operator restart. |
-| Claude proposes and revises (follow-up) | Max | Implement the reviewed propose → validate → revise design after the catalog contract is agreed. Claude constructs alternatives; Python validates facts and hard constraints rather than enumerating complete choices. | Bounded calls and structured repair feedback produce grounded current plans; errors/evidence gaps have useful next actions. |
 | Personalized meal costs (implemented) | Max + Eric Chen | Owner-private menu selections/totals now count each person's own meal plus later stops; the public legacy cost remains a venue baseline. Review order editing next. | Each person's full outing total is correct and fits their own cap. Missing/default prices never prove actual affordability, and caps cannot be pooled. |
 | Meal-quality and preference scenarios | Max + Eric Chen | Review vegan meal versus steak/fries, optional dessert, split takeout with evidenced seating, duration, categories and soft wishes. Distinguish input ambiguity from unavailable venue evidence. | Useful alternatives are independently supported; no fabricated vegan/allergen/menu facts or extra activity forced by a template. |
 | Conditional compromise | Max + Eric Chen | Explain the actual blocking evidence or requirement and offer a specific next action. Obtain the affected owner's explicit approval for permitted changes; cap increases still require acceptance of a current private offer. | No unexplained dead end, silently relaxed limit or selectable unvalidated compromise. |
@@ -120,8 +117,7 @@ may remain null and meal costs may default to $25. The basic snapshot/read path
 is reviewed and tested; richer detail and item-assignment contracts remain open. A default
 $25 estimate cannot prove a real hard cap, and inferred dietary tags do not
 verify vegan options or allergen safety. More reviews are secondary to the
-menu/takeout/seating evidence needed for the current example. See the full
-[planner handoff](CLAUDE_PLANNER_FOLLOWUP.md).
+menu/takeout/seating evidence needed for the current example.
 
 ## Solo test on this branch
 
