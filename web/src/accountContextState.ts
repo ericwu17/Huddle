@@ -7,9 +7,10 @@ export type AccountContext = {
   allergies: string[];
   budgetMaxPerPerson: number | null;
   maxOutingMinutes: number | null;
+  preferredStops: number | null;
 };
 
-export const EMPTY_CONTEXT: AccountContext = { version: 1, preferences: "", dietary: [], allergies: [], budgetMaxPerPerson: null, maxOutingMinutes: null };
+export const EMPTY_CONTEXT: AccountContext = { version: 1, preferences: "", dietary: [], allergies: [], budgetMaxPerPerson: null, maxOutingMinutes: null, preferredStops: null };
 
 export type SavedAccountContext = {
   accountId: string;

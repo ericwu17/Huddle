@@ -28,7 +28,7 @@ function contextJson(text: string) {
   if (text.length > 8000) throw new SenderError("Saved context is too long.");
   let value: any;
   try { value = JSON.parse(text); } catch { throw new SenderError("Saved context must be valid JSON."); }
-  const fields = new Set(["version", "preferences", "dietary", "allergies", "budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes"]);
+  const fields = new Set(["version", "preferences", "dietary", "allergies", "budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes", "preferredStops"]);
   if (!value || Array.isArray(value) || typeof value !== "object" || value.version !== 1 ||
       Object.keys(value).some(k => !fields.has(k)) || typeof value.preferences !== "string" || value.preferences.length > 4000)
     throw new SenderError("Invalid saved context.");
@@ -41,9 +41,13 @@ function contextJson(text: string) {
     if (n !== null && (typeof n !== "number" || !Number.isFinite(n) || n < 0 || n > (field === "budgetMaxPerPerson" ? 10000 : 1440)))
       throw new SenderError(`Invalid ${field}.`);
   }
+  const stops = value.preferredStops;
+  if (stops !== undefined && stops !== null && !(Number.isInteger(stops) && stops >= 1 && stops <= 5))
+    throw new SenderError("Invalid preferredStops.");
   return JSON.stringify({ version: 1, preferences: value.preferences.trim(), dietary, allergies,
     budgetMaxPerPerson: value.budgetMaxPerPerson, maxOutingMinutes: value.maxOutingMinutes,
-    ...(value.maxTravelMinutes !== undefined ? { maxTravelMinutes: value.maxTravelMinutes } : {}) });
+    ...(value.maxTravelMinutes !== undefined ? { maxTravelMinutes: value.maxTravelMinutes } : {}),
+    ...(stops !== undefined ? { preferredStops: stops } : {}) });
 }
 
 export const saveAccountContext = spacetimedb.reducer({ contextJson: t.string() }, (tx, args) => {
@@ -219,6 +223,29 @@ export const cancelHuddleInvitation = spacetimedb.reducer({ invitationId: t.stri
   if (invitation.status !== "pending") throw new SenderError("This invitation is no longer pending.");
   tx.db.huddle_invitation.id.update({ ...invitation, status: "cancelled" });
 });
+
+// Clear every finished invitation from this account's Inbox, either the ones
+// received or the ones sent. Pending ones stay: they still need an answer.
+export const clearInvitations = spacetimedb.reducer({ direction: t.string() }, (tx, { direction }) => {
+  const { account } = requireAccount(tx);
+  if (direction !== "incoming" && direction !== "outgoing") throw new SenderError("Choose received or sent invitations to clear.");
+  const rows = direction === "incoming"
+    ? Array.from(tx.db.huddle_invitation.toAccountId.filter(account.id))
+    : Array.from(tx.db.huddle_invitation.fromAccountId.filter(account.id));
+  for (const invitation of rows) {
+    if (invitation.status === "pending") continue;
+    const id = `${account.id}:${invitation.id}`;
+    if (!tx.db.invitation_dismissal.id.find(id))
+      tx.db.invitation_dismissal.insert({ id, accountId: account.id, invitationId: invitation.id });
+  }
+});
+
+export const my_dismissed_invitations = spacetimedb.view({ name: "my_dismissed_invitations", public: true },
+  t.array(t.row("MyDismissedInvitationRow", { invitationId: t.string().primaryKey() })), ctx => {
+    const account = accountFor(ctx.db, ctx.sender);
+    if (!account) return [];
+    return Array.from(ctx.db.invitation_dismissal.accountId.filter(account.id)).map(d => ({ invitationId: d.invitationId }));
+  });
 
 export const runInvitationExpiryJob = spacetimedb.procedure(
   { onSchedule: invitation_expiry_job }, { job: invitation_expiry_job.rowType }, t.unit(),

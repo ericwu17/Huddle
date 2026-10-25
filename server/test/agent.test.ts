@@ -215,16 +215,40 @@ describe("single coordinator flow", () => {
     }
   });
 
+  it("saves a 1–5 stop preference and rejects other stop counts", () => {
+    const s = setup();
+    expect(JSON.parse(s.save(0).resultJson!).hard.preferredStops).toBeNull();
+    expect(JSON.parse(s.save(0, { preferredStops: 5 }).resultJson!).hard.preferredStops).toBe(5);
+    const saved = s.save(0, { preferredStops: 2 });
+    expect(JSON.parse(saved.resultJson!).hard.preferredStops).toBe(2);
+    for (const preferredStops of [0, 6, 1.5, "2"]) {
+      const structuredJson = JSON.stringify({ budgetMaxPerPerson: null, maxOutingMinutes: null, dietary: [], allergies: [], preferredStops });
+      expect(() => s.reduce(s.users[0].auth, tx => api.saveAgentPreferences(tx, { text: "", structuredJson }))).toThrow();
+      expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.revision).toBe(saved.revision);
+    }
+  });
+
+  it("keeps preferredStops soft when a valid outing has fewer venues", () => {
+    const s = setup();
+    s.save(0, { preferredStops: 5 }); s.save(1, { preferredStops: 4 });
+    const runId = s.plan();
+    expect(s.captured().members.map((member: any) => member.needs.hard.preferredStops)).toEqual([5, 4]);
+    expect(s.test.db.plan_run.runId.find(runId)?.status).toBe("done");
+    s.vote(0, runId); s.vote(1, runId);
+    expect(api.my_votes(s.test.viewContext(s.users[0].auth))).toHaveLength(2);
+    expect(api.createResultShare(s.proc(s.users[0].auth), { runId, planId: "choice-1" }).shareId).toMatch(/^share_/);
+  });
+
   it("automatically becomes ready after text interpretation while preserving controls the service drops", () => {
     const s = setup();
-    s.save(0, { budgetMaxPerPerson: 20, maxOutingMinutes: 180, dietary: ["vegetarian"], allergies: ["peanuts"] }, "quiet please");
+    s.save(0, { budgetMaxPerPerson: 20, maxOutingMinutes: 180, preferredStops: 3, dietary: ["vegetarian"], allergies: ["peanuts"] }, "quiet please");
     expect(s.test.db.agent_need.memberId.find(s.users[0].id)?.confirmed).toBe(false);
     const job = [...s.test.db.agent_needs_job.iter()].at(-1)!;
     s.extraction(needs(50));
     api.runAgentNeedsJob(s.proc(), { job });
     const saved = s.test.db.agent_need.memberId.find(s.users[0].id)!;
     expect(saved.confirmed).toBe(true);
-    expect(JSON.parse(saved.resultJson!).hard).toMatchObject({ budgetMaxPerPerson: 20, maxOutingMinutes: 180,
+    expect(JSON.parse(saved.resultJson!).hard).toMatchObject({ budgetMaxPerPerson: 20, maxOutingMinutes: 180, preferredStops: 3,
       dietary: ["vegetarian"], allergies: ["peanuts"] });
     expect(s.test.db.member.id.find(s.users[0].id)?.ready).toBe(true);
   });
@@ -274,6 +298,21 @@ describe("single coordinator flow", () => {
     expect(() => api.doRoulette(s.proc(s.users[0].auth), { runId: run })).toThrow();
     api.runCallJob(s.proc(), { job });
     expect(s.test.db.booking.id.find(job.bookingId)?.status).toBe("failed");
+  });
+
+  it("keeps each vote secret until everyone has voted, then reveals the whole ballot", () => {
+    const s = setup(); s.ready(); const runId = s.plan();
+    const view = (i: number) => api.my_votes(s.test.viewContext(s.users[i].auth));
+    s.vote(0, runId, "choice-1");
+    // The voter sees their own choice; the other phone only learns THAT someone voted.
+    expect(view(0).map(v => [v.memberId, v.planId])).toEqual([[s.users[0].id, "choice-1"]]);
+    expect(view(1).map(v => [v.memberId, v.planId])).toEqual([[s.users[0].id, "hidden"]]);
+    expect(JSON.stringify(view(1))).not.toContain("choice-");
+    s.vote(1, runId, "choice-2");
+    expect(view(1).map(v => v.planId).sort()).toEqual(["choice-1", "choice-2"]);
+    expect(view(0).map(v => v.planId).sort()).toEqual(["choice-1", "choice-2"]);
+    // Changing a vote before the ballot completes is also kept private; stored rows are unchanged.
+    expect(s.test.db.vote.count()).toBe(2n);
   });
 
   it("requires a full vote, a winning current plan, and host-only explicit booking", () => {

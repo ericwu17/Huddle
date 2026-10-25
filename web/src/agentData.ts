@@ -6,7 +6,7 @@ import type { PlanStop } from "./types";
 export type AgentHard = {
   budgetMaxPerPerson: number | null; dietary: string[]; allergies: string[];
   vetoCuisines: string[]; vetoCategories: string[]; rejectedTerms: string[]; maxTravelMinutes: number | null;
-  maxOutingMinutes: number | null;
+  maxOutingMinutes: number | null; preferredStops?: number | null;
 };
 export type AgentNeedsResult = { hard: AgentHard; preferences: string[]; questions: string[]; warnings: string[] };
 export type AgentNeeds = { memberId: string; text: string; revision: number; result: AgentNeedsResult | null; confirmed: boolean; error?: string };
@@ -40,7 +40,7 @@ export function useAgentNeeds(): AgentNeeds | null | undefined {
   }, [rows, ready]);
 }
 
-export type AgentStructuredPreferences = { budgetMaxPerPerson: number | null; maxOutingMinutes: number | null; dietary: string[]; allergies: string[]; maxTravelMinutes?: number | null };
+export type AgentStructuredPreferences = { budgetMaxPerPerson: number | null; maxOutingMinutes: number | null; dietary: string[]; allergies: string[]; maxTravelMinutes?: number | null; preferredStops?: number | null };
 export function useAgentPreferences() {
   const [rows, ready] = useTable(tables.myAgentPreferences);
   return useMemo(() => ready ? rows[0] ? { ...rows[0], structured: JSON.parse(rows[0].structuredJson) as AgentStructuredPreferences } : null : undefined, [rows, ready]);

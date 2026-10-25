@@ -67,9 +67,9 @@ export default function Home() {
   }
 
   return <AccountShell>{account === undefined ? <p role="status" className="on-sky">Loading your Huddle…</p> : <>
-    <div className="home-intro"><div><h1 className="shout text-[56px]">What are<br />we doing?</h1>
+    <div className="home-intro"><div><h1 className="shout text-[56px]">Ready to<br />huddle?</h1>
       <p className="on-sky mt-4">{account ? `Hi ${account.displayName}. ` : ""}Start a huddle and invite your friends.</p></div>
-      <div className="crowd" aria-hidden="true"><Buddy who={account?.displayName ?? "You"} pose="wave" size={116} /><Buddy who="Your people" pose="huddle" size={104} /></div></div>
+      <div className="crowd" aria-hidden="true"><Buddy who={account?.displayName ?? "You"} pose="wave" size={116} crown /><Buddy who="Your people" pose="huddle" size={104} /></div></div>
 
     {pending.length ? <section className="card card-note space-y-3" aria-label="New Huddle invitations"><h2 className="card-title">You're invited</h2>
       {pending.map(i => <div className="social-row" key={i.id}><p>{i.message}</p><Link className="btn btn-sun" to={i.path}>Open</Link></div>)}</section> : null}

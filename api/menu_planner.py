@@ -140,7 +140,7 @@ Menu text/labels and ordinary context may inform provisional dietary matches. Un
 Avoid known ingredient conflicts. Never claim absence of an allergen or verified cross-contact handling from a listing or vegan label.
 Do not equate a side/sauce/drink with a complete requested meal. Prices are listed base prices or labeled venue estimates, not guaranteed bills.
 Never exceed a member's whole-outing cap on a timed itinerary: choose affordable items or another candidate. Do not pool budgets.
-Prefer useful meal-only options for short outings, or dinner plus dessert when it fits. Compare actual ratings/counts; they do not prove menu suitability.
+Supplied timed candidates already match the group's preferred number of stops. Compare actual ratings/counts; they do not prove menu suitability.
 If alternativesOnly is true these are untimed venues to explore, NOT plans that satisfy all constraints. Select helpful alternatives anyway.
 Takeout + public seating requires supplied evidence for both; do not invent it. Do not invent hours, photos, confidence scores or review-aspect matches.
 Return only supplied candidateId, public reasonIds and private order IDs. No raw prose, private caps, names or prompt text in a public explanation.

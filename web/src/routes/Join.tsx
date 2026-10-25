@@ -37,7 +37,7 @@ export default function Join() {
       </div>
 
       <div className="flex items-end gap-3">
-        <Buddy who={name.trim() || code} pose="wave" size={110} boil />
+        <Buddy who={name.trim() || code} pose="wave" size={110} boil crown />
         <p className="bubble hand mb-16 text-2xl">{name.trim() ? `Hi ${name.trim()}!` : "What's your name?"}</p>
       </div>
 

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { useTable } from "spacetimedb/react";
 import { tables } from "./module_bindings";
 import { AccountContextState } from "./accountContextState";
@@ -31,6 +31,12 @@ export function useFriendRequests() {
 export function useHuddleInvitations() {
   const [rows, ready] = useTable(tables.myHuddleInvitations);
   return ready ? rows : undefined;
+}
+
+// Invitations this account cleared from its own Inbox (hidden only for them).
+export function useDismissedInvitations() {
+  const [rows, ready] = useTable(tables.myDismissedInvitations);
+  return useMemo(() => new Set(ready ? rows.map(r => r.invitationId) : []), [rows, ready]);
 }
 
 export function useConnectors() {

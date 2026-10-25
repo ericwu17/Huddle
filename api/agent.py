@@ -54,7 +54,7 @@ def merge_input(body: AgentNeedsRequest, result: AgentNeeds) -> AgentNeeds:
             if field not in structured.model_fields_set and previous:
                 explicit = getattr(previous, field)
             setattr(result.hard, field, _unique([*explicit, *getattr(result.hard, field)]))
-        for field in ("budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes"):
+        for field in ("budgetMaxPerPerson", "maxOutingMinutes", "maxTravelMinutes", "preferredStops"):
             value = getattr(structured, field)
             if value is not None:
                 setattr(result.hard, field, value)
@@ -116,6 +116,7 @@ Structured is the member's explicit controls. Preserve every structured dietary 
 The budget slider is the WHOLE outing cost per person, never a per-stop budget.
 maxOutingMinutes is the entire outing's elapsed duration, including travel/waiting BETWEEN stops.
 maxTravelMinutes is only the trip from their starting location TO THE FIRST stop. Never confuse them.
+preferredStops is the member's preferred number of venues (1-5), a soft preference. Set it only when explicitly stated.
 Null/omitted choices mean flexible on a first submission; don't invent restrictions or questions.
 Explicit 'no allergies' means no stated allergy, not an unresolved allergy question.
 Known allergies can be saved without a confirmation question; venue evidence is checked during planning.
@@ -208,7 +209,21 @@ def candidates(catalog: Catalog, body: AgentPlanRequest) -> dict[str, AgentPlan]
                not set(m.needs.hard.dietary).issubset(catalog.places[catalog.index[s.placeId]].dietary)
                for s in stops) for m in body.members):
             plan.status = "provisional"
-    return plans
+    return nearest_stop_count(plans, body.members)
+
+
+def nearest_stop_count(plans: dict[str, AgentPlan], members) -> dict[str, AgentPlan]:
+    """Keep feasible plans whose stop count is nearest the stated preferences' mean.
+
+    A soft preference: Flexible members are left out, and when the nearest
+    count has no feasible itinerary the next nearest feasible count is kept.
+    """
+    wanted = [m.needs.hard.preferredStops for m in members if m.needs.hard.preferredStops is not None]
+    if not wanted or not plans:
+        return plans
+    mean = sum(wanted) / len(wanted)
+    best = min(abs(len(plan.stops) - mean) for plan in plans.values())
+    return {key: plan for key, plan in plans.items() if abs(len(plan.stops) - mean) == best}
 
 
 def public_facts(catalog: Catalog, plan: AgentPlan) -> dict[str, str]:

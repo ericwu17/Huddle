@@ -49,6 +49,16 @@ export function PreferenceFields({ value, onChange, prefix = "needs", budgetCeil
             value={value.maxOutingMinutes} onChange={e => update({ maxOutingMinutes: Math.max(0, Number(e.target.value)) })} /></div>
       </>}
     </fieldset>
+    <fieldset className="preference-field space-y-3">
+      <legend className="font-bold">Number of stops</legend>
+      <p className="muted">The group plan aims for the average of everyone's choice. 1 is a meal; 2 adds dessert or an activity; 3 is a meal, activity and dessert. Plans currently have at most 3 stops, so 4 or 5 asks for the longest outing available.</p>
+      <label className="check"><input type="checkbox" checked={value.preferredStops !== null}
+        onChange={e => update({ preferredStops: e.target.checked ? 2 : null })} />Choose a number of stops</label>
+      {value.preferredStops === null ? <p className="sticker">Flexible</p> :
+        <div className="flex flex-wrap gap-2">{[1, 2, 3, 4, 5].map(n => <label key={n} className={`diet-chip ${value.preferredStops === n ? "selected" : ""}`}>
+          <input type="radio" name={`${prefix}-stops`} checked={value.preferredStops === n} onChange={() => update({ preferredStops: n })} />{n} stop{n === 1 ? "" : "s"}
+        </label>)}</div>}
+    </fieldset>
     <fieldset className="space-y-3"><legend className="font-bold">Dietary requirements</legend>
       <p className="muted">Leave unselected if you are open to anything. These are requirements, not cuisine preferences.</p>
       <div className="flex flex-wrap gap-2">{DIETARY_CHOICES.map(([id, label]) => <label key={id} className={`diet-chip ${value.dietary.includes(id) ? "selected" : ""}`}>

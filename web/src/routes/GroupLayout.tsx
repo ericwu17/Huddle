@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link, Outlet, useLoaderData, useLocation, useNavigate } from "react-router";
-import { useGroupState, useLatestBooking, useMyPrivate } from "../data";
+import { useGroupState, useLatestBooking, useMyPrivate, useVotes } from "../data";
+import { readinessFor, stepOf } from "../readiness";
 import type { Session } from "../session";
 import type { GroupStatus } from "../types";
 import type { GroupContext } from "../groupContext";
@@ -138,8 +139,8 @@ export default function GroupLayout() {
             huddle
           </a>
         </header>
-        <span className="me-tag on-sky">
-          <Buddy who={session.name} size={40} />
+        <span className="me-tag">
+          <Buddy who={session.name} size={56} crown />
           <span>
             {session.name}
             {ctx.isHost && <span className="sticker sticker-sun ml-1.5">host</span>}
@@ -169,18 +170,21 @@ export default function GroupLayout() {
 
 // Desktop only: joined people and their public readiness.
 function SidebarPeople({ ctx }: { ctx: GroupContext }) {
-  const { group, agent, session } = ctx;
+  const { group, session } = ctx;
+  const { pathname } = useLocation();
+  const step = stepOf(pathname);
+  const votes = useVotes(group.latestRunId, session.memberId);
   return (
     <section className="sidebar-people card" aria-label="Who's in">
       <h2 className="card-title">Your people</h2>
       <ul className="sidebar-members">
         {group.members.map((m) => {
-          const ready = agent ? agent.confirmedMemberIds.includes(m.id) : m.ready;
+          const { ready, label } = readinessFor(step, ctx, m.id, votes);
           return (
             <li key={m.id}>
               <Buddy who={m.name} pose={ready ? "huddle" : "idle"} size={30} />
               <span className="min-w-0 flex-1 truncate">{m.id === session.memberId ? `${m.name} (you)` : m.name}</span>
-              <span className={`sticker ${ready ? "sticker-lime" : ""}`}>{ready ? "ready" : "…"}</span>
+              <span className={`sticker ${ready ? "sticker-lime" : ""}`}>{label}</span>
             </li>
           );
         })}

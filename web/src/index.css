@@ -223,9 +223,11 @@ textarea.input { font-family: var(--hand); font-size: 22px; line-height: 1.2; re
 
 /* ---- Group shell ---- */
 .topbar { display: flex; align-items: center; gap: 12px; }
-.logo { font-family: var(--display); font-size: 30px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--ink); }
+.logo { font-family: var(--display); font-size: 42px; line-height: 1; text-transform: uppercase; color: #fff; text-decoration: none; -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--ink); }
+@media (max-width: 560px) { .logo { font-size: 34px; } }
 .code-tag { padding: 2px 12px; border-radius: 12px; background: var(--paper); color: var(--ink); border: 3px solid var(--ink); font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; box-shadow: 3px 3px 0 var(--ink); }
 .me-tag { margin-left: auto; display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
+.group-sidebar .me-tag { margin-left: 0; align-self: start; gap: 8px; padding: 6px 14px 4px 10px; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 2px 3px 0 var(--ink); }
 
 .steps {
   display: flex;
