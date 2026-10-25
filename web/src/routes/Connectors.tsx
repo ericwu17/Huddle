@@ -8,37 +8,17 @@ import AccountShell, { AccountRequired } from "../components/AccountShell";
 import { useRun } from "../useRun";
 import MacContactsConnector from "../components/MacContactsConnector";
 
-type ConnectorConfiguration = { googleConfigured: boolean; messagesConfigured: boolean; externalInvitesConfigured: boolean; googleCallbackUrl?: string };
-type ConnectorSettings = { messageEnabled: boolean; messageDestination: string; messageStatus: string; calendarStatus: string; calendarEmail?: string; calendarEventConsent: boolean; calendarError?: string };
+type ConnectorConfiguration = { googleConfigured: boolean; googleCallbackUrl?: string };
+type ConnectorSettings = { calendarStatus: string; calendarEmail?: string; calendarEventConsent: boolean; calendarError?: string };
 
 function ConnectorForm({ initial, configuration }: { initial: ConnectorSettings | null; configuration: ConnectorConfiguration | null }) {
-  const saveMessages = useReducer(reducers.saveMessageConnector);
   const disconnect = useReducer(reducers.disconnectGoogleCalendar);
   const eventConsent = useReducer(reducers.setCalendarEventConsent);
   const connect = useProcedure(procedures.startGoogleCalendar);
   const { run, busy, error } = useRun();
-  const [enabled, setEnabled] = useState(initial?.messageEnabled ?? false);
-  const [destination, setDestination] = useState(initial?.messageDestination ?? "");
   const [notice, setNotice] = useState("");
-  const messagesReady = !!configuration?.messagesConfigured && !!configuration.externalInvitesConfigured;
   const calendarConnected = initial?.calendarStatus === "connected";
   return <div className="space-y-6">
-    <section className="card space-y-4" aria-label="Messages connector">
-      <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Text invites</h2>
-        <span className={`sticker ${messagesReady ? "sticker-lime" : ""}`}>{configuration === null ? "Checking…" : messagesReady ? "Ready" : "Not set up"}</span></div>
-      <p>Get invites in Messages, sent from Max’s Mac.</p>
-
-      {!messagesReady && configuration ? <p className="card-note rounded-xl p-3">Text invites aren’t set up yet. Your Huddle inbox still works.</p> : null}
-      <form className="space-y-4" onSubmit={e => { e.preventDefault(); void run(async () => {
-        await saveMessages({ enabled, destination }); setNotice(enabled ? "Text invites are on." : "Text invites are off.");
-      }); }}>
-        <label className="block font-bold" htmlFor="message-destination">Phone number or Apple ID email</label>
-        <input id="message-destination" className="input" type="text" autoComplete="off" maxLength={254} value={destination} onChange={e => setDestination(e.target.value)} placeholder="+15105551234 or your Apple ID email" required={enabled} />
-        <label className="check"><input type="checkbox" checked={enabled} disabled={busy || (!messagesReady && !enabled)} onChange={e => setEnabled(e.target.checked)} />Send invites here</label>
-        <button className="btn btn-sun" disabled={busy}>Save settings</button>
-      </form>
-      <p className="muted">Delivery isn’t guaranteed. Invites also appear in your Huddle inbox.</p>
-    </section>
     <section className="card space-y-4" aria-label="Google Calendar connector">
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Google Calendar</h2><span className={`sticker ${calendarConnected ? "sticker-lime" : ""}`}>{calendarConnected ? "Connected" : initial?.calendarStatus === "pending" ? "Connecting…" : "Not connected"}</span></div>
       <p>Find a shared time using your primary calendar’s availability. Event details stay hidden.</p>
