@@ -22,7 +22,7 @@ breakdown, suggested owners and solo-test commands.
 its current public URL is `https://roughly-metabolism-representing-harmony.trycloudflare.com`.
 The additive module is published to `huddle-calhacks` with `STUB_MODE=false`, no
 data reset, and existing shared secret/unrelated settings preserved. The updated
-Vercel UI is `https://huddle-two-neon.vercel.app/login`; account/catalog source
+Vercel UI is `https://huddle.compare/login`; account/catalog source
 `a029fb6` is activated. Keep the shared API, tunnel and Mac awake; Vite is not
 required for Vercel. The 130-venue rollout preserved 26 existing groups, 57
 members and 17 plan runs. Shared verification passed 41 connected, 14 OAuth and

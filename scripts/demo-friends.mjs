@@ -108,7 +108,7 @@ for (const name of names) {
       if (/no group with that code/i.test(String(e.message))) {
         console.error(`\nNo huddle with code ${code} on ${DB}.`);
         console.error("Use the 4 letters shown on your phone's lobby screen (not the ABCD example),");
-        console.error("and start the huddle on the same site the friends join (the Vercel link uses huddle-calhacks).");
+        console.error("and start the huddle on the same site the friends join (huddle.compare uses huddle-calhacks).");
       } else {
         console.error(`\nCould not join: ${e.message}`);
       }

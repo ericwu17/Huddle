@@ -55,7 +55,7 @@ route names, AM/PM times, ratings/photos and private orders with known menu pric
 source/confirmation boilerplate and unknown price estimates are hidden.
 
 Max authorized and completed the shared activation from `a029fb6` after its main
-push. Vercel `https://huddle-two-neon.vercel.app` now uses the updated shared
+push. Vercel (`https://huddle.compare`) now uses the updated shared
 module/API and 130 real venues. All original groups/members/plan identifiers
 survived; the shared rollout passed 41 connected, 14 OAuth and 30 browser checks.
 Preview accounts remain separate in `huddle-account-max-check`/local port 5174. See

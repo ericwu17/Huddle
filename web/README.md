@@ -4,7 +4,7 @@ React 19 + React Router v7 (data mode, `createBrowserRouter`) + Vite + Tailwind.
 
 ## Current direction October 24
 
-**Shared activation complete:** `https://huddle-two-neon.vercel.app/login` now
+**Shared activation complete:** `https://huddle.compare/login` now
 uses the updated `huddle-calhacks` module and 130 real venues, with shared API
 source `a029fb6`. The actual desktop/mobile Vercel account flow passed 30 checks.
 Create shared accounts there; isolated-preview accounts are separate. Texting

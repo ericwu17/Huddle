@@ -14,7 +14,7 @@ show only known menu prices. See MENU_RECOMMENDATIONS.md for the current contrac
 
 Updated October 24, 2026 after the authorized shared rollout. Accounts,
 invitations, private context, preference sliders and the 130-venue catalog are
-active on [Vercel](https://huddle-two-neon.vercel.app/login) with shared Maincloud
+active on [huddle.compare](https://huddle.compare/login) with shared Maincloud
 `huddle-calhacks`; the initial account foundation was `a029fb6`, with the newer
 menu extension and UI reconciliation now merged. The shared API remains on Max's Mac, port
 8000, through the existing public tunnel. Original rows and secret/settings

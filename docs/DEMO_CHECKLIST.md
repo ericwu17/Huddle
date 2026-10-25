@@ -18,7 +18,7 @@ that future features already work. Current integration details: [HANDOFF.md](HAN
 
 ## Before the rehearsal
 
-- [ ] Agree on the exact build to demo and record the deployed Vercel URL.
+- [ ] Agree on the exact build to demo on the deployed site, `https://huddle.compare`.
 - [ ] Eric Wu confirms which API features are real and which remain stubs.
 - [ ] Record that status in [HONESTY.md](HONESTY.md) and keep visible demo labels accurate.
 - [ ] Verify API/voice health, current tunnel URLs and shared-secret matching.
@@ -63,7 +63,7 @@ It creates disposable synthetic groups; it does not replace the browser rehearsa
 ## Three-minute script (coordinator flow; rehearse with a clock)
 
 This script follows the current account → invite → private needs → coordinator
-plans → vote → booking simulation flow on [Vercel](https://huddle-two-neon.vercel.app/start)
+plans → vote → booking simulation flow on [huddle.compare](https://huddle.compare/start)
 and shared Maincloud `huddle-calhacks`. Owners are carried over from the earlier
 draft; confirm them at rehearsal. Screen names in quotes are the UI's own labels.
 

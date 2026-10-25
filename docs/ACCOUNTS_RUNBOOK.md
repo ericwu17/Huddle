@@ -42,7 +42,7 @@ joined menu snapshot after updating both committed data files.
 ## Initial account foundation release — October 24, 2026
 
 The initial account/catalog release `a029fb6` activated shared Maincloud
-**`huddle-calhacks`**, with [Vercel login](https://huddle-two-neon.vercel.app/login).
+**`huddle-calhacks`**, with [Huddle login](https://huddle.compare/login).
 The public frontend was already deployed from that commit. The shared API was
 restarted from it on Max's Mac, port **8000**, behind the existing tunnel
 `https://roughly-metabolism-representing-harmony.trycloudflare.com`.
@@ -83,7 +83,7 @@ Restart **only the shared API** from the repo root, preserving the current
 secret and stable connector encryption key in `api/.env`:
 
 ```sh
-HUDDLE_FRONTEND_BASE_URL=https://huddle-two-neon.vercel.app \
+HUDDLE_FRONTEND_BASE_URL=https://huddle.compare \
 HUDDLE_MESSAGES_ENABLED=false \
 HUDDLE_MAC_CONTACTS_ENABLED=false \
 GOOGLE_REDIRECT_URI=https://roughly-metabolism-representing-harmony.trycloudflare.com/connectors/google/callback \
@@ -95,7 +95,7 @@ SPACETIMEDB_DB=huddle-calhacks \
 Keep the existing API tunnel and Mac awake. Restarting the tunnel creates a new
 URL: update only shared `FASTAPI_BASE_URL`, the API's `GOOGLE_REDIRECT_URI` and
 the OAuth client's registered URI together. Keep invitation frontend origin
-`https://huddle-two-neon.vercel.app`. Never point this shared API at the preview
+`https://huddle.compare`. Never point this shared API at the preview
 database or copy preview credential/session state into production.
 
 Shared checks (synthetic accounts, no external writes):
@@ -106,7 +106,7 @@ Shared checks (synthetic accounts, no external writes):
 SPACETIMEDB_URI=https://maincloud.spacetimedb.com \
 SPACETIMEDB_DB=huddle-calhacks \
 FASTAPI_BASE_URL=https://roughly-metabolism-representing-harmony.trycloudflare.com \
-PUBLIC_FRONTEND_BASE_URL=https://huddle-two-neon.vercel.app \
+PUBLIC_FRONTEND_BASE_URL=https://huddle.compare \
 node scripts/connectors-smoke.mjs
 ```
 
