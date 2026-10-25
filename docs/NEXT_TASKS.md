@@ -1,5 +1,12 @@
 # Current task: accounts, preferences and coordinator polish (in progress)
 
+Option comparison and map update: Plans/Vote label evidence-backed differences
+in ratings, owner-private total cost, inter-stop travel and variety. Options,
+Done and shared results open Google Maps with the blue underlined **Click here
+to see the map!** action. The key-free URL phase is implemented; paid routing,
+embedded Google Maps and context-based adventurousness remain follow-ups in
+[GOOGLE_MAPS_PLAN.md](GOOGLE_MAPS_PLAN.md).
+
 New result flow: complete voting opens Done with the chosen route/date/time and
 owner-private menu order. Calendar actions and an explicit public result link
 live there; re-voting stays available. Shared links exclude all private orders
