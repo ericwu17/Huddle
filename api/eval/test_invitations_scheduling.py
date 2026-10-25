@@ -14,7 +14,7 @@ class Model:
     available = True
     def __init__(self, data=None): self.data=data; self.calls=0; self.context=None
     async def call(self, role, system, user, schema, model, timeout, **kwargs):
-        self.calls+=1; self.context=json.loads(user)
+        self.calls+=1; self.context=json.loads(user); self.system=system
         data=self.data or {"slotId": next(iter(self.context['openings']))}
         kwargs['check'](data)
         return data
@@ -55,6 +55,39 @@ class InviteTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.ambiguousNames,['Alex']);self.assertFalse(result.friendAccountIds)
 
 class ScheduleTests(unittest.IsolatedAsyncioTestCase):
+    def test_legacy_member_defaults_to_flexible_and_unknown_time_preference_is_rejected(self):
+        self.assertTrue(all(member.timeOfDay == "flexible" for member in schedule().members))
+        data = schedule().model_dump()
+        data["members"][1]["timeOfDay"] = "sometime"
+        with self.assertRaises(ValidationError):
+            CalendarScheduleRequest.model_validate(data)
+
+    async def test_all_personal_time_preferences_reach_claude_and_stay_out_of_public_response(self):
+        body = schedule()
+        body.members[0].timeOfDay = "morning"
+        body.members[1].timeOfDay = "evening"
+        model = Model()
+        result = await choose_time(Calendar(availability()), model, body)
+        self.assertTrue(result.ok)
+        self.assertEqual([member["timeOfDay"] for member in model.context["members"]], ["morning", "evening"])
+        self.assertIn("EVERY participant", model.system)
+        self.assertIn("soft preferences", model.system)
+        self.assertNotIn("timeOfDay", result.model_dump_json())
+        self.assertNotIn("PRIVATE_REQUEST", result.model_dump_json())
+
+    async def test_conflicting_preferences_do_not_relax_busy_periods_or_meal_hours(self):
+        body = schedule(venues=[venue(intervals=[["17:00", "19:00"]])])
+        body.members[0].timeOfDay = "morning"
+        body.members[1].timeOfDay = "afternoon"
+        busy = availability()
+        busy[1]["busy"] = [{"start": "2030-01-02T01:00:00Z", "end": "2030-01-02T02:00:00Z"}]
+        model = Model()
+        result = await choose_time(Calendar(busy), model, body)
+        self.assertTrue(result.ok)
+        self.assertEqual((result.chosen.windowStart, result.chosen.windowEnd), ("18:00", "19:00"))
+        self.assertTrue(all(slot["windowStart"] >= "18:00" and slot["windowEnd"] <= "19:00"
+                            for slot in model.context["openings"].values()))
+
     def test_flexible_week_search_keeps_daytime_and_evening_openings_for_claude(self):
         body = schedule(timeMin='2030-01-01T08:00:00Z',timeMax='2030-01-08T08:00:00Z',dayStart='00:00',dayEnd='23:59',durationMinutes=90)
         rows = CalendarAvailabilityResponse.model_validate({'availability':availability(),'updatedConnections':[]}).availability
