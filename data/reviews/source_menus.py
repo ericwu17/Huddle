@@ -17,6 +17,13 @@ without pypdf they are recorded as unread links. PDFs are fetched directly in ei
 Menus that live only in ordering apps (DoorDash, Clover, Toast, ...) are JavaScript we cannot
 read; the record names the app instead of claiming there is no menu.
 
+context.dev (contextdev.py) covers those blind spots when asked. With a context.dev client,
+a page the primary mode could not fetch, or fetched as an empty JavaScript shell, is fetched
+again browser-rendered; and before settling for "menu_in_ordering_app", up to two ordering-app
+links are read the same way. Its pages carry mode "contextdev" and go through the same
+extraction and verification, so the record format does not change. --fetch contextdev uses it
+for every page instead.
+
 Runs under api/.venv with data/reviews/requirements.txt (anthropic, pypdf); everything else in
 data/reviews is standard library.
 """
@@ -33,8 +40,10 @@ import urllib.request
 from html.parser import HTMLParser
 
 from brightdata import BrightDataError, Client, env_value, now_iso
+from contextdev import ContextDev
 
 MAX_CHARS = 60000  # per page sent to Claude; longer pages are cut and marked truncated
+MIN_TEXT = 40  # fewer readable characters means a JavaScript app shell or an empty page
 USER_AGENT = "HuddleMenuCheck/0.1 (hackathon prototype; one request per page)"
 SKIP_TAGS = {"script", "style", "noscript", "svg", "template", "iframe"}
 BLOCK_TAGS = {"p", "div", "li", "tr", "br", "h1", "h2", "h3", "h4", "h5", "h6", "section", "article", "td",
@@ -143,10 +152,33 @@ def is_pdf(url: str) -> bool:
     return urllib.parse.urlparse(url).path.lower().endswith(".pdf")
 
 
-def fetch(url: str, mode: str, client: Client | None = None, zone: str | None = None) -> dict:
-    """{"url", "fetchedAt", "mode", "html" | "text"} or {"url", "error"}; never raises for one bad site."""
+def unreadable(page: dict) -> bool:
+    return "error" in page or ("html" in page and len(page_text(page["html"])[0].strip()) < MIN_TEXT)
+
+
+def fetch(url: str, mode: str, client: Client | None = None, zone: str | None = None,
+          cd: ContextDev | None = None) -> dict:
+    """{"url", "fetchedAt", "mode", "html" | "text"} or {"url", "error"}; never raises for one bad site.
+
+    With a context.dev client, a page the primary mode could not read is tried once more through
+    context.dev; its result replaces the primary one only when it is readable."""
+    page = fetch_once(url, mode, client, zone, cd)
+    if cd is not None and mode != "contextdev" and not is_pdf(url) and unreadable(page):
+        alt = fetch_once(url, "contextdev", cd=cd)
+        if not unreadable(alt):
+            return alt
+    return page
+
+
+def fetch_once(url: str, mode: str, client: Client | None = None, zone: str | None = None,
+               cd: ContextDev | None = None) -> dict:
     if is_pdf(url):
         return fetch_pdf(url)
+    if mode == "contextdev":
+        body, reason = cd.scrape_html(url)
+        if reason:
+            return {"url": url, "mode": mode, "error": reason}
+        return {"url": url, "mode": mode, "fetchedAt": now_iso(), "html": body}
     if mode == "unlocker":
         try:
             status, body = client.api("/request", {"zone": zone, "url": url, "format": "raw"}, timeout=90)
@@ -203,6 +235,17 @@ def menu_links(base: str, links: list[tuple[str, str]], limit: int = 3) -> list[
         url = urllib.parse.urljoin(base, html.unescape(href)).split("#")[0]
         if url.startswith(("https://", "http://")) and url not in out and url.rstrip("/") != base.rstrip("/"):
             out.append(url)
+    return out[:limit]
+
+
+def app_links(base: str, links: list[tuple[str, str]], limit: int = 2) -> list[str]:
+    """Absolute links to ordering apps (Toast, Clover, ...), where some venues keep their only menu."""
+    out = []
+    for href, _ in links:
+        if href and ORDERING_APPS.search(href):
+            url = urllib.parse.urljoin(base, html.unescape(href)).split("#")[0]
+            if url.startswith(("https://", "http://")) and url not in out:
+                out.append(url)
     return out[:limit]
 
 
@@ -288,30 +331,13 @@ def extract(text: str, venue: str, url: str) -> dict:
         return {"error": f"invalid reply: {e}"[:200]}
 
 
-def menu_for(venue: str, website: str | None, mode: str, client: Client | None = None,
-             zone: str | None = None) -> dict:
-    """One venue's menu record. Every outcome keeps its reason; nothing becomes an empty "no items"."""
-    record = {"status": "unknown", "website": website, "pages": [], "items": [], "legend": None,
-              "extractedAt": None, "model": env_value("CLAUDE_MODEL_SMART") or "claude-opus-5-5"}
-    if not website:
-        return {**record, "reason": "no website on the listing"}
-    home = fetch(website, mode, client, zone)
-    if "error" in home:
-        record["pages"].append({k: v for k, v in home.items() if k != "html"})
-        return {**record, "status": "fetch_failed", "reason": home["error"]}
-    text, links = page_text(home["html"]) if "html" in home else (home["text"], [])
-    candidates = [(home, text)]
-    for url in menu_links(home["url"], links):
-        page = fetch(url, mode, client, zone)
-        if "error" in page:
-            record["pages"].append({k: v for k, v in page.items() if k != "html"})
-        else:
-            candidates.append((page, text_of(page)))
+def read_pages(record: dict, candidates: list[tuple[dict, str]], venue: str) -> int:
+    """Extract and verify each fetched page into `record` (pages, items, legend). Returns items dropped."""
     dropped_total = 0
     for page, body in candidates:
         truncated = len(body) > MAX_CHARS
         info = {"url": page["url"], "fetchedAt": page["fetchedAt"], "mode": page["mode"], "truncated": truncated}
-        if len(body.strip()) < 40:  # a JavaScript app shell or an empty page: nothing to read
+        if len(body.strip()) < MIN_TEXT:  # a JavaScript app shell or an empty page: nothing to read
             record["pages"].append({**info, "error": "page has no readable text (likely rendered by JavaScript)"})
             continue
         result = extract(body[:MAX_CHARS], venue, page["url"])
@@ -326,12 +352,47 @@ def menu_for(venue: str, website: str | None, mode: str, client: Client | None =
                                 "unverifiedDropped": dropped, "duplicates": len(items) - len(fresh)})
         record["items"] += fresh
         record["legend"] = record["legend"] or legend
+    return dropped_total
+
+
+def menu_for(venue: str, website: str | None, mode: str, client: Client | None = None,
+             zone: str | None = None, cd: ContextDev | None = None) -> dict:
+    """One venue's menu record. Every outcome keeps its reason; nothing becomes an empty "no items"."""
+    record = {"status": "unknown", "website": website, "pages": [], "items": [], "legend": None,
+              "extractedAt": None, "model": env_value("CLAUDE_MODEL_SMART") or "claude-opus-5-5"}
+    if not website:
+        return {**record, "reason": "no website on the listing"}
+    home = fetch(website, mode, client, zone, cd)
+    if "error" in home:
+        record["pages"].append({k: v for k, v in home.items() if k != "html"})
+        return {**record, "status": "fetch_failed", "reason": home["error"]}
+    text, links = page_text(home["html"]) if "html" in home else (home["text"], [])
+    candidates = [(home, text)]
+    for url in menu_links(home["url"], links):
+        page = fetch(url, mode, client, zone, cd)
+        if "error" in page:
+            record["pages"].append({k: v for k, v in page.items() if k != "html"})
+        else:
+            candidates.append((page, text_of(page)))
+    dropped_total = read_pages(record, candidates, venue)
     record["extractedAt"] = now_iso()
     if record["items"]:
         return {**record, "status": "ok"}
     if any("extractError" in p for p in record["pages"]) and not any("isMenu" in p for p in record["pages"]):
         return {**record, "status": "extraction_failed", "reason": "Claude call failed on every page"}
     apps = sorted({m.group(1).lower() for h, _ in links if h and (m := ORDERING_APPS.search(h))})
+    if apps and cd is not None:  # context.dev renders the app page; same extraction and checks
+        app_pages = []
+        for url in app_links(home["url"], links):
+            page = fetch_once(url, "contextdev", cd=cd)
+            if "error" in page:
+                record["pages"].append({k: v for k, v in page.items() if k != "html"})
+            else:
+                app_pages.append((page, text_of(page)))
+        dropped_total += read_pages(record, app_pages, venue)
+        record["extractedAt"] = now_iso()
+        if record["items"]:
+            return {**record, "status": "ok"}
     if apps:
         return {**record, "status": "menu_in_ordering_app",
                 "reason": f"the site links its menu to an ordering app we cannot read ({', '.join(apps)})"}

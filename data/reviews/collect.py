@@ -39,6 +39,7 @@ DATA = HERE.parent
 sys.path.insert(0, str(DATA))
 
 import brightdata as bd  # noqa: E402
+import contextdev  # noqa: E402
 import details  # noqa: E402
 import fetch_places as fp  # noqa: E402
 import source_gmaps  # noqa: E402
@@ -795,29 +796,41 @@ def cmd_details(args) -> None:
                 google[gid] = result
                 write_json(places_path, google)
     if args.menus:
-        client = zone = None
+        client = zone = cd = None
         if args.fetch == "unlocker":
             zone = bd.env_value("BRIGHTDATA_UNLOCKER_ZONE")
             if not zone:
                 sys.exit("Set BRIGHTDATA_UNLOCKER_ZONE (a Web Unlocker zone name) or pass --fetch direct.")
             client = bd.Client(bd.load_key())
+        if args.fetch == "contextdev" or args.fallback:
+            cd_key = contextdev.load_key()
+            if not cd_key:
+                sys.exit("Set CONTEXT_DEV_API_KEY (environment or repo-root .env) for --fallback or --fetch contextdev.")
+            cd = contextdev.ContextDev(cd_key)
+        rerun = set()
         for t in targets:
             mkey = t.get("googlePlaceId") or t["id"]
-            if t["category"] == "activity" or (mkey in menus and not args.refresh):
+            cached = menus.get(mkey)
+            if t["category"] == "activity" or (cached and not args.refresh
+                                               and not (args.only_gaps and cached.get("status") != "ok")):
                 continue
             website = ((by_gid.get(t.get("googlePlaceId")) or {}).get("google") or {}).get("website")
             try:
-                menus[mkey] = source_menus.menu_for(t["name"], website, args.fetch, client, zone)
+                menus[mkey] = source_menus.menu_for(t["name"], website, args.fetch, client, zone, cd)
             except Exception as e:  # one bad site must not stop a long batch; the reason is kept
                 menus[mkey] = {"status": "fetch_failed", "website": website, "pages": [], "items": [], "legend": None,
                                "extractedAt": None, "reason": f"unexpected error: {type(e).__name__}: {e}"[:300]}
             m = menus[mkey]
+            rerun.add(t["id"])
             print(f"  menu: {t['name']}: {m['status']}, {len(m['items'])} items" + (f" ({m['reason']})" if m.get("reason") else ""))
             write_json(menus_path, menus)
     fetched = latest_fetches(read_json(OUT / "snapshots.json", []))
     order = {t["id"]: i for i, t in enumerate([v["place"] for v in snap["venues"]] if snap else targets)}
-    # A full run replaces the file (venues no longer in the catalog go); --only/--limit update in place.
-    out = {} if not (args.only or args.limit) else {d["id"]: d for d in read_json(OUT / "details.json", [])}
+    if args.menus and args.only_gaps:  # fill gaps without rebuilding every other venue's details
+        targets = [t for t in targets if t["id"] in rerun]
+    # A full run replaces the file (venues no longer in the catalog go); --only/--limit/--only-gaps update in place.
+    out = ({} if not (args.only or args.limit or (args.menus and args.only_gaps))
+           else {d["id"]: d for d in read_json(OUT / "details.json", [])})
     for t in targets:
         gid = t.get("googlePlaceId")
         out[t["id"]] = details.venue_details(t, by_gid.get(gid), google.get(gid), menus.get(gid or t["id"]),
@@ -891,6 +904,9 @@ def cmd_publish(args) -> None:
 
 
 def main() -> None:
+    # A venue name the Windows console code page cannot encode must not stop a paid batch.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("probe", help="list Bright Data's Yelp and Google Maps scrapers with their metadata")
@@ -921,8 +937,12 @@ def main() -> None:
     dt.add_argument("--limit", type=int, help="first N catalog venues")
     dt.add_argument("--no-places", dest="places", action="store_false", help="skip Google Places lookups")
     dt.add_argument("--no-menus", dest="menus", action="store_false", help="skip website menus")
-    dt.add_argument("--fetch", choices=["unlocker", "direct"], default="unlocker",
-                    help="how to fetch websites: Bright Data Web Unlocker (default) or plain HTTPS")
+    dt.add_argument("--fetch", choices=["unlocker", "direct", "contextdev"], default="unlocker",
+                    help="how to fetch websites: Bright Data Web Unlocker (default), plain HTTPS or context.dev")
+    dt.add_argument("--fallback", action="store_true",
+                    help="retry pages the fetch mode could not read, and ordering-app menus, through context.dev")
+    dt.add_argument("--only-gaps", action="store_true",
+                    help="re-run cached menus whose status is not ok (e.g. with --fallback); ok menus are kept")
     dt.add_argument("--photos", type=int, default=2, help="Google Places photos per venue")
     dt.add_argument("--refresh", action="store_true", help="look up again even when cached")
     sub.add_parser("build", help="rebuild data/brightdata/ from data/raw/ without calling the API")

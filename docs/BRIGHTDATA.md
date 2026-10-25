@@ -168,6 +168,32 @@ api/.venv/bin/python data/reviews/collect.py details --limit 20          # Place
 api/.venv/bin/python data/reviews/collect.py details --only p_006 --fetch direct --no-places
 ```
 
+### context.dev fallback for menu blind spots (optional)
+
+**Alternative, not adopted.** This lives only on the `alt/contextdev-menu-fallback` branch for reference. It is
+not merged into `main`, and nothing from it was published to the live catalog.
+
+Bright Data stays the primary source. `--fallback` adds context.dev (`data/reviews/contextdev.py`, key
+`CONTEXT_DEV_API_KEY` in the repo-root `.env`) for the pages it cannot read:
+- **Failed fetches:** a page the Web Unlocker (or `--fetch direct`) could not fetch is tried once more, browser-rendered.
+- **JavaScript shells:** a page with no readable text (an app shell) is also tried once more, browser-rendered.
+- **Ordering apps:** before a venue is recorded as `menu_in_ordering_app`, up to two of its ordering-app links (Toast, Clover, ...) are read the same way.
+
+Those pages carry `"mode": "contextdev"` and go through the same Claude extraction and verbatim-quote
+verification, so `menus.json` and `details.json` keep their format. PDFs are still read directly. `--only-gaps`
+re-runs only cached menus that are not `ok`, so the 51 extracted menus are not fetched or billed again.
+`--fetch contextdev` uses context.dev for every page instead. Each page costs one context.dev credit.
+
+```bash
+api/.venv/bin/python data/reviews/collect.py details --no-places --only-gaps --fallback   # fill blind spots only
+api/.venv/bin/python -m unittest data/reviews/test_contextdev.py                           # offline tests
+```
+
+On Windows the interpreter is `api\.venv\Scripts\python`. Create the venv with
+`python -m venv api\.venv`, then install `data\reviews\requirements.txt` into it; the scraper needs
+`anthropic==2.3.0`, so an older system install fails every extraction. For venues that already failed
+through Bright Data, `--fetch contextdev --only-gaps` skips paying Bright Data again and needs no Unlocker zone.
+
 ## Outputs
 
 - `data/raw/brightdata_<source>_<kind>_<time>.json` (gitignored): every raw response, along with what was asked.
