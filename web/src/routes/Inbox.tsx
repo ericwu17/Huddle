@@ -6,7 +6,6 @@ import { useAccount, useDismissedInvitations, useFriendRequests, useHuddleInvita
 import AccountShell, { AccountRequired } from "../components/AccountShell";
 import { useRun } from "../useRun";
 import InvitationDelivery from "../components/InvitationDelivery";
-import SendInvitationMessageButton from "../components/SendInvitationMessageButton";
 
 export default function Inbox() {
   const account = useAccount();
@@ -45,9 +44,7 @@ export default function Inbox() {
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="card-title">Invitations you sent</h2>
         <button className="btn" disabled={busy || !clearableOut} onClick={() => run(() => clear({ direction: "outgoing" }))}>Clear invitations</button></div>
       {outgoing.map(i => <div className="social-row" key={i.id}>
-      <div><p><strong>{i.toDisplayName}</strong> <span className="muted">@{i.toUsername}</span><br /><span className="muted">{i.groupName} · {i.status}</span></p><InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} /></div>
-      <SendInvitationMessageButton invitationId={i.id} pending={i.status === "pending"} status={deliveries?.find(d => d.invitationId === i.id)?.status} />
-      {i.status === "pending" ? <button className="btn" disabled={busy} onClick={() => run(() => cancel({ invitationId: i.id }))}>Cancel invitation</button> : null}
+      <div><p><strong>{i.toDisplayName}</strong> <span className="muted">@{i.toUsername}</span><br /><span className="muted">{i.groupName} · {i.status}</span></p><InvitationDelivery status={deliveries?.find(d => d.invitationId === i.id)?.status} /></div>      {i.status === "pending" ? <button className="btn" disabled={busy} onClick={() => run(() => cancel({ invitationId: i.id }))}>Cancel invitation</button> : null}
     </div>)}</section> : null}
     {error ? <p className="error" role="alert">{error}</p> : null}
   </>}</AccountShell>;
